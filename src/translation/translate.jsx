@@ -46,15 +46,15 @@ const replaceKey = (key, noSpan, language, params) => {
       let text = !translate(key)
         ? key + "***NO_KEY***"
         : !translate(key)[language]
-        ? key + "***NO_TRANSLATION**"
-        : translate(key)[language]
-        ? translate(key)[language] + "*TRANSLATED*"
-        : key;
-      
+          ? key + "***NO_TRANSLATION**"
+          : translate(key)[language]
+            ? translate(key)[language] + "*TRANSLATED*"
+            : key;
+
       // Handle parameter substitution
       if (params && Array.isArray(params)) {
         params.forEach((param, index) => {
-          text = text.replace(new RegExp(`\\{${index}\\}`, 'g'), param);
+          text = text.replace(new RegExp(`\\{${index}\\}`, "g"), param);
         });
       }
       return text;
@@ -70,14 +70,15 @@ const replaceKey = (key, noSpan, language, params) => {
       );
     }
   } else {
-    let text = translate(key) && translate(key)[language]
-      ? translate(key)[language]
-      : key;
-    
+    let text =
+      translate(key) && translate(key)[language]
+        ? translate(key)[language]
+        : key;
+
     // Handle parameter substitution
     if (params && Array.isArray(params)) {
       params.forEach((param, index) => {
-        text = text.replace(new RegExp(`\\{${index}\\}`, 'g'), param);
+        text = text.replace(new RegExp(`\\{${index}\\}`, "g"), param);
       });
     }
     return text;

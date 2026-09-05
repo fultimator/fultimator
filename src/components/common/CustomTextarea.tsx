@@ -1,203 +1,303 @@
-import React, { useState, useRef, useCallback } from "react";
-import { TextareaAutosize, Button } from "@mui/material";
+import React, { useRef, useCallback, useState, useEffect } from "react";
+import { TextField, Button, Box } from "@mui/material";
+import ReactMarkdown from "react-markdown";
 import { useCustomTheme } from "../../hooks/useCustomTheme";
 
 interface CustomTextareaProps {
+  id?: string;
   label: string;
   value: string;
-  helperText: string;
+  previewValue?: string;
+  helperText?: string;
   onChange: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
   onFocus?: (event: React.FocusEvent<HTMLTextAreaElement>) => void;
   onBlur?: (event: React.FocusEvent<HTMLTextAreaElement>) => void;
-  onMouseOver?: (event: React.MouseEvent<HTMLTextAreaElement>) => void;
-  onMouseOut?: (event: React.MouseEvent<HTMLTextAreaElement>) => void;
+  onMouseOver?: (event: React.MouseEvent<HTMLElement>) => void;
+  onMouseOut?: (event: React.MouseEvent<HTMLElement>) => void;
   readOnly?: boolean;
+  disabled?: boolean;
+  minRows?: number;
   maxRows?: number;
   maxLength?: number;
+  placeholder?: string;
 }
 
 const CustomTextarea: React.FC<CustomTextareaProps> = ({
+  id,
   label,
   value,
-  helperText,
+  previewValue,
+  helperText = "",
   onChange,
   onFocus,
   onBlur,
   onMouseOver,
   onMouseOut,
   readOnly = false,
+  disabled = false,
+  minRows,
   maxRows,
   maxLength,
+  placeholder,
 }) => {
   const theme = useCustomTheme();
-  const isDarkMode = theme.mode === "dark";
   const [isFocused, setIsFocused] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
+  const [pendingFocus, setPendingFocus] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const handleFocus = useCallback((e: React.FocusEvent<HTMLTextAreaElement>) => {
-    setIsFocused(true);
-    if (onFocus) onFocus(e);
-  }, [onFocus]);
+  const effectiveMinRows = minRows || 4;
+  const showPreview = !isFocused && !!value;
 
-  const handleBlur = useCallback((e: React.FocusEvent<HTMLTextAreaElement>) => {
-    setIsFocused(false);
-    if (onBlur) onBlur(e);
-  }, [onBlur]);
-
-  const handleMouseOver = useCallback((e: React.MouseEvent<HTMLTextAreaElement>) => {
-    setIsHovered(true);
-    if (onMouseOver) onMouseOver(e);
-  }, [onMouseOver]);
-
-  const handleMouseOut = useCallback((e: React.MouseEvent<HTMLTextAreaElement>) => {
-    setIsHovered(false);
-    if (onMouseOut) onMouseOut(e);
-  }, [onMouseOut]);
-
-  const handleFormat = useCallback((format: string) => {
-    const textarea = textareaRef.current;
-
-    if (!textarea) return;
-
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const selectedText = value.substring(start, end);
-    let formattedText = "";
-
-    switch (format) {
-      case "bold":
-        formattedText = `**${selectedText}**`;
-        break;
-      case "italic":
-        formattedText = `*${selectedText}*`;
-        break;
-      case "brackets":
-        formattedText = `【${selectedText}】`;
-        break;
-      default:
-        break;
+  useEffect(() => {
+    if (pendingFocus && textareaRef.current) {
+      textareaRef.current.focus();
+      setPendingFocus(false);
     }
+  }, [pendingFocus]);
 
-    const newText = `${value.substring(0, start)}${formattedText}${value.substring(end)}`;
+  const handleFocus = useCallback(
+    (e: React.FocusEvent<HTMLTextAreaElement>) => {
+      if (!readOnly) setIsFocused(true);
+      if (onFocus) onFocus(e);
+    },
+    [onFocus, readOnly],
+  );
 
-    onChange({
-      target: { value: newText },
-    } as React.ChangeEvent<HTMLTextAreaElement>);
+  const handleBlur = useCallback(
+    (e: React.FocusEvent<HTMLTextAreaElement>) => {
+      setIsFocused(false);
+      if (onBlur) onBlur(e);
+    },
+    [onBlur],
+  );
 
-    textarea.setSelectionRange(start + 2, start + 2 + selectedText.length);
-    textarea.focus();
-  }, [value, onChange]);
+  const handleMouseOver = useCallback(
+    (e: React.MouseEvent<HTMLElement>) => {
+      if (onMouseOver) onMouseOver(e);
+    },
+    [onMouseOver],
+  );
 
-  const { fontFamily, fontSize } = theme.typography.body1;
+  const handleMouseOut = useCallback(
+    (e: React.MouseEvent<HTMLElement>) => {
+      if (onMouseOut) onMouseOut(e);
+    },
+    [onMouseOut],
+  );
 
-  const textareaStyle: React.CSSProperties = {
+  const handleFormat = useCallback(
+    (format: string) => {
+      const textarea = textareaRef.current;
+      if (!textarea || readOnly) return;
+
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      const selectedText = value.substring(start, end);
+      let formattedText = "";
+      let cursorOffset = 0;
+
+      switch (format) {
+        case "bold":
+          formattedText = `**${selectedText}**`;
+          cursorOffset = 2;
+          break;
+        case "italic":
+          formattedText = `*${selectedText}*`;
+          cursorOffset = 1;
+          break;
+        case "brackets":
+          formattedText = `【${selectedText}】`;
+          cursorOffset = 1;
+          break;
+        default:
+          return;
+      }
+
+      const newText = `${value.substring(0, start)}${formattedText}${value.substring(end)}`;
+      onChange({
+        target: { value: newText },
+      } as React.ChangeEvent<HTMLTextAreaElement>);
+
+      requestAnimationFrame(() => {
+        textarea.focus();
+        textarea.setSelectionRange(
+          start + cursorOffset,
+          start + cursorOffset + selectedText.length,
+        );
+      });
+    },
+    [value, onChange, readOnly],
+  );
+
+  const textFieldSx = {
     width: "100%",
-    padding: "14px",
-    fontSize: "1rem",
-    lineHeight: fontSize,
-    fontFamily: fontFamily,
-    borderRadius: "4px",
-    border: isFocused ? "none" : `1px solid ${isDarkMode ? "rgba(255, 255, 255, 0.23)" : "rgba(0, 0, 0, 0.23)"}`,
-    outline: isHovered && !isFocused ? `1px solid white` : "none",
-    resize: "vertical",
-    boxShadow: isFocused ? `0 0 0 1px ${isDarkMode ? "#ffffff": theme.primary}` : "none",
-    backgroundColor: readOnly ? "#f5f5f5" : `${theme.transparent}`,
-    cursor: readOnly ? "not-allowed" : "text",
-    color: isDarkMode ? "white" : "black",
-    transition: 'border 0.3s ease, box-shadow 0.3s ease',
-    display: "flex",
-    alignItems: "center",
+    "& .MuiOutlinedInput-input": {
+      fontFamily: theme.typography.body1.fontFamily,
+      fontSize: theme.typography.body1.fontSize,
+      lineHeight: "1.4375em",
+    },
+    "& .MuiOutlinedInput-input::placeholder": {
+      color: theme.text.secondary,
+      opacity: 0.7,
+    },
+    "& .MuiFormHelperText-root": {
+      marginLeft: 0,
+      marginRight: 0,
+      marginTop: "4px",
+      marginBottom: 0,
+    },
   };
 
-  const labelStyle: React.CSSProperties = {
-    position: "absolute",
-    padding: "0 2px",
-    top: isFocused || value ? "-8px" : "16px",
-    backgroundColor: isDarkMode ? "#252525" : "white",
-    left: "14px",
-    transition: "top 0.2s ease, font-size 0.2s ease",
-    fontSize: isFocused || value ? "0.8rem" : "1rem",
-    lineHeight: fontSize,
-    fontFamily: fontFamily,
-    color: isFocused ? (isDarkMode ? 'rgba(255, 255, 255, 0.87)' : 'black') : (isDarkMode ? '#b0b0b0' : 'black'),
-    pointerEvents: "none",
-    borderRadius: "4px",
-  };
+  const inputHideStyle: React.CSSProperties =
+    showPreview && !readOnly ? { opacity: 0, userSelect: "none" } : {};
 
-  const helperStyle: React.CSSProperties = {
-    fontSize: "0.8rem",
-    color: isDarkMode ? "white" : "#252525",
-    marginTop: "4px",
-    marginRight: "14px",
-    marginBottom: "0",
-    marginLeft: "14px",
-  };
-
-  const toolbarStyle: React.CSSProperties = {
-    position: "absolute",
-    top: "-10px",
-    right: "10px",
-    display: "flex",
-    border: isFocused 
-    ? `1px solid ${isDarkMode ? 'rgba(255, 255, 255, 0.87)' : 'rgba(0, 0, 0, 0.87)'}` 
-    : `1px solid ${isDarkMode ? '#b0b0b0' : theme.ternary}`,
-  outline: isHovered && !isFocused ? `1px solid white` : "none",
-    borderRadius: "50px",
-    overflow: "hidden",
-    backgroundColor: isDarkMode ? "#252525" : `${theme.ternary}`,
-  };
-
-  const buttonStyle: React.CSSProperties = {
-    fontSize: "12px",
-    padding: "0",
-    marginRight: "8px",
-    transition: "font-weight 0.3s ease",
-    fontWeight: "normal",
-    color: isDarkMode ? "white" : "black",
-  };
   return (
-    <div style={{ position: "relative", margin: "5px 0" }}>
-      <div style={toolbarStyle}>
+    <Box sx={{ my: "5px", position: "relative" }}>
+      <Box
+        sx={{ position: "relative" }}
+        onMouseDown={(e) => {
+          if (showPreview && !readOnly) {
+            e.preventDefault();
+            setIsFocused(true);
+            setPendingFocus(true);
+          }
+        }}
+      >
+        <TextField
+          id={id}
+          inputRef={textareaRef}
+          label={label}
+          value={value}
+          onChange={(e) =>
+            onChange(e as React.ChangeEvent<HTMLTextAreaElement>)
+          }
+          onFocus={handleFocus}
+          onBlur={handleBlur}
+          onMouseOver={handleMouseOver}
+          onMouseOut={handleMouseOut}
+          multiline
+          minRows={effectiveMinRows}
+          maxRows={maxRows}
+          slotProps={{
+            htmlInput: {
+              maxLength,
+              tabIndex: showPreview ? -1 : 0,
+              style: inputHideStyle,
+              readOnly,
+            },
+            inputLabel: readOnly
+              ? {
+                  style: {
+                    color:
+                      theme.mode === "dark"
+                        ? "rgba(255,255,255,0.4)"
+                        : "rgba(36,52,70,0.45)",
+                  },
+                }
+              : undefined,
+          }}
+          placeholder={placeholder}
+          helperText={helperText}
+          variant="outlined"
+          fullWidth
+          disabled={disabled}
+          sx={textFieldSx}
+        />
+
+        {showPreview && !readOnly ? (
+          <Box
+            sx={{
+              position: "absolute",
+              top: "14px",
+              left: "14px",
+              right: "14px",
+              bottom: helperText ? "26px" : "14px",
+              overflow: "auto",
+              color: theme.text.primary,
+              fontFamily: theme.typography.body1.fontFamily,
+              fontSize: theme.typography.body1.fontSize,
+              lineHeight: "1.4375em",
+              pointerEvents: "none",
+              "& p": { margin: 0 },
+              "& p + p": { marginTop: 0 },
+              "& ul, & ol": {
+                margin: "0 0 0 1.25rem",
+                padding: 0,
+              },
+            }}
+          >
+            <ReactMarkdown>{previewValue ?? value}</ReactMarkdown>
+          </Box>
+        ) : null}
+      </Box>
+
+      <Box
+        sx={{
+          display: isFocused ? "flex" : "none",
+          gap: "4px",
+          mt: "8px",
+          mb: isFocused ? "8px" : "0",
+          p: "6px 8px",
+          border: `1px solid ${theme.ternary || theme.primary}`,
+          borderRadius: "50px",
+          backgroundColor: theme.background.paper,
+          boxShadow: `0 1px 3px rgba(0, 0, 0, ${theme.mode === "dark" ? "0.5" : "0.2"})`,
+          width: "fit-content",
+        }}
+      >
         <Button
-          onClick={() => handleFormat("bold")}
-          style={buttonStyle}
+          size="small"
+          onMouseDown={(e) => {
+            e.preventDefault();
+            handleFormat("bold");
+          }}
           disabled={readOnly}
+          sx={{
+            fontSize: "12px",
+            padding: "6px 8px",
+            minWidth: "auto",
+            textTransform: "none",
+            color: theme.text.primary,
+          }}
         >
           Bold
         </Button>
         <Button
-          onClick={() => handleFormat("italic")}
-          style={buttonStyle}
+          size="small"
+          onMouseDown={(e) => {
+            e.preventDefault();
+            handleFormat("italic");
+          }}
           disabled={readOnly}
+          sx={{
+            fontSize: "12px",
+            padding: "6px 8px",
+            minWidth: "auto",
+            textTransform: "none",
+            color: theme.text.primary,
+          }}
         >
           Italic
         </Button>
         <Button
-          onClick={() => handleFormat("brackets")}
-          style={buttonStyle}
+          size="small"
+          onMouseDown={(e) => {
+            e.preventDefault();
+            handleFormat("brackets");
+          }}
           disabled={readOnly}
+          sx={{
+            fontSize: "12px",
+            padding: "6px 8px",
+            minWidth: "auto",
+            textTransform: "none",
+            color: theme.text.primary,
+          }}
         >
           【】
         </Button>
-      </div>
-      <TextareaAutosize
-        ref={textareaRef}
-        aria-label={label}
-        value={value}
-        onChange={onChange}
-        onFocus={handleFocus}
-        onBlur={handleBlur}
-        onMouseOver={handleMouseOver}
-        onMouseOut={handleMouseOut}
-        readOnly={readOnly}
-        style={textareaStyle}
-        maxRows={maxRows}
-        maxLength={maxLength}
-      />
-      <label style={labelStyle}>{label}</label>
-      <div style={helperStyle}>{helperText}</div>
-    </div>
+      </Box>
+    </Box>
   );
 };
 

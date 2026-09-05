@@ -1,14 +1,10 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Typography,
   ListItem,
   ListItemText,
-  ListItemSecondaryAction,
   IconButton,
-  Button,
-  Checkbox,
-  Popover,
   Menu,
   MenuItem,
   Tooltip,
@@ -19,42 +15,79 @@ import {
   Delete,
   MoreVert,
   DragIndicator,
+  RadioButtonUnchecked,
 } from "@mui/icons-material";
+import TurnTokens from "./TurnTokens";
+import ResourceInlineBars from "./ResourceInlineBars";
+import ResourceInlineReadout from "./ResourceInlineReadout";
 import { calcHP, calcMP } from "../../../libs/npcs";
+import { villainUltimaMax } from "../../../routes/combat/combatSimulator";
 import { GiDeathSkull } from "react-icons/gi";
-import { IoIosWarning } from "react-icons/io";
 import { t } from "../../../translation/translate";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { useTheme } from "@mui/material/styles";
+import { alpha, useTheme } from "@mui/material/styles";
+import { useCombatEncounterStore } from "../../../stores/combatEncounterStore";
 
 export default function NpcListItem({
   npc,
   index,
   selectedNpcID,
   handleListItemClick,
-  handlePopoverOpen,
-  handlePopoverClose,
+  _handlePopoverOpen,
+  _handlePopoverClose,
   handleUpdateNpcTurns,
   handleMenuOpen,
   handleMenuClose,
   handleMoveUp,
   handleMoveDown,
   handleRemoveNPC,
-  anchorEl,
   anchorMenu,
-  popoverNpcId,
   selectedNpcMenu,
-  isMobile,
   getTurnCount,
   handleHpMpClick,
   selectedNPCs,
   useDragAndDrop,
+  combatActive = false,
+  isActiveFaction = false,
+  activeTurnIndex = null,
+  onStartTurn,
+  onEndTurn,
+  onRowNode,
 }) {
   const theme = useTheme();
   const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
   const isDarkMode = theme.palette.mode === "dark";
+  const error = theme.palette.error;
+  const text = theme.palette.text;
+
+  const { targets, setTarget, toggleTarget, runtimeActors } =
+    useCombatEncounterStore();
+  const runtime = runtimeActors[npc.combatId];
+  const currentHp = npc.combatStats?.currentHp ?? runtime?.currentHp ?? 0;
+  const currentMp = npc.combatStats?.currentMp ?? runtime?.currentMp ?? 0;
+  const currentUp = npc.villain ? (npc.combatStats?.ultima ?? 0) : null;
+  const maxUp = npc.villain ? villainUltimaMax(npc.villain) : null;
+  const [hovered, setHovered] = useState(false);
+  const isTargeted = targets.some((t) => t.combatId === npc.combatId);
+
+  useEffect(() => {
+    if (!hovered) return;
+    const handleKeyDown = (e) => {
+      if (e.key !== "t" && e.key !== "T") return;
+      const tag = document.activeElement?.tagName;
+      if (["INPUT", "TEXTAREA", "SELECT"].includes(tag)) return;
+      const ref = { combatId: npc.combatId, name: npc.name, source: "npc" };
+      if (e.shiftKey) {
+        toggleTarget(ref);
+      } else {
+        setTarget(ref);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [hovered, npc.combatId, npc.name, setTarget, toggleTarget]);
 
   const {
     attributes,
@@ -81,44 +114,50 @@ export default function NpcListItem({
 
   return (
     <ListItem
-      ref={setNodeRef}
+      ref={(node) => {
+        setNodeRef(node);
+        onRowNode?.(npc.combatId, node);
+      }}
       style={style}
       key={npc.combatId}
-      button
       onClick={(e) => npc.id && handleListItemClick(e, npc.combatId)}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
       sx={{
-        border: isDarkMode
-          ? selectedNpcID && selectedNpcID === npc.combatId
-            ? "1px solid #fff"
-            : "1px solid #555"
-          : selectedNpcID && selectedNpcID === npc.combatId
-          ? "1px solid " + primary
-          : "1px solid #ddd",
-        marginY: 1,
-        borderRadius: 1,
+        border:
+          selectedNpcID && selectedNpcID === npc.combatId
+            ? `2px solid ${theme.palette.error.main}`
+            : `1px solid ${alpha(theme.palette.error.main, 0.28)}`,
+        marginY: 0.35,
+        borderRadius: 1.2,
+        position: "relative",
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        backgroundColor: isDarkMode
-          ? npc.combatStats?.currentHp === 0
-            ? "#5c1010"
-            : "#333"
-          : npc.combatStats?.currentHp === 0
-          ? "#ffe6e6"
-          : "inherit",
+        backgroundColor:
+          currentHp === 0
+            ? isDarkMode
+              ? "rgba(211,47,47,0.22)"
+              : "#ffeaea"
+            : isDarkMode
+              ? "rgba(255,255,255,0.04)"
+              : "rgba(255,244,246,0.82)",
         "&:hover": {
-          backgroundColor: isDarkMode
-            ? npc.combatStats?.currentHp === 0
-              ? "#6f0000"
-              : "#444"
-            : npc.combatStats?.currentHp === 0
-            ? "#ffcccc"
-            : "#f1f1f1",
+          backgroundColor:
+            currentHp === 0
+              ? isDarkMode
+                ? "rgba(211,47,47,0.3)"
+                : "#ffdede"
+              : isDarkMode
+                ? "rgba(255,255,255,0.07)"
+                : "rgba(255,248,250,0.98)",
         },
-        paddingY: 1,
+        paddingY: 0.5,
         flexDirection: "row",
-        overflow: "hidden",
+        overflow: "visible",
         cursor: npc.id ? "pointer" : "default",
+        containerType: "inline-size",
+        containerName: "initiative-row",
       }}
     >
       {/* Drag Handle */}
@@ -131,12 +170,12 @@ export default function NpcListItem({
             alignItems: "center",
             justifyContent: "center",
             height: "100%",
-            width: "40px",
+            width: "24px",
             cursor: "grab",
-            marginRight: 1,
-            color: isDarkMode ? "#888" : "#666",
+            marginRight: 0.5,
+            color: text.secondary,
             "&:hover": {
-              color: isDarkMode ? "#ccc" : "#333",
+              color: text.primary,
             },
             touchAction: "none",
           }}
@@ -145,23 +184,82 @@ export default function NpcListItem({
         </Box>
       )}
 
+      {/* Selected indicator badge */}
+      {selectedNpcID === npc.combatId && (
+        <Tooltip title="Selected" enterDelay={300}>
+          <Box
+            sx={{
+              position: "absolute",
+              top: -10,
+              left: isTargeted ? 32 : 8,
+              width: 20,
+              height: 20,
+              borderRadius: "50%",
+              backgroundColor: primary,
+              border: `2px solid ${theme.palette.background.paper}`,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              zIndex: 10,
+              boxShadow: `0 0 0 1px ${primary}`,
+            }}
+          >
+            <RadioButtonUnchecked
+              sx={{ fontSize: 11, color: "primary.contrastText" }}
+            />
+          </Box>
+        </Tooltip>
+      )}
+
+      {/* Target indicator badge */}
+      {isTargeted && (
+        <Tooltip title="Targeted (T / Shift+T)" enterDelay={300}>
+          <Box
+            sx={{
+              position: "absolute",
+              top: -10,
+              left: 8,
+              width: 20,
+              height: 20,
+              borderRadius: "50%",
+              backgroundColor: theme.palette.warning.main,
+              border: `2px solid ${theme.palette.background.paper}`,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              zIndex: 10,
+              boxShadow: `0 0 0 1px ${theme.palette.warning.main}`,
+            }}
+          >
+            <img
+              src="/assets/icons/checks/roll_target.png"
+              alt="targeted"
+              style={{ width: 12, height: 12 }}
+            />
+          </Box>
+        </Tooltip>
+      )}
+
       {/* Left: Index */}
       <Box
         sx={{
           display: "flex",
+          flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          width: isMobile ? "5px" : "10px",
+          width: 24,
           height: "100%",
-          borderRight: "1px solid #ccc",
-          padding: "0 10px",
+          borderRight: `1px solid ${theme.palette.divider}`,
+          padding: "0 7px",
+          gap: "2px",
         }}
       >
         <Typography
           variant="h6"
           sx={{
             fontWeight: "bold",
-            color: isDarkMode ? "#fff" : "#333",
+            color: text.primary,
+            fontSize: "0.92rem",
           }}
         >
           {index + 1}
@@ -175,11 +273,13 @@ export default function NpcListItem({
               whiteSpace: "nowrap",
               overflow: "hidden",
               textOverflow: "ellipsis",
+              fontFamily: "Antonio",
+              fontWeight: 700,
               fontSize: {
-                xs: "0.7rem",
-                sm: "0.8rem",
-                md: "0.9rem",
-                lg: "1rem",
+                xs: "0.95rem",
+                sm: "1.02rem",
+                md: "1.06rem",
+                lg: "1.08rem",
               },
               maxWidth:
                 npc.combatStats.turns.length > 1
@@ -188,7 +288,7 @@ export default function NpcListItem({
             }}
           >
             {npc.id ? (
-              npc.combatStats?.currentHp === 0 ? (
+              currentHp === 0 ? (
                 <>
                   <GiDeathSkull style={{ marginRight: 5 }} />
                   {npc.name}
@@ -215,308 +315,141 @@ export default function NpcListItem({
         }
         secondary={
           npc.id && (
-            <>
-              <Tooltip
-                title={t("combat_sim_edit_hp")}
-                enterDelay={500}
-                enterNextDelay={500}
-              >
-                <Typography
-                  component="span"
-                  variant="h5"
-                  sx={{
-                    color:
-                      npc.combatStats?.currentHp <= Math.floor(calcHP(npc) / 2)
-                        ? "#D32F2F"
-                        : "#4CAF50",
-                    fontWeight: "bold",
-                    transition: "color 0.2s ease-in-out",
-                    "&:hover": {
-                      color:
-                        npc.combatStats?.currentHp <=
-                        Math.floor(calcHP(npc) / 2)
-                          ? "#B71C1C"
-                          : "#388E3C",
-                      textDecoration: "underline",
-                    },
-                  }}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleHpMpClick("HP", npc);
-                  }}
-                >
-                  {npc.combatStats?.currentHp}/{calcHP(npc)} {t("HP")}{" "}
-                  {npc.combatStats?.currentHp <=
-                    Math.floor(calcHP(npc) / 2) && (
-                    <IoIosWarning
-                      style={{
-                        fontSize: "1.2em",
-                        textAlign: "center",
-                        verticalAlign: "middle",
-                      }}
-                    />
-                  )}
-                </Typography>
-              </Tooltip>
-              {" | "}
-              <Tooltip
-                title={t("combat_sim_edit_mp")}
-                enterDelay={500}
-                enterNextDelay={500}
-              >
-                <Typography
-                  component="span"
-                  variant="h5"
-                  sx={{
-                    color: "#2196F3",
-                    fontWeight: "bold",
-                    transition: "color 0.2s ease-in-out",
-                    "&:hover": {
-                      color: "#1976D2",
-                      textDecoration: "underline",
-                    },
-                  }}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleHpMpClick("MP", npc);
-                  }}
-                >
-                  {npc.combatStats?.currentMp}/{calcMP(npc)} {t("MP")}
-                </Typography>
-              </Tooltip>
-            </>
+            <Box>
+              <ResourceInlineReadout
+                currentHp={currentHp}
+                maxHp={calcHP(npc)}
+                currentMp={currentMp}
+                maxMp={calcMP(npc)}
+                hpColor={error.main}
+                hpHover={error.dark}
+                mpColor={theme.palette.info.main}
+                mpHover={theme.palette.info.dark}
+                currentUp={currentUp}
+                maxUp={maxUp}
+                upColor="#674168"
+                upHover="#563257"
+                onHpClick={(e) => {
+                  e.stopPropagation();
+                  handleHpMpClick("HP", npc);
+                }}
+                onMpClick={(e) => {
+                  e.stopPropagation();
+                  handleHpMpClick("MP", npc);
+                }}
+                onUpClick={(e) => {
+                  e.stopPropagation();
+                  handleHpMpClick("UP", npc);
+                }}
+              />
+              <ResourceInlineBars
+                hpPct={calcHP(npc) > 0 ? (currentHp / calcHP(npc)) * 100 : 0}
+                mpPct={calcMP(npc) > 0 ? (currentMp / calcMP(npc)) * 100 : 0}
+                hpColor={theme.palette.error.main}
+                mpColor={theme.palette.info.main}
+                tone="npc"
+              />
+            </Box>
           )
         }
+        disableTypography
         sx={{
           flex: 1,
-          paddingLeft: 2,
+          paddingLeft: 1,
           fontWeight: "500",
           fontSize: "1rem",
           overflow: "hidden",
+          my: 0,
         }}
       />
 
       {/* Popover for extra turn checkboxes */}
-      <Popover
-        open={Boolean(anchorEl) && popoverNpcId === npc.combatId}
-        anchorEl={anchorEl}
-        onClose={handlePopoverClose}
-        anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "center",
-        }}
-        transformOrigin={{
-          vertical: "top",
-          horizontal: "center",
-        }}
-        sx={{
-          zIndex: 1300,
-        }}
-      >
-        <Box sx={{ padding: 1 }}>
-          {npc.combatStats.turns.map((turnTaken, turnIndex) => (
-            <Checkbox
-              key={turnIndex}
-              checked={turnTaken}
-              onChange={(e) => {
-                e.stopPropagation();
-                const newTurns = [...npc.combatStats.turns];
-                newTurns[turnIndex] = e.target.checked;
-                handleUpdateNpcTurns(npc.combatId, newTurns);
-              }}
-              color="success"
-              sx={{ padding: "2px" }}
-            />
-          ))}
-        </Box>
-      </Popover>
       {/* Actions */}
       {npc.id ? (
-        <ListItemSecondaryAction
+        <Box
           sx={{
             display: "flex",
             alignItems: "center",
             justifyContent: "flex-end",
-            minWidth: "120px",
+            minWidth: "92px",
             flexShrink: 0,
             zIndex: 5, // Prevent overlap with turn counter
+            gap: 0.25,
           }}
         >
-          {/* Turn Counter or Checkboxes */}
-          {npc.combatStats.turns.length > 1 ? (
-            <Tooltip
-              title={t("combat_sim_check_turn")}
-              enterDelay={500}
-              enterNextDelay={500}
+          {/* Turn tokens */}
+          <TurnTokens
+            turns={npc.combatStats.turns}
+            combatActive={combatActive}
+            isActiveFaction={isActiveFaction}
+            activeTurnIndex={activeTurnIndex}
+            onStartTurn={onStartTurn}
+            onEndTurn={onEndTurn}
+            onToggle={(newTurns) =>
+              handleUpdateNpcTurns(npc.combatId, newTurns)
+            }
+            color="primary"
+          />
+          <>
+            <IconButton
+              edge="end"
+              color="primary"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleMenuOpen(e, npc.combatId);
+              }}
+              sx={{ padding: 0.5 }}
             >
-              <Button
-                variant={
-                  npc.combatStats.turns?.every((turn) => turn)
-                    ? "contained"
-                    : "outlined"
-                }
-                color={
-                  npc.combatStats.turns?.every((turn) => turn)
-                    ? "success"
-                    : "inherit"
-                }
-                onClick={(event) => {
-                  event.stopPropagation();
-                  handlePopoverOpen(event, npc.combatId);
-                }}
-                sx={{
-                  zIndex: 10,
-                }}
-                size={isMobile ? "small" : "medium"}
-              >
-                {npc.combatStats.turns.filter((turn) => turn).length} /{" "}
-                {npc.combatStats.turns.length}
-              </Button>
-            </Tooltip>
-          ) : (
-            npc.combatStats.turns.slice(0, 3).map((turnTaken, turnIndex) => (
-              <Tooltip
-                title={t("combat_sim_check_turn")}
-                key={turnIndex}
-                enterDelay={500}
-                enterNextDelay={500}
-              >
-                <Checkbox
-                  checked={turnTaken}
-                  onChange={(e) => {
-                    const newTurns = [...npc.combatStats.turns];
-                    newTurns[turnIndex] = e.target.checked;
-                    handleUpdateNpcTurns(npc.combatId, newTurns);
-                  }}
-                  color="success"
-                  sx={{ padding: "2px", zIndex: 10 }}
-                />
-              </Tooltip>
-            ))
-          )}
-          {isMobile && !useDragAndDrop ? (
-            <>
-              <IconButton
-                edge="end"
-                color="primary"
+              <MoreVert fontSize="small" />
+            </IconButton>
+            <Menu
+              anchorEl={anchorMenu}
+              open={Boolean(anchorMenu) && selectedNpcMenu === npc.combatId}
+              onClose={(e) => handleMenuClose(e)}
+            >
+              <MenuItem
                 onClick={(e) => {
-                  e.stopPropagation();
-                  handleMenuOpen(e, npc.combatId);
+                  handleMoveUp(npc.combatId);
+                  handleMenuClose(e);
                 }}
-                sx={{ padding: 1 }}
+                disabled={index === 0}
               >
-                <MoreVert fontSize="small" />
-              </IconButton>
-              <Menu
-                anchorEl={anchorMenu}
-                open={Boolean(anchorMenu) && selectedNpcMenu === npc.combatId}
-                onClose={(e) => handleMenuClose(e)}
-              >
-                <MenuItem
-                  onClick={(e) => {
-                    handleMoveUp(npc.combatId);
-                    handleMenuClose(e);
-                  }}
-                  disabled={index === 0}
-                >
-                  <ArrowUpward fontSize="small" />
-                  {" " + t("combat_sim_move_up")}
-                </MenuItem>
-                <MenuItem
-                  onClick={(e) => {
-                    handleMoveDown(npc.combatId);
-                    handleMenuClose(e);
-                  }}
-                  disabled={index === selectedNPCs.length - 1}
-                >
-                  <ArrowDownward fontSize="small" />
-                  {" " + t("combat_sim_move_down")}
-                </MenuItem>
-
-                <MenuItem
-                  onClick={(e) => {
-                    handleRemoveNPC(npc.combatId);
-                    handleMenuClose(e);
-                  }}
-                  sx={{ color: "error.main" }}
-                >
-                  <Delete fontSize="small" />
-                  {" " + t("combat_sim_delete")}
-                </MenuItem>
-              </Menu>
-            </>
-          ) : (
-            <>
-              {!useDragAndDrop && (
-                <>
-                  {" "}
-                  <IconButton
-                    edge="end"
-                    color={isDarkMode ? "secondary" : "primary"}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleMoveUp(npc.combatId);
-                    }}
-                    disabled={index === 0}
-                    sx={{ padding: 1 }}
-                  >
-                    <Tooltip
-                      title={t("combat_sim_move_up")}
-                      enterDelay={500}
-                      enterNextDelay={500}
-                    >
-                      <ArrowUpward fontSize="small" />
-                    </Tooltip>
-                  </IconButton>
-                  <IconButton
-                    edge="end"
-                    color={isDarkMode ? "secondary" : "primary"}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleMoveDown(npc.combatId);
-                    }}
-                    disabled={index === selectedNPCs.length - 1}
-                    sx={{ padding: 1 }}
-                  >
-                    <Tooltip
-                      title={t("combat_sim_move_down")}
-                      enterDelay={500}
-                      enterNextDelay={500}
-                    >
-                      <ArrowDownward fontSize="small" />
-                    </Tooltip>
-                  </IconButton>
-                </>
-              )}
-              <IconButton
-                edge="end"
-                color="error"
+                <ArrowUpward fontSize="small" />
+                {" " + t("combat_sim_move_up")}
+              </MenuItem>
+              <MenuItem
                 onClick={(e) => {
-                  e.stopPropagation();
+                  handleMoveDown(npc.combatId);
+                  handleMenuClose(e);
+                }}
+                disabled={index === selectedNPCs.length - 1}
+              >
+                <ArrowDownward fontSize="small" />
+                {" " + t("combat_sim_move_down")}
+              </MenuItem>
+              <MenuItem
+                onClick={(e) => {
                   handleRemoveNPC(npc.combatId);
+                  handleMenuClose(e);
                 }}
-                sx={{ padding: 1 }}
+                sx={{ color: "error.main" }}
               >
-                <Tooltip
-                  title={t("combat_sim_delete")}
-                  enterDelay={500}
-                  enterNextDelay={500}
-                >
-                  <Delete fontSize="small" />
-                </Tooltip>
-              </IconButton>
-            </>
-          )}
-        </ListItemSecondaryAction>
+                <Delete fontSize="small" />
+                {" " + t("combat_sim_delete")}
+              </MenuItem>
+            </Menu>
+          </>
+        </Box>
       ) : (
-        <ListItemSecondaryAction
+        <Box
           sx={{
             display: "flex",
             alignItems: "center",
             justifyContent: "flex-end",
-            minWidth: "120px",
+            minWidth: "92px",
             flexShrink: 0,
             zIndex: 5, // Prevent overlap with turn counter
+            gap: 0.25,
           }}
         >
           <IconButton
@@ -526,11 +459,11 @@ export default function NpcListItem({
               e.stopPropagation();
               handleRemoveNPC(npc.combatId);
             }}
-            sx={{ padding: 1 }}
+            sx={{ padding: 0.5, ml: 0.25 }}
           >
             <Delete fontSize="small" />
           </IconButton>
-        </ListItemSecondaryAction>
+        </Box>
       )}
     </ListItem>
   );

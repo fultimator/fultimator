@@ -1,0 +1,541 @@
+import { useMemo, useState } from "react";
+import {
+  Grid,
+  TextField,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Button,
+  IconButton,
+  FormControlLabel,
+  Switch,
+  Divider,
+  Box,
+  FormHelperText,
+} from "@mui/material";
+import { Delete } from "@mui/icons-material";
+import attributes from "/src/libs/attributes";
+import DeleteConfirmationDialog from "/src/components/common/DeleteConfirmationDialog";
+
+const SECOND_EFFECT_DICE = [1, 2, 3, 4, 5, 6];
+const TARGET_DICE = Array.from({ length: 12 }, (_, i) => i + 1);
+
+const ERROR_MESSAGES = {
+  INSUFFICIENT_TARGETS: "At least two targets are required.",
+  INVALID_RANGE: "Each target range must be valid.",
+  OVERLAPPING_RANGES: "Ranges cannot overlap.",
+  INCOMPLETE_COVERAGE: "All 12 die faces must be covered without overlap.",
+  MISSING_EFFECT: "All target effect fields must be filled out.",
+  INCOMPLETE_SECOND_EFFECTS:
+    "All 6 die values for second effects must be covered.",
+  MISSING_SECOND_EFFECT: "All second effect fields must be filled out.",
+};
+
+const validateTargets = (targets) => {
+  if (targets.length < 2) return "INSUFFICIENT_TARGETS";
+
+  const normalized = targets
+    .map((target) => ({
+      from: Number(target?.rangeFrom),
+      to: Number(target?.rangeTo),
+      effect: String(target?.effect || "").trim(),
+    }))
+    .sort((a, b) => a.from - b.from);
+
+  if (
+    normalized.some(
+      (target) => !target.from || !target.to || target.from > target.to,
+    )
+  ) {
+    return "INVALID_RANGE";
+  }
+
+  for (let i = 0; i < normalized.length - 1; i += 1) {
+    if (normalized[i].to >= normalized[i + 1].from) {
+      return "OVERLAPPING_RANGES";
+    }
+  }
+
+  const covered = new Set();
+  normalized.forEach((target) => {
+    for (let value = target.from; value <= target.to; value += 1)
+      covered.add(value);
+  });
+  if (covered.size !== 12) return "INCOMPLETE_COVERAGE";
+  if (normalized.some((target) => !target.effect)) return "MISSING_EFFECT";
+
+  for (const target of targets) {
+    if (!target?.secondRoll) continue;
+    const secondEffects = Array.isArray(target.secondEffects)
+      ? target.secondEffects
+      : [];
+    if (secondEffects.length !== 6) return "INCOMPLETE_SECOND_EFFECTS";
+    const secondCovered = new Set(
+      secondEffects.map((entry) => Number(entry?.dieValue)),
+    );
+    if (
+      secondCovered.size !== 6 ||
+      SECOND_EFFECT_DICE.some((value) => !secondCovered.has(value))
+    ) {
+      return "INCOMPLETE_SECOND_EFFECTS";
+    }
+    if (secondEffects.some((entry) => !String(entry?.effect || "").trim())) {
+      return "MISSING_SECOND_EFFECT";
+    }
+  }
+
+  return null;
+};
+
+export default function GambleGeneralSection({ formState, setFormState, t }) {
+  const [pendingDelete, setPendingDelete] = useState(null);
+
+  const targets = useMemo(
+    () => (Array.isArray(formState.targets) ? formState.targets : []),
+    [formState.targets],
+  );
+
+  const validationErrorKey = useMemo(() => validateTargets(targets), [targets]);
+  const validationError = validationErrorKey
+    ? t(ERROR_MESSAGES[validationErrorKey])
+    : "";
+
+  const updateField = (field, value) => {
+    setFormState((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const updateTarget = (index, patch) => {
+    setFormState((prev) => {
+      const nextTargets = [
+        ...(Array.isArray(prev.targets) ? prev.targets : []),
+      ];
+      nextTargets[index] = { ...nextTargets[index], ...patch };
+      return { ...prev, targets: nextTargets };
+    });
+  };
+
+  const addTarget = () => {
+    setFormState((prev) => ({
+      ...prev,
+      targets: [
+        ...(Array.isArray(prev.targets) ? prev.targets : []),
+        {
+          rangeFrom: 1,
+          rangeTo: 1,
+          effect: "",
+          secondRoll: false,
+          secondEffects: [],
+        },
+      ],
+    }));
+  };
+
+  const removeTarget = (index) => {
+    setFormState((prev) => ({
+      ...prev,
+      targets: (Array.isArray(prev.targets) ? prev.targets : []).filter(
+        (_, i) => i !== index,
+      ),
+    }));
+  };
+
+  const addSecondEffect = (targetIndex) => {
+    const current = targets[targetIndex];
+    const usedDice = new Set(
+      (current?.secondEffects || []).map((entry) => Number(entry?.dieValue)),
+    );
+    const nextDie =
+      SECOND_EFFECT_DICE.find((value) => !usedDice.has(value)) || 1;
+
+    setFormState((prev) => {
+      const nextTargets = [
+        ...(Array.isArray(prev.targets) ? prev.targets : []),
+      ];
+      const secondEffects = Array.isArray(
+        nextTargets[targetIndex]?.secondEffects,
+      )
+        ? nextTargets[targetIndex].secondEffects
+        : [];
+      nextTargets[targetIndex] = {
+        ...nextTargets[targetIndex],
+        secondEffects: [...secondEffects, { dieValue: nextDie, effect: "" }],
+      };
+      return { ...prev, targets: nextTargets };
+    });
+  };
+
+  const updateSecondEffect = (targetIndex, effectIndex, patch) => {
+    setFormState((prev) => {
+      const nextTargets = [
+        ...(Array.isArray(prev.targets) ? prev.targets : []),
+      ];
+      const secondEffects = Array.isArray(
+        nextTargets[targetIndex]?.secondEffects,
+      )
+        ? [...nextTargets[targetIndex].secondEffects]
+        : [];
+      secondEffects[effectIndex] = { ...secondEffects[effectIndex], ...patch };
+      nextTargets[targetIndex] = { ...nextTargets[targetIndex], secondEffects };
+      return { ...prev, targets: nextTargets };
+    });
+  };
+
+  const removeSecondEffect = (targetIndex, effectIndex) => {
+    setFormState((prev) => {
+      const nextTargets = [
+        ...(Array.isArray(prev.targets) ? prev.targets : []),
+      ];
+      const secondEffects = Array.isArray(
+        nextTargets[targetIndex]?.secondEffects,
+      )
+        ? nextTargets[targetIndex].secondEffects.filter(
+            (_, i) => i !== effectIndex,
+          )
+        : [];
+      nextTargets[targetIndex] = { ...nextTargets[targetIndex], secondEffects };
+      return { ...prev, targets: nextTargets };
+    });
+  };
+
+  const confirmDelete = () => {
+    if (!pendingDelete) return;
+    if (pendingDelete.type === "target") {
+      removeTarget(pendingDelete.targetIndex);
+    } else if (pendingDelete.type === "secondEffect") {
+      removeSecondEffect(pendingDelete.targetIndex, pendingDelete.effectIndex);
+    }
+    setPendingDelete(null);
+  };
+
+  return (
+    <Grid container spacing={2}>
+      <Grid size={12}>
+        <TextField
+          label={t("Spell Name")}
+          fullWidth
+          value={formState.spellName || ""}
+          onChange={(e) => updateField("spellName", e.target.value)}
+          slotProps={{
+            htmlInput: { maxLength: 50 },
+          }}
+        />
+      </Grid>
+      <Grid
+        size={{
+          xs: 12,
+          md: 4,
+        }}
+      >
+        <TextField
+          type="number"
+          label={t("MP x Dice")}
+          fullWidth
+          value={formState.mp ?? 0}
+          onChange={(e) =>
+            updateField("mp", Math.max(0, Number(e.target.value) || 0))
+          }
+        />
+      </Grid>
+      <Grid
+        size={{
+          xs: 12,
+          md: 4,
+        }}
+      >
+        <TextField
+          type="number"
+          label={t("Max Throwable Dices")}
+          fullWidth
+          value={formState.maxTargets ?? 0}
+          onChange={(e) =>
+            updateField("maxTargets", Math.max(0, Number(e.target.value) || 0))
+          }
+        />
+      </Grid>
+      <Grid
+        size={{
+          xs: 12,
+          md: 4,
+        }}
+      >
+        <FormControl fullWidth>
+          <InputLabel>{t("Attribute")}</InputLabel>
+          <Select
+            value={formState.attr || "will"}
+            label={t("Attribute")}
+            onChange={(e) => updateField("attr", e.target.value)}
+          >
+            {Object.keys(attributes).map((key) => (
+              <MenuItem key={key} value={key}>
+                {attributes[key].shortcaps}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Grid>
+      <Grid size={12}>
+        <Divider />
+      </Grid>
+      {targets.map((target, targetIndex) => (
+        <Grid key={`target-${targetIndex}`} size={12}>
+          <Box
+            sx={{
+              border: "1px solid",
+              borderColor: "divider",
+              borderRadius: 1,
+              p: 1.5,
+            }}
+          >
+            <Grid container spacing={1.5} sx={{ alignItems: "center" }}>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 2,
+                }}
+              >
+                <FormControl fullWidth size="small">
+                  <InputLabel>{t("Range From")}</InputLabel>
+                  <Select
+                    value={target.rangeFrom ?? 1}
+                    label={t("Range From")}
+                    onChange={(e) =>
+                      updateTarget(targetIndex, {
+                        rangeFrom: Number(e.target.value),
+                      })
+                    }
+                  >
+                    {TARGET_DICE.map((value) => (
+                      <MenuItem key={value} value={value}>
+                        {value}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 2,
+                }}
+              >
+                <FormControl fullWidth size="small">
+                  <InputLabel>{t("Range To")}</InputLabel>
+                  <Select
+                    value={target.rangeTo ?? 1}
+                    label={t("Range To")}
+                    onChange={(e) =>
+                      updateTarget(targetIndex, {
+                        rangeTo: Number(e.target.value),
+                      })
+                    }
+                  >
+                    {TARGET_DICE.map((value) => (
+                      <MenuItem key={value} value={value}>
+                        {value}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 5,
+                }}
+              >
+                <TextField
+                  label={t("Effect")}
+                  fullWidth
+                  size="small"
+                  value={target.effect || ""}
+                  onChange={(e) =>
+                    updateTarget(targetIndex, { effect: e.target.value })
+                  }
+                  slotProps={{
+                    htmlInput: { maxLength: 200 },
+                  }}
+                />
+              </Grid>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 2,
+                }}
+              >
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={Boolean(target.secondRoll)}
+                      onChange={(e) =>
+                        updateTarget(targetIndex, {
+                          secondRoll: e.target.checked,
+                          secondEffects: e.target.checked
+                            ? target.secondEffects || []
+                            : [],
+                        })
+                      }
+                    />
+                  }
+                  label={t("Second Roll")}
+                />
+              </Grid>
+              <Grid
+                size={{
+                  xs: 12,
+                  sm: 1,
+                }}
+              >
+                <IconButton
+                  color="error"
+                  onClick={() =>
+                    setPendingDelete({ type: "target", targetIndex })
+                  }
+                >
+                  <Delete />
+                </IconButton>
+              </Grid>
+
+              {target.secondRoll && (
+                <Grid size={12}>
+                  <Grid container spacing={1}>
+                    {(target.secondEffects || []).map((entry, effectIndex) => (
+                      <Grid
+                        key={`target-${targetIndex}-effect-${effectIndex}`}
+                        size={12}
+                      >
+                        <Grid
+                          container
+                          spacing={1}
+                          sx={{ alignItems: "center" }}
+                        >
+                          <Grid
+                            size={{
+                              xs: 4,
+                              sm: 2,
+                            }}
+                          >
+                            <FormControl fullWidth size="small">
+                              <InputLabel>{t("Die")}</InputLabel>
+                              <Select
+                                value={entry.dieValue ?? 1}
+                                label={t("Die")}
+                                onChange={(e) =>
+                                  updateSecondEffect(targetIndex, effectIndex, {
+                                    dieValue: Number(e.target.value),
+                                  })
+                                }
+                              >
+                                {SECOND_EFFECT_DICE.map((die) => (
+                                  <MenuItem key={die} value={die}>
+                                    {die}
+                                  </MenuItem>
+                                ))}
+                              </Select>
+                            </FormControl>
+                          </Grid>
+                          <Grid
+                            size={{
+                              xs: 8,
+                              sm: 9,
+                            }}
+                          >
+                            <TextField
+                              label={t("Effect")}
+                              fullWidth
+                              size="small"
+                              value={entry.effect || ""}
+                              onChange={(e) =>
+                                updateSecondEffect(targetIndex, effectIndex, {
+                                  effect: e.target.value,
+                                })
+                              }
+                              slotProps={{
+                                htmlInput: { maxLength: 200 },
+                              }}
+                            />
+                          </Grid>
+                          <Grid
+                            size={{
+                              xs: 12,
+                              sm: 1,
+                            }}
+                          >
+                            <IconButton
+                              color="error"
+                              onClick={() =>
+                                setPendingDelete({
+                                  type: "secondEffect",
+                                  targetIndex,
+                                  effectIndex,
+                                })
+                              }
+                            >
+                              <Delete />
+                            </IconButton>
+                          </Grid>
+                        </Grid>
+                      </Grid>
+                    ))}
+                    {(target.secondEffects || []).length < 6 && (
+                      <Grid size={12}>
+                        <Button
+                          size="small"
+                          variant="outlined"
+                          onClick={() => addSecondEffect(targetIndex)}
+                        >
+                          {t("Add Second Effect")}
+                        </Button>
+                      </Grid>
+                    )}
+                  </Grid>
+                </Grid>
+              )}
+            </Grid>
+          </Box>
+        </Grid>
+      ))}
+      <Grid size={12}>
+        <Button variant="contained" onClick={addTarget}>
+          {t("Add Target")}
+        </Button>
+      </Grid>
+      {validationError ? (
+        <Grid size={12}>
+          <FormHelperText error>{validationError}</FormHelperText>
+        </Grid>
+      ) : null}
+      <Grid size={12}>
+        <FormControlLabel
+          control={
+            <Switch
+              checked={formState.showInPlayerSheet !== false}
+              onChange={(e) =>
+                updateField("showInPlayerSheet", e.target.checked)
+              }
+            />
+          }
+          label={t("Show in Character Sheet")}
+        />
+      </Grid>
+      <Grid size={12}>
+        <FormControlLabel
+          control={
+            <Switch
+              checked={Boolean(formState.isMagisphere)}
+              onChange={(e) => updateField("isMagisphere", e.target.checked)}
+            />
+          }
+          label={t("Is a Magisphere?")}
+        />
+      </Grid>
+      <DeleteConfirmationDialog
+        open={Boolean(pendingDelete)}
+        onClose={() => setPendingDelete(null)}
+        onConfirm={confirmDelete}
+        title={t("Delete")}
+        message={t("Are you sure you want to delete this entry?")}
+      />
+    </Grid>
+  );
+}

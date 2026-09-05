@@ -9,7 +9,7 @@ An unofficial Fabula Ultima Tool
 
 It contains multiple tools to manage a game of Fabula Ultima.
 
-> Fultimator is not affiliated with Need Games, it's a product of the work of fans of the game. 
+> Fultimator is not affiliated with Need Games, it's a product of the work of fans of the game.
 
 Welcome to the contribution guidelines for Fultimator! We appreciate your interest in improving our web app. Please follow the guidelines below for code and content contributions.
 
@@ -17,8 +17,9 @@ Welcome to the contribution guidelines for Fultimator! We appreciate your intere
 
 If you have any questions or concerns, feel free to reach out to us through the following channels:
 
-- Developer Discord: [Fultimator](https://discord.gg/aNEgvHm3Re) - `#development` channel 
+- Developer Discord: [Fultimator](https://discord.gg/aNEgvHm3Re) - `#development` channel
 - Discord: [Rooster Games](https://discord.gg/ZSjM6yFUPx) - `#bot-and-tool-discussion` channel
+- Discord: [Official Fabula Ultima TTJRPG Discord]- `vtt-discussion` channel
 
 ## Submitting Issues
 
@@ -41,7 +42,6 @@ Fultimator uses [React](https://react.dev/) for building dynamic user interfaces
 - **dev:** The primary development branch for most features.
 
 When opening a pull request (PR), ensure it goes into the most relevant branch.
-
 
 ### Prerequisite Software
 
@@ -83,10 +83,10 @@ This will help you visualize and test your changes locally.
 
 The app is hosted by firebase.
 
-To deploy you need to have firebase installed. 
+To deploy you need to have firebase installed.
 See [firebase - npm](https://www.npmjs.com/package/firebase)
 
-You also need to have the proper permissions. 
+You also need to have the proper permissions.
 See [Firebase IAM permissions](https://firebase.google.com/docs/projects/iam/permissions).
 
 ```bash

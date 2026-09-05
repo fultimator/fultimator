@@ -6,6 +6,7 @@ import {
   Divider,
   FormControlLabel,
   Grid,
+  Paper,
   Skeleton,
   TextField,
   Typography,
@@ -14,19 +15,17 @@ import {
   Tooltip,
   Stack,
 } from "@mui/material";
-import { Download, AddCircle } from "@mui/icons-material";
+import { Cloud as CloudIcon, Download, AddCircle } from "@mui/icons-material";
 import { useRef, useState } from "react";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { collection, orderBy, query, where } from "firebase/firestore";
-import { useCollectionData } from "react-firebase-hooks/firestore";
-import { User } from "firebase/auth";
+import { useDatabaseContext } from "../../context/useDatabaseContext";
+import { useDatabase } from "../../hooks/useDatabase";
 
 import { SignIn } from "../../components/auth";
-import { auth, firestore } from "../../firebase";
 import Layout from "../../components/Layout";
-import NpcPretty from "../../components/npc/Pretty";
+import NpcActorCard from "../../components/shared/actors/npc/NpcActorCard";
 import PointBar from "../../components/PointBar";
 import { calcHP, calcMP } from "../../libs/npcs";
+import { applyNpcPostLoadTransforms } from "../../libs/actor";
 import { useEffect } from "react";
 import React from "react";
 import { TypeNpc } from "../../types/Npcs";
@@ -35,44 +34,66 @@ import { useTranslate } from "../../translation/translate";
 
 export default function Combat() {
   const { t } = useTranslate();
-  const [user, loading, error] = useAuthState(auth);
-  console.debug("user, loading, error", user, loading, error);
+  const { authLoading, dbMode, cloudUser } = useDatabaseContext();
 
   return (
     <Layout>
       <Typography variant="h4">{t("Combat")}</Typography>
-      {loading && <Skeleton />}
+      {authLoading && <Skeleton />}
 
-      {!loading && !user && (
-        <>
-          <Typography sx={{ my: 1 }}>
-            {t("You must be logged in to use this feature")}
+      {!authLoading && !cloudUser && (
+        <Paper
+          elevation={dbMode === "cloud" ? 3 : 0}
+          variant={dbMode === "cloud" ? "elevation" : "outlined"}
+          sx={{
+            p: 2,
+            mb: 2,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 2,
+            flexWrap: "wrap",
+          }}
+        >
+          <CloudIcon color={dbMode === "cloud" ? "primary" : "disabled"} />
+          <Typography
+            variant="body2"
+            color={dbMode === "cloud" ? "text.primary" : "text.secondary"}
+            sx={{ flex: 1, minWidth: 200 }}
+          >
+            {t("You have to be logged in to access this feature")}
           </Typography>
           <SignIn />
-        </>
+        </Paper>
       )}
 
-      {user && <AuthCombat user={user} />}
+      {cloudUser && <AuthCombat />}
     </Layout>
   );
 }
 
-interface AuthCombatProps {
-  user: User;
-}
-
-function AuthCombat({ user }: AuthCombatProps) {
+function AuthCombat() {
   const { t } = useTranslate();
-  const personalRef = collection(firestore, "npc-personal");
-  const personalQuery = query(
-    personalRef,
-    where("uid", "==", user.uid),
-    orderBy("lvl", "asc"),
-    orderBy("name", "asc")
-  );
-  const [personalList, loading] = useCollectionData(personalQuery, {
-    idField: "id",
-  });
+  const db = useDatabase("cloud");
+
+  const [personalList, setPersonalList] = useState<TypeNpc[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const q = db.query(
+      db.collection("npc-personal"),
+      db.orderBy("lvl", "asc"),
+      db.orderBy("name", "asc"),
+    );
+    db.getDocs(q)
+      .then((docs) =>
+        setPersonalList(
+          ((docs as TypeNpc[]) ?? []).map(applyNpcPostLoadTransforms),
+        ),
+      )
+      .catch((e) => console.error("Error loading NPCs:", e))
+      .finally(() => setLoading(false));
+  }, [db]);
 
   const [npcs, setNpcs] = useState<TypeNpc[]>([]);
 
@@ -80,13 +101,13 @@ function AuthCombat({ user }: AuthCombatProps) {
     return null;
   }
 
-  const addNpc = (e: any, newValue: any) => {
+  const addNpc = (e: unknown, newValue: unknown) => {
     if (newValue) {
       setNpcs((prevState) => [...prevState, newValue as TypeNpc]);
     }
   };
 
-  const addDuplicateNpc = (npc: any) => {
+  const addDuplicateNpc = (npc: TypeNpc) => {
     setNpcs((prevState) => [...prevState, npc]);
   };
 
@@ -108,8 +129,8 @@ function AuthCombat({ user }: AuthCombatProps) {
   console.debug(npcs);
 
   return (
-    <Grid container direction="column" sx={{ mt: 2 }}>
-      <Grid item xs={12}>
+    <Grid container sx={{ flexDirection: "column", mt: 2 }}>
+      <Grid size={12}>
         <Autocomplete
           size="small"
           disablePortal
@@ -122,9 +143,8 @@ function AuthCombat({ user }: AuthCombatProps) {
           )}
         />
       </Grid>
-
-      <Grid item xs={12}>
-        <Stack direction="row" spacing={1} mb={2}>
+      <Grid size={12}>
+        <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
           {personalList?.map((npc) => {
             // Only show buttons for NPCs that have been selected at least once
             if (npcCounts[npc.id]) {
@@ -143,14 +163,12 @@ function AuthCombat({ user }: AuthCombatProps) {
           })}
         </Stack>
       </Grid>
-
-      <Grid item xs={12}>
+      <Grid size={12}>
         {npcs.map((npc, index) => (
           <Grid
             container
-            item
-            xs={12}
-            key={index} // Use index as key for duplicate handling
+            // Use index as key for duplicate handling
+            key={index}
             sx={{
               mb: 1,
               p: 1,
@@ -158,11 +176,12 @@ function AuthCombat({ user }: AuthCombatProps) {
               borderRadius: "4px",
               alignItems: "center",
             }}
+            size={12}
           >
-            <Grid item xs={9}>
+            <Grid size={9}>
               <Typography variant="h3">{index + 1}</Typography>
             </Grid>
-            <Grid item xs={12}>
+            <Grid size={12}>
               <NpcCombatant npc={npc} />
             </Grid>
           </Grid>
@@ -203,38 +222,43 @@ function NpcCombatant({ npc }: NpcProps) {
     };
   };
 
-  const adjustAttribute = (attribute = 0, amount = 0, min = 6) => {
-    return attribute + amount <= min ? min : attribute + amount;
+  const adjustAttribute = (
+    attr: { base: number },
+    amount: number,
+    min = 6,
+  ): { base: number } => {
+    const next = attr.base + amount;
+    return { base: next <= min ? min : next };
   };
 
   useEffect(() => {
-    let { slow, dazed, weak, shaken, enraged, poisoned } = statusEffects;
+    const { slow, dazed, weak, shaken, enraged, poisoned } = statusEffects;
 
     setAttributes({
       dexterity:
         enraged && slow
           ? adjustAttribute(originalAttributes.dexterity, -4)
           : enraged || slow
-          ? adjustAttribute(originalAttributes.dexterity, -2)
-          : originalAttributes.dexterity,
+            ? adjustAttribute(originalAttributes.dexterity, -2)
+            : originalAttributes.dexterity,
       insight:
         enraged && dazed
           ? adjustAttribute(originalAttributes.insight, -4)
           : enraged || dazed
-          ? adjustAttribute(originalAttributes.insight, -2)
-          : originalAttributes.insight,
+            ? adjustAttribute(originalAttributes.insight, -2)
+            : originalAttributes.insight,
       might:
         poisoned && weak
           ? adjustAttribute(originalAttributes.might, -4)
           : poisoned || weak
-          ? adjustAttribute(originalAttributes.might, -2)
-          : originalAttributes.might,
+            ? adjustAttribute(originalAttributes.might, -2)
+            : originalAttributes.might,
       will:
         poisoned && shaken
           ? adjustAttribute(originalAttributes.will, -4)
           : poisoned || shaken
-          ? adjustAttribute(originalAttributes.will, -2)
-          : originalAttributes.will,
+            ? adjustAttribute(originalAttributes.will, -2)
+            : originalAttributes.will,
     });
   }, [
     statusEffects,
@@ -295,7 +319,7 @@ function NpcCombatant({ npc }: NpcProps) {
     setSelectedStudy(event.target.value);
   };
 
-  const ref = useRef();
+  const ref = useRef<HTMLDivElement>(null);
   const [downloadImage] = useDownloadImage(npc.name, ref);
 
   /************ ATTACK ROLL ************/
@@ -314,39 +338,43 @@ function NpcCombatant({ npc }: NpcProps) {
     let attribute1, attribute2, extraDamage, extraPrecision, type;
 
     // Get +1 accuracy every 10 levels
-    let accuracyLevelBonus = Math.floor(npc.lvl / 10);
+    const accuracyLevelBonus = Math.floor(npc.lvl / 10);
 
     if (attackType === "weapon") {
       // For weapon attacks
-      const { att1, att2 } = attack.weapon;
-      attribute1 = attributes[att1];
-      attribute2 = attributes[att2];
-      extraDamage =
-        attack.weapon.damage +
-        (attack.flatdmg ? parseInt(attack.flatdmg) : 0) +
-        (attack.extraDamage ? 5 : 0);
+      attribute1 =
+        attributes[attack.accuracy?.attr1]?.base ??
+        attributes[attack.accuracy?.attr1];
+      attribute2 =
+        attributes[attack.accuracy?.attr2]?.base ??
+        attributes[attack.accuracy?.attr2];
+      extraDamage = (attack.damage?.value ?? 0) + (attack.extraDamage ? 5 : 0);
       extraPrecision =
-        (npc.extra?.precision ? 3 : 0) +
-        attack.weapon.prec +
-        (attack.flathit ? parseInt(attack.flathit) : 0) +
+        (npc.features?.precision?.enabled ? 3 : 0) +
+        (attack.accuracy?.value ?? 0) +
         accuracyLevelBonus;
-      type = attack.weapon.type;
+      type = attack.damage?.type;
     } else if (attackType === "spell") {
       // For spells
       const { attr1, attr2 } = attack;
-      attribute1 = attributes[attr1];
-      attribute2 = attributes[attr2];
+      attribute1 = attributes[attr1]?.base ?? attributes[attr1];
+      attribute2 = attributes[attr2]?.base ?? attributes[attr2];
       extraDamage = 0;
-      extraPrecision = (npc.extra?.magic ? 3 : 0) + accuracyLevelBonus;
+      extraPrecision =
+        (npc.features?.magic?.enabled ? 3 : 0) + accuracyLevelBonus;
       type = "spell";
     } else {
       // For base attacks
-      const { attr1, attr2 } = attack;
-      attribute1 = attributes[attr1];
-      attribute2 = attributes[attr2];
-      extraDamage = attack.extraDamage ? 10 : 5;
-      extraPrecision = (npc.extra?.precision ? 3 : 0) + accuracyLevelBonus;
-      type = attack.type;
+      const attr1 = attack.accuracy?.attr1;
+      const attr2 = attack.accuracy?.attr2;
+      attribute1 = attributes[attr1]?.base ?? attributes[attr1];
+      attribute2 = attributes[attr2]?.base ?? attributes[attr2];
+      extraDamage = (attack.damage?.value ?? 0) + (attack.extraDamage ? 5 : 0);
+      extraPrecision =
+        (npc.features?.precision?.enabled ? 3 : 0) +
+        (attack.accuracy?.value ?? 0) +
+        accuracyLevelBonus;
+      type = attack.damage?.type;
     }
 
     // Get +5 damage after lvl 20 and another +5 after lvl 40 and another +5 after lvl 60
@@ -384,7 +412,7 @@ function NpcCombatant({ npc }: NpcProps) {
 
     // Calculate results
     const totalHitScore = roll1 + roll2 + extraPrecision;
-    let baseDamage = Math.max(roll1, roll2);
+    const baseDamage = Math.max(roll1, roll2);
 
     let damage = 0;
     if (type !== "nodmg") {
@@ -402,25 +430,26 @@ function NpcCombatant({ npc }: NpcProps) {
   const generateButtonLabel = (attack) => {
     let translatedAttribute1, translatedAttribute2;
 
-    if (attack.weapon) {
+    if (attack.weapon || attack.accuracy) {
       // For weapon attacks
-      const { name, weapon } = attack;
-      const { att1, att2 } = weapon;
-      const attributeMap = {
+      const name = attack.name ?? attack.weapon?.name;
+      const attr1 = attack.accuracy?.attr1;
+      const attr2 = attack.accuracy?.attr2;
+      const attributeMap: Record<string, string> = {
         dexterity: "DEX",
         insight: "INS",
         might: "MIG",
         will: "WLP",
       };
 
-      translatedAttribute1 = `${t(attributeMap[att1])} d${attributes[att1]}`;
-      translatedAttribute2 = `${t(attributeMap[att2])} d${attributes[att2]}`;
+      translatedAttribute1 = `${t(attributeMap[attr1])} d${attributes[attr1]?.base ?? attributes[attr1]}`;
+      translatedAttribute2 = `${t(attributeMap[attr2])} d${attributes[attr2]?.base ?? attributes[attr2]}`;
 
       return `${name} [${translatedAttribute1} + ${translatedAttribute2}]`;
     } else if (attack.spell) {
       // For spells
       const { name, spell } = attack;
-      const { attr1, attr2 } = spell;
+      const { attr1, attr2 } = spell.accuracy ?? {};
       const attributeMap = {
         dexterity: "DEX",
         insight: "INS",
@@ -428,8 +457,8 @@ function NpcCombatant({ npc }: NpcProps) {
         will: "WLP",
       };
 
-      translatedAttribute1 = `${t(attributeMap[attr1])} d${attributes[attr1]}`;
-      translatedAttribute2 = `${t(attributeMap[attr2])} d${attributes[attr2]}`;
+      translatedAttribute1 = `${t(attributeMap[attr1])} d${attributes[attr1]?.base ?? attributes[attr1]}`;
+      translatedAttribute2 = `${t(attributeMap[attr2])} d${attributes[attr2]?.base ?? attributes[attr2]}`;
 
       return `${name} [${translatedAttribute1} + ${translatedAttribute2}]`;
     }
@@ -443,8 +472,8 @@ function NpcCombatant({ npc }: NpcProps) {
         will: "WLP",
       };
 
-      translatedAttribute1 = `${t(attributeMap[attr1])} d${attributes[attr1]}`;
-      translatedAttribute2 = `${t(attributeMap[attr2])} d${attributes[attr2]}`;
+      translatedAttribute1 = `${t(attributeMap[attr1])} d${attributes[attr1]?.base ?? attributes[attr1]}`;
+      translatedAttribute2 = `${t(attributeMap[attr2])} d${attributes[attr2]?.base ?? attributes[attr2]}`;
 
       return `${name} [${translatedAttribute1} + ${translatedAttribute2}]`;
     }
@@ -452,19 +481,20 @@ function NpcCombatant({ npc }: NpcProps) {
 
   return (
     <Grid container spacing={1} sx={{ my: 1 }}>
-      <Grid item xs={6}>
-        <NpcPretty
+      <Grid size={6}>
+        <NpcActorCard
           npc={npc}
           study={selectedStudy}
           npcImage={npc.imgurl}
-          ref={ref}
+          cardRef={ref}
           collapse={true}
+          variant="interactive"
         />
-        <Grid item container xs={12} mt={5}>
-          <Grid item xs={2}>
+        <Grid container size={12} sx={{ mt: 5 }}>
+          <Grid size={2}>
             <Typography variant="h5">{t("Study Roll:")}</Typography>
           </Grid>
-          <Grid item xs={2}>
+          <Grid size={2}>
             <Select
               labelId="study"
               id="study"
@@ -473,9 +503,9 @@ function NpcCombatant({ npc }: NpcProps) {
               fullWidth
             >
               <MenuItem value={0}>-</MenuItem>
-              <MenuItem value={1}>7+</MenuItem>
-              <MenuItem value={2}>10+</MenuItem>
-              <MenuItem value={3}>13+</MenuItem>
+              <MenuItem value={1}>10+</MenuItem>
+              <MenuItem value={2}>13+</MenuItem>
+              <MenuItem value={3}>16+</MenuItem>
             </Select>
           </Grid>
           {/* Download Button */}
@@ -491,16 +521,16 @@ function NpcCombatant({ npc }: NpcProps) {
           </Button>
         </Grid>
       </Grid>
-      <Grid xs={6} item>
+      <Grid size={6}>
         <Grid container spacing={1} rowSpacing={2} sx={{ px: 2 }}>
-          <Grid item xs={10} container alignItems="center">
-            <Grid item xs={2}>
+          <Grid container size={10} sx={{ alignItems: "center" }}>
+            <Grid size={2}>
               <Typography variant="h5" color="red">
                 {t("HP:")} {hp}
               </Typography>
               {crisis && <Typography variant="h5">{t("Crisis!")}</Typography>}
             </Grid>
-            <Grid item xs={10}>
+            <Grid size={10}>
               <PointBar
                 pt={hp}
                 maxPt={calcHP(npc)}
@@ -509,7 +539,7 @@ function NpcCombatant({ npc }: NpcProps) {
               />
             </Grid>
           </Grid>
-          <Grid item xs={5}>
+          <Grid size={5}>
             <ButtonGroup variant="outlined" size="small" color="error">
               <Button onClick={changeHp(-1)}>-1</Button>
               <Button onClick={changeHp(-2)}>-2</Button>
@@ -518,7 +548,7 @@ function NpcCombatant({ npc }: NpcProps) {
               <Button onClick={changeHp(-20)}>-20</Button>
             </ButtonGroup>
           </Grid>
-          <Grid item xs={5}>
+          <Grid size={5}>
             <ButtonGroup variant="outlined" size="small" color="error">
               <Button onClick={changeHp(+1)}>+1</Button>
               <Button onClick={changeHp(+2)}>+2</Button>
@@ -527,13 +557,13 @@ function NpcCombatant({ npc }: NpcProps) {
               <Button onClick={changeHp(+20)}>+20</Button>
             </ButtonGroup>
           </Grid>
-          <Grid item xs={10} container alignItems="center">
-            <Grid item xs={2}>
+          <Grid container size={10} sx={{ alignItems: "center" }}>
+            <Grid size={2}>
               <Typography variant="h5" color="red">
                 {t("MP:")} {mp}
               </Typography>
             </Grid>
-            <Grid item xs={10}>
+            <Grid size={10}>
               <PointBar
                 pt={mp}
                 maxPt={calcMP(npc)}
@@ -542,7 +572,7 @@ function NpcCombatant({ npc }: NpcProps) {
               />
             </Grid>
           </Grid>
-          <Grid item xs={5}>
+          <Grid size={5}>
             <ButtonGroup variant="outlined" size="small" color="info">
               <Button onClick={changeMp(-1)}>-1</Button>
               <Button onClick={changeMp(-2)}>-2</Button>
@@ -551,7 +581,7 @@ function NpcCombatant({ npc }: NpcProps) {
               <Button onClick={changeMp(-20)}>-20</Button>
             </ButtonGroup>
           </Grid>
-          <Grid item xs={5}>
+          <Grid size={5}>
             <ButtonGroup variant="outlined" size="small" color="info">
               <Button onClick={changeMp(+1)}>+1</Button>
               <Button onClick={changeMp(+2)}>+2</Button>
@@ -560,31 +590,31 @@ function NpcCombatant({ npc }: NpcProps) {
               <Button onClick={changeMp(+20)}>+20</Button>
             </ButtonGroup>
           </Grid>
-          <Grid item container xs={12}>
-            <Grid item xs>
+          <Grid container size={12}>
+            <Grid size="grow">
               <Typography variant="h5">
-                {t("DEX:")} d{attributes.dexterity}
+                {t("DEX:")} d{attributes.dexterity?.base}
               </Typography>
             </Grid>
-            <Grid item xs>
+            <Grid size="grow">
               <Typography variant="h5">
-                {t("INS:")} d{attributes.insight}
+                {t("INS:")} d{attributes.insight?.base}
               </Typography>
             </Grid>
-            <Grid item xs>
+            <Grid size="grow">
               <Typography variant="h5">
-                {t("MIG:")} d{attributes.might}
+                {t("MIG:")} d{attributes.might?.base}
               </Typography>
             </Grid>
-            <Grid item xs>
+            <Grid size="grow">
               <Typography variant="h5">
-                {t("WIL:")} d{attributes.will}
+                {t("WIL:")} d{attributes.will?.base}
               </Typography>
             </Grid>
           </Grid>
 
-          <Grid item container xs={12}>
-            <Grid item xs>
+          <Grid container size={12}>
+            <Grid size="grow">
               <FormControlLabel
                 value="slow"
                 control={
@@ -600,7 +630,7 @@ function NpcCombatant({ npc }: NpcProps) {
                 labelPlacement="top"
               />
             </Grid>
-            <Grid item xs>
+            <Grid size="grow">
               <FormControlLabel
                 value="dazed"
                 control={
@@ -616,7 +646,7 @@ function NpcCombatant({ npc }: NpcProps) {
                 labelPlacement="top"
               />
             </Grid>
-            <Grid item xs>
+            <Grid size="grow">
               <FormControlLabel
                 value="weak"
                 control={
@@ -632,7 +662,7 @@ function NpcCombatant({ npc }: NpcProps) {
                 labelPlacement="top"
               />
             </Grid>
-            <Grid item xs>
+            <Grid size="grow">
               <FormControlLabel
                 value="shaken"
                 control={
@@ -649,8 +679,11 @@ function NpcCombatant({ npc }: NpcProps) {
               />
             </Grid>
           </Grid>
-          <Grid item container xs={12}>
-            <Grid item xs display="flex" justifyContent="center">
+          <Grid container size={12}>
+            <Grid
+              size="grow"
+              sx={{ display: "flex", justifyContent: "center" }}
+            >
               <FormControlLabel
                 value="enraged"
                 control={
@@ -666,7 +699,10 @@ function NpcCombatant({ npc }: NpcProps) {
                 labelPlacement="top"
               />
             </Grid>
-            <Grid item xs display="flex" justifyContent="center">
+            <Grid
+              size="grow"
+              sx={{ display: "flex", justifyContent: "center" }}
+            >
               <FormControlLabel
                 value="poisoned"
                 control={
@@ -684,9 +720,9 @@ function NpcCombatant({ npc }: NpcProps) {
             </Grid>
           </Grid>
           {/**ATTACK ROLL SIMULATOR**/}
-          <Grid item flex="1">
+          <Grid sx={{ flex: 1 }}>
             {npc.attacks.map((attack, index) => (
-              <Grid item key={index}>
+              <Grid key={index}>
                 <Button
                   variant="contained"
                   onClick={() => rollAttackDice(attack, "baseattack")}
@@ -702,7 +738,7 @@ function NpcCombatant({ npc }: NpcProps) {
               </Grid>
             ))}
             {npc.weaponattacks?.map((wattack, index) => (
-              <Grid item key={index}>
+              <Grid key={index}>
                 <Button
                   variant="outlined"
                   onClick={() => rollAttackDice(wattack, "weapon")}
@@ -718,9 +754,9 @@ function NpcCombatant({ npc }: NpcProps) {
               </Grid>
             ))}
             {npc.spells
-              ?.filter((spell) => spell.type === "offensive")
+              ?.filter((spell) => spell.isOffensive)
               .map((spell, index) => (
-                <Grid item key={index}>
+                <Grid key={index}>
                   <Button
                     variant="contained"
                     color="info"
@@ -736,8 +772,8 @@ function NpcCombatant({ npc }: NpcProps) {
                   </Button>
                 </Grid>
               ))}
-            <Grid item container pb={1} mt={2} border={1} borderRadius={1}>
-              <Grid item xs={4} pt={1} pl={1}>
+            <Grid container sx={{ pb: 1, mt: 2, border: 1, borderRadius: 1 }}>
+              <Grid size={4} sx={{ pt: 1, pl: 1 }}>
                 <Typography variant="h6">{t("Dice Results")}</Typography>
                 <Typography variant="body1">
                   {t("Die 1")}: <b>{diceResults.attribute1}</b>
@@ -746,20 +782,20 @@ function NpcCombatant({ npc }: NpcProps) {
                   {t("Die 2")}: <b>{diceResults.attribute2}</b>
                 </Typography>
               </Grid>
-              <Grid item xs={4} pt={1} pl={1}>
+              <Grid size={4} sx={{ pt: 1, pl: 1 }}>
                 <Typography variant="h6">{t("Hit Throw Result")}</Typography>
                 <Typography variant="body1">
                   {t("Hit Score")}: <b>{hitThrowResult.totalHitScore}</b>
                 </Typography>
               </Grid>
-              <Grid item xs={4} pt={1} pl={1}>
+              <Grid size={4} sx={{ pt: 1, pl: 1 }}>
                 <Typography variant="h6">{t("Damage Result")}</Typography>
                 <Typography variant="body1">
                   {t("Damage")}: <b>{damageResult.damage}</b>
                 </Typography>
               </Grid>
               {isCriticalSuccess && (
-                <Grid item xs={12}>
+                <Grid size={12}>
                   <Typography
                     variant="h4"
                     color="green"
@@ -773,7 +809,7 @@ function NpcCombatant({ npc }: NpcProps) {
                 </Grid>
               )}
               {isCriticalFailure && (
-                <Grid item xs={12}>
+                <Grid size={12}>
                   <Typography
                     variant="h4"
                     color="error"

@@ -1,6 +1,6 @@
 // useDownload exposes a function that makes the browser download a file
 function useDownload() {
-  function download(content: string, fileName: string, contentType: string) {
+  function download(content: string, fileName: string, _contentType: string) {
     fileName = fileName.replace(/\s/g, "_").toLowerCase();
     const a = document.createElement("a");
     a.href = content;
@@ -8,7 +8,7 @@ function useDownload() {
     a.click();
   }
 
-  return [download]
+  return [download];
 }
 
-export default useDownload
+export default useDownload;

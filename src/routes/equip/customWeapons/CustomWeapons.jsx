@@ -1,401 +1,445 @@
 import React, { useState } from "react";
 import {
   Paper,
-  Typography,
   Grid,
   Button,
-  TextField,
-  Divider,
-  Box,
   useTheme,
   IconButton,
   Tooltip,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  FormControlLabel,
-  Checkbox,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
 } from "@mui/material";
 import { useTranslate } from "../../../translation/translate";
-import { AutoAwesome, Download, ExpandMore } from "@mui/icons-material";
+import { useStickyTop } from "../../../hooks/useStickyTop";
+import { AutoAwesome, Download, Search } from "@mui/icons-material";
+import CompendiumViewerModal from "../../../components/compendium/CompendiumViewerModal";
 import CustomHeaderAlt from "../../../components/common/CustomHeaderAlt";
-import ChangeCategory from "./ChangeCategory";
-import ChangeRange from "./ChangeRange";
-import ChangeAccuracyCheck from "./ChangeAccuracyCheck";
-import ChangeType from "./ChangeType";
-import ChangeCustomizations from "./ChangeCustomizations";
-import PrettyCustomWeapon from "./PrettyCustomWeapon";
+import { SharedCustomWeaponCard } from "../../../components/shared/items";
 import Export from "../../../components/Export";
 import useDownloadImage from "../../../hooks/useDownloadImage";
-import SelectQuality from "../weapons/SelectQuality";
-import ChangeQuality from "../common/ChangeQuality";
-import qualities from "../weapons/qualities";
-import { categories, range, accuracyChecks, customizations, types } from "./libs.jsx";
+import AddToCompendiumButton from "../../../components/compendium/AddToCompendiumButton";
+import allQualities from "../../../libs/qualities";
+import groupBy from "../../../libs/groupby";
+import { calculateCustomWeaponStats } from "../../../libs/playerCalculations";
+import { categories, accuracyChecks } from "./libs.jsx";
+import { SchemaFieldRenderer } from "../../../forms/rendering/SchemaFieldRenderer";
+import {
+  customWeaponFieldConfig,
+  customWeaponGroupLabels,
+} from "../../../forms/rendering/config/itemConfigs/customWeapon";
 
-function CustomWeapons() {
+const qualities = allQualities
+  .filter(
+    (q) => q.filter?.includes("weapon") || q.filter?.includes("customWeapon"),
+  )
+  .filter(
+    (q, idx, arr) => arr.findIndex((entry) => entry.name === q.name) === idx,
+  );
+const qualityGroups = Object.entries(groupBy(qualities, "category")).map(
+  ([category, qs]) => ({
+    header: category,
+    options: qs.map((q) => ({
+      value: q.name,
+      label: `${q.name} (${q.cost}z)`,
+    })),
+  }),
+);
+
+function normalizeAccuracyCheck(
+  value,
+  fallback = { attr1: accuracyChecks[0].att1, attr2: accuracyChecks[0].att2 },
+) {
+  const attr1 = Array.isArray(value)
+    ? value[0]
+    : (value?.accuracy?.attr1 ?? value?.attr1 ?? value?.att1);
+  const attr2 = Array.isArray(value)
+    ? value[1]
+    : (value?.accuracy?.attr2 ?? value?.attr2 ?? value?.att2);
+  const validAttrs = ["dexterity", "insight", "might", "will"];
+  if (validAttrs.includes(attr1) && validAttrs.includes(attr2)) {
+    return { attr1, attr2 };
+  }
+  return fallback;
+}
+
+function buildInitialState(data) {
+  if (!data) {
+    return {
+      itemType: "customWeapon",
+      name: "",
+      category: categories[0],
+      range: "melee",
+      hands: 2,
+      martial: false,
+      accuracy: {
+        attr1: "dexterity",
+        attr2: "insight",
+        value: 0,
+        defense: "def",
+      },
+      damage: { value: 0, type: "physical", hrZero: false },
+      modifiers: { damage: 0, accuracy: 0, def: 0, mdef: 0 },
+      rare: {
+        accuracyBonus: false,
+        damageBonus: false,
+        overrideDamageType: false,
+        overrideAccuracyAttributes: false,
+      },
+      customizations: [],
+      quality: "",
+      qualityCost: 0,
+      cost: 300,
+      secondName: "",
+      secondCategory: categories[0],
+      secondRange: "melee",
+      secondAccuracy: undefined,
+      secondDamage: undefined,
+      secondModifiers: { damage: 0, accuracy: 0, def: 0, mdef: 0 },
+      secondCustomizations: [],
+      dataType: "weapon",
+      selectedQuality: "",
+      qualityName: "",
+      isEquipped: false,
+      selectedCategory: categories[0],
+      selectedRange: "melee",
+      selectedAccuracyCheck: {
+        attr1: accuracyChecks[0].att1,
+        attr2: accuracyChecks[0].att2,
+      },
+      customDamageType: "physical",
+      rareOverrideDamageTypeValue: "physical",
+      primaryHrZero: false,
+      rareAccuracyBonus: false,
+      rareDamageBonus: false,
+      overrideDamageType: false,
+      overrideAccuracyAttributes: false,
+      precModifier: 0,
+      damageModifier: 0,
+      defModifier: 0,
+      mDefModifier: 0,
+      hasTransforming: false,
+      secondWeaponName: "",
+      secondSelectedCategory: categories[0],
+      secondSelectedRange: "melee",
+      secondSelectedAccuracyCheck: {
+        attr1: accuracyChecks[0].att1,
+        attr2: accuracyChecks[0].att2,
+      },
+      secondaryHrZero: false,
+      secondOverrideDamageType: false,
+      secondCustomDamageType: "physical",
+      secondPrecModifier: 0,
+      secondDamageModifier: 0,
+      secondDefModifier: 0,
+      secondMDefModifier: 0,
+      isSlotsVariant: false,
+    };
+  }
+
+  const rare = data.rare ?? {};
+  const overrideAccuracyAttributes =
+    rare.overrideAccuracyAttributes ?? data.overrideAccuracyAttributes ?? false;
+  const ac = data.accuracy ?? {};
+  const selectedAccuracyCheck = overrideAccuracyAttributes
+    ? normalizeAccuracyCheck(ac)
+    : (() => {
+        const found =
+          accuracyChecks.find(
+            (c) =>
+              c.att1 === (ac.attr1 ?? ac.att1) &&
+              c.att2 === (ac.attr2 ?? ac.att2),
+          ) ?? accuracyChecks[0];
+        return { attr1: found.att1, attr2: found.att2 };
+      })();
+
+  const secondAc = data.secondAccuracy ?? {};
+  const secondSelectedAccuracyCheck = (() => {
+    const found =
+      accuracyChecks.find(
+        (c) =>
+          c.att1 === (secondAc.attr1 ?? secondAc.att1) &&
+          c.att2 === (secondAc.attr2 ?? secondAc.att2),
+      ) ?? accuracyChecks[0];
+    return { attr1: found.att1, attr2: found.att2 };
+  })();
+
+  const overrideDamageType =
+    rare.overrideDamageType ?? data.overrideDamageType ?? false;
+  const customDamageType = data.damage?.type ?? "physical";
+  const rareOverrideDamageTypeValue =
+    rare.overrideDamageTypeValue ??
+    data.rareOverrideDamageTypeValue ??
+    data.customDamageType ??
+    data.damage?.type ??
+    "physical";
+
+  const currentCustomizations = data.customizations ?? [];
+  const hasTransforming = currentCustomizations.some(
+    (c) => c.name === "weapon_customization_transforming",
+  );
+
+  return {
+    itemType: "customWeapon",
+    name: data.name ?? "",
+    category: data.category ?? categories[0],
+    range: data.range ?? "melee",
+    hands: data.hands ?? 2,
+    martial: data.martial ?? false,
+    accuracy: data.accuracy ?? {
+      attr1: "dexterity",
+      attr2: "insight",
+      value: 0,
+      defense: "def",
+    },
+    damage: data.damage ?? { value: 0, type: "physical", hrZero: false },
+    modifiers: data.modifiers ?? { damage: 0, accuracy: 0, def: 0, mdef: 0 },
+    rare: {
+      accuracyBonus: rare.accuracyBonus ?? false,
+      damageBonus: rare.damageBonus ?? false,
+      overrideDamageType,
+      overrideAccuracyAttributes,
+      overrideDamageTypeValue: rareOverrideDamageTypeValue,
+      overrideAccuracyAttr1: selectedAccuracyCheck.attr1,
+      overrideAccuracyAttr2: selectedAccuracyCheck.attr2,
+    },
+    customizations: currentCustomizations,
+    quality: data.quality ?? "",
+    qualityCost: data.qualityCost ?? 0,
+    cost: data.cost ?? 300,
+    secondName: data.secondName ?? "",
+    secondCategory: data.secondCategory ?? categories[0],
+    secondRange: data.secondRange ?? "melee",
+    secondAccuracy: data.secondAccuracy,
+    secondDamage: data.secondDamage,
+    secondModifiers: data.secondModifiers ?? {
+      damage: 0,
+      accuracy: 0,
+      def: 0,
+      mdef: 0,
+    },
+    secondCustomizations: data.secondCustomizations ?? [],
+    dataType: "weapon",
+    selectedQuality: data.selectedQuality ?? "",
+    qualityName: data.qualityName ?? "",
+    isEquipped: false,
+    selectedCategory: data.category ?? categories[0],
+    selectedRange: data.range ?? "melee",
+    selectedAccuracyCheck,
+    customDamageType,
+    rareOverrideDamageTypeValue,
+    primaryHrZero: data.damage?.hrZero === true,
+    rareAccuracyBonus: rare.accuracyBonus ?? false,
+    rareDamageBonus: rare.damageBonus ?? false,
+    overrideDamageType,
+    overrideAccuracyAttributes,
+    precModifier: data.modifiers?.accuracy ?? 0,
+    damageModifier: data.modifiers?.damage ?? 0,
+    defModifier: data.modifiers?.def ?? 0,
+    mDefModifier: data.modifiers?.mdef ?? 0,
+    hasTransforming,
+    secondWeaponName: data.secondName ?? "",
+    secondSelectedCategory: data.secondCategory ?? categories[0],
+    secondSelectedRange: data.secondRange ?? "melee",
+    secondSelectedAccuracyCheck,
+    secondaryHrZero: data.secondDamage?.hrZero === true,
+    secondOverrideDamageType: !!(
+      data.secondDamage?.type && data.secondDamage.type !== "physical"
+    ),
+    secondCustomDamageType: data.secondDamage?.type ?? "physical",
+    secondPrecModifier: data.secondModifiers?.accuracy ?? 0,
+    secondDamageModifier: data.secondModifiers?.damage ?? 0,
+    secondDefModifier: data.secondModifiers?.def ?? 0,
+    secondMDefModifier: data.secondModifiers?.mdef ?? 0,
+    isSlotsVariant: false,
+  };
+}
+
+function CustomWeapons({ variant = "equip" }) {
   const { t } = useTranslate();
+  const stickyTop = useStickyTop();
   const theme = useTheme();
   const secondary = theme.palette.secondary.main;
   const weaponCardsRef = React.useRef();
   const fileInputRef = React.useRef();
 
-  // Primary weapon state
-  const [weaponName, setWeaponName] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState(categories[0]);
-  const [selectedRange, setSelectedRange] = useState(range[0]);
-  const [martial, setMartial] = useState(false);
-  const [selectedAccuracyCheck, setSelectedAccuracyCheck] = useState(accuracyChecks[0]);
-  const [selectedType, setSelectedType] = useState(types[0]);
-  const [currentCustomizations, setCurrentCustomizations] = useState([]);
-  const [selectedCustomization, setSelectedCustomization] = useState("");
-  const [selectedQuality, setSelectedQuality] = useState("");
-  const [quality, setQuality] = useState("");
-  const [qualityCost, setQualityCost] = useState(0);
+  const [formState, setFormState] = useState(() => buildInitialState(null));
+  const [qualityBrowserOpen, setQualityBrowserOpen] = useState(false);
+  const [baseBrowserOpen, setBaseBrowserOpen] = useState(false);
 
-  // Secondary weapon state (for transforming weapons)
-  const [secondWeaponName, setSecondWeaponName] = useState("");
-  const [secondSelectedCategory, setSecondSelectedCategory] = useState(categories[0]);
-  const [secondSelectedRange, setSecondSelectedRange] = useState(range[0]);
-  const [secondMartial, setSecondMartial] = useState(false);
-  const [secondSelectedAccuracyCheck, setSecondSelectedAccuracyCheck] = useState(accuracyChecks[0]);
-  const [secondSelectedType, setSecondSelectedType] = useState(types[0]);
-  const [secondCurrentCustomizations, setSecondCurrentCustomizations] = useState([]);
-  const [secondSelectedCustomization, setSecondSelectedCustomization] = useState("");
+  const handleBaseSelected = (item) => {
+    setFormState(buildInitialState(item));
+    setBaseBrowserOpen(false);
+  };
 
-  // Override states for manual adjustments
-  const [overrideType, setOverrideType] = useState(false);
-  const [customAccuracyMod, setCustomAccuracyMod] = useState(0);
-  const [customDamageMod, setCustomDamageMod] = useState(0);
-  const [customDamageType, setCustomDamageType] = useState("physical");
-  
-  // Additional modifiers (matching player equipment)
-  const [defModifier, setDefModifier] = useState(0);
-  const [mDefModifier, setMDefModifier] = useState(0);
-  const [modifiersExpanded, setModifiersExpanded] = useState(false);
+  const handleQualitySelected = (item) => {
+    setFormState((prev) => ({
+      ...prev,
+      selectedQuality: item.name,
+      qualityName: item.name,
+      quality: item.quality ?? "",
+      qualityCost: item.cost ?? 0,
+      qualityApplicableTo: Array.isArray(item.filter) ? item.filter : [],
+      cost: (prev.cost ?? 0) - (prev.qualityCost ?? 0) + (item.cost ?? 0),
+    }));
+    setQualityBrowserOpen(false);
+  };
 
-  // Secondary weapon overrides
-  const [secondOverrideType, setSecondOverrideType] = useState(false);
-  const [secondCustomAccuracyMod, setSecondCustomAccuracyMod] = useState(0);
-  const [secondCustomDamageMod, setSecondCustomDamageMod] = useState(0);
-  const [secondCustomDamageType, setSecondCustomDamageType] = useState("physical");
-  
-  // Additional secondary modifiers (matching player equipment)
-  const [secondDefModifier, setSecondDefModifier] = useState(0);
-  const [secondMDefModifier, setSecondMDefModifier] = useState(0);
-  const [secondModifiersExpanded, setSecondModifiersExpanded] = useState(false);
-
-  // Check if weapon has transforming customization
-  const hasTransforming = currentCustomizations.some(
-    (c) => c.name === "weapon_customization_transforming"
+  const [downloadImage, downloadSnackbar] = useDownloadImage(
+    formState.name || "Custom Weapon",
+    weaponCardsRef,
   );
-
-  // Check if weapon has elemental customization
-  const hasElemental = currentCustomizations.some(
-    (c) => c.name === "weapon_customization_elemental"
-  );
-  const secondHasElemental = secondCurrentCustomizations.some(
-    (c) => c.name === "weapon_customization_elemental"
-  );
-
-  // Combined download for transforming weapons
-  const [downloadCombinedImage, downloadSnackbar] = useDownloadImage(
-    `${weaponName || "Custom Weapon"}`,
-    weaponCardsRef
-  );
-
-  // Handle category change and remove invalid customizations
-  const handleCategoryChange = (event) => {
-    const newCategory = event.target.value;
-    setSelectedCategory(newCategory);
-
-    // Remove 'powerful' customization if switching to arcane or dagger
-    if (
-      newCategory === "weapon_category_arcane" ||
-      newCategory === "weapon_category_dagger"
-    ) {
-      setCurrentCustomizations((prev) =>
-        prev.filter((c) => c.name !== "weapon_customization_powerful")
-      );
-    }
-  };
-
-  const handleSecondCategoryChange = (event) => {
-    const newCategory = event.target.value;
-    setSecondSelectedCategory(newCategory);
-
-    // Remove 'powerful' customization if switching to arcane or dagger
-    if (
-      newCategory === "weapon_category_arcane" ||
-      newCategory === "weapon_category_dagger"
-    ) {
-      setSecondCurrentCustomizations((prev) =>
-        prev.filter((c) => c.name !== "weapon_customization_powerful")
-      );
-    }
-  };
-
-  // Handle customization addition
-  const handleCustomizationAdd = () => {
-    if (selectedCustomization) {
-      const customToAdd = customizations.find(
-        (c) => c.name === selectedCustomization
-      );
-      if (customToAdd) {
-        setCurrentCustomizations((prev) => [...prev, customToAdd]);
-        setSelectedCustomization("");
-      }
-    }
-  };
-
-  const handleSecondCustomizationAdd = () => {
-    if (secondSelectedCustomization) {
-      const customToAdd = customizations.find(
-        (c) => c.name === secondSelectedCustomization
-      );
-      if (customToAdd) {
-        setSecondCurrentCustomizations((prev) => [...prev, customToAdd]);
-        setSecondSelectedCustomization("");
-      }
-    }
-  };
-
-  // Handle customization removal
-  const handleCustomizationRemove = (customizationToRemove) => {
-    setCurrentCustomizations((prev) =>
-      prev.filter((c) => c.name !== customizationToRemove.name)
-    );
-  };
-
-  const handleSecondCustomizationRemove = (customizationToRemove) => {
-    // Prevent removing transforming from second form
-    if (customizationToRemove.name === "weapon_customization_transforming") {
-      return;
-    }
-    setSecondCurrentCustomizations((prev) =>
-      prev.filter((c) => c.name !== customizationToRemove.name)
-    );
-  };
-
-  // Initialize second form with transforming customization when needed
-  React.useEffect(() => {
-    if (hasTransforming && secondCurrentCustomizations.length === 0) {
-      const transformingCustom = customizations.find(
-        (c) => c.name === "weapon_customization_transforming"
-      );
-      if (transformingCustom) {
-        setSecondCurrentCustomizations([transformingCustom]);
-      }
-    }
-  }, [hasTransforming, secondCurrentCustomizations.length]);
-
-  // Clear all fields
-  const handleClearFields = () => {
-    setWeaponName("");
-    setSelectedCategory(categories[0]);
-    setSelectedRange(range[0]);
-    setMartial(false);
-    setSelectedAccuracyCheck(accuracyChecks[0]);
-    setSelectedType(types[0]);
-    setCurrentCustomizations([]);
-    setSelectedCustomization("");
-    setSelectedQuality("");
-    setQuality("");
-    setQualityCost(0);
-
-    setSecondWeaponName("");
-    setSecondSelectedCategory(categories[0]);
-    setSecondSelectedRange(range[0]);
-    setSecondMartial(false);
-    setSecondSelectedAccuracyCheck(accuracyChecks[0]);
-    setSecondSelectedType(types[0]);
-    setSecondCurrentCustomizations([]);
-    setSecondSelectedCustomization("");
-
-    // Reset override states
-    setOverrideType(false);
-    setCustomAccuracyMod(0);
-    setCustomDamageMod(0);
-    setCustomDamageType("physical");
-    
-    // Reset additional modifiers
-    setDefModifier(0);
-    setMDefModifier(0);
-    setModifiersExpanded(false);
-
-    // Reset secondary weapon overrides
-    setSecondOverrideType(false);
-    setSecondCustomAccuracyMod(0);
-    setSecondCustomDamageMod(0);
-    setSecondCustomDamageType("physical");
-    
-    // Reset additional secondary modifiers
-    setSecondDefModifier(0);
-    setSecondMDefModifier(0);
-    setSecondModifiersExpanded(false);
-  };
 
   const handleFileUpload = (data) => {
     if (data && data.dataType === "weapon") {
-      // Clear all fields first
-      setWeaponName("");
-      setSelectedCategory("");
-      setSelectedRange("");
-      setMartial(false);
-      setSelectedAccuracyCheck(accuracyChecks[0]);
-      setSelectedType("");
-      setCurrentCustomizations([]);
-      setSelectedQuality("");
-      setQuality("");
-      setQualityCost(0);
-      setTimeout(() => {
-        if (data.name) {
-          setWeaponName(data.name);
-        }
-        if (data.category && categories.includes(data.category)) {
-          setSelectedCategory(data.category);
-        }
-        if (data.range && range.includes(data.range)) {
-          setSelectedRange(data.range);
-        }
-        if (data.martial) {
-          setMartial(data.martial);
-        }
-        if (data.accuracyCheck && data.accuracyCheck.att1 && data.accuracyCheck.att2) {
-          const matchingCheck = accuracyChecks.find(
-            check => check.att1 === data.accuracyCheck.att1 && check.att2 === data.accuracyCheck.att2
-          );
-          if (matchingCheck) {
-            setSelectedAccuracyCheck(matchingCheck);
-          }
-        }
-        if (data.type && types.includes(data.type)) {
-          setSelectedType(data.type);
-        }
-        if (data.customizations && Array.isArray(data.customizations)) {
-          const validCustomizations = data.customizations.filter(custom =>
-            customizations.some(c => c.name === custom.name)
-          );
-          setCurrentCustomizations(validCustomizations);
-        }
-        if (data.quality) {
-          setSelectedQuality("");
-          setQuality(data.quality);
-        }
-        if (data.qualityCost !== undefined) {
-          setQualityCost(data.qualityCost);
-        }
-
-        // Handle modifiers (map standard format to generator fields)
-        if (data.damageModifier !== undefined) {
-          setCustomDamageMod(data.damageModifier);
-        }
-        if (data.precModifier !== undefined) {
-          setCustomAccuracyMod(data.precModifier);
-        }
-        if (data.defModifier !== undefined) {
-          setDefModifier(data.defModifier);
-        }
-        if (data.mDefModifier !== undefined) {
-          setMDefModifier(data.mDefModifier);
-        }
-        if (data.overrideDamageType !== undefined) {
-          setOverrideType(data.overrideDamageType);
-        }
-        if (data.customDamageType !== undefined) {
-          setCustomDamageType(data.customDamageType);
-        }
-        
-        // Auto-expand modifiers if any are set
-        setModifiersExpanded(
-          (data.damageModifier && data.damageModifier !== 0) ||
-          (data.precModifier && data.precModifier !== 0) ||
-          (data.defModifier && data.defModifier !== 0) ||
-          (data.mDefModifier && data.mDefModifier !== 0) ||
-          data.overrideDamageType
-        );
-
-        // Handle secondary weapon data for transforming weapons
-        if (data.secondWeaponName) {
-          setSecondWeaponName(data.secondWeaponName);
-        }
-        if (data.secondSelectedCategory && categories.includes(data.secondSelectedCategory)) {
-          setSecondSelectedCategory(data.secondSelectedCategory);
-        }
-        if (data.secondSelectedRange && range.includes(data.secondSelectedRange)) {
-          setSecondSelectedRange(data.secondSelectedRange);
-        }
-        if (data.secondMartial) {
-          setSecondMartial(data.secondMartial);
-        }
-        if (data.secondSelectedAccuracyCheck) {
-          const matchingCheck = accuracyChecks.find(
-            check => check.att1 === data.secondSelectedAccuracyCheck.att1 && check.att2 === data.secondSelectedAccuracyCheck.att2
-          );
-          if (matchingCheck) {
-            setSecondSelectedAccuracyCheck(matchingCheck);
-          }
-        }
-        if (data.secondSelectedType && types.includes(data.secondSelectedType)) {
-          setSecondSelectedType(data.secondSelectedType);
-        }
-        if (data.secondCurrentCustomizations && Array.isArray(data.secondCurrentCustomizations)) {
-          const validCustomizations = data.secondCurrentCustomizations.filter(custom =>
-            customizations.some(c => c.name === custom.name)
-          );
-          setSecondCurrentCustomizations(validCustomizations);
-        }
-
-        // Handle secondary weapon modifiers (map standard format to generator fields)
-        if (data.secondDamageModifier !== undefined) {
-          setSecondCustomDamageMod(data.secondDamageModifier);
-        }
-        if (data.secondPrecModifier !== undefined) {
-          setSecondCustomAccuracyMod(data.secondPrecModifier);
-        }
-        if (data.secondDefModifier !== undefined) {
-          setSecondDefModifier(data.secondDefModifier);
-        }
-        if (data.secondMDefModifier !== undefined) {
-          setSecondMDefModifier(data.secondMDefModifier);
-        }
-        if (data.secondOverrideDamageType !== undefined) {
-          setSecondOverrideType(data.secondOverrideDamageType);
-        }
-        if (data.secondCustomDamageType !== undefined) {
-          setSecondCustomDamageType(data.secondCustomDamageType);
-        }
-        
-        // Auto-expand secondary modifiers if any are set
-        setSecondModifiersExpanded(
-          (data.secondDamageModifier && data.secondDamageModifier !== 0) ||
-          (data.secondPrecModifier && data.secondPrecModifier !== 0) ||
-          (data.secondDefModifier && data.secondDefModifier !== 0) ||
-          (data.secondMDefModifier && data.secondMDefModifier !== 0) ||
-          data.secondOverrideDamageType
-        );
-
-      }, 100);
+      setFormState(buildInitialState(data));
     }
   };
 
-  const handleUploadJSON = () => {
-    fileInputRef.current.click();
-  };
+  const handleClearFields = () => setFormState(buildInitialState(null));
 
-  const calculateWeaponCost = () => {
-    const baseCost = 300; // Custom weapons have base cost of 300
-    const customizationCost = hasTransforming ? 100 : 0;
-    return baseCost + customizationCost;
+  const {
+    name,
+    selectedCategory,
+    selectedRange,
+    martial,
+    selectedAccuracyCheck,
+    customDamageType,
+    overrideDamageType,
+    rareAccuracyBonus,
+    rareDamageBonus,
+    customizations,
+    quality,
+    qualityCost,
+    cost,
+    hasTransforming,
+    precModifier,
+    damageModifier,
+    defModifier,
+    mDefModifier,
+    overrideAccuracyAttributes,
+    secondWeaponName,
+    secondSelectedCategory,
+    secondSelectedRange,
+    secondSelectedAccuracyCheck,
+    secondCustomDamageType,
+    _secondOverrideDamageType,
+    secondCustomizations,
+    secondPrecModifier,
+    secondDamageModifier,
+    secondDefModifier,
+    secondMDefModifier,
+    primaryHrZero,
+    secondaryHrZero,
+  } = formState;
+
+  const { precision: pPrec, damage: pDmg } = calculateCustomWeaponStats(
+    {
+      category: selectedCategory,
+      customizations,
+      rareAccuracyBonus,
+      rareDamageBonus,
+      damageModifier,
+      precModifier,
+    },
+    false,
+  );
+
+  const pHasElemental = (customizations ?? []).some(
+    (c) => c.name === "weapon_customization_elemental",
+  );
+  const _pType = pHasElemental
+    ? (formState.damage?.type ?? customDamageType ?? "physical")
+    : overrideDamageType
+      ? (formState.rareOverrideDamageTypeValue ?? "physical")
+      : "physical";
+
+  const exportData = {
+    name,
+    itemType: "customWeapon",
+    category: selectedCategory,
+    range: selectedRange,
+    martial,
+    accuracy: {
+      attr1: selectedAccuracyCheck?.attr1 ?? "dexterity",
+      attr2: selectedAccuracyCheck?.attr2 ?? "insight",
+      value: pPrec,
+      defense: "def",
+    },
+    damage: {
+      value: pDmg,
+      type: formState.damage?.type ?? "physical",
+      hrZero: primaryHrZero,
+    },
+    modifiers: {
+      damage: parseInt(damageModifier) || 0,
+      accuracy: parseInt(precModifier) || 0,
+      def: parseInt(defModifier) || 0,
+      mdef: parseInt(mDefModifier) || 0,
+    },
+    rare: {
+      accuracyBonus: rareAccuracyBonus,
+      damageBonus: rareDamageBonus,
+      overrideAccuracyAttributes,
+      overrideDamageType,
+      overrideDamageTypeValue: formState.rareOverrideDamageTypeValue,
+      overrideAccuracyAttr1: selectedAccuracyCheck?.attr1 ?? "dexterity",
+      overrideAccuracyAttr2: selectedAccuracyCheck?.attr2 ?? "insight",
+    },
+    customizations,
+    selectedQuality: formState.selectedQuality,
+    quality,
+    qualityCost,
+    cost,
+    hands: 2,
+    dataType: "weapon",
+    ...(hasTransforming &&
+      (() => {
+        const { precision: s2Prec, damage: s2Dmg } = calculateCustomWeaponStats(
+          {
+            secondSelectedCategory,
+            secondCurrentCustomizations: secondCustomizations,
+            rareAccuracyBonus,
+            rareDamageBonus,
+            secondDamageModifier: secondDamageModifier,
+            secondPrecModifier: secondPrecModifier,
+          },
+          true,
+        );
+        const s2HasElemental = (secondCustomizations ?? []).some(
+          (c) => c.name === "weapon_customization_elemental",
+        );
+        const s2Type = s2HasElemental
+          ? (formState.secondDamage?.type ??
+            secondCustomDamageType ??
+            "physical")
+          : overrideDamageType
+            ? (formState.rareOverrideDamageTypeValue ?? "physical")
+            : "physical";
+        return {
+          secondName: secondWeaponName,
+          secondCategory: secondSelectedCategory,
+          secondRange: secondSelectedRange,
+          secondMartial: formState.secondMartial ?? false,
+          secondCustomizations,
+          secondAccuracy: {
+            attr1: secondSelectedAccuracyCheck?.attr1 ?? "dexterity",
+            attr2: secondSelectedAccuracyCheck?.attr2 ?? "insight",
+            value: s2Prec,
+            defense: "def",
+          },
+          secondDamage: { value: s2Dmg, type: s2Type, hrZero: secondaryHrZero },
+          secondModifiers: {
+            damage: parseInt(secondDamageModifier) || 0,
+            accuracy: parseInt(secondPrecModifier) || 0,
+            def: parseInt(secondDefModifier) || 0,
+            mdef: parseInt(secondMDefModifier) || 0,
+          },
+        };
+      })()),
   };
 
   return (
     <Grid container spacing={2}>
       {/* Left side - Configuration Card */}
-      <Grid item xs={12} md={6}>
+      <Grid size={{ xs: 12, md: 6 }}>
         <Paper
           elevation={3}
           sx={{
@@ -405,34 +449,140 @@ function CustomWeapons() {
             borderColor: secondary,
           }}
         >
-          {/* Header */}
           <CustomHeaderAlt
             headerText={t("Custom Weapons")}
             icon={<AutoAwesome fontSize="large" />}
+            actionIcon={<Search fontSize="large" />}
+            onAction={() => setBaseBrowserOpen(true)}
+            actionTooltip={t("Browse Compendium")}
           />
-          {/* Action Buttons */}
+
+          {/* Primary Weapon Form */}
           <Grid container spacing={2} sx={{ mb: 2 }}>
-            <Grid item xs={6}>
+            <SchemaFieldRenderer
+              config={customWeaponFieldConfig}
+              groupLabels={customWeaponGroupLabels}
+              state={formState}
+              onChange={setFormState}
+              surface="edit"
+              group="core"
+              cols={2}
+              extraProps={{
+                selectedCategory,
+                rareAccuracyBonus,
+                isSecondForm: false,
+              }}
+            />
+          </Grid>
+          <Grid container spacing={2} sx={{ mb: 2 }}>
+            <SchemaFieldRenderer
+              config={customWeaponFieldConfig}
+              groupLabels={customWeaponGroupLabels}
+              state={formState}
+              onChange={setFormState}
+              surface="edit"
+              group="accuracy"
+              cols={2}
+            />
+          </Grid>
+          <Grid container spacing={2} sx={{ mb: 2 }}>
+            <SchemaFieldRenderer
+              config={customWeaponFieldConfig}
+              groupLabels={customWeaponGroupLabels}
+              state={formState}
+              onChange={setFormState}
+              surface="edit"
+              group="damage"
+              cols={2}
+            />
+          </Grid>
+          <Grid container spacing={2} sx={{ mb: 2 }}>
+            <SchemaFieldRenderer
+              config={customWeaponFieldConfig}
+              groupLabels={customWeaponGroupLabels}
+              state={formState}
+              onChange={setFormState}
+              surface="edit"
+              group="quality"
+              cols={2}
+              extraProps={{
+                groups: qualityGroups,
+                onBrowse: () => setQualityBrowserOpen(true),
+              }}
+            />
+          </Grid>
+
+          <Grid container spacing={2} sx={{ mb: 2 }}>
+            <SchemaFieldRenderer
+              config={customWeaponFieldConfig}
+              groupLabels={customWeaponGroupLabels}
+              state={formState}
+              onChange={setFormState}
+              surface="edit"
+              group="rare"
+              cols={2}
+            />
+          </Grid>
+          <Grid container spacing={2} sx={{ mb: 2 }}>
+            <SchemaFieldRenderer
+              config={customWeaponFieldConfig}
+              groupLabels={customWeaponGroupLabels}
+              state={formState}
+              onChange={setFormState}
+              surface="edit"
+              group="modifiers"
+              cols={2}
+            />
+          </Grid>
+
+          {/* Secondary Weapon Form (transforming only) */}
+          {hasTransforming && (
+            <>
+              <Grid container spacing={2} sx={{ mb: 2, mt: 1 }}>
+                <SchemaFieldRenderer
+                  config={customWeaponFieldConfig}
+                  groupLabels={customWeaponGroupLabels}
+                  state={formState}
+                  onChange={setFormState}
+                  surface="edit"
+                  group="secondary"
+                  cols={2}
+                  extraProps={{
+                    selectedCategory: secondSelectedCategory,
+                    rareAccuracyBonus,
+                    isSecondForm: true,
+                  }}
+                />
+              </Grid>
+              <Grid container spacing={2}>
+                <SchemaFieldRenderer
+                  config={customWeaponFieldConfig}
+                  groupLabels={customWeaponGroupLabels}
+                  state={formState}
+                  onChange={setFormState}
+                  surface="edit"
+                  group="secondaryModifiers"
+                  cols={2}
+                />
+              </Grid>
+            </>
+          )}
+          <Grid container spacing={2} sx={{ mt: 2 }}>
+            <Grid size={6}>
               <Button
                 variant="outlined"
                 fullWidth
-                onClick={handleUploadJSON}
+                onClick={() => fileInputRef.current.click()}
               >
-                Upload JSON
+                {t("Upload JSON")}
               </Button>
             </Grid>
-            <Grid item xs={6}>
-              <Button
-                variant="outlined"
-                fullWidth
-                onClick={handleClearFields}
-              >
-                Clear All Fields
+            <Grid size={6}>
+              <Button variant="outlined" fullWidth onClick={handleClearFields}>
+                {t("Clear All Fields")}
               </Button>
             </Grid>
           </Grid>
-
-          {/* Hidden file input */}
           <input
             ref={fileInputRef}
             type="file"
@@ -443,11 +593,9 @@ function CustomWeapons() {
                 const reader = new FileReader();
                 reader.onload = () => {
                   try {
-                    const result = JSON.parse(reader.result);
-                    handleFileUpload(result);
-                  } catch (error) {
-                    console.error('Error parsing JSON file:', error);
-                    alert('Invalid JSON file format');
+                    handleFileUpload(JSON.parse(reader.result));
+                  } catch {
+                    // ignore malformed JSON
                   }
                 };
                 reader.readAsText(file);
@@ -455,478 +603,56 @@ function CustomWeapons() {
             }}
             style={{ display: "none" }}
           />
-
-          {/* Primary Weapon Form */}
-          <Grid container spacing={2}>
-            <Grid item xs={12}>
-              <Typography variant="h6" gutterBottom>
-                Primary Weapon
-              </Typography>
-            </Grid>
-
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label="Weapon Name"
-                value={weaponName}
-                onChange={(e) => setWeaponName(e.target.value)}
-              />
-            </Grid>
-
-            <Grid item xs={12} sm={6}>
-              <ChangeCategory
-                value={selectedCategory}
-                onChange={handleCategoryChange}
-              />
-            </Grid>
-
-            <Grid item xs={12} sm={6}>
-              <ChangeRange
-                value={selectedRange}
-                onChange={(e) => setSelectedRange(e.target.value)}
-              />
-            </Grid>
-
-            <Grid item xs={12} sm={6}>
-              <ChangeAccuracyCheck
-                value={selectedAccuracyCheck}
-                onChange={setSelectedAccuracyCheck}
-              />
-            </Grid>
-
-            <Grid item xs={12} sm={6}>
-              <ChangeType
-                value={overrideType ? customDamageType : selectedType}
-                onChange={(e) => {
-                  if (overrideType) {
-                    setCustomDamageType(e.target.value);
-                  } else {
-                    setSelectedType(e.target.value);
-                  }
-                }}
-                disabled={!hasElemental && !overrideType}
-              />
-            </Grid>
-
-            <ChangeCustomizations
-              selectedCustomization={selectedCustomization}
-              setSelectedCustomization={setSelectedCustomization}
-              onCustomizationAdd={handleCustomizationAdd}
-              onCustomizationRemove={handleCustomizationRemove}
-              currentCustomizations={currentCustomizations}
-              selectedCategory={selectedCategory}
-              isSecondForm={false}
-            />
-
-            {/* Quality Selection */}
-            <Grid item xs={12} sm={5}>
-              <SelectQuality
-                quality={selectedQuality}
-                setQuality={(e) => {
-                  const quality = qualities.find(
-                    (el) => el.name === e.target.value
-                  );
-                  setSelectedQuality(quality.name);
-                  setQuality(quality.quality);
-                  setQualityCost(quality.cost);
-                }}
-              />
-            </Grid>
-            <Grid item xs={12} sm={1}>
-              <Button
-                variant="outlined"
-                onClick={() => {
-                  setSelectedQuality("");
-                  setQuality("");
-                  setQualityCost(0);
-                }}
-                disabled={!selectedQuality}
-                sx={{ height: "100%", minWidth: "40px", px: 1 }}
-              >
-                ×
-              </Button>
-            </Grid>
-
-            {/* Quality Text Area */}
-            <Grid item xs={12}>
-              <ChangeQuality
-                quality={quality}
-                setQuality={(e) => setQuality(e.target.value)}
-                qualityCost={qualityCost}
-                setQualityCost={(e) => setQualityCost(e.target.value)}
-              />
-            </Grid>
-
-            {/* Advanced Overrides Section */}
-            <Grid item xs={12}>
-              <Accordion>
-                <AccordionSummary
-                  expandIcon={<ExpandMore />}
-                  aria-controls="overrides-content"
-                  id="overrides-header"
-                >
-                  <Typography variant="h6">{t("Advanced Overrides")}</Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  <Grid container spacing={2}>
-                    {/* Accuracy Modifier */}
-                    <Grid item xs={12} sm={4}>
-                      <TextField
-                        fullWidth
-                        type="number"
-                        label={t("Accuracy Modifier")}
-                        value={customAccuracyMod}
-                        onChange={(e) => setCustomAccuracyMod(parseInt(e.target.value) || 0)}
-                        size="small"
-                      />
-                    </Grid>
-
-                    {/* Damage Modifier */}
-                    <Grid item xs={12} sm={4}>
-                      <TextField
-                        fullWidth
-                        type="number"
-                        label={t("Damage Modifier")}
-                        value={customDamageMod}
-                        onChange={(e) => setCustomDamageMod(parseInt(e.target.value) || 0)}
-                        size="small"
-                      />
-                    </Grid>
-
-                    {/* Override Type */}
-                    <Grid item xs={12} sm={4}>
-                      <FormControlLabel
-                        control={
-                          <Checkbox
-                            checked={overrideType}
-                            onChange={(e) => setOverrideType(e.target.checked)}
-                          />
-                        }
-                        label={t("Override Damage Type")}
-                      />
-                      {overrideType && (
-                        <FormControl fullWidth size="small" sx={{ mt: 1 }}>
-                          <InputLabel>{t("Damage Type")}</InputLabel>
-                          <Select
-                            value={customDamageType}
-                            onChange={(e) => setCustomDamageType(e.target.value)}
-                            label={t("Damage Type")}
-                          >
-                            {types.map((type) => (
-                              <MenuItem key={type} value={type}>
-                                {t(type)}
-                              </MenuItem>
-                            ))}
-                          </Select>
-                        </FormControl>
-                      )}
-                    </Grid>
-
-                    {/* DEF Modifier */}
-                    <Grid item xs={12} sm={6}>
-                      <TextField
-                        fullWidth
-                        type="number"
-                        label={t("DEF Modifier")}
-                        value={defModifier}
-                        onChange={(e) => setDefModifier(parseInt(e.target.value) || 0)}
-                        size="small"
-                      />
-                    </Grid>
-
-                    {/* MDEF Modifier */}
-                    <Grid item xs={12} sm={6}>
-                      <TextField
-                        fullWidth
-                        type="number"
-                        label={t("MDEF Modifier")}
-                        value={mDefModifier}
-                        onChange={(e) => setMDefModifier(parseInt(e.target.value) || 0)}
-                        size="small"
-                      />
-                    </Grid>
-                  </Grid>
-                </AccordionDetails>
-              </Accordion>
-            </Grid>
-          </Grid>
-
-          {/* Secondary Weapon Form (shown when transforming is selected) */}
-          {hasTransforming && (
-            <>
-              <Divider sx={{ my: 3 }} />
-              <Grid container spacing={2}>
-                <Grid item xs={12}>
-                  <Typography variant="h6" gutterBottom>
-                    Transforming Form
-                  </Typography>
-                </Grid>
-
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    fullWidth
-                    label="Second Form Name"
-                    value={secondWeaponName}
-                    onChange={(e) => setSecondWeaponName(e.target.value)}
-                  />
-                </Grid>
-
-                <Grid item xs={12} sm={6}>
-                  <ChangeCategory
-                    value={secondSelectedCategory}
-                    onChange={handleSecondCategoryChange}
-                  />
-                </Grid>
-
-                <Grid item xs={12} sm={6}>
-                  <ChangeRange
-                    value={secondSelectedRange}
-                    onChange={(e) => setSecondSelectedRange(e.target.value)}
-                  />
-                </Grid>
-
-                <Grid item xs={12} sm={6}>
-                  <ChangeAccuracyCheck
-                    value={secondSelectedAccuracyCheck}
-                    onChange={setSecondSelectedAccuracyCheck}
-                  />
-                </Grid>
-
-                <Grid item xs={12} sm={6}>
-                  <ChangeType
-                    value={secondOverrideType ? secondCustomDamageType : secondSelectedType}
-                    onChange={(e) => {
-                      if (secondOverrideType) {
-                        setSecondCustomDamageType(e.target.value);
-                      } else {
-                        setSecondSelectedType(e.target.value);
-                      }
-                    }}
-                    disabled={!secondHasElemental && !secondOverrideType}
-                  />
-                </Grid>
-
-                <ChangeCustomizations
-                  selectedCustomization={secondSelectedCustomization}
-                  setSelectedCustomization={setSecondSelectedCustomization}
-                  onCustomizationAdd={handleSecondCustomizationAdd}
-                  onCustomizationRemove={handleSecondCustomizationRemove}
-                  currentCustomizations={secondCurrentCustomizations}
-                  selectedCategory={secondSelectedCategory}
-                  isSecondForm={true}
-                />
-
-                {/* Advanced Overrides Section for Transforming Form */}
-                <Grid item xs={12}>
-                  <Accordion>
-                    <AccordionSummary
-                      expandIcon={<ExpandMore />}
-                      aria-controls="second-overrides-content"
-                      id="second-overrides-header"
-                    >
-                      <Typography variant="h6">{t("Advanced Overrides - Transforming Form")}</Typography>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                      <Grid container spacing={2}>
-                        {/* Accuracy Modifier */}
-                        <Grid item xs={12} sm={4}>
-                          <TextField
-                            fullWidth
-                            type="number"
-                            label={t("Accuracy Modifier")}
-                            value={secondCustomAccuracyMod}
-                            onChange={(e) => setSecondCustomAccuracyMod(parseInt(e.target.value) || 0)}
-                            size="small"
-                          />
-                        </Grid>
-
-                        {/* Damage Modifier */}
-                        <Grid item xs={12} sm={4}>
-                          <TextField
-                            fullWidth
-                            type="number"
-                            label={t("Damage Modifier")}
-                            value={secondCustomDamageMod}
-                            onChange={(e) => setSecondCustomDamageMod(parseInt(e.target.value) || 0)}
-                            size="small"
-                          />
-                        </Grid>
-
-                        {/* Override Type */}
-                        <Grid item xs={12} sm={4}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                checked={secondOverrideType}
-                                onChange={(e) => setSecondOverrideType(e.target.checked)}
-                              />
-                            }
-                            label={t("Override Damage Type")}
-                          />
-                          {secondOverrideType && (
-                            <FormControl fullWidth size="small" sx={{ mt: 1 }}>
-                              <InputLabel>{t("Damage Type")}</InputLabel>
-                              <Select
-                                value={secondCustomDamageType}
-                                onChange={(e) => setSecondCustomDamageType(e.target.value)}
-                                label={t("Damage Type")}
-                              >
-                                {types.map((type) => (
-                                  <MenuItem key={type} value={type}>
-                                    {t(type)}
-                                  </MenuItem>
-                                ))}
-                              </Select>
-                            </FormControl>
-                          )}
-                        </Grid>
-
-                        {/* Secondary DEF Modifier */}
-                        <Grid item xs={12} sm={6}>
-                          <TextField
-                            fullWidth
-                            type="number"
-                            label={t("DEF Modifier")}
-                            value={secondDefModifier}
-                            onChange={(e) => setSecondDefModifier(parseInt(e.target.value) || 0)}
-                            size="small"
-                          />
-                        </Grid>
-
-                        {/* Secondary MDEF Modifier */}
-                        <Grid item xs={12} sm={6}>
-                          <TextField
-                            fullWidth
-                            type="number"
-                            label={t("MDEF Modifier")}
-                            value={secondMDefModifier}
-                            onChange={(e) => setSecondMDefModifier(parseInt(e.target.value) || 0)}
-                            size="small"
-                          />
-                        </Grid>
-                      </Grid>
-                    </AccordionDetails>
-                  </Accordion>
-                </Grid>
-              </Grid>
-            </>
-          )}
-
         </Paper>
       </Grid>
 
       {/* Right side - Weapon Preview */}
-      <Grid item xs={12} md={6}>
-        <Box>
-          <Box ref={weaponCardsRef}>
-            <Typography variant="h6" gutterBottom>
-              Primary Weapon Preview
-            </Typography>
-            <PrettyCustomWeapon
-              weaponData={{
-                name: weaponName,
-                category: selectedCategory,
-                range: selectedRange,
-                martial: martial,
-                accuracyCheck: selectedAccuracyCheck,
-                type: selectedType,
-                customizations: currentCustomizations,
-                quality: quality,
-                qualityCost: qualityCost,
-                // Map to standard format
-                damageModifier: customDamageMod,
-                precModifier: customAccuracyMod,
-                defModifier: defModifier,
-                mDefModifier: mDefModifier,
-                overrideDamageType: overrideType,
-                customDamageType: customDamageType
-              }}
-              showActions={!hasTransforming}
-            />
-
-            {hasTransforming && (
-              <>
-                <Typography variant="h6" gutterBottom sx={{ mt: 3 }}>
-                  Transforming Form Preview
-                </Typography>
-                <PrettyCustomWeapon
-                  weaponData={{
-                    name: secondWeaponName,
-                    category: secondSelectedCategory,
-                    range: secondSelectedRange,
-                    martial: secondMartial,
-                    accuracyCheck: secondSelectedAccuracyCheck,
-                    type: secondSelectedType,
-                    customizations: secondCurrentCustomizations,
-                    quality: quality,
-                    qualityCost: qualityCost,
-                    // Map to standard format for transforming form
-                    damageModifier: secondCustomDamageMod,
-                    precModifier: secondCustomAccuracyMod,
-                    defModifier: secondDefModifier,
-                    mDefModifier: secondMDefModifier,
-                    overrideDamageType: secondOverrideType,
-                    customDamageType: secondCustomDamageType
-                  }}
-                  showActions={false}
-                />
-              </>
-            )}
-          </Box>
-
-          {hasTransforming && (
-            /* Combined Download Actions for Transforming Weapons */
-            <Box sx={{ display: "flex", mt: 2 }}>
-              <Tooltip title={t("Download Combined as Image")}>
-                <IconButton onClick={downloadCombinedImage}>
+      <Grid
+        size={{ xs: 12, md: 6 }}
+        sx={{ position: "sticky", top: stickyTop, alignSelf: "flex-start" }}
+      >
+        <SharedCustomWeaponCard
+          variant={variant}
+          item={exportData}
+          cardRef={weaponCardsRef}
+          imageMode="slot"
+          showImageToggle
+          actionContent={
+            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              <Tooltip title={t("Download as Image")}>
+                <IconButton onClick={downloadImage}>
                   <Download />
                 </IconButton>
               </Tooltip>
               <Export
-                name={`${weaponName || "Custom Weapon"}`}
+                name={name || "Custom Weapon"}
                 dataType="weapon"
-                data={{
-                  name: weaponName,
-                  category: selectedCategory,
-                  range: selectedRange,
-                  martial: martial,
-                  accuracyCheck: selectedAccuracyCheck,
-                  type: selectedType,
-                  customizations: currentCustomizations,
-                  selectedQuality: selectedQuality,
-                  quality: quality,
-                  qualityCost: qualityCost,
-                  cost: calculateWeaponCost(),
-                  hands: 2,
-                  isEquipped: false,
-                  damageModifier: customDamageMod,
-                  precModifier: customAccuracyMod,
-                  defModifier: defModifier,
-                  mDefModifier: mDefModifier,
-                  overrideDamageType: overrideType,
-                  customDamageType: customDamageType,
-                  secondWeaponName: secondWeaponName,
-                  secondSelectedCategory: secondSelectedCategory,
-                  secondSelectedRange: secondSelectedRange,
-                  secondMartial: secondMartial,
-                  secondSelectedAccuracyCheck: secondSelectedAccuracyCheck,
-                  secondSelectedType: secondSelectedType,
-                  secondCurrentCustomizations: secondCurrentCustomizations,
-                  secondDamageModifier: secondCustomDamageMod,
-                  secondPrecModifier: secondCustomAccuracyMod,
-                  secondDefModifier: secondDefModifier,
-                  secondMDefModifier: secondMDefModifier,
-                  secondOverrideDamageType: secondOverrideType,
-                  secondCustomDamageType: secondCustomDamageType,
-                  
-                  dataType: "weapon"
-                }}
+                data={{ ...exportData, dataType: "weapon" }}
               />
-            </Box>
-          )}
-        </Box>
+              <AddToCompendiumButton
+                itemType="custom-weapon"
+                data={exportData}
+              />
+            </div>
+          }
+        />
       </Grid>
       {downloadSnackbar}
+      <CompendiumViewerModal
+        open={qualityBrowserOpen}
+        onClose={() => setQualityBrowserOpen(false)}
+        onAddItem={handleQualitySelected}
+        initialType="qualities"
+        restrictToTypes={["qualities"]}
+        initialQualityFilters={["weapon", "customWeapon"]}
+      />
+      <CompendiumViewerModal
+        open={baseBrowserOpen}
+        onClose={() => setBaseBrowserOpen(false)}
+        onAddItem={handleBaseSelected}
+        initialType="custom-weapons"
+        restrictToTypes={["custom-weapons"]}
+      />
     </Grid>
   );
 }

@@ -1,23 +1,23 @@
 export function diceList(list, modifier) {
   const dice = [...list];
-  
+
   if (modifier > 0) {
     dice.push(modifier);
-    return dice.join("+")
+    return dice.join("+");
   }
-  
+
   if (modifier < 0) {
     return dice.join("+") + modifier;
   }
-  
-  return dice.join("+")
+
+  return dice.join("+");
 }
 
 export function random(size) {
   const randomValues = window.crypto.getRandomValues(new Uint32Array(1));
-  
-  const sizeN = parseInt (size.slice(1));
-  
+
+  const sizeN = parseInt(size.slice(1));
+
   return (randomValues[0] % sizeN) + 1;
 }
 
@@ -42,5 +42,5 @@ export function prepareDice(d4, d6, d8, d10, d12, d20, bonus, malus) {
     dice.push("d20");
   }
   const modifier = bonus - malus;
-  return {dice, modifier};
+  return { dice, modifier };
 }

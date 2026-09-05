@@ -1,13 +1,26 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import useDownloadJSON from "../hooks/useDownloadJSON";
 import { Code } from "@mui/icons-material";
-import { Tooltip, IconButton, Menu, MenuItem, Snackbar } from "@mui/material";
+import {
+  Tooltip,
+  IconButton,
+  Menu,
+  MenuItem,
+  Snackbar,
+  Divider,
+} from "@mui/material";
 import { useTranslate } from "../translation/translate";
+import { buildItemText } from "../libs/buildItemText";
+import {
+  canonicalizeForTransfer,
+  canonicalizeForExport,
+} from "../libs/exportTransforms";
 
 type Props = {
   name?: string;
   dataType: string;
-  data?: any;
+  data?: Record<string, unknown>;
+  size?: "small" | "medium" | "large";
 };
 
 enum ExportAction {
@@ -15,15 +28,31 @@ enum ExportAction {
   CLIPBOARD,
 }
 
-function Export({ name = "", dataType, data = {} }: Props) {
+function Export({ name = "", dataType, data = {}, size = "medium" }: Props) {
   const { t } = useTranslate();
-  const [downloadJSON, copyToClipboard] = useDownloadJSON(name, { ...data, dataType });
+  const canonicalData = React.useMemo(
+    () => canonicalizeForTransfer(dataType, data),
+    [dataType, data],
+  );
+  // JSON export includes derived fields (e.g. NPC max HP/MP).
+  const exportData = React.useMemo(
+    () => canonicalizeForExport(dataType, data),
+    [dataType, data],
+  );
+  const exportDataObject =
+    exportData && typeof exportData === "object"
+      ? (exportData as Record<string, unknown>)
+      : {};
+  const [downloadJSON, copyToClipboard] = useDownloadJSON(name, {
+    ...exportDataObject,
+    dataType,
+  });
 
   const [isSnackbarOpen, setIsSnackbarOpen] = useState(false);
   const [exportAnchor, setExportAnchor] = useState(null);
   const isExportMenuOpen = Boolean(exportAnchor);
 
-  function handleOpenExportMenu(event) {
+  function handleOpenExportMenu(event: React.MouseEvent<HTMLButtonElement>) {
     setExportAnchor(event.currentTarget);
   }
 
@@ -54,11 +83,32 @@ function Export({ name = "", dataType, data = {} }: Props) {
     handleCloseExportMenu();
   }
 
+  async function handleCopyText(fmt: string) {
+    const text = buildItemText(dataType, canonicalData, fmt);
+    await navigator.clipboard.writeText(text);
+    handleCloseExportMenu();
+    handleSnackbarOpen();
+  }
+
+  function handleDownloadText(fmt: string) {
+    const text = buildItemText(dataType, canonicalData, fmt);
+    const ext = fmt === "plain" ? "txt" : "md";
+    const safeName = (name || "export").replace(/\s+/g, "_").toLowerCase();
+    const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${safeName}.${ext}`;
+    a.click();
+    URL.revokeObjectURL(url);
+    handleCloseExportMenu();
+  }
+
   return (
     <>
       <Tooltip title={t("Export")}>
-        <IconButton onClick={handleOpenExportMenu}>
-          <Code />
+        <IconButton onClick={handleOpenExportMenu} size={size}>
+          <Code fontSize={size === "small" ? "small" : "medium"} />
         </IconButton>
       </Tooltip>
 
@@ -70,18 +120,42 @@ function Export({ name = "", dataType, data = {} }: Props) {
       >
         <MenuItem
           onClick={() => {
-            exportJSON(ExportAction.FILE);
-          }}
-        >
-          {t("export_json_file")}
-        </MenuItem>
-        <MenuItem
-          onClick={() => {
             exportJSON(ExportAction.CLIPBOARD);
           }}
         >
           {t("copy_json_clipboard")}
         </MenuItem>
+        <MenuItem
+          onClick={() => {
+            exportJSON(ExportAction.FILE);
+          }}
+        >
+          {t("export_json_file")}
+        </MenuItem>
+        <Divider />
+        <MenuItem onClick={() => handleCopyText("markdown")}>
+          {t("Copy Markdown to Clipboard")}
+        </MenuItem>
+        <MenuItem onClick={() => handleDownloadText("markdown")}>
+          {t("Export as Markdown (.md)")}
+        </MenuItem>
+        <Divider />
+        <MenuItem onClick={() => handleCopyText("plain")}>
+          {t("Copy Plaintext to Clipboard")}
+        </MenuItem>
+        <MenuItem onClick={() => handleDownloadText("plain")}>
+          {t("Export as Plaintext (.txt)")}
+        </MenuItem>
+        {dataType === "npc" && (
+          <MenuItem onClick={() => handleCopyText("obsidian")}>
+            {t("Copy Obsidian (BlueCorvid) to Clipboard")}
+          </MenuItem>
+        )}
+        {dataType === "npc" && (
+          <MenuItem onClick={() => handleDownloadText("obsidian")}>
+            {t("Export as Obsidian (.md)")}
+          </MenuItem>
+        )}
       </Menu>
       <Snackbar
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}

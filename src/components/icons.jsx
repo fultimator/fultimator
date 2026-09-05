@@ -1,238 +1,287 @@
-export function PhysicalIcon({ disabled }) {
-  const color = disabled ? "#d8d7d7" : "#d8d7d7";
-  const strokeWidth = disabled ? "0" : "100";
+import { ACTION_ICON_SRC_BY_KEY } from "./actionIconSrc";
 
+const AFFINITY_ICON_BASE = "/assets/icons/affinities";
+const RESOURCE_ICON_BASE = "/assets/icons/resources";
+const ATTRIBUTE_ICON_BASE = "/assets/icons/attributes";
+const ACTION_ICON_BASE = "/assets/icons/actions";
+const CHECK_ICON_BASE = "/assets/icons/checks";
+
+function ResourceImg({ name, alt, size = "1.1em" }) {
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      version="1.1"
-      viewBox="-60 -120 1200 1200"
-      width="1.2em"
-      stroke="#000000"
-      strokeWidth={strokeWidth}
-      paintOrder="stroke markers fill"
-    >
-      <g transform="matrix(1 0 0 -1 0 1024)">
-        <path
-          fill={color}
-          d="M2 61q1 -26 18 -43t43 -18q23 1 39 14.5t20 35.5l-69 70q-22 -4 -36 -20t-15 -39v0zM96 132q3 -2 19 -18l18 -18q62 26 107.5 68.5t78.5 99.5q-27 26 -53 54q-113 -72 -170 -186v0zM137 656q1 -7 5 -55l4 -55q77 -127 175 -228t223 -170l110 -9l-40 94l-79 -7l-6 4
-q-94 57 -171.5 130.5t-129.5 171.5l-2 5l6 78zM279 523q19 -32 41 -61q78 75 169.5 137.5t185.5 106.5l51 24l-24 -50q-45 -94 -107 -185t-136 -169q30 -23 62 -44q153 165 280.5 356t220.5 386q-194 -92 -386 -220t-357 -281v0zM345 431q38 -43 82 -80q62 64 115.5 138.5
-t95.5 153.5q-78 -42 -153.5 -96t-139.5 -116v0z"
-        />
-      </g>
-    </svg>
+    <img
+      src={`${RESOURCE_ICON_BASE}/${name}.png`}
+      alt={alt}
+      style={{
+        width: size,
+        height: size,
+        display: "block",
+        objectFit: "contain",
+      }}
+    />
   );
 }
 
-export function WindIcon({ disabled }) {
-  const color = disabled ? "#d8d7d7" : "#bade15";
-  const strokeWidth = disabled ? "0" : "100";
-
+function AttributeImg({ name, alt, size = "1.1em" }) {
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      version="1.1"
-      viewBox="-60 -120 1200 1200"
-      width="1.2em"
-      stroke="#000000"
-      strokeWidth={strokeWidth}
-      paintOrder="stroke markers fill"
-    >
-      <g transform="matrix(1 0 0 -1 0 1024)">
-        <path
-          fill={color}
-          d="M314 1024h-28q543 -93 373 -327t-658 -158v-62q353 -70 585.5 74.5t134.5 325.5q121 -106 10 -299t-477 -262q130 29 237 91t168 151v0q-128 -121 -305 -163.5t-353 -16.5v-147q171 -30 354 20.5t327 190.5q-110 -150 -297.5 -232.5t-383.5 -73.5v-135q621 25 881 312.5
-t43 533.5q125 -265 -105.5 -489.5t-555.5 -239.5q419 91 558.5 397.5t-169.5 469.5q-140 38 -339 39v0z"
-        />
-      </g>
-    </svg>
+    <img
+      src={`${ATTRIBUTE_ICON_BASE}/${name}.png`}
+      alt={alt}
+      style={{
+        width: size,
+        height: size,
+        display: "block",
+        objectFit: "contain",
+      }}
+    />
   );
 }
 
-export function BoltIcon({ disabled }) {
-  const color = disabled ? "#d8d7d7" : "#fff423";
-  const strokeWidth = disabled ? "0" : "100";
-
+function ActionImg({ name, alt, size = "1.05em" }) {
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      version="1.1"
-      viewBox="-60 -120 1200 1200"
-      width="1.2em"
-      stroke="#000000"
-      strokeWidth={strokeWidth}
-      paintOrder="stroke markers fill"
-      style={{ verticalAlign: "text-bottom" }}
-    >
-      <g transform="matrix(1 0 0 -1 0 1024)">
-        <path
-          fill={color}
-          d="M8 1024q29 -25 235 -199l235 -199h-273l249 -192h-300l500 -385l-181 257h147l397 -306l-381 541h187l-332 483h-483z"
-        />
-      </g>
-    </svg>
+    <img
+      src={`${ACTION_ICON_BASE}/${name}.png`}
+      alt={alt}
+      style={{
+        width: size,
+        height: size,
+        display: "block",
+        objectFit: "contain",
+      }}
+    />
   );
 }
 
-export function DarkIcon({ disabled }) {
-  const color = disabled ? "#d8d7d7" : "#ed153e";
-  const strokeWidth = disabled ? "0" : "100";
-
+function CheckImg({ name, alt, size = "1.05em" }) {
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      version="1.1"
-      viewBox="-60 -120 1200 1200"
-      width="1.2em"
-      stroke="#000000"
-      strokeWidth={strokeWidth}
-      paintOrder="stroke markers fill"
-      style={{ verticalAlign: "text-bottom" }}
-    >
-      <g transform="matrix(1 0 0 -1 0 800)">
-        <path
-          fill={color}
-          d="M940 577q-6 54 -27 93q-50 94 -161 97q72 -55 72 -137q0 -17 -3 -31q-19 -69 -126 -118q-84 48 -187 48q-109 0 -196 -53q-117 50 -137 123q-4 14 -4 31q0 82 73 137q-112 -3 -161 -97q-21 -39 -28 -93q-9 -157 134 -236q-36 -71 -36 -141q0 -75 45 -133.5t127 -88.5
-q25 -132 42 -132q13 0 41 54q7 -1 11 -2q27 -2 41 10q20 -15 45 -15t44 14q14 -11 39 -9l14 2q28 -52 41 -52q16 0 41 128q86 30 132 89t46 135q0 74 -41 150q128 80 119 227zM357 112q-40 0 -68.5 33.5t-28.5 80.5t28.5 80.5t68.5 33.5t68.5 -33.5t28.5 -80.5t-28.5 -80.5
-t-68.5 -33.5zM508 15q-24 0 -35 14q-7 7 -7 19q0 18 14 36.5t27 18.5q14 0 25.5 -20t11.5 -39q0 -29 -36 -29zM649 112q-40 0 -68.5 33.5t-28.5 80.5t28.5 80.5t68.5 33.5q41 0 69.5 -33.5t28.5 -80.5t-28.5 -80.5t-69.5 -33.5z"
-        />
-      </g>
-    </svg>
+    <img
+      src={`${CHECK_ICON_BASE}/${name}.png`}
+      alt={alt}
+      style={{
+        width: size,
+        height: size,
+        display: "block",
+        objectFit: "contain",
+      }}
+    />
   );
 }
 
-export function EarthIcon({ disabled }) {
-  const color = disabled ? "#d8d7d7" : "#cc8d2e";
-  const strokeWidth = disabled ? "0" : "100";
+export function HpResourceIcon({ size }) {
+  return <ResourceImg name="hp" alt="HP" size={size} />;
+}
 
+export function MpResourceIcon({ size }) {
+  return <ResourceImg name="mp" alt="MP" size={size} />;
+}
+
+export function IpResourceIcon({ size }) {
+  return <ResourceImg name="ip" alt="IP" size={size} />;
+}
+
+export function FpResourceIcon({ size }) {
+  return <ResourceImg name="fp" alt="FP" size={size} />;
+}
+
+export function ZenitResourceIcon({ size }) {
+  return <ResourceImg name="zenit" alt="Zenit" size={size} />;
+}
+
+export function XpResourceIcon({ size }) {
+  return <ResourceImg name="xp" alt="XP" size={size} />;
+}
+
+export function LevelUpResourceIcon({ size }) {
+  return <ResourceImg name="levelup" alt="Level Up" size={size} />;
+}
+
+export function UpResourceIcon({ size }) {
+  return <ResourceImg name="up" alt="UP" size={size} />;
+}
+
+export function DexAttributeIcon({ size }) {
+  return <AttributeImg name="dex-glyph" alt="DEX" size={size} />;
+}
+
+export function InsAttributeIcon({ size }) {
+  return <AttributeImg name="ins-glyph" alt="INS" size={size} />;
+}
+
+export function MigAttributeIcon({ size }) {
+  return <AttributeImg name="mig-glyph" alt="MIG" size={size} />;
+}
+
+export function WlpAttributeIcon({ size }) {
+  return <AttributeImg name="wlp-glyph" alt="WLP" size={size} />;
+}
+
+export function ActionAttackIcon({ size }) {
+  return <ActionImg name="action_attack" alt="Attack" size={size} />;
+}
+
+export function ActionEquipmentIcon({ size }) {
+  return <ActionImg name="action_equipment" alt="Equipment" size={size} />;
+}
+
+export function ActionGuardIcon({ size }) {
+  return <ActionImg name="action_guard" alt="Guard" size={size} />;
+}
+
+export function ActionHinderIcon({ size }) {
+  return <ActionImg name="action_hinder" alt="Hinder" size={size} />;
+}
+
+export function ActionInventoryIcon({ size }) {
+  return <ActionImg name="action_inventory" alt="Inventory" size={size} />;
+}
+
+export function ActionObjectiveIcon({ size }) {
+  return <ActionImg name="action_objective" alt="Objective" size={size} />;
+}
+
+export function ActionSkillIcon({ size }) {
+  return <ActionImg name="action_skill" alt="Skill" size={size} />;
+}
+
+export function ActionSpellIcon({ size }) {
+  return <ActionImg name="action_spell" alt="Spell" size={size} />;
+}
+
+export function ActionStudyIcon({ size }) {
+  return <ActionImg name="action_study" alt="Study" size={size} />;
+}
+
+export function CheckAccuracyIcon({ size }) {
+  return <CheckImg name="check_accuracy" alt="Accuracy Check" size={size} />;
+}
+
+export function CheckAttributeIcon({ size }) {
+  return <CheckImg name="check_attribute" alt="Attribute Check" size={size} />;
+}
+
+export function CheckMagicIcon({ size }) {
+  return <CheckImg name="check_magic" alt="Magic Check" size={size} />;
+}
+
+export function CheckOpenIcon({ size }) {
+  return <CheckImg name="check_open" alt="Open Check" size={size} />;
+}
+
+export function CheckOpposedIcon({ size }) {
+  return <CheckImg name="check_opposed" alt="Opposed Check" size={size} />;
+}
+
+export function CheckGroupIcon({ size }) {
+  return <CheckImg name="check_ritual" alt="Group Check" size={size} />;
+}
+
+export function CheckRitualIcon({ size }) {
+  return <CheckImg name="check_ritual" alt="Ritual Check" size={size} />;
+}
+
+export function ActionCommandIcon({ action, size = "1em", alt = "" }) {
+  const key = String(action ?? "").toLowerCase();
+  if (key === "check") {
+    return <CheckOpenIcon size={size} />;
+  }
+  const src = ACTION_ICON_SRC_BY_KEY[key];
+  if (!src) return null;
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      version="1.1"
-      viewBox="-60 -120 1200 1200"
-      width="1.2em"
-      stroke="#000000"
-      strokeWidth={strokeWidth}
-      paintOrder="stroke markers fill"
-      style={{ verticalAlign: "text-bottom" }}
-    >
-      <g transform="matrix(1 0 0 -1 0 1024)">
-        <path
-          fill={color}
-          d="M447 1024q-22 -7 -175 -54l-175 -54l-63 -240l126 57l39 -172l-82 73l-62 -70l307 -297l38 158l142 -425l350 57l99 444l-184 325zM321 915q-4 -5 -30 -44l-31 -43l-7 -161l-59 195zM360 711q15 -21 124 -170l123 -169l229 -74l-234 2l-242 279v132zM120 353
-q20 -21 153 -167l154 -168l-13 144l-294 191v0z"
-        />
-      </g>
-    </svg>
+    <img
+      src={src}
+      alt={alt}
+      style={{
+        width: size,
+        height: size,
+        display: "block",
+        objectFit: "contain",
+      }}
+    />
   );
 }
 
-export function FireIcon({ disabled }) {
-  const color = disabled ? "#d8d7d7" : "#f79010";
-  const strokeWidth = disabled ? "0" : "100";
-
+function AffinityImg({ name, disabled, alt, size = "1.5em" }) {
+  const src = disabled
+    ? `${AFFINITY_ICON_BASE}/${name}-disabled.svg`
+    : `${AFFINITY_ICON_BASE}/${name}.svg`;
+  const overflow = `calc((${size} - 1em) / 2)`;
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      version="1.1"
-      viewBox="-60 -120 1200 1200"
-      width="1.2em"
-      stroke="#000000"
-      strokeWidth={strokeWidth}
-      paintOrder="stroke markers fill"
-      style={{ verticalAlign: "text-bottom" }}
-    >
-      <g transform="matrix(1 0 0 -1 0 1024)">
-        <path
-          fill={color}
-          d="M159 1023q-10 0 -19 -1q-79 -12 -116 -80.5t-16 -162.5q11 -45 33 -82v0q5 -7 11 -14q19 -19 41.5 -22t38 12.5t13 39t-21.5 44.5q-2 -13 -11.5 -21t-23.5 -8t-24 10t-11 25q0 6 2 11q16 36 46.5 61t72.5 33q50 9 93.5 -10t70.5 -58q14 -43 12 -77q-2 -32 -12 -62.5
-t-25 -62.5q-21 -45 -37.5 -100t-11.5 -127q2 -96 49.5 -179.5t135.5 -137.5q140 -78 286 -40.5t231 172.5q78 140 41 286t-173 232q-43 25 -89 38q74 -59 96 -147t-16 -175q-2 14 -5 28q-26 91 -101.5 136.5t-167.5 25.5q-29 -9 -54 -24q61 7 109 -24t64 -90
-q15 -65 -16.5 -118.5t-95.5 -71.5q-33 -8 -65 -3q-24 9 -47 22q-48 29 -79 72q-28 53 -33 104t15 102l1 2q15 33 27 67t14 73q1 30 -6 63q-2 20 -7 40q-23 87 -84 142.5t-135 56.5v0zM774 898q-48 1 -86.5 -32t-59.5 -102q57 55 179.5 6t216.5 -216q-24 166 -96.5 254.5
-t-153.5 89.5v0z"
-        />
-      </g>
-    </svg>
+    <img
+      src={src}
+      alt={alt}
+      style={{
+        width: size,
+        height: size,
+        verticalAlign: "middle",
+        marginTop: `-${overflow}`,
+        marginBottom: `-${overflow}`,
+      }}
+    />
   );
 }
 
-export function IceIcon({ disabled }) {
-  const color = disabled ? "#d8d7d7" : "#b3e7fb";
-  const strokeWidth = disabled ? "0" : "100";
-
+export function PhysicalIcon({ disabled, size }) {
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      version="1.1"
-      viewBox="-60 -120 1200 1200"
-      width="1.2em"
-      stroke="#000000"
-      strokeWidth={strokeWidth}
-      paintOrder="stroke markers fill"
-      style={{ verticalAlign: "text-bottom" }}
-    >
-      <g transform="matrix(1 0 0 -1 0 1024)">
-        <path
-          fill={color}
-          d="M69 256q12 -7 99 -57l98 -57l47 155l115 -67l-111 -118l195 -112l196 113l-111 118l116 66l47 -154l195 113v225l-157 -37v134l157 -37v227l-195 112l-46 -154l-116 67l111 117l-197 114l-196 -113l111 -118l-115 -67l-47 155l-196 -113v-228l157 37v-132l-157 36v-225v0
-zM319 319q1 4 8 25l7 24l137 69l8 -153l-35 -37l-125 72v0v0zM249 439v72v71l51 12l129 -84l-129 -83l-51 12v0zM581 248q-2 2 -17 18l-17 18l9 154l136 -70l14 -47l-125 -73v0v0zM333 655q-1 3 -7 24l-8 24l125 73l35 -37l-8 -152l-137 68v0v0zM601 510q8 5 64 42l63 42
-l47 -11v-145l-47 -11l-127 83v0v0zM557 587q0 9 -4 76l-5 76l34 36l125 -72l-14 -47l-136 -69v0v0z"
-        />
-      </g>
-    </svg>
+    <AffinityImg
+      name="physical"
+      disabled={disabled}
+      alt="Physical"
+      size={size}
+    />
   );
 }
 
-export function LightIcon({ disabled }) {
-  const color = disabled ? "#d8d7d7" : "#fffa99";
-  const strokeWidth = disabled ? "0" : "100";
+export function AirIcon({ disabled, size }) {
+  return <AffinityImg name="air" disabled={disabled} alt="Air" size={size} />;
+}
 
+// Backward compatibility while callers migrate.
+export const WindIcon = AirIcon;
+
+export function BoltIcon({ disabled, size }) {
+  return <AffinityImg name="bolt" disabled={disabled} alt="Bolt" size={size} />;
+}
+
+export function DarkIcon({ disabled, size }) {
+  return <AffinityImg name="dark" disabled={disabled} alt="Dark" size={size} />;
+}
+
+export function EarthIcon({ disabled, size }) {
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      version="1.1"
-      viewBox="-60 -120 1200 1200"
-      width="1.2em"
-      stroke="#000000"
-      strokeWidth={strokeWidth}
-      paintOrder="stroke markers fill"
-      style={{ verticalAlign: "text-bottom" }}
-    >
-      <g transform="matrix(1 0 0 -1 0 1024)">
-        <path
-          fill={color}
-          d="M73 1024q16 -20 125 -156l125 -156q-38 -32 -60 -78l-262 124v-136l245 -41q-3 -20 -3 -40q0 -12 1 -23l-156 -59l171 -2q14 -33 37 -60l-295 -284v-113h102l228 364q38 -29 86 -40l-51 -324h225l-88 322q28 6 53 17l80 -91l-46 111q23 15 41 36l393 -317v236l-357 138
-q14 31 18 67l182 56l-187 15q-7 32 -23 60l367 189v175l-395 -326q-17 20 -38 34l33 83l-65 -64q-31 15 -66 19l46 264h-87l3 -262q-63 -3 -112 -36l-184 298h-86z"
-        />
-      </g>
-    </svg>
+    <AffinityImg name="earth" disabled={disabled} alt="Earth" size={size} />
   );
 }
 
-export function PoisonIcon({ disabled }) {
-  const color = disabled ? "#d8d7d7" : "#d757a1";
-  const strokeWidth = disabled ? "0" : "100";
+export function FireIcon({ disabled, size }) {
+  return <AffinityImg name="fire" disabled={disabled} alt="Fire" size={size} />;
+}
 
+export function IceIcon({ disabled, size }) {
+  return <AffinityImg name="ice" disabled={disabled} alt="Ice" size={size} />;
+}
+
+export function LightIcon({ disabled, size }) {
+  return (
+    <AffinityImg name="light" disabled={disabled} alt="Light" size={size} />
+  );
+}
+
+export function PoisonIcon({ disabled, size }) {
+  return (
+    <AffinityImg name="poison" disabled={disabled} alt="Poison" size={size} />
+  );
+}
+
+export function UntypedIcon({ disabled }) {
+  const color = disabled ? "#d8d7d7" : "#888888";
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       version="1.1"
-      viewBox="-60 -120 1200 1200"
+      viewBox="0 0 1000 1000"
       width="1.2em"
-      stroke="#000000"
-      strokeWidth={strokeWidth}
-      paintOrder="stroke markers fill"
-      style={{ verticalAlign: "text-bottom" }}
     >
-      <g transform="matrix(1 0 0 -1 0 800)">
-        <path
-          fill={color}
-          d="M276 221v-15q0 -28 19 -47t47 -21q29 -2 43 10q22 -16 49 -16q25 0 46 15q14 -11 41 -9q28 3 47 21.5t19 46.5v11q108 28 167 94q57 63 57 149q0 19 -4 40q-20 128 -118 211q-103 89 -251 89t-251 -88q-98 -84 -117 -212q-4 -21 -4 -40q0 -84 55 -147t155 -92zM587 605
-q43 0 72.5 -34.5t29.5 -83.5t-29.5 -83.5t-72.5 -34.5q-42 0 -71.5 34.5t-29.5 83.5t29.5 83.5t71.5 34.5zM438 360q14 0 26.5 -21t12.5 -40q0 -29 -38 -29q-25 0 -37 13q-7 8 -7 20q0 19 14.5 38t28.5 19zM280 605q42 0 72 -34.5t30 -83.5t-30 -83.5t-72 -34.5t-72 34.5
-t-30 83.5t30 83.5t72 34.5zM703 -45l-133 49l135 49q34 -22 63 -22q32 0 42 33q2 7 2 15q0 42 -54 45q22 22 22 43q0 22 -23 37q-12 6 -25 6q-44 0 -60 -71l-234 -87l-234 85q-16 73 -60 73q-13 0 -25 -6q-22 -15 -22 -37q0 -21 22 -43q-55 -3 -55 -45q0 -8 2 -15
-q11 -33 42 -33q29 0 63 22l136 -49l-134 -48q-35 25 -62 25q-32 0 -45 -33q-2 -7 -2 -15q0 -42 55 -45q-22 -22 -22 -43q0 -22 22 -37q14 -8 27 -8q41 0 59 70l233 85l233 -85q18 -70 60 -70q12 0 26 8q23 15 23 37q0 21 -22 43q54 3 54 45q0 8 -2 15q-12 33 -44 33
-q-27 0 -63 -26z"
-        />
-      </g>
+      <circle cx="500" cy="500" r="420" fill={color} />
+      <rect x="200" y="440" width="600" height="120" fill="white" />
     </svg>
   );
 }
@@ -456,6 +505,7 @@ export function NotesIcon() {
       fillRule="evenodd"
       clipRule="evenodd"
       viewBox="0 0 412 511.87"
+      width="1.2em"
     >
       <path
         fillRule="nonzero"
@@ -643,11 +693,11 @@ export function CharacterSheetIcon({ size, color }) {
       width={size || "1.2em"}
       height={size || "1.2em"}
     >
-      <g class="" transform="translate(0,0)">
+      <g className="" transform="translate(0,0)">
         <path
           d="M50 96c-9.972 0-18 8.028-18 18v300c0 9.972 8.028 18 18 18h412c9.972 0 18-8.028 18-18V114c0-9.972-8.028-18-18-18H50zm5 23h402v18H55v-18zm0 32h210v258H55V151zm18 18v222h7.03c.47-24.342 18.315-74.172 47.093-97.889C136.331 300.56 147.615 305 160 305c12.385 0 23.669-4.44 32.877-11.889C221.655 316.828 239.5 366.658 239.97 391H247V169H73zm222 14h146v18H295v-18zm-135 10c20.835 0 39 20.241 39 47s-18.165 47-39 47-39-20.241-39-47 18.165-47 39-47zm135 22h114v18H295v-18zm0 32h50v18h-50v-18zm80 0h66v18h-66v-18zm-16 96h98v18h-98v-18zm-32 32h130v18H327v-18z"
           fill={color || "#ffffff"}
-          fill-opacity="1"
+          fillOpacity="1"
         ></path>
       </g>
     </svg>
@@ -662,11 +712,11 @@ export function StatsIcon({ size, color }) {
       width={size || "1.2em"}
       height={size || "1.2em"}
     >
-      <g class="" transform="translate(0,0)">
+      <g className="" transform="translate(0,0)">
         <path
           d="M37 73v382h18V73zm418.045 0l1.91 382h18l-1.91-382zM105 160c-14.638 0-27.157 9.715-31.43 23-2.405 6.634-1.479 14.38-.574 18 3.61 14.3 16.641 25 32.004 25 14.17 0 26.36-9.102 31-21.736C140.64 216.898 152.83 226 167 226c15.363 0 28.394-10.7 32.004-25h238.682l-.09-18H198.43c-4.273-13.285-16.792-23-31.43-23-14.17 0-26.36 9.102-31 21.736C131.36 169.102 119.17 160 105 160zm0 18c8.39 0 15 6.61 15 15s-6.61 15-15 15-15-6.61-15-15 6.61-15 15-15zm62 0c8.39 0 17 6.61 17 15s-8.61 15-17 15-15-6.61-15-15 6.61-15 15-15zm33 45c-15.002 0-27.775 10.206-31.729 24H73v18h95.271c3.954 13.794 16.727 24 31.729 24 15.002 0 27.775-10.206 31.729-24h206.277l-.092-18H231.73c-3.954-13.794-16.727-24-31.729-24zm0 18c8.39 0 15 6.61 15 15s-6.61 15-15 15-15-6.61-15-15 6.61-15 15-15zm83 47c-14.638 0-27.157 9.715-31.43 23H73v18h177.996c3.61 14.3 16.641 25 32.004 25 14.17 0 26.36-9.102 31-21.736C318.64 344.898 330.83 354 345 354c14.17 0 26.36-9.102 31-21.736C380.64 344.898 392.83 354 407 354c15.363 0 28.394-10.7 32.004-25 1.31-3.077.621-13.458-.77-18C432 294.406 418.467 288.286 407 288c-14.17 0-26.36 9.102-31 21.736C371.36 297.102 359.17 288 345 288c-14.17 0-26.36 9.102-31 21.736C309.36 297.102 297.17 288 283 288zm62 66c-13.892 0-25.874 8.752-30.71 21H73v18h239.564c2.853 15.29 16.366 27 32.436 27s29.583-11.71 32.436-27h61.209l-.09-18H375.71c-4.837-12.248-16.819-21-30.711-21zm-62-48c8.39 0 15 6.61 15 15s-6.61 15-15 15-15-6.61-15-15 6.61-15 15-15zm62 0c8.39 0 15 6.61 15 15s-6.61 15-15 15-15-6.61-15-15 6.61-15 15-15zm62 0c8.39 0 15 6.61 15 15s-6.61 15-15 15-15-6.61-15-15 6.61-15 15-15zm-62 66c8.39 0 15 6.61 15 15s-6.61 15-15 15-15-6.61-15-15 6.61-15 15-15zM25 473v16h462v-16z"
           fill={color || "#ffffff"}
-          fill-opacity="1"
+          fillOpacity="1"
         ></path>
       </g>
     </svg>
@@ -681,11 +731,11 @@ export function ClassesIcon({ size, color }) {
       width={size || "1.2em"}
       height={size || "1.2em"}
     >
-      <g class="" transform="translate(0,0)">
+      <g className="" transform="translate(0,0)">
         <path
           d="M104 37.25V215.1c3.6 9.9 10 14.1 20.9 17 11.4 2.9 27.1 3.1 43.9 3.1 16.8 0 34.6-.1 51.4 3.6 9.5 2.1 18.7 5.7 26.8 11.2V55.43c-7.2-9.9-15.9-13.69-27.3-15.09-12.2-1.49-27.3.55-42.9 2.83-15.7 2.28-31.9 4.81-47.7 2.88-8.7-1.07-17.3-3.87-25.1-8.8zm304 0c-7.8 4.93-16.4 7.73-25.1 8.8-15.8 1.93-32-.6-47.7-2.88-15.6-2.28-30.7-4.32-42.9-2.83-11.4 1.4-20.1 5.19-27.3 15.09V250c8.1-5.5 17.3-9.1 26.8-11.2 16.8-3.7 34.6-3.6 51.4-3.6 16.8 0 32.5-.2 43.9-3.1 10.9-2.9 17.3-7.1 20.9-17V37.25zM130.8 80.03h89.4v18h-89.4v-18zm161 0h89.4v18h-89.4v-18zm-161 44.47h89.4v18h-89.4v-18zm161 0h89.4v18h-89.4v-18zm-161 46.8h89.4v18h-89.4v-18zm161 0h89.4v18h-89.4v-18zM96 249c-17.3 0-29.19 7.3-37.77 18.9C49.66 279.4 45 295.7 45 312s4.66 32.6 13.23 44.1C66.81 367.7 78.7 375 96 375c22 0 35.7-7.1 44.4-14 8.6-6.9 11.5-13 11.5-13l2.5-5h203.2l2.5 5s2.9 6.1 11.5 13c8.7 6.9 22.4 14 44.4 14 17.3 0 29.2-7.3 37.8-18.9 8.5-11.5 13.2-27.8 13.2-44.1s-4.7-32.6-13.2-44.1c-8.6-11.6-20.5-18.9-37.8-18.9-22 0-35.7 7.1-44.4 14-8.6 6.9-11.5 13-11.5 13l-2.5 5H154.4l-2.5-5s-2.9-6.1-11.5-13c-8.7-6.9-22.4-14-44.4-14zm4.6 21.9c.9 0 1.9 0 2.9.1 13.5 1.2 28.2 8.9 44.1 24h216.8c15.9-15.1 30.6-22.8 44.1-24 14.2-1.2 26.6 5.8 33.1 16.2 13.1 20.9 7 53.9-20.6 72.3l-10-15c20.4-13.6 22.3-36.6 15.4-47.7-3.5-5.6-8.1-8.6-16.4-7.8-8.2.7-20.6 6.3-35.6 21.4l-2.7 2.6H140.3l-2.7-2.6c-15-15.1-27.4-20.7-35.6-21.4-8.26-.8-12.9 2.2-16.37 7.8-6.92 11.1-4.99 34.1 15.37 47.7l-9.99 15c-27.65-18.4-33.72-51.4-20.64-72.3 5.72-9.1 15.9-15.6 27.92-16.3h2.31zM169 361v126h30V361h-30zm48 0v126h30V361h-30zm48 0v126h30V361h-30zm48 0v126h30V361h-30z"
           fill={color || "#ffffff"}
-          fill-opacity="1"
+          fillOpacity="1"
         ></path>
       </g>
     </svg>
@@ -700,11 +750,11 @@ export function SpellsIcon({ size, color }) {
       width={size || "1.2em"}
       height={size || "1.2em"}
     >
-      <g class="" transform="translate(0,0)">
+      <g className="" transform="translate(0,0)">
         <path
           d="M319.61 20.654c13.145 33.114 13.144 33.115-5.46 63.5 33.114-13.145 33.116-13.146 63.5 5.457-13.145-33.114-13.146-33.113 5.457-63.498-33.114 13.146-33.113 13.145-63.498-5.459zM113.024 38.021c-11.808 21.04-11.808 21.04-35.724 24.217 21.04 11.809 21.04 11.808 24.217 35.725 11.808-21.04 11.808-21.04 35.724-24.217-21.04-11.808-21.04-11.808-24.217-35.725zm76.55 56.184c-.952 50.588-.95 50.588-41.991 80.18 50.587.95 50.588.95 80.18 41.99.95-50.588.95-50.588 41.99-80.18-50.588-.95-50.588-.95-80.18-41.99zm191.177 55.885c-.046 24.127-.048 24.125-19.377 38.564 24.127.047 24.127.046 38.566 19.375.047-24.126.046-24.125 19.375-38.564-24.126-.047-24.125-.046-38.564-19.375zm-184.086 83.88c-1.191.024-2.36.07-3.492.134-18.591 1.064-41.868 8.416-77.445 22.556L76.012 433.582c78.487-20.734 132.97-21.909 170.99-4.615V247.71c-18.076-8.813-31.79-13.399-46.707-13.737a91.166 91.166 0 0 0-3.629-.002zm122.686 11.42c-2.916-.026-5.81.011-8.514.098-12.81.417-27.638 2.215-45.84 4.522V427.145c43.565-7.825 106.85-4.2 171.244 7.566l-39.78-177.197c-35.904-8.37-56.589-11.91-77.11-12.123zm2.289 16.95c18.889.204 36.852 2.768 53.707 5.02l4.437 16.523c-23.78-3.75-65.966-4.906-92.467-.98l-.636-17.805c11.959-2.154 23.625-2.88 34.959-2.758zm-250.483 4.658l-10.617 46.004h24.094l10.326-46.004H71.158zm345.881 0l39.742 177.031 2.239 9.973 22.591-.152-40.855-186.852h-23.717zm-78.857 57.82c16.993.026 33.67.791 49.146 2.223l3.524 17.174c-32.645-3.08-72.58-2.889-102.995 0l-.709-17.174c16.733-1.533 34.04-2.248 51.034-2.223zm-281.793 6.18l-6.924 30.004h24.394l6.735-30.004H56.389zm274.418 27.244c4.656.021 9.487.085 14.716.203l2.555 17.498c-19.97-.471-47.115.56-59.728 1.05l-.7-17.985c16.803-.493 29.189-.828 43.157-.766zm41.476.447c8.268.042 16.697.334 24.121.069l2.58 17.74c-8.653-.312-24.87-.83-32.064-.502l-2.807-17.234a257.25 257.25 0 0 1 8.17-.073zm-326.97 20.309l-17.985 77.928 25.035-.17 17.455-77.758H45.313zm303.164 11.848c19.608-.01 38.66.774 56.449 2.572l2.996 20.787c-34.305-4.244-85.755-7.697-119.1-3.244l-.14-17.922c20.02-1.379 40.186-2.183 59.795-2.193zm-166.606 44.05c-30.112.09-67.916 6.25-115.408 19.76l-7.22 2.053 187.759-1.27v-6.347c-16.236-9.206-37.42-14.278-65.13-14.196zm134.41 6.174c-19.63.067-37.112 1.439-51.283 4.182v10.064l177.594-1.203c-44.322-8.634-89.137-13.17-126.31-13.043zM26 475v18h460v-18H26z"
           fill={color || "#ffffff"}
-          fill-opacity="1"
+          fillOpacity="1"
         ></path>
       </g>
     </svg>
@@ -719,11 +769,11 @@ export function EquipmentIcon({ size, color }) {
       width={size || "1.2em"}
       height={size || "1.2em"}
     >
-      <g class="" transform="translate(0,0)">
+      <g className="" transform="translate(0,0)">
         <path
           d="M262.406 17.188c-27.22 8.822-54.017 28.012-72.375 55.53 17.544 47.898 17.544 57.26 0 105.157 19.92 15.463 40.304 24.76 60.782 27.47-2.063-25.563-3.63-51.13 1.125-76.69-13.625-1.483-23.374-5.995-37-13.874V82.563c35.866 19.096 61.84 18.777 98.813 0v32.22c-13.364 6.497-21.886 11.16-35.25 13.218 3.614 25.568 3.48 51.15 1.375 76.72 18.644-3.265 37.236-12.113 55.5-26.845-14.353-47.897-14.355-57.26 0-105.156-16.982-28.008-47.453-46.633-72.97-55.532zm-129.594 8.218c-25.906 110.414-27.35 215.33-27.4 330.922-18.84-1.537-37.582-5.12-56.027-11.12v28.554h69.066c8.715 35.025 6.472 70.052-1.036 105.078h28.13c-7.195-35.026-8.237-70.053-.872-105.078h68.904v-28.555c-18.49 4.942-37.256 8.552-56.097 10.46.082-114.94 2.496-223.068-24.667-330.26zm89.47 202.375c0 117.27 25.517 233.342 120.155 257.97C446.62 464.716 462.72 345.374 462.72 227.78H222.28z"
           fill={color || "#ffffff"}
-          fill-opacity="1"
+          fillOpacity="1"
         ></path>
       </g>
     </svg>
@@ -738,11 +788,11 @@ export function NotesIcon2({ size, color }) {
       width={size || "1.2em"}
       height={size || "1.2em"}
     >
-      <g class="" transform="translate(0,0)">
+      <g className="" transform="translate(0,0)">
         <path
           d="M131.3 20.35c-14.6.1-28.1 10-31.93 24.82-2.33 9.13-.55 18.4 4.13 25.84-7.67 4.26-13.69 11.53-16.03 20.66-2.32 9.13-.56 18.33 4.1 25.83a32.687 32.687 0 0 0-15.96 20.6c-2.34 9.1-.54 18.4 4.18 25.8-7.72 4.3-13.75 11.5-16.09 20.7-2.33 9.1-.54 18.4 4.19 25.8-7.72 4.3-13.75 11.5-16.09 20.7-2.34 9.1-.54 18.4 4.18 25.8-7.72 4.3-13.75 11.5-16.08 20.7-2.34 9.1-.54 18.4 4.18 25.8-7.72 4.3-13.75 11.5-16.09 20.7-2.35 9.2-.51 18.5 4.3 26a32.915 32.915 0 0 0-16.28 20.8c-4.48 17.5 6.25 35.6 23.79 40.1l.1-.2 31.71 8.2-1.47 5.7 261.56 67L374 326.5l-22.4 21.2-87.8 26.5 15.5-42.5-151.7-38.8 4.4-17.4 153.5 39.3 9.7-26.7 15.3-14.4-167-42.8 4.4-17.4 178 45.6 39.6-37.4-206.1-52.8 4.4-17.4L380.7 207l-.1.4 31.5-29.8 18.3-71.4-261.6-67.04-4.8 18.66c2.2-16.32-8.1-32.27-24.5-36.44-2.7-.7-5.5-1.04-8.2-1.03zm.3 17.99c1.2 0 2.4.19 3.5.48 8.1 2.09 12.9 10.13 10.8 18.27l17.2 4.4-11 42.81c2.2-16.35-8.2-32.26-24.5-36.43l-.6-.15c-7.8-2.34-12.2-10.15-10.2-18.07 1.7-6.61 7.3-11 13.7-11.3h1.1zm-11.9 46.51c.9 0 1.9.14 2.9.36l.6.15c8.1 2.08 12.9 10.12 10.8 18.24l17.2 4.4-11 43c2.4-16.4-8-32.6-24.4-36.7-.7-.2-1.3-.4-1.9-.5-7-2.7-10.9-10.1-9-17.62 1.7-6.97 7.9-11.45 14.8-11.29zm59.9 4.59 217 55.66-4.4 17.4-217-55.6zm-72.9 41.86h1.3c.5 0 .9 0 1.4.1.6.2 1.2.3 1.8.5l.1-.2c8.1 2.1 12.9 10.1 10.8 18.3l17.2 4.4-11 43c2.3-16.3-8.1-32.4-24.4-36.6-8.18-2.1-12.94-10.1-10.85-18.3 1.69-6.6 7.25-10.9 13.65-11.2zM465.4 152l-10.2 9.6 31.6 33.5 10.2-9.6zm-23.3 22L315.7 293.5l31.5 33.5 126.5-119.5zm-347.23 3.7c1.48 0 3 .1 4.53.5 8.1 2.1 12.9 10.1 10.8 18.3l17.2 4.4-11 43c2.3-16.4-8.1-32.4-24.44-36.6-8.14-2.1-12.9-10.1-10.82-18.3 1.7-6.6 7.32-11 13.73-11.3zm-11.91 46.5c1.48 0 3 .1 4.53.5 8.14 2.1 12.91 10.1 10.81 18.3l17.2 4.4-11 42.9c2.3-16.3-8.1-32.3-24.45-36.5-8.14-2.1-12.89-10.1-10.81-18.3 1.69-6.6 7.31-11 13.72-11.3zm-11.9 46.5c1.48 0 3 .1 4.53.5 8.13 2.1 12.89 10.1 10.81 18.3l17.2 4.3-10.94 42.8c2.16-16.3-8.25-32.1-24.51-36.3-8.14-2.1-12.9-10.1-10.82-18.3 1.7-6.6 7.32-11 13.73-11.3zm235.34 39.2L293 346.6l37.4-11.3zm-247.25 7.3c1.48 0 3 .1 4.53.5 8.14 2.1 12.9 10.1 10.81 18.3l17.21 4.3-11 43c2.1-16.2-8.3-32-24.53-36.2l.1-.3c-8.16-2.1-12.92-10.1-10.84-18.3 1.69-6.6 7.31-11 13.72-11.3zm56.95 20.3L333.2 393l-4.4 17.4-217.1-55.5zM47.18 364c1.48 0 3 .1 4.52.5 8.14 2.1 12.9 10.1 10.82 18.3l17.2 4.3-3.69 14.4-31.92-8.2v.2c-8.01-2.2-12.67-10.1-10.61-18.2 1.7-6.6 7.32-11 13.73-11.3z"
           fill={color || "#ffffff"}
-          fill-opacity="1"
+          fillOpacity="1"
         ></path>
       </g>
     </svg>
@@ -791,7 +841,7 @@ export function MdefIcon({ size, color }) {
       width={size || "1.2em"}
       height={size || "1.2em"}
     >
-      <g class="" transform="translate(0,0)">
+      <g className="" transform="translate(0,0)">
         <path
           d="M320.938 13.28c-16.646 34.584-38.466 60.157-63.094 60.157-24.522 0-47.035-25.275-63.656-59.593.366 39.358-9.71 90.884-30.938 105.125-21.228 14.24-49.64-12.002-78.844-32.126 17.455 34.04 42.095 67.5 29.78 92.28-12.21 24.576-59.172 35.96-92.874 35.626 29.338 19.29 78.842 45.803 78.844 74.188.002 28.384-49.504 53.71-78.844 73 33.702-.333 80.663 11.612 92.876 36.187 12.227 24.61-9.03 56.31-33.75 85.563 44.826-15.413 65.142-5.735 85.374 10.812h31.75c-42.74-35.413-72.062-107.828-72.062-191.563-.002-118.62 58.92-214.906 131.406-214.906 72.488 0 131.406 96.29 131.406 214.907 0 83.74-29.317 156.153-72.062 191.563h27.313c19.847-14.62 39.796-25.65 89.687-9.28-26.233-30.264-42.2-62.484-29.97-87.095 12.257-24.665 56.658-36.612 90.533-36.188-29.4-19.297-75.344-44.584-75.344-73 0-28.415 45.943-54.89 75.342-74.187-33.874.424-78.273-10.962-90.53-35.625-12.315-24.78 9.982-58.24 27.437-92.28-29.202 20.12-57.583 46.385-78.845 32.124-21.262-14.263-31.382-66.13-30.938-105.69zm-68.97 93.75c-19.56 2.543-37.343 25.564-37.343 55.407 0 16.447 5.67 30.986 14 41.032l10.156 12.218-15.593 2.937c-10.815 2.035-18.743 7.737-25.53 17.063-6.79 9.325-11.984 22.344-15.626 37.343-6.585 27.128-8.078 60.24-8.31 89.47h36.093l.656 8.656 9.124 122.563h76.187l8.095-122.5.563-8.72h34.375c-.026-29.592-.44-63.166-6.407-90.5-3.295-15.095-8.287-28.096-15.156-37.313-6.87-9.216-15.133-14.897-27.28-16.78l-15.94-2.47 10.064-12.593c7.97-9.996 13.375-24.36 13.375-40.406-.002-31.817-19.884-55.313-41.44-55.313-2.54 0-3.96-.103-4.03-.094h-.03z"
           fill={color || "#ffffff"}
@@ -809,7 +859,7 @@ export function InitIcon({ size, color }) {
       width={size || "1.2em"}
       height={size || "1.2em"}
     >
-      <g class="" transform="translate(0,0)">
+      <g className="" transform="translate(0,0)">
         <path
           d="M355.102 21.097c-33.682.164-64.173 18.585-74.615 50.5 21.357-.79 23.203 53.922 23.203 53.922l41.619 6.262c-13.41 12.963-50.025 5.967-50.025 5.967-17.14 19.182-33.124 40.966-47.758 57.578-15.952 18.127-35.2 38.103-57.018 60.086-6.79 6.823 41.594-9.821 34.342-2.604-24.567 12.751-42.297 16.097-61.764 32.069-31.312 25.674-62.853 60.71-81.146 79.431-7.711 7.91-44.362 37.674 20.469 34.74 2.404 7.52-1.621 9.456-7.493 15.293-4.327 4.303-18.082.283-22.263 2.828-22.172 35.055-17.246 37.975-27.43 58.047-4.252 11.635 41.68-14.404 64.305-34.18 13.974-7.58 25.147-21.652 35.002-17.202 43.11 18.984 129.826 35.53 141.328 27.619 18.368-12.646-10.321-46.343 3.832-97.912 23.47 5.817 43.825 13.657 66.767 11.459-1.581 49.307 3.56 55.306-3.888 104.777l59.129 21.127 1.91-13.809-33.815-22.478c14.568-50.659 16.809-72.578 15.227-121.719-.16-5.372-45.168-24.325-74.492-33.133l18.593-30.412c30.393-44.788 124.141-62.055 127.932-88.258-13.02-19.676 3.022-27.384-25.092-21.912-6.295 1.318-13.771 24.346-18.023 27.213-7.843 5.276-40.655 24.477-51.951 18.377-1.9-1.026 7.246-33.441 6.85-44.78-.116-3.205-1.19-6.625-2.866-10.001.185-.64 15.24-52.482 54.809-94.016-43.978 25.134-65.332 79.925-65.354 79.98-2.207-2.134-4.476-3.983-6.639-5.423-1.916-14.7-4.819-73.02 68.598-78.776-21.427-21.177-47.704-30.78-72.283-30.66z"
           fill={color || "#ffffff"}

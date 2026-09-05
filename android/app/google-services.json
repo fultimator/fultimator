@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "384266567864",
+    "project_id": "fabula-ultima-helper",
+    "storage_bucket": "fabula-ultima-helper.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:384266567864:android:9bf23075703047cbaef44d",
+        "android_client_info": {
+          "package_name": "com.fultimator.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "384266567864-ppvg4j9qr19dbrjfbrb93oqfjepij7uk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDmSPuaeKiR-yfHX_FaMrXMg6nIPoUbk_Y"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "384266567864-ppvg4j9qr19dbrjfbrb93oqfjepij7uk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

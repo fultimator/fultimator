@@ -1,20 +1,31 @@
-import {
-  query,
-  collection,
-  where,
-  doc,
-  addDoc,
-  deleteDoc,
-} from "firebase/firestore";
-import { useAuthState } from "react-firebase-hooks/auth";
-import React, { useState, useRef } from "react";
-import { firestore } from "../../firebase";
-import { auth } from "../../firebase";
+import { useState, useRef, useEffect, useMemo } from "react";
 import HelpFeedbackDialog from "../../components/appbar/HelpFeedbackDialog";
-import { useNavigate } from "react-router-dom";
+import { useDeleteConfirmation } from "../../hooks/useDeleteConfirmation";
+import DeleteConfirmationDialog from "../../components/common/DeleteConfirmationDialog";
+import MigrationDialog from "../../components/common/MigrationDialog";
+import {
+  playerNeedsMigration,
+  getPendingPlayerMigrations,
+  PLAYER_CURRENT_SCHEMA_VERSION,
+  applyPreSaveTransforms,
+  applyPostLoadTransforms,
+} from "../../libs/actor";
+import {
+  stampSave,
+  stampCreate,
+  compareTimestamps,
+} from "../../libs/actor/timestamps";
+import SystemUpdateAltIcon from "@mui/icons-material/SystemUpdateAlt";
+import { useNavigate } from "react-router";
 
 import {
+  Chip,
+  Divider,
   IconButton,
+  useMediaQuery,
+  ListItemIcon,
+  ListItemText,
+  Menu as MuiMenu,
   Skeleton,
   Tooltip,
   Typography,
@@ -24,109 +35,256 @@ import {
   TextField,
   Button,
   InputAdornment,
-  Alert,
-  AlertTitle,
   Box,
   FormControl,
   InputLabel,
   Select,
   MenuItem,
   CircularProgress,
+  Collapse,
+  ToggleButtonGroup,
+  ToggleButton,
+  Fab,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Checkbox,
+  Radio,
+  RadioGroup,
+  FormControlLabel,
 } from "@mui/material";
 import Layout from "../../components/Layout";
 import { SignIn } from "../../components/auth";
-// import NpcUgly from "../../components/npc/Ugly";
 import {
-  ContentCopy,
+  ContentPaste,
+  ChevronLeft,
+  ChevronRight,
+  Code,
   Delete,
+  Download,
+  DriveFileMove,
+  FileCopy,
+  LibraryAddCheck,
   Share,
   Edit,
   HistoryEdu,
   Badge,
-  Star,
   BugReport,
+  ExpandLess,
+  ExpandMore,
+  Menu as MenuIcon,
 } from "@mui/icons-material";
-import { useCollectionData } from "react-firebase-hooks/firestore";
+import StorageIcon from "@mui/icons-material/Storage";
+import CloudIcon from "@mui/icons-material/Cloud";
 import { useTranslate } from "../../translation/translate";
-import PlayerCardGallery from "../../components/player/playerSheet/PlayerCardGallery";
-// import { testUsers, moderators } from "../../libs/userGroups";
+import PlayerCardGallery from "/src/libs/player/PlayerCardGallery";
 import Export from "../../components/Export";
 import SearchIcon from "@mui/icons-material/Search";
+import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import { validateCharacter } from "../../utility/validateJson";
+import { SUPPORTS_LOCAL_DB, IS_ELECTRON } from "../../platform";
+import DriveSync from "../../components/DriveSync";
+import { useDatabaseContext } from "../../context/useDatabaseContext";
+import { useDatabase } from "../../hooks/useDatabase";
+import JSZip from "jszip";
+import useDownload from "../../hooks/useDownload";
+import useDownloadImage from "../../hooks/useDownloadImage";
+import SettingRow from "../../components/common/SettingRow";
+import classList from "../../libs/classes";
+import { buildItemText } from "../../libs/buildItemText";
+import MnemosphereCreateDialog from "/src/libs/player/MnemosphereCreateDialog";
+import {
+  canonicalizeForTransfer,
+  normalizeOwnershipForTarget,
+} from "../../libs/exportTransforms";
 
 export default function PlayerGallery() {
-  const { t } = useTranslate();
-  const [user, loading] = useAuthState(auth);
+  const { authLoading, dbMode } = useDatabaseContext();
 
   return (
     <Layout>
-      {loading && <Skeleton />}
-
-      {!loading && !user && (
-        <>
-          <Typography sx={{ my: 1 }}>
-            {t("You have to be logged in to access this feature")}
-          </Typography>
-          <SignIn />
-        </>
-      )}
-
-      {user && <Personal user={user} />}
+      {authLoading && <Skeleton />}
+      {!authLoading && <Personal key={dbMode} />}
     </Layout>
   );
 }
 
-function Personal({ user }) {
+function Personal() {
   const { t } = useTranslate();
+  const defaultCreatePlayerOptions = {
+    name: "",
+    advancement: false,
+    automaticClassLevel: true,
+    defaultView: "normal",
+    expandAllSections: true,
+    autoEquipUnarmed: true,
+    optionalRules: {
+      quirks: false,
+      campActivities: false,
+      zeroPower: false,
+      technospheres: false,
+      technospheresVariant: "standard",
+      innateClasses: [],
+    },
+  };
   const [name, setName] = useState("");
+  const [sort, setSort] = useState("name");
   const [direction, setDirection] = useState("ascending");
   const [open, setOpen] = useState(false);
   const [isBugDialogOpen, setIsBugDialogOpen] = useState(false);
+  const [isCreatePlayerModalOpen, setIsCreatePlayerModalOpen] = useState(false);
+  const [createPlayerOptions, setCreatePlayerOptions] = useState(
+    defaultCreatePlayerOptions,
+  );
+  const [startingMnemosphereDialogOpen, setStartingMnemosphereDialogOpen] =
+    useState(false);
+
+  // Deletion confirmation states
+  const playerToDeleteRef = useRef(null);
+  const isBulkDeleteRef = useRef(false);
+
+  const performDelete = async () => {
+    if (isBulkDeleteRef.current) {
+      for (const id of selectedIds) {
+        await db.deleteDoc(db.doc("player-personal", id));
+      }
+      setSelectedIds(new Set());
+    } else if (playerToDeleteRef.current) {
+      await db.deleteDoc(
+        db.doc("player-personal", playerToDeleteRef.current.id),
+      );
+      playerToDeleteRef.current = null;
+      setPlayerToDelete(null);
+    }
+    closeDeleteDialog();
+  };
+
+  const {
+    isOpen: deleteDialogOpen,
+    closeDialog: closeDeleteDialog,
+    handleDelete,
+  } = useDeleteConfirmation({
+    onConfirm: performDelete,
+  });
+
+  const [playerToDelete, setPlayerToDelete] = useState(null);
+  const [isBulkDelete, setIsBulkDelete] = useState(false);
+
   const navigate = useNavigate();
 
   const fileInputRef = useRef(null);
 
-  const personalRef = collection(firestore, "player-personal");
-  const personalQuery = query(personalRef, where("uid", "==", user.uid));
-  const [personalList, loading, err] = useCollectionData(personalQuery, {
-    idField: "id",
-  });
-  if (err?.code === "resource-exhausted") {
+  const [showScrollTop, setShowScrollTop] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setShowScrollTop(window.scrollY > 300);
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const { dbMode, requestModeSwitch, cloudUser, activeUid } =
+    useDatabaseContext();
+  const db = useDatabase();
+  const localDb = useDatabase("local");
+  const cloudDb = useDatabase("cloud");
+  const [download] = useDownload();
+
+  const playerQuery = useMemo(
+    () => db.query(db.collection("player-personal")),
+    [db],
+  );
+  const [personalList, loading, err] = db.useCollectionData(playerQuery);
+
+  const [snackMsg, setSnackMsg] = useState(null);
+
+  // Migration
+  const [migrationDialogOpen, setMigrationDialogOpen] = useState(false);
+
+  // Select mode
+  const [selectMode, setSelectMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState(new Set());
+  const [copyAnchor, setCopyAnchor] = useState(null);
+  const [moveAnchor, setMoveAnchor] = useState(null);
+
+  if (err?.code === "quota-exceeded") {
     return (
-      <Paper elevation={3} sx={{ marginBottom: 5, padding: 4 }}>
-        {t(
-          "Apologies, fultimator has reached its read quota at the moment, please try again tomorrow. (Around 12-24 hours)"
-        )}
-      </Paper>
+      <Layout>
+        <Paper elevation={3} sx={{ marginBottom: 5, padding: 4 }}>
+          {t(
+            "Apologies, fultimator has reached its read quota at the moment, please try again tomorrow. (Around 12-24 hours)",
+          )}
+        </Paper>
+      </Layout>
     );
   }
 
   const filteredList = personalList
     ? personalList
+        .map(applyPostLoadTransforms)
         .filter((item) => {
-          // Filter based on name
           if (
             name !== "" &&
             !item.name.toLowerCase().includes(name.toLowerCase())
           )
             return false;
-
           return true;
         })
         .sort((item1, item2) => {
-          // Sort based on selected sort and direction
           if (direction === "ascending") {
+            if (sort === "createdAt")
+              return compareTimestamps(item1.createdAt, item2.createdAt);
+            else if (sort === "updatedAt")
+              return compareTimestamps(item1.updatedAt, item2.updatedAt);
             return item1.name.localeCompare(item2.name);
           } else {
+            if (sort === "createdAt")
+              return compareTimestamps(item2.createdAt, item1.createdAt);
+            else if (sort === "updatedAt")
+              return compareTimestamps(item2.updatedAt, item1.updatedAt);
             return item2.name.localeCompare(item1.name);
           }
         })
     : [];
 
-  const addPlayer = async function () {
+  const addPlayer = async function (
+    options = defaultCreatePlayerOptions,
+    forcedId = null,
+  ) {
+    const technospheresEnabled = options.optionalRules?.technospheres ?? false;
+    const technospheresVariant =
+      options.optionalRules?.technospheresVariant ?? "standard";
+    const usesInnateClassRules =
+      technospheresEnabled && technospheresVariant !== "hoplospheres";
+    const grantsTechnosphereHpMpBonus =
+      technospheresEnabled &&
+      ["standard", "mnemospheres"].includes(technospheresVariant);
+    const enablesMnemospheres =
+      technospheresEnabled && technospheresVariant !== "hoplospheres";
+
+    const innateClassNames = usesInnateClassRules
+      ? (options.optionalRules?.innateClasses ?? [])
+      : [];
+    const startingClasses = innateClassNames
+      .map((className) =>
+        classList.find((classDef) => classDef.name === className),
+      )
+      .filter(Boolean)
+      .map((classDef) => ({
+        name: classDef.name,
+        lvl: 1,
+        benefits: classDef.benefits,
+        skills: (classDef.skills ?? []).slice().sort((a, b) => {
+          if (a.skillName < b.skillName) return -1;
+          if (a.skillName > b.skillName) return 1;
+          return 0;
+        }),
+        heroic: classDef.heroic || { name: "", description: "" },
+        spells: classDef.spells || [],
+        isHomebrew: false,
+      }));
+
     const data = {
-      uid: user.uid,
-      name: "-",
+      name: options.name,
       lvl: 5,
       info: {
         pronouns: "",
@@ -147,18 +305,9 @@ function Personal({ user }) {
         willpower: 8,
       },
       stats: {
-        hp: {
-          max: 45,
-          current: 45,
-        },
-        mp: {
-          max: 45,
-          current: 45,
-        },
-        ip: {
-          max: 6,
-          current: 6,
-        },
+        hp: { max: 45, current: 45 },
+        mp: { max: 45, current: 45 },
+        ip: { max: 6, current: 6 },
       },
       statuses: {
         slow: false,
@@ -180,7 +329,7 @@ function Personal({ user }) {
         shaken: false,
         poisoned: false,
       },
-      classes: [],
+      classes: startingClasses,
       weapons: [
         {
           base: {
@@ -220,14 +369,17 @@ function Personal({ user }) {
           precModifier: 0,
           defModifier: 0,
           mDefModifier: 0,
-          isEquipped: true,
+          initModifier: 0,
+          magicModifier: 0,
+          damageMeleeModifier: 0,
+          damageRangedModifier: 0,
         },
       ],
       armor: [],
       notes: [],
       modifiers: {
-        hp: 0,
-        mp: 0,
+        hp: grantsTechnosphereHpMpBonus ? 5 : 0,
+        mp: grantsTechnosphereHpMpBonus ? 5 : 0,
         ip: 0,
         def: 0,
         mdef: 0,
@@ -236,67 +388,430 @@ function Personal({ user }) {
         rangedPrec: 0,
         magicPrec: 0,
       },
+      equippedSlots: {
+        mainHand: {
+          source: "weapons",
+          name: "Unarmed Strike",
+          index: 0,
+        },
+        offHand: {
+          source: "weapons",
+          name: "Unarmed Strike",
+          index: 0,
+        },
+      },
+      settings: {
+        defaultView: options.defaultView,
+        expandAllSections: options.expandAllSections ?? true,
+        advancement: options.advancement,
+        automaticClassLevel:
+          options.optionalRules?.technospheres ||
+          options.automaticClassLevel !== false,
+        autoEquipUnarmed: options.autoEquipUnarmed ?? true,
+        optionalRules: {
+          ...options.optionalRules,
+        },
+        ...(options.optionalRules?.technospheres
+          ? { specialSkillOverrides: { "Dual Shieldbearer": true } }
+          : {}),
+      },
+      ...(technospheresEnabled
+        ? {
+            equipment: [
+              {
+                mnemospheres:
+                  enablesMnemospheres && options.startingMnemosphere
+                    ? [options.startingMnemosphere]
+                    : [],
+                hoplospheres: [],
+              },
+            ],
+          }
+        : {}),
+      ...(activeUid ? { uid: activeUid } : {}),
     };
-    const ref = collection(firestore, "player-personal");
 
     try {
-      const res = await addDoc(ref, data);
-      console.debug(res);
+      // Normalize and migrate before saving
+      const normalizedData = stampCreate(
+        applyPreSaveTransforms(applyPostLoadTransforms(data)),
+      );
+      if (forcedId) {
+        await db.setDoc(db.doc("player-personal", forcedId), normalizedData);
+        return forcedId;
+      }
+      const res = await db.addDoc(
+        db.collection("player-personal"),
+        normalizedData,
+      );
+      return res.id;
     } catch (e) {
       console.debug(e);
+      return null;
     }
   };
 
   const handleFileUpload = async (jsonData) => {
     try {
-      if (!validateCharacter(jsonData)) {
+      // Apply post-load transforms to normalize legacy formats (equipment nesting, skill names, etc.)
+      let data = applyPostLoadTransforms(jsonData);
+
+      if (!validateCharacter(data)) {
         console.error("Invalid character data.");
-        const alertMessage = t("Invalid character JSON data.");
-        alert(alertMessage);
+        alert(t("Invalid character JSON data."));
         return;
       }
 
-      delete jsonData.id; // Remove the id field if present
-      jsonData.uid = user.uid; // Assign the current user UID
-      jsonData.published = false; // Set the published field to false
+      delete data.id;
+      data.uid = activeUid;
+      data.published = false;
+      data = stampCreate(applyPreSaveTransforms(data));
 
-      // Reference to the Firestore collection
-      const ref = collection(firestore, "player-personal");
-
-      // Add document to Firestore
-      const res = await addDoc(ref, jsonData);
+      const res = await db.addDoc(db.collection("player-personal"), data);
       console.debug("Document added with ID: ", res.id);
     } catch (error) {
-      console.error("Error uploading PC from JSON:", error);
+      console.error("Error uploading character from JSON:", error);
     }
   };
 
-  const copyPlayer = function (player) {
-    return async function () {
-      const data = Object.assign({}, player);
-      data.uid = user.uid;
-      delete data.id;
-      data.published = false;
-
-      const ref = collection(firestore, "player-personal");
-      if (window.confirm("Are you sure you want to copy?")) {
-        addDoc(ref, data)
-          .then(function (docRef) {
-            window.location.href = `/pc-gallery/${docRef.id}`;
-          })
-          .catch(function (error) {
-            console.error("Error adding document: ", error);
-          });
-      }
-    };
+  const handlePastePlayer = async () => {
+    try {
+      const text = await navigator.clipboard.readText();
+      const jsonData = JSON.parse(text);
+      await handleFileUpload(jsonData);
+    } catch (err) {
+      console.error("Failed to parse clipboard content:", err);
+      alert(t("Could not parse clipboard content as JSON."));
+    }
   };
 
-  const deletePlayer = function (player) {
-    return function () {
-      if (window.confirm("Are you sure you want to delete?")) {
-        deleteDoc(doc(firestore, "player-personal", player.id));
+  const notify = (msg) => setSnackMsg(msg);
+
+  const uniqueName = (name, existingNames) => {
+    let newName = name;
+    let counter = 1;
+    while (existingNames.includes(newName)) {
+      newName = `${name} (${counter})`;
+      counter++;
+    }
+    return newName;
+  };
+
+  const preparePlayerTransferData = (player, target, nextName) => {
+    const canonical = canonicalizeForTransfer("pc", player);
+    const normalized = normalizeOwnershipForTarget(
+      { ...canonical, name: nextName, published: false },
+      target,
+      cloudUser?.uid,
+    );
+    return stampSave(normalized, normalized.createdAt);
+  };
+
+  const exportSelectedAsJson = async () => {
+    const selected = filteredList.filter((p) => selectedIds.has(p.id));
+    if (!selected.length) return;
+    const zip = new JSZip();
+    selected.forEach((p) => {
+      const canonical = canonicalizeForTransfer("pc", p);
+      zip.file(
+        `${p.name.replace(/\s/g, "_").toLowerCase()}.json`,
+        JSON.stringify(canonical, null, 2),
+      );
+    });
+    const content = await zip.generateAsync({ type: "blob" });
+    download(URL.createObjectURL(content), "selected_players.zip");
+  };
+
+  const copyPlayerToLocal = (player) => async () => {
+    try {
+      const existing = await localDb.getDocs(
+        localDb.query(localDb.collection("player-personal")),
+      );
+      const existingNames = existing.map((n) => n.name);
+      const newName = uniqueName(player.name, existingNames);
+      const data = preparePlayerTransferData(player, "local", newName);
+      await localDb.addDoc(localDb.collection("player-personal"), data);
+      notify(t("Copied to Local"));
+    } catch {
+      notify(t("Failed to copy to Local"));
+    }
+  };
+
+  const copyPlayerToCloud = (player) => async () => {
+    if (!cloudUser) {
+      notify(t("Sign in to copy to Cloud"));
+      return;
+    }
+    try {
+      const existing = await cloudDb.getDocs(
+        cloudDb.query(cloudDb.collection("player-personal")),
+      );
+      const existingNames = existing.map((n) => n.name);
+      const newName = uniqueName(player.name, existingNames);
+      const data = preparePlayerTransferData(player, "cloud", newName);
+      await cloudDb.addDoc(cloudDb.collection("player-personal"), data);
+      notify(t("Copied to Cloud"));
+    } catch {
+      notify(t("Failed to copy to Cloud"));
+    }
+  };
+
+  const movePlayerToLocal = (player) => async () => {
+    try {
+      const existing = await localDb.getDocs(
+        localDb.query(localDb.collection("player-personal")),
+      );
+      const existingNames = existing.map((n) => n.name);
+      const newName = uniqueName(player.name, existingNames);
+      const data = preparePlayerTransferData(player, "local", newName);
+      await localDb.addDoc(localDb.collection("player-personal"), data);
+      await db.deleteDoc(db.doc("player-personal", player.id));
+      notify(t("Moved to Local"));
+    } catch {
+      notify(t("Failed to move to Local"));
+    }
+  };
+
+  const movePlayerToCloud = (player) => async () => {
+    if (!cloudUser) {
+      notify(t("Sign in to move to Cloud"));
+      return;
+    }
+    try {
+      const existing = await cloudDb.getDocs(
+        cloudDb.query(cloudDb.collection("player-personal")),
+      );
+      const existingNames = existing.map((n) => n.name);
+      const newName = uniqueName(player.name, existingNames);
+      const data = preparePlayerTransferData(player, "cloud", newName);
+      await cloudDb.addDoc(cloudDb.collection("player-personal"), data);
+      await db.deleteDoc(db.doc("player-personal", player.id));
+      notify(t("Moved to Cloud"));
+    } catch {
+      notify(t("Failed to move to Cloud"));
+    }
+  };
+
+  const stalePlayers = (personalList ?? []).filter(playerNeedsMigration);
+
+  const handleMigrateAllPlayers = async (actors) => {
+    for (const player of actors) {
+      const ref = db.doc("player-personal", player.id);
+      const migrated = applyPostLoadTransforms(player);
+      await db.setDoc(ref, applyPreSaveTransforms(migrated));
+    }
+    // Wait longer for Firestore to propagate changes to real-time listeners
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+  };
+
+  const toggleSelectMode = () => {
+    setSelectMode((prev) => {
+      if (prev) setSelectedIds(new Set());
+      return !prev;
+    });
+  };
+
+  const toggleSelectPlayer = (id) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const deleteSelected = (e) => {
+    isBulkDeleteRef.current = true;
+    setIsBulkDelete(true);
+    handleDelete(e);
+  };
+
+  const copySelectedToLocal = async () => {
+    const selected = filteredList.filter((p) => selectedIds.has(p.id));
+    if (!selected.length) return;
+    try {
+      const existing = await localDb.getDocs(
+        localDb.query(localDb.collection("player-personal")),
+      );
+      const usedNames = existing.map((n) => n.name);
+      for (const p of selected) {
+        const newName = uniqueName(p.name, usedNames);
+        usedNames.push(newName);
+        const data = preparePlayerTransferData(p, "local", newName);
+        await localDb.addDoc(localDb.collection("player-personal"), data);
       }
-    };
+      notify(t("Copied to Local"));
+    } catch {
+      notify(t("Failed to copy to Local"));
+    }
+  };
+
+  const copySelectedToCloud = async () => {
+    if (!cloudUser) {
+      notify(t("Sign in to copy to Cloud"));
+      return;
+    }
+    const selected = filteredList.filter((p) => selectedIds.has(p.id));
+    if (!selected.length) return;
+    try {
+      const existing = await cloudDb.getDocs(
+        cloudDb.query(cloudDb.collection("player-personal")),
+      );
+      const usedNames = existing.map((n) => n.name);
+      for (const p of selected) {
+        const newName = uniqueName(p.name, usedNames);
+        usedNames.push(newName);
+        const data = preparePlayerTransferData(p, "cloud", newName);
+        await cloudDb.addDoc(cloudDb.collection("player-personal"), data);
+      }
+      notify(t("Copied to Cloud"));
+    } catch {
+      notify(t("Failed to copy to Cloud"));
+    }
+  };
+
+  const moveSelectedToLocal = async () => {
+    const selected = filteredList.filter((p) => selectedIds.has(p.id));
+    if (!selected.length) return;
+    if (!window.confirm(`Move ${selected.length} player(s) to Local?`)) return;
+    try {
+      const existing = await localDb.getDocs(
+        localDb.query(localDb.collection("player-personal")),
+      );
+      const usedNames = existing.map((n) => n.name);
+      for (const p of selected) {
+        const newName = uniqueName(p.name, usedNames);
+        usedNames.push(newName);
+        const data = preparePlayerTransferData(p, "local", newName);
+        await localDb.addDoc(localDb.collection("player-personal"), data);
+        await db.deleteDoc(db.doc("player-personal", p.id));
+      }
+      setSelectedIds(new Set());
+      notify(t("Moved to Local"));
+    } catch {
+      notify(t("Failed to move to Local"));
+    }
+  };
+
+  const moveSelectedToCloud = async () => {
+    if (!cloudUser) {
+      notify(t("Sign in to move to Cloud"));
+      return;
+    }
+    const selected = filteredList.filter((p) => selectedIds.has(p.id));
+    if (!selected.length) return;
+    if (!window.confirm(`Move ${selected.length} player(s) to Cloud?`)) return;
+    try {
+      const existing = await cloudDb.getDocs(
+        cloudDb.query(cloudDb.collection("player-personal")),
+      );
+      const usedNames = existing.map((n) => n.name);
+      for (const p of selected) {
+        const newName = uniqueName(p.name, usedNames);
+        usedNames.push(newName);
+        const data = preparePlayerTransferData(p, "cloud", newName);
+        await cloudDb.addDoc(cloudDb.collection("player-personal"), data);
+        await db.deleteDoc(db.doc("player-personal", p.id));
+      }
+      setSelectedIds(new Set());
+      notify(t("Moved to Cloud"));
+    } catch {
+      notify(t("Failed to move to Cloud"));
+    }
+  };
+
+  const copyAllToLocal = async () => {
+    try {
+      const existing = await localDb.getDocs(
+        localDb.query(localDb.collection("player-personal")),
+      );
+      const usedNames = existing.map((n) => n.name);
+      for (const p of filteredList) {
+        const newName = uniqueName(p.name, usedNames);
+        usedNames.push(newName);
+        const data = preparePlayerTransferData(p, "local", newName);
+        await localDb.addDoc(localDb.collection("player-personal"), data);
+      }
+      notify(t("Copied to Local"));
+    } catch {
+      notify(t("Failed to copy to Local"));
+    }
+  };
+
+  const copyAllToCloud = async () => {
+    if (!cloudUser) {
+      notify(t("Sign in to copy to Cloud"));
+      return;
+    }
+    try {
+      const existing = await cloudDb.getDocs(
+        cloudDb.query(cloudDb.collection("player-personal")),
+      );
+      const usedNames = existing.map((n) => n.name);
+      for (const p of filteredList) {
+        const newName = uniqueName(p.name, usedNames);
+        usedNames.push(newName);
+        const data = preparePlayerTransferData(p, "cloud", newName);
+        await cloudDb.addDoc(cloudDb.collection("player-personal"), data);
+      }
+      notify(t("Copied to Cloud"));
+    } catch {
+      notify(t("Failed to copy to Cloud"));
+    }
+  };
+
+  const moveAllToLocal = async () => {
+    if (!window.confirm(`Move all ${filteredList.length} player(s) to Local?`))
+      return;
+    try {
+      const existing = await localDb.getDocs(
+        localDb.query(localDb.collection("player-personal")),
+      );
+      const usedNames = existing.map((n) => n.name);
+      for (const p of filteredList) {
+        const newName = uniqueName(p.name, usedNames);
+        usedNames.push(newName);
+        const data = preparePlayerTransferData(p, "local", newName);
+        await localDb.addDoc(localDb.collection("player-personal"), data);
+        await db.deleteDoc(db.doc("player-personal", p.id));
+      }
+      notify(t("Moved to Local"));
+    } catch {
+      notify(t("Failed to move to Local"));
+    }
+  };
+
+  const moveAllToCloud = async () => {
+    if (!cloudUser) {
+      notify(t("Sign in to move to Cloud"));
+      return;
+    }
+    if (!window.confirm(`Move all ${filteredList.length} player(s) to Cloud?`))
+      return;
+    try {
+      const existing = await cloudDb.getDocs(
+        cloudDb.query(cloudDb.collection("player-personal")),
+      );
+      const usedNames = existing.map((n) => n.name);
+      for (const p of filteredList) {
+        const newName = uniqueName(p.name, usedNames);
+        usedNames.push(newName);
+        const data = preparePlayerTransferData(p, "cloud", newName);
+        await cloudDb.addDoc(cloudDb.collection("player-personal"), data);
+        await db.deleteDoc(db.doc("player-personal", p.id));
+      }
+      notify(t("Moved to Cloud"));
+    } catch {
+      notify(t("Failed to move to Cloud"));
+    }
+  };
+
+  const deletePlayer = (player) => (e) => {
+    playerToDeleteRef.current = player;
+    setPlayerToDelete(player);
+    isBulkDeleteRef.current = false;
+    setIsBulkDelete(false);
+    handleDelete(e);
   };
 
   const handleClose = () => {
@@ -307,87 +822,96 @@ function Personal({ user }) {
     setIsBugDialogOpen(false);
   };
 
+  const handleOpenCreatePlayerModal = () => {
+    setCreatePlayerOptions(defaultCreatePlayerOptions);
+    setIsCreatePlayerModalOpen(true);
+  };
+
+  const handleCloseCreatePlayerModal = () => {
+    setIsCreatePlayerModalOpen(false);
+  };
+
+  const handleCreatePlayerOptionChange = (field, value) => {
+    setCreatePlayerOptions((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+  const handleCreateOptionalRuleChange = (rule, checked) => {
+    setCreatePlayerOptions((prev) => ({
+      ...prev,
+      ...(rule === "technospheres" && checked
+        ? { automaticClassLevel: true }
+        : {}),
+      optionalRules: {
+        ...prev.optionalRules,
+        [rule]: checked,
+      },
+    }));
+  };
+
+  const handleCreateOptionalRuleValueChange = (rule, value) => {
+    setCreatePlayerOptions((prev) => ({
+      ...prev,
+      optionalRules: {
+        ...prev.optionalRules,
+        [rule]: value,
+      },
+    }));
+  };
+
+  const handleCreatePlayerConfirm = async () => {
+    const newPlayerId = crypto.randomUUID();
+    handleCloseCreatePlayerModal();
+    navigate(`/player-edit/${newPlayerId}`, {
+      state: { from: "/pc-gallery", creating: true },
+    });
+    void addPlayer(createPlayerOptions, newPlayerId).then((savedId) => {
+      if (!savedId) {
+        console.error("Failed to persist newly created player", newPlayerId);
+      }
+    });
+    setCreatePlayerOptions(defaultCreatePlayerOptions);
+  };
+
+  const handleStartingMnemosphereConfirm = (mnemo) => {
+    setStartingMnemosphereDialogOpen(false);
+    setCreatePlayerOptions((prev) => ({ ...prev, startingMnemosphere: mnemo }));
+  };
+
+  const handleStartingMnemosphereSkip = () => {
+    setStartingMnemosphereDialogOpen(false);
+    setCreatePlayerOptions((prev) => ({ ...prev, startingMnemosphere: null }));
+  };
+
   const sharePlayer = async (id) => {
-    const baseUrl = window.location.href.replace(/\/[^/]+$/, "");
+    let baseUrl = window.location.href.replace(/\/[^/]+$/, "");
+    if (IS_ELECTRON) {
+      baseUrl = "https://fultimator.com";
+    }
     const fullUrl = `${baseUrl}/pc-gallery/${id}`;
     await navigator.clipboard.writeText(fullUrl);
     setOpen(true);
   };
 
   const handleNavigation = (path) => {
-    navigate(path, {
-      state: {
-        from: "/pc-gallery",
-      },
-    });
+    navigate(path, { state: { from: "/pc-gallery", dbMode } });
   };
 
   return (
     <>
-      <Alert
-        icon={<Star />}
-        severity="success"
-        variant="filled"
-        sx={{
-          mb: 3,
-          backgroundColor: "rgb(22, 163, 74)", // emerald-600 equivalent
-          "& .MuiAlert-icon": {
-            color: "#fff",
-          },
-        }}
-      >
-        <Box>
-          <AlertTitle
-            sx={{
-              fontSize: "1.1rem",
-              fontWeight: "bold",
-              mb: 1,
-              color: "#fff",
-            }}
-          >
-            {t("Help us improve the Character Designer!")}
-          </AlertTitle>
-          <Typography variant="body2" color="#fff" sx={{ mb: 2 }}>
-            {t(
-              "We value your input on this new feature. Please take a moment to complete our quick survey and share your thoughts. Your feedback will directly influence future updates and enhancements."
-            )}
-          </Typography>
-          <Button
-            href="https://forms.gle/4kfWcrZYRcoAErew5"
-            target="_blank"
-            rel="noopener noreferrer"
-            variant="contained"
-            sx={{
-              backgroundColor: "rgb(220, 252, 231)",
-              color: "rgb(22, 163, 74)",
-              fontWeight: "bold",
-              "&:hover": {
-                backgroundColor: "white",
-              },
-            }}
-          >
-            {t("TAKE QUICK SURVEY")}
-          </Button>
-        </Box>
-      </Alert>
-      {/*<Alert variant="filled" severity="warning" sx={{ marginBottom: 3 }}>
-        {t(
-          "Character Designer is a test feature and it is currently in alpha. Please be aware that it is not finished yet and will be updated frequently. Characters created could be deleted at any time for testing purposes."
-        )}
-      </Alert>*/}
       <div style={{ display: "flex", alignItems: "center", marginBottom: 20 }}>
         <Paper sx={{ width: "100%", px: 2, py: 1 }}>
-          <Grid container spacing={1} sx={{ py: 1 }} justifyContent="center">
+          {/* Zone 1: Filters */}
+          <Grid container spacing={1} sx={{ alignItems: "center" }}>
             <Grid
-              item
-              xs={12}
-              md={3}
-              alignItems="center"
-              justifyContent="center"
-              sx={{ display: "flex" }}
+              size={{
+                xs: 12,
+                sm: "grow",
+              }}
             >
               <TextField
-                id="outlined-basic"
                 label={t("Search by Player Name")}
                 variant="outlined"
                 size="small"
@@ -396,23 +920,49 @@ function Personal({ user }) {
                 onChange={(evt) => {
                   setName(evt.target.value);
                 }}
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <SearchIcon />
-                    </InputAdornment>
-                  ),
+                slotProps={{
+                  input: {
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <SearchIcon />
+                      </InputAdornment>
+                    ),
+                  },
+
+                  htmlInput: { maxLength: 50 },
                 }}
-                inputProps={{ maxLength: 50 }}
               />
             </Grid>
             <Grid
-              item
-              xs={4}
-              md={1.5}
-              alignItems="center"
-              justifyContent="center"
-              sx={{ display: "flex" }}
+              sx={{ minWidth: 160 }}
+              size={{
+                xs: 12,
+                sm: "auto",
+              }}
+            >
+              <FormControl fullWidth size="small">
+                <InputLabel id="sort">{t("Sort:")}</InputLabel>
+                <Select
+                  labelId="sort"
+                  id="select-sort"
+                  value={sort}
+                  label="Sort:"
+                  onChange={(evt) => {
+                    setSort(evt.target.value);
+                  }}
+                >
+                  <MenuItem value={"name"}>{t("Name")}</MenuItem>
+                  <MenuItem value={"createdAt"}>{t("creation_date")}</MenuItem>
+                  <MenuItem value={"updatedAt"}>{t("updated_date")}</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid
+              sx={{ minWidth: 160 }}
+              size={{
+                xs: 12,
+                sm: "auto",
+              }}
             >
               <FormControl fullWidth size="small">
                 <InputLabel id="direction">{t("Direction:")}</InputLabel>
@@ -421,7 +971,7 @@ function Personal({ user }) {
                   id="select-direction"
                   value={direction}
                   label="direction:"
-                  onChange={(evt, val2) => {
+                  onChange={(evt) => {
                     setDirection(evt.target.value);
                   }}
                 >
@@ -430,57 +980,329 @@ function Personal({ user }) {
                 </Select>
               </FormControl>
             </Grid>
-            <Grid
-              item
-              xs={12}
-              md={2}
-              sx={{}}
-              alignItems="center"
-              justifyContent="center"
+          </Grid>
+
+          <Divider sx={{ my: 0.75 }} />
+
+          {/* Actions + Status (single row) */}
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              flexWrap: "wrap",
+              gap: 1,
+            }}
+          >
+            <Button
+              variant="contained"
+              startIcon={<HistoryEdu />}
+              onClick={handleOpenCreatePlayerModal}
+              disabled={dbMode === "cloud" && !cloudUser}
+            >
+              {t("create_pc")}
+            </Button>
+            {SUPPORTS_LOCAL_DB && (
+              <ToggleButtonGroup
+                value={dbMode}
+                exclusive
+                onChange={(_, val) => {
+                  if (val !== null) requestModeSwitch(val);
+                }}
+                size="small"
+              >
+                <ToggleButton value="local">
+                  <StorageIcon sx={{ mr: 0.5 }} fontSize="small" />
+                  {t("Local")}
+                </ToggleButton>
+                <ToggleButton value="cloud">
+                  <CloudIcon sx={{ mr: 0.5 }} fontSize="small" />
+                  {t("Cloud")}
+                </ToggleButton>
+              </ToggleButtonGroup>
+            )}
+            {dbMode === "local" && <DriveSync />}
+            <Box sx={{ flex: 1 }} />
+            <Button
+              variant="outlined"
+              size="small"
+              onClick={() => fileInputRef.current.click()}
+            >
+              {t("Add PC from JSON")}
+            </Button>
+            <Tooltip title={t("Add PC from Clipboard")}>
+              <IconButton size="small" onClick={handlePastePlayer}>
+                <ContentPaste />
+              </IconButton>
+            </Tooltip>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".json"
+              onChange={(e) => {
+                const file = e.target.files[0];
+                if (file) {
+                  const reader = new FileReader();
+                  reader.onload = () => {
+                    try {
+                      const result = JSON.parse(reader.result);
+                      handleFileUpload(result);
+                    } catch (err) {
+                      console.error("Error parsing JSON:", err);
+                    }
+                  };
+                  reader.readAsText(file);
+                }
+              }}
+              style={{ display: "none" }}
+            />
+            <Divider orientation="vertical" flexItem />
+            <Typography
+              variant="body1"
+              sx={{
+                fontWeight: 600,
+              }}
+            >
+              {filteredList?.length ?? 0} {t("Players")}
+            </Typography>
+            {stalePlayers.length > 0 && (
+              <Tooltip title={t("Some players need a data migration")}>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  color="warning"
+                  startIcon={<SystemUpdateAltIcon />}
+                  onClick={() => setMigrationDialogOpen(true)}
+                >
+                  {t("Migrate")} ({stalePlayers.length})
+                </Button>
+              </Tooltip>
+            )}
+            <Tooltip
+              title={selectMode ? t("Exit Select Mode") : t("Select Players")}
             >
               <Button
-                fullWidth
-                variant="contained"
-                startIcon={<HistoryEdu />}
-                onClick={addPlayer}
+                variant={selectMode ? "contained" : "outlined"}
+                size="small"
+                startIcon={<LibraryAddCheck />}
+                onClick={toggleSelectMode}
               >
-                {t("Create Player")}
+                {t("Select")}
               </Button>
-            </Grid>
-            <Grid item xs={12} md={2}>
-              <Button
-                variant="outlined"
-                fullWidth
-                onClick={() => fileInputRef.current.click()}
-              >
-                {t("Add PC from JSON")}
-              </Button>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept=".json"
-                onChange={(e) => {
-                  const file = e.target.files[0];
-                  if (file) {
-                    const reader = new FileReader();
-                    reader.onload = () => {
-                      try {
-                        const result = JSON.parse(reader.result);
-                        handleFileUpload(result);
-                      } catch (err) {
-                        console.error("Error parsing JSON:", err);
-                      }
-                    };
-                    reader.readAsText(file);
-                  }
+            </Tooltip>
+          </Box>
+
+          {/* Select mode sub-bar */}
+          <Collapse in={selectMode}>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                flexWrap: "wrap",
+                gap: 1,
+                mt: 0.75,
+                pt: 0.75,
+                borderTop: 1,
+                borderColor: "divider",
+              }}
+            >
+              <Typography
+                variant="body2"
+                sx={{
+                  color: "text.secondary",
                 }}
-                style={{ display: "none" }}
-              />
-            </Grid>
-          </Grid>
+              >
+                {selectedIds.size} {t("selected")}
+              </Typography>
+              <Box sx={{ flex: 1 }} />
+              <Button
+                size="small"
+                variant="outlined"
+                onClick={(e) => setCopyAnchor(e.currentTarget)}
+                startIcon={<FileCopy />}
+              >
+                {t("Copy")}
+              </Button>
+              <MuiMenu
+                anchorEl={copyAnchor}
+                open={Boolean(copyAnchor)}
+                onClose={() => setCopyAnchor(null)}
+              >
+                <MenuItem
+                  disabled={selectedIds.size === 0}
+                  onClick={() => {
+                    setCopyAnchor(null);
+                    copySelectedToLocal();
+                  }}
+                >
+                  <ListItemIcon>
+                    <StorageIcon fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={`${t("Copy Selected to Local")} (${selectedIds.size})`}
+                  />
+                </MenuItem>
+                <MenuItem
+                  disabled={selectedIds.size === 0 || !cloudUser}
+                  onClick={() => {
+                    setCopyAnchor(null);
+                    copySelectedToCloud();
+                  }}
+                >
+                  <ListItemIcon>
+                    <CloudIcon fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={`${t("Copy Selected to Cloud")} (${selectedIds.size})`}
+                  />
+                </MenuItem>
+                <Divider />
+                <MenuItem
+                  onClick={() => {
+                    setCopyAnchor(null);
+                    copyAllToLocal();
+                  }}
+                >
+                  <ListItemIcon>
+                    <StorageIcon fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText primary={t("Copy All to Local")} />
+                </MenuItem>
+                <MenuItem
+                  disabled={!cloudUser}
+                  onClick={() => {
+                    setCopyAnchor(null);
+                    copyAllToCloud();
+                  }}
+                >
+                  <ListItemIcon>
+                    <CloudIcon fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText primary={t("Copy All to Cloud")} />
+                </MenuItem>
+              </MuiMenu>
+              <Button
+                size="small"
+                variant="outlined"
+                onClick={(e) => setMoveAnchor(e.currentTarget)}
+                startIcon={<DriveFileMove />}
+              >
+                {t("Move")}
+              </Button>
+              <MuiMenu
+                anchorEl={moveAnchor}
+                open={Boolean(moveAnchor)}
+                onClose={() => setMoveAnchor(null)}
+              >
+                <MenuItem
+                  disabled={selectedIds.size === 0}
+                  onClick={() => {
+                    setMoveAnchor(null);
+                    moveSelectedToLocal();
+                  }}
+                >
+                  <ListItemIcon>
+                    <StorageIcon fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={`${t("Move Selected to Local")} (${selectedIds.size})`}
+                  />
+                </MenuItem>
+                <MenuItem
+                  disabled={selectedIds.size === 0 || !cloudUser}
+                  onClick={() => {
+                    setMoveAnchor(null);
+                    moveSelectedToCloud();
+                  }}
+                >
+                  <ListItemIcon>
+                    <CloudIcon fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={`${t("Move Selected to Cloud")} (${selectedIds.size})`}
+                  />
+                </MenuItem>
+                <Divider />
+                <MenuItem
+                  onClick={() => {
+                    setMoveAnchor(null);
+                    moveAllToLocal();
+                  }}
+                >
+                  <ListItemIcon>
+                    <StorageIcon fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText primary={t("Move All to Local")} />
+                </MenuItem>
+                <MenuItem
+                  disabled={!cloudUser}
+                  onClick={() => {
+                    setMoveAnchor(null);
+                    moveAllToCloud();
+                  }}
+                >
+                  <ListItemIcon>
+                    <CloudIcon fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText primary={t("Move All to Cloud")} />
+                </MenuItem>
+              </MuiMenu>
+              <Tooltip
+                title={`${t("Export Selected as JSON")} (${selectedIds.size})`}
+              >
+                <span>
+                  <IconButton
+                    onClick={exportSelectedAsJson}
+                    disabled={selectedIds.size === 0}
+                  >
+                    <Download />
+                  </IconButton>
+                </span>
+              </Tooltip>
+              <Tooltip title={`${t("Delete Selected")} (${selectedIds.size})`}>
+                <span>
+                  <IconButton
+                    onClick={deleteSelected}
+                    disabled={selectedIds.size === 0}
+                    color="error"
+                  >
+                    <Delete />
+                  </IconButton>
+                </span>
+              </Tooltip>
+            </Box>
+          </Collapse>
         </Paper>
       </div>
-      {loading && (
+      {!cloudUser && (
+        <Paper
+          elevation={dbMode === "cloud" ? 3 : 0}
+          variant={dbMode === "cloud" ? "elevation" : "outlined"}
+          sx={{
+            p: 2,
+            mb: 2,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 2,
+            flexWrap: "wrap",
+          }}
+        >
+          <CloudIcon color={dbMode === "cloud" ? "primary" : "disabled"} />
+          <Typography
+            variant="body2"
+            color={dbMode === "cloud" ? "text.primary" : "text.secondary"}
+            sx={{ flex: 1, minWidth: 200 }}
+          >
+            {dbMode === "cloud"
+              ? t("You have to be logged in to access this feature")
+              : t(
+                  "Have a Google account? Sign in to sync your data between devices",
+                )}
+          </Typography>
+          <SignIn />
+        </Paper>
+      )}
+      {loading && (dbMode !== "cloud" || cloudUser) && (
         <div
           style={{
             display: "flex",
@@ -492,58 +1314,49 @@ function Personal({ user }) {
         </div>
       )}
       <Grid container spacing={1} sx={{ py: 1 }}>
-        {filteredList.map((player, index) => (
+        {filteredList.map((player) => (
           <Grid
-            item
-            xs={12}
-            md={6}
-            alignItems="center"
-            justifyContent="center"
-            key={index}
-            sx={{ marginBottom: "20px" }}
-          >
-            <PlayerCardGallery
-              player={player}
-              setPlayer={null}
-              sx={{ marginBottom: 1 }}
-            />
-            <div style={{ marginTop: "3px" }}>
-              <Tooltip title={t("Copy")}>
-                <IconButton onClick={copyPlayer(player)}>
-                  <ContentCopy />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title={t("Edit")}>
-                <IconButton
-                  onClick={() =>
-                    handleNavigation(`/pc-gallery/${player.id}`)
+            key={player.id}
+            sx={{
+              alignItems: "center",
+              justifyContent: "center",
+              marginBottom: "20px",
+              ...(selectMode
+                ? {
+                    cursor: "pointer",
+                    outline: selectedIds.has(player.id)
+                      ? "3px solid"
+                      : "1px dashed",
+                    outlineColor: selectedIds.has(player.id)
+                      ? "primary.main"
+                      : "divider",
+                    borderRadius: 1,
                   }
-                >
-                  <Edit />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title={t("Delete")}>
-                <IconButton onClick={deletePlayer(player)}>
-                  <Delete />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title={t("Share URL")}>
-                <IconButton onClick={() => sharePlayer(player.id)}>
-                  <Share />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title={t("Player Sheet")}>
-                <IconButton
-                  onClick={() => handleNavigation(`/character-sheet/${player.id}`)}
-                >
-                  <Badge />
-                </IconButton>
-              </Tooltip>
-              <Export name={`${player.name}`} dataType="pc" data={player} />
-            </div>
+                : {}),
+            }}
+            onClick={
+              selectMode ? () => toggleSelectPlayer(player.id) : undefined
+            }
+            size={{
+              xs: 12,
+              md: 6,
+            }}
+          >
+            <PlayerGalleryCardActions
+              player={player}
+              t={t}
+              dbMode={dbMode}
+              handleNavigation={handleNavigation}
+              deletePlayer={deletePlayer}
+              sharePlayer={sharePlayer}
+              copyPlayerToLocal={copyPlayerToLocal}
+              copyPlayerToCloud={copyPlayerToCloud}
+              movePlayerToLocal={movePlayerToLocal}
+              movePlayerToCloud={movePlayerToCloud}
+            />
           </Grid>
         ))}
-        <Grid item xs={12}>
+        <Grid size={12}>
           <Button
             variant="outlined"
             startIcon={<BugReport />}
@@ -555,11 +1368,328 @@ function Personal({ user }) {
         </Grid>
       </Grid>
       <Box sx={{ height: "10vh" }} />
+      <MigrationDialog
+        open={migrationDialogOpen}
+        onClose={() => setMigrationDialogOpen(false)}
+        actors={stalePlayers}
+        actorType="player"
+        onMigrateAll={handleMigrateAllPlayers}
+        getMigrations={getPendingPlayerMigrations}
+      />
+      <DeleteConfirmationDialog
+        open={deleteDialogOpen}
+        onClose={closeDeleteDialog}
+        onConfirm={performDelete}
+        title={
+          isBulkDelete ? t("Confirm Bulk Deletion") : t("Confirm Deletion")
+        }
+        message={
+          isBulkDelete
+            ? t("Are you sure you want to delete {count} player(s)?").replace(
+                "{count}",
+                String(selectedIds.size),
+              )
+            : t("Are you sure you want to delete this player?")
+        }
+        itemPreview={
+          !isBulkDelete &&
+          playerToDelete && (
+            <Box>
+              <Typography variant="h4">{playerToDelete.name}</Typography>
+              <Typography variant="body2">
+                {t("Level")} {playerToDelete.lvl} -{" "}
+                {playerToDelete.info?.identity}
+              </Typography>
+            </Box>
+          )
+        }
+      />
+      <Dialog
+        open={isCreatePlayerModalOpen}
+        onClose={handleCloseCreatePlayerModal}
+        fullWidth
+        maxWidth="sm"
+      >
+        <DialogTitle>{t("create_pc")}</DialogTitle>
+        <DialogContent dividers>
+          <Box sx={{ mt: 1 }}>
+            <SettingRow label={t("Name")} hint={t("optional_name_hint")}>
+              <TextField
+                value={createPlayerOptions.name}
+                onChange={(evt) =>
+                  handleCreatePlayerOptionChange("name", evt.target.value)
+                }
+                size="small"
+                sx={{ minWidth: 220 }}
+              />
+            </SettingRow>
+
+            <SettingRow
+              label={t("Default View")}
+              hint={t("Choose which view opens first in Player Edit.")}
+            >
+              <FormControl
+                variant="outlined"
+                size="small"
+                sx={{ minWidth: 180 }}
+              >
+                <Select
+                  value={createPlayerOptions.defaultView}
+                  onChange={(evt) =>
+                    handleCreatePlayerOptionChange(
+                      "defaultView",
+                      evt.target.value,
+                    )
+                  }
+                >
+                  <MenuItem value="normal">{t("Normal View")}</MenuItem>
+                  <MenuItem value="compact">{t("Compact View")}</MenuItem>
+                </Select>
+              </FormControl>
+            </SettingRow>
+
+            <SettingRow
+              label={t("Expand All Sections")}
+              hint={t(
+                "When enabled, all spell and class sections start expanded on load.",
+              )}
+              compactControl
+            >
+              <Checkbox
+                checked={createPlayerOptions.expandAllSections ?? true}
+                onChange={(evt) =>
+                  handleCreatePlayerOptionChange(
+                    "expandAllSections",
+                    evt.target.checked,
+                  )
+                }
+              />
+            </SettingRow>
+
+            <SettingRow
+              label={t("Advancement")}
+              hint={t(
+                "(Placeholder) Toggle to enable features related to character advancement such as guided level up options, and per-level skill management.",
+              )}
+              compactControl
+            >
+              <Checkbox
+                checked={createPlayerOptions.advancement}
+                onChange={(evt) =>
+                  handleCreatePlayerOptionChange(
+                    "advancement",
+                    evt.target.checked,
+                  )
+                }
+              />
+            </SettingRow>
+
+            <SettingRow
+              label={t("Automatic Class Leveling")}
+              hint={t(
+                "When enabled, class level is read-only and is derived from the total current skill levels in that class.",
+              )}
+              compactControl
+            >
+              <Checkbox
+                checked={
+                  createPlayerOptions.optionalRules.technospheres ||
+                  createPlayerOptions.automaticClassLevel !== false
+                }
+                disabled={createPlayerOptions.optionalRules.technospheres}
+                onChange={(evt) =>
+                  handleCreatePlayerOptionChange(
+                    "automaticClassLevel",
+                    evt.target.checked,
+                  )
+                }
+              />
+            </SettingRow>
+
+            <SettingRow
+              label={t("Auto-Equip Unarmed Strike")}
+              hint={t(
+                "When a weapon is unequipped from a hand slot, automatically equip Unarmed Strike if that hand is now empty.",
+              )}
+              compactControl
+            >
+              <Checkbox
+                checked={createPlayerOptions.autoEquipUnarmed ?? true}
+                onChange={(evt) =>
+                  handleCreatePlayerOptionChange(
+                    "autoEquipUnarmed",
+                    evt.target.checked,
+                  )
+                }
+              />
+            </SettingRow>
+
+            <Typography
+              variant="body1"
+              sx={{ px: 1, mt: 1, mb: 0.25, fontWeight: 600 }}
+            >
+              {t("Optional Rules")}
+            </Typography>
+
+            <SettingRow
+              label={t("Quirks")}
+              hint={t(
+                "Play with the Quirk advanced optional rule from High Fantasy Atlas, page 114.",
+              )}
+              showDivider={false}
+              dense
+              compactControl
+            >
+              <Checkbox
+                checked={createPlayerOptions.optionalRules.quirks}
+                onChange={(evt) =>
+                  handleCreateOptionalRuleChange("quirks", evt.target.checked)
+                }
+              />
+            </SettingRow>
+
+            <SettingRow
+              label={t("Zero Power")}
+              hint={t(
+                "Play with the Zero Power optional rule from High Fantasy Atlas, page 124.",
+              )}
+              showDivider={false}
+              dense
+              compactControl
+            >
+              <Checkbox
+                checked={createPlayerOptions.optionalRules.zeroPower}
+                onChange={(evt) =>
+                  handleCreateOptionalRuleChange(
+                    "zeroPower",
+                    evt.target.checked,
+                  )
+                }
+              />
+            </SettingRow>
+
+            <SettingRow
+              label={t("Camp Activities")}
+              hint={t(
+                "Enable the Camp Activity optional rule from Natural Fantasy Atlas, page 130.",
+              )}
+              showDivider={false}
+              dense
+              compactControl
+            >
+              <Checkbox
+                checked={createPlayerOptions.optionalRules.campActivities}
+                onChange={(evt) =>
+                  handleCreateOptionalRuleChange(
+                    "campActivities",
+                    evt.target.checked,
+                  )
+                }
+              />
+            </SettingRow>
+
+            <SettingRow
+              label={t("Technospheres")}
+              hint={t(
+                "Enable the Technosphere optional rule from Techno Fantasy Atlas, page 130. Armor and Custom Weapons will have slots instead of qualities. Hoplospheres, Mnemospheres and Mnemosphere Receptacles can be created.",
+              )}
+              showDivider={false}
+              dense
+              compactControl
+            >
+              <Checkbox
+                checked={createPlayerOptions.optionalRules.technospheres}
+                onChange={(evt) =>
+                  handleCreateOptionalRuleChange(
+                    "technospheres",
+                    evt.target.checked,
+                  )
+                }
+              />
+            </SettingRow>
+            {createPlayerOptions.optionalRules.technospheres && (
+              <Box sx={{ mt: 1, px: 1, mb: 1 }}>
+                <Typography variant="caption" color="text.secondary">
+                  {t(
+                    "Manage innate classes from the Classes tab. Add them under Innate Classes with the compendium search or add button.",
+                  )}
+                </Typography>
+              </Box>
+            )}
+            {createPlayerOptions.optionalRules.technospheres && (
+              <SettingRow
+                label={t("Technospheres Alternative Rule")}
+                hint={t("Select which Technospheres variant to use.")}
+                showDivider={false}
+                dense
+                compactControl
+              >
+                <RadioGroup
+                  value={
+                    createPlayerOptions.optionalRules.technospheresVariant ??
+                    "standard"
+                  }
+                  onChange={(evt) =>
+                    handleCreateOptionalRuleValueChange(
+                      "technospheresVariant",
+                      evt.target.value,
+                    )
+                  }
+                  sx={{
+                    alignItems: "flex-end",
+                    minWidth: 240,
+                    "& .MuiFormControlLabel-root": {
+                      mr: 0,
+                      ml: 0,
+                    },
+                  }}
+                >
+                  <FormControlLabel
+                    value="standard"
+                    control={<Radio size="small" />}
+                    label={t("Standard")}
+                    labelPlacement="start"
+                  />
+                  <FormControlLabel
+                    value="integrated"
+                    control={<Radio size="small" />}
+                    label={t("Integrated technospheres")}
+                    labelPlacement="start"
+                  />
+                  <FormControlLabel
+                    value="mnemospheres"
+                    control={<Radio size="small" />}
+                    label={t("Mnemospheres only")}
+                    labelPlacement="start"
+                  />
+                  <FormControlLabel
+                    value="hoplospheres"
+                    control={<Radio size="small" />}
+                    label={t("Hoplospheres only")}
+                    labelPlacement="start"
+                  />
+                </RadioGroup>
+              </SettingRow>
+            )}
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseCreatePlayerModal}>{t("Cancel")}</Button>
+          <Button variant="contained" onClick={handleCreatePlayerConfirm}>
+            {t("create_pc")}
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <MnemosphereCreateDialog
+        open={startingMnemosphereDialogOpen}
+        onClose={handleStartingMnemosphereSkip}
+        onConfirm={handleStartingMnemosphereConfirm}
+      />
       <HelpFeedbackDialog
         open={isBugDialogOpen}
         onClose={handleBugDialogClose}
-        userEmail={user.email}
-        userUUID={user.uid}
+        userEmail={cloudUser?.email ?? ""}
+        userUUID={cloudUser?.uid ?? activeUid}
         title={"Report a Bug"}
         placeholder="Please describe the bug. Please leave a message in english!"
         onSuccess={null}
@@ -572,6 +1702,450 @@ function Personal({ user }) {
         onClose={handleClose}
         message={t("Copied to Clipboard!")}
       />
+      <Snackbar
+        open={Boolean(snackMsg)}
+        onClose={() => setSnackMsg(null)}
+        autoHideDuration={2000}
+        message={snackMsg}
+      />
+      {showScrollTop && (
+        <Tooltip title={t("Scroll to top")}>
+          <Fab
+            size="small"
+            color="primary"
+            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+            sx={{ position: "fixed", bottom: 24, right: 24, zIndex: 1200 }}
+          >
+            <KeyboardArrowUpIcon />
+          </Fab>
+        </Tooltip>
+      )}
+    </>
+  );
+}
+
+function PlayerGalleryCardActions({
+  player,
+  t,
+  dbMode,
+  handleNavigation,
+  deletePlayer,
+  sharePlayer,
+  copyPlayerToLocal,
+  copyPlayerToCloud,
+  movePlayerToLocal,
+  movePlayerToCloud,
+}) {
+  const cardRef = useRef(null);
+  const [expanded, setExpanded] = useState(false);
+  const [actionsAnchor, setActionsAnchor] = useState(null);
+  const [actionsSubmenu, setActionsSubmenu] = useState(null); // "export" | "transfer" | null
+  const isMobile = useMediaQuery("(max-width: 600px)");
+  const [downloadImage] = useDownloadImage(player?.name || "player", cardRef);
+  const exportData = canonicalizeForTransfer(
+    "pc",
+    applyPreSaveTransforms(player),
+  );
+
+  const closeMenus = () => {
+    setActionsAnchor(null);
+    setActionsSubmenu(null);
+  };
+
+  const copyJsonToClipboard = async () => {
+    await navigator.clipboard.writeText(
+      JSON.stringify({ ...exportData, dataType: "pc" }, null, 2),
+    );
+    closeMenus();
+  };
+
+  const downloadJson = () => {
+    const safeName = (player?.name || "player")
+      .replace(/\s+/g, "_")
+      .toLowerCase();
+    const blob = new Blob(
+      [JSON.stringify({ ...exportData, dataType: "pc" }, null, 2)],
+      {
+        type: "application/json;charset=utf-8",
+      },
+    );
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${safeName}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    closeMenus();
+  };
+
+  const copyText = async (fmt) => {
+    const text = buildItemText("pc", exportData, fmt);
+    await navigator.clipboard.writeText(text);
+    closeMenus();
+  };
+
+  const downloadText = (fmt) => {
+    const text = buildItemText("pc", exportData, fmt);
+    const ext = fmt === "plain" ? "txt" : "md";
+    const safeName = (player?.name || "player")
+      .replace(/\s+/g, "_")
+      .toLowerCase();
+    const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${safeName}.${ext}`;
+    a.click();
+    URL.revokeObjectURL(url);
+    closeMenus();
+  };
+
+  return (
+    <>
+      <Box ref={cardRef}>
+        <PlayerCardGallery
+          player={player}
+          setPlayer={null}
+          isExpanded={expanded}
+          sx={{ marginBottom: 1 }}
+        />
+      </Box>
+      <Box
+        sx={{
+          mt: "3px",
+          display: "flex",
+          alignItems: "center",
+          gap: 1,
+          flexWrap: "wrap",
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <Tooltip title={t("Actions")}>
+          <IconButton onClick={(e) => setActionsAnchor(e.currentTarget)}>
+            <MenuIcon />
+          </IconButton>
+        </Tooltip>
+        <MuiMenu
+          anchorEl={actionsAnchor}
+          open={Boolean(actionsAnchor)}
+          onClose={closeMenus}
+          slotProps={{
+            transition: { onExited: () => setActionsSubmenu(null) },
+          }}
+        >
+          {actionsSubmenu === null && [
+            <MenuItem
+              key="edit"
+              onClick={() => {
+                closeMenus();
+                handleNavigation(`/player-edit/${player.id}`);
+              }}
+            >
+              <ListItemIcon>
+                <Edit fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary={t("Edit")} />
+            </MenuItem>,
+            <MenuItem
+              key="sheet"
+              onClick={() => {
+                closeMenus();
+                handleNavigation(`/character-sheet/${player.id}`);
+              }}
+            >
+              <ListItemIcon>
+                <Badge fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary={t("Player Sheet")} />
+            </MenuItem>,
+            <MenuItem key="export" onClick={() => setActionsSubmenu("export")}>
+              <ListItemIcon>
+                <Code fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary={t("Export")} />
+              <ChevronRight fontSize="small" />
+            </MenuItem>,
+            <MenuItem
+              key="transfer"
+              onClick={() => setActionsSubmenu("transfer")}
+            >
+              <ListItemIcon>
+                <FileCopy fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary={t("Copy / Move")} />
+              <ChevronRight fontSize="small" />
+            </MenuItem>,
+            <MenuItem
+              key="delete"
+              onClick={() => {
+                closeMenus();
+                deletePlayer(player)();
+              }}
+            >
+              <ListItemIcon>
+                <Delete fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary={t("Delete")} />
+            </MenuItem>,
+            <MenuItem
+              key="share"
+              disabled={dbMode === "local"}
+              onClick={() => {
+                closeMenus();
+                sharePlayer(player.id);
+              }}
+            >
+              <ListItemIcon>
+                <Share fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary={t("Share URL")} />
+            </MenuItem>,
+            <MenuItem
+              key="download"
+              onClick={() => {
+                closeMenus();
+                downloadImage();
+              }}
+            >
+              <ListItemIcon>
+                <Download fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary={t("Download as Image")} />
+            </MenuItem>,
+          ]}
+          {actionsSubmenu === "export" && [
+            <MenuItem key="back" onClick={() => setActionsSubmenu(null)}>
+              <ListItemIcon>
+                <ChevronLeft fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary={t("Export")} />
+            </MenuItem>,
+            <Divider key="div" />,
+            <MenuItem key="copy-json" onClick={copyJsonToClipboard}>
+              {t("copy_json_clipboard")}
+            </MenuItem>,
+            <MenuItem key="dl-json" onClick={downloadJson}>
+              {t("export_json_file")}
+            </MenuItem>,
+            <Divider key="div2" />,
+            <MenuItem key="copy-md" onClick={() => copyText("markdown")}>
+              {t("Copy Markdown to Clipboard")}
+            </MenuItem>,
+            <MenuItem key="dl-md" onClick={() => downloadText("markdown")}>
+              {t("Export as Markdown (.md)")}
+            </MenuItem>,
+            <Divider key="div3" />,
+            <MenuItem key="copy-plain" onClick={() => copyText("plain")}>
+              {t("Copy Plaintext to Clipboard")}
+            </MenuItem>,
+            <MenuItem key="dl-plain" onClick={() => downloadText("plain")}>
+              {t("Export as Plaintext (.txt)")}
+            </MenuItem>,
+          ]}
+          {actionsSubmenu === "transfer" && [
+            <MenuItem key="back" onClick={() => setActionsSubmenu(null)}>
+              <ListItemIcon>
+                <ChevronLeft fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary={t("Copy / Move")} />
+            </MenuItem>,
+            <Divider key="div" />,
+            <MenuItem
+              key="copy-local"
+              onClick={() => {
+                closeMenus();
+                copyPlayerToLocal(player)();
+              }}
+            >
+              <ListItemIcon>
+                <StorageIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary={t("Copy to Local")} />
+            </MenuItem>,
+            <MenuItem
+              key="copy-cloud"
+              onClick={() => {
+                closeMenus();
+                copyPlayerToCloud(player)();
+              }}
+            >
+              <ListItemIcon>
+                <CloudIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary={t("Copy to Cloud")} />
+            </MenuItem>,
+            <Divider key="div2" />,
+            <MenuItem
+              key="move-local"
+              onClick={() => {
+                closeMenus();
+                movePlayerToLocal(player)();
+              }}
+            >
+              <ListItemIcon>
+                <StorageIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary={t("Move to Local")} />
+            </MenuItem>,
+            <MenuItem
+              key="move-cloud"
+              onClick={() => {
+                closeMenus();
+                movePlayerToCloud(player)();
+              }}
+            >
+              <ListItemIcon>
+                <CloudIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary={t("Move to Cloud")} />
+            </MenuItem>,
+          ]}
+        </MuiMenu>
+        <Tooltip title={t("Edit")}>
+          <IconButton
+            onClick={() => handleNavigation(`/player-edit/${player.id}`)}
+          >
+            <Edit />
+          </IconButton>
+        </Tooltip>
+        {!isMobile && (
+          <>
+            <Tooltip title={t("Player Sheet")}>
+              <IconButton
+                onClick={() =>
+                  handleNavigation(`/character-sheet/${player.id}`)
+                }
+              >
+                <Badge />
+              </IconButton>
+            </Tooltip>
+            <PlayerTransferButton
+              player={player}
+              copyPlayerToLocal={copyPlayerToLocal}
+              copyPlayerToCloud={copyPlayerToCloud}
+              movePlayerToLocal={movePlayerToLocal}
+              movePlayerToCloud={movePlayerToCloud}
+              t={t}
+            />
+            <Tooltip title={t("Delete")}>
+              <IconButton onClick={deletePlayer(player)}>
+                <Delete />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title={t("Share URL")}>
+              <span>
+                <IconButton
+                  onClick={() => sharePlayer(player.id)}
+                  disabled={dbMode === "local"}
+                >
+                  <Share />
+                </IconButton>
+              </span>
+            </Tooltip>
+            <Tooltip title={t("Download as Image")}>
+              <IconButton onClick={downloadImage}>
+                <Download />
+              </IconButton>
+            </Tooltip>
+            <Export
+              name={`${player.name}`}
+              dataType="pc"
+              data={applyPreSaveTransforms(player)}
+            />
+          </>
+        )}
+        <Box sx={{ ml: "auto" }} />
+        <Tooltip
+          title={`Schema version ${player.schemaVersion ?? 0} of ${PLAYER_CURRENT_SCHEMA_VERSION} (${playerNeedsMigration(player) ? "migration needed" : "up to date"})`}
+        >
+          <Chip
+            label={`v${player.schemaVersion ?? 0}`}
+            size="small"
+            color={playerNeedsMigration(player) ? "warning" : "default"}
+            variant="outlined"
+            sx={{ fontSize: "0.85rem" }}
+          />
+        </Tooltip>
+        <Tooltip title={expanded ? t("Collapse Details") : t("Expand Details")}>
+          <IconButton onClick={() => setExpanded((prev) => !prev)}>
+            {expanded ? <ExpandLess /> : <ExpandMore />}
+          </IconButton>
+        </Tooltip>
+      </Box>
+    </>
+  );
+}
+
+function PlayerTransferButton({
+  player,
+  copyPlayerToLocal,
+  copyPlayerToCloud,
+  movePlayerToLocal,
+  movePlayerToCloud,
+  t,
+}) {
+  const { cloudUser } = useDatabaseContext();
+  const [anchor, setAnchor] = useState(null);
+  return (
+    <>
+      <Tooltip title={t("Copy to / Move to...")}>
+        <IconButton onClick={(e) => setAnchor(e.currentTarget)}>
+          <FileCopy />
+        </IconButton>
+      </Tooltip>
+      <MuiMenu
+        anchorEl={anchor}
+        open={Boolean(anchor)}
+        onClose={() => setAnchor(null)}
+      >
+        <MenuItem
+          onClick={() => {
+            setAnchor(null);
+            copyPlayerToLocal(player)();
+          }}
+        >
+          <ListItemIcon>
+            <StorageIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText primary={t("Copy to Local")} />
+        </MenuItem>
+        <MenuItem
+          disabled={!cloudUser}
+          onClick={() => {
+            setAnchor(null);
+            copyPlayerToCloud(player)();
+          }}
+        >
+          <ListItemIcon>
+            <CloudIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText primary={t("Copy to Cloud")} />
+        </MenuItem>
+        <Divider />
+        <MenuItem
+          onClick={() => {
+            setAnchor(null);
+            movePlayerToLocal(player)();
+          }}
+        >
+          <ListItemIcon>
+            <StorageIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText primary={t("Move to Local")} />
+        </MenuItem>
+        <MenuItem
+          disabled={!cloudUser}
+          onClick={() => {
+            setAnchor(null);
+            movePlayerToCloud(player)();
+          }}
+        >
+          <ListItemIcon>
+            <CloudIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText primary={t("Move to Cloud")} />
+        </MenuItem>
+      </MuiMenu>
     </>
   );
 }

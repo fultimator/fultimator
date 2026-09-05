@@ -1,4 +1,5 @@
 ![alt text](https://github.com/fultimator/fultimator/blob/main/public/fultimatorlogo.webp)
+
 # Fultimator
 
 ## Introduction
@@ -46,7 +47,6 @@ Fultimator uses [React](https://react.dev/) for building dynamic user interfaces
 
 When opening a pull request (PR), ensure it goes into the most relevant branch.
 
-
 ### Prerequisite Software
 
 - [Git](https://git-scm.com/)
@@ -87,10 +87,10 @@ This will help you visualize and test your changes locally.
 
 The app is hosted by firebase.
 
-To deploy you need to have firebase installed. 
+To deploy you need to have firebase installed.
 See [firebase - npm](https://www.npmjs.com/package/firebase)
 
-You also need to have the proper permissions. 
+You also need to have the proper permissions.
 See [Firebase IAM permissions](https://firebase.google.com/docs/projects/iam/permissions).
 
 ```bash
@@ -104,7 +104,7 @@ This command will build a production version of the app, and upload it to fireba
 Major thanks to the following contributors:
 
 - Triex ([matteosuppo](https://github.com/matteosuppo)) - The original creator of the fultimator webapp. The repository can be found here: [Fultimator](https://github.com/codeclysm/fultimator)
-- [Alyx](https://github.com/greg-argulla) - For prolonging the project, providing useful features such as localization, adversary compendium and improving overall functionality of the webapp. 
+- [Alyx](https://github.com/greg-argulla) - For prolonging the project, providing useful features such as localization, adversary compendium and improving overall functionality of the webapp.
 - [spyrella](https://github.com/spyrella) - For ongoing updates to the system and maintainence of the project.
 - [acinoroc](https://github.com/acinoroc) - Another active maintainer, lead developer of the Character Designer.
 

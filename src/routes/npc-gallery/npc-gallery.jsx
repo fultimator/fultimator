@@ -3,85 +3,162 @@ import {
   useSearchParams,
   useNavigate,
   useLocation,
-} from "react-router-dom";
+} from "react-router";
 
 import {
-  query,
-  orderBy,
-  collection,
-  where,
-  doc,
-  addDoc,
-  deleteDoc,
-} from "firebase/firestore";
-import { useAuthState } from "react-firebase-hooks/auth";
-
-import { firestore } from "../../firebase";
-import { auth } from "../../firebase";
-
-import {
+  Box,
+  Button,
+  Chip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Divider,
   IconButton,
+  ListItemIcon,
+  ListItemText,
+  Menu as MuiMenu,
   Skeleton,
+  Snackbar,
   Tooltip,
   Typography,
   Grid,
-  Snackbar,
+  Collapse,
   CircularProgress,
   Paper,
   TextField,
   FormControl,
+  FormControlLabel,
   InputLabel,
   Select,
   MenuItem,
-  Button,
+  Switch,
   Autocomplete,
+  ToggleButtonGroup,
+  ToggleButton,
+  Fab,
 } from "@mui/material";
 import Layout from "../../components/Layout";
+import SettingRow from "../../components/common/SettingRow";
 import { SignIn } from "../../components/auth";
-import NpcPretty from "../../components/npc/Pretty";
-// import NpcUgly from "../../components/npc/Ugly";
+import NpcActorCard from "../../components/shared/actors/npc/NpcActorCard";
 import {
-  ContentCopy,
   Delete,
-  Share,
+  ChevronLeft,
+  ChevronRight,
+  Code,
   Download,
+  DriveFileMove,
   Edit,
+  FileCopy,
   HistoryEdu,
+  LibraryAddCheck,
+  PhotoLibrary,
+  Share,
   UploadFile,
+  ContentPaste,
+  ExpandLess,
+  ExpandMore,
+  KeyboardArrowUp,
+  Menu as MenuIcon,
 } from "@mui/icons-material";
-import { useCollectionData } from "react-firebase-hooks/firestore";
-import { useEffect, useRef, useState } from "react";
+import JSZip from "jszip";
+import { useCallback, useEffect, useRef, useState, useMemo } from "react";
 import useDownloadImage from "../../hooks/useDownloadImage";
 import Export from "../../components/Export";
+import { buildItemText } from "../../libs/buildItemText";
 import { useTranslate } from "../../translation/translate";
 import { validateNpc } from "../../utility/validateJson";
 import ExportAllNPCs from "../../components/common/ExportAllNPCs";
 import DeleteSweepIcon from "@mui/icons-material/DeleteSweep";
-import { ExpandLess, ExpandMore } from "@mui/icons-material";
+import StorageIcon from "@mui/icons-material/Storage";
+import CloudIcon from "@mui/icons-material/Cloud";
+import { SUPPORTS_LOCAL_DB, IS_ELECTRON } from "../../platform";
+import DriveSync from "../../components/DriveSync";
+import { useDatabaseContext } from "../../context/useDatabaseContext";
+import { useDatabase } from "../../hooks/useDatabase";
+import DeleteConfirmationDialog from "../../components/common/DeleteConfirmationDialog";
+import MigrationDialog from "../../components/common/MigrationDialog";
+import {
+  npcNeedsMigration,
+  getPendingNpcMigrations,
+  NPC_CURRENT_SCHEMA_VERSION,
+  applyNpcPreSaveTransforms,
+  applyNpcPostLoadTransforms,
+} from "../../libs/actor";
+import {
+  stampSave,
+  stampCreate,
+  compareTimestamps,
+} from "../../libs/actor/timestamps";
+import SystemUpdateAltIcon from "@mui/icons-material/SystemUpdateAlt";
+import {
+  canonicalizeForTransfer,
+  canonicalizeForExport,
+  normalizeOwnershipForTarget,
+} from "../../libs/exportTransforms";
+import { applySpeciesEffects } from "../../forms/rendering/config/actorConfigs/npcSpeciesEffects";
+import {
+  applyRole,
+  QA_LEVELS,
+  QA_ROLE_KEYS,
+} from "../../libs/quickAssembly/roles";
+
+const CREATE_NPC_ROLE_OPTIONS = QA_ROLE_KEYS.map((key) => ({
+  value: key,
+  label: key.charAt(0).toUpperCase() + key.slice(1),
+}));
+
+const CREATE_NPC_SPECIES_OPTIONS = [
+  { value: "Beast", label: "Beast" },
+  { value: "Construct", label: "Construct" },
+  { value: "Demon", label: "Demon" },
+  { value: "Elemental", label: "Elemental" },
+  { value: "Monster", label: "Monster" },
+  { value: "Plant", label: "Plant" },
+  { value: "Undead", label: "Undead" },
+  { value: "Humanoid", label: "Humanoid" },
+  { value: "Variant Humanoid", label: "Variant Humanoid" },
+];
+
+const CREATE_NPC_RANK_OPTIONS = [
+  { value: "soldier", label: "Soldier" },
+  { value: "elite", label: "Elite" },
+  { value: "champion1", label: "Champion(1)" },
+  { value: "champion2", label: "Champion(2)" },
+  { value: "champion3", label: "Champion(3)" },
+  { value: "champion4", label: "Champion(4)" },
+  { value: "champion5", label: "Champion(5)" },
+  { value: "champion6", label: "Champion(6)" },
+  { value: "companion", label: "Companion" },
+  { value: "groupvehicle", label: "Group Vehicle" },
+];
+
+const CREATE_NPC_COMPANION_LVL_OPTIONS = [1, 2, 3, 4, 5];
+
+const defaultCreateNpcOptions = {
+  name: "",
+  species: "Beast",
+  rank: "soldier",
+  companionlvl: 1,
+  companionpclvl: 5,
+  useQuickAssembly: false,
+  role: "brute",
+  lvl: 5,
+};
 
 export default function NpcGallery() {
-  const { t } = useTranslate();
-  const [user, loading] = useAuthState(auth);
+  const { authLoading, dbMode } = useDatabaseContext();
 
   return (
     <Layout>
-      {loading && <Skeleton />}
-
-      {!loading && !user && (
-        <>
-          <Typography sx={{ my: 1 }}>
-            {t("You have to be logged in to access this feature")}
-          </Typography>
-          <SignIn />
-        </>
-      )}
-
-      {user && <Personal user={user} />}
+      {authLoading && <Skeleton />}
+      {!authLoading && <Personal key={dbMode} />}
     </Layout>
   );
 }
 
-function Personal({ user }) {
+function Personal() {
   const { t } = useTranslate();
   const navigate = useNavigate();
   const location = useLocation();
@@ -93,7 +170,7 @@ function Personal({ user }) {
   const [species, setSpecies] = useState(searchParams.get("species") || "");
   const [sort, setSort] = useState(searchParams.get("sort") || "name");
   const [direction, setDirection] = useState(
-    searchParams.get("direction") || "ascending"
+    searchParams.get("direction") || "ascending",
   );
   const [tagSearch] = useState("");
   const [tagSort, setTagSort] = useState(searchParams.get("tagSort") || null);
@@ -102,23 +179,64 @@ function Personal({ user }) {
 
   const fileInputRef = useRef(null);
 
-  const personalRef = collection(firestore, "npc-personal");
-  const personalQuery = query(
-    personalRef,
-    where("uid", "==", user.uid),
-    orderBy("lvl", "asc"),
-    orderBy("name", "asc")
+  const [showScrollTop, setShowScrollTop] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setShowScrollTop(window.scrollY > 300);
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const { dbMode, requestModeSwitch, cloudUser } = useDatabaseContext();
+  const db = useDatabase();
+  const localDb = useDatabase("local");
+  const cloudDb = useDatabase("cloud");
+
+  // Deletion confirmation states
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [npcToDelete, setNpcToDelete] = useState(null);
+  const [isBulkDelete, setIsBulkDelete] = useState(false);
+
+  // Migration states
+  const [migrationDialogOpen, setMigrationDialogOpen] = useState(false);
+
+  // Create NPC modal state
+  const [isCreateNpcModalOpen, setIsCreateNpcModalOpen] = useState(false);
+  const [createNpcOptions, setCreateNpcOptions] = useState(
+    defaultCreateNpcOptions,
   );
-  const [personalList, loading, err] = useCollectionData(personalQuery, {
-    idField: "id",
-  });
+
+  const npcQuery = useMemo(
+    () =>
+      db.query(
+        db.collection("npc-personal"),
+        db.orderBy("lvl", "asc"),
+        db.orderBy("name", "asc"),
+      ),
+    [db],
+  );
+  const [personalList, loading, err] = db.useCollectionData(npcQuery);
+
+  const staleNpcs = useMemo(() => {
+    if (!personalList) return [];
+    return personalList.filter(npcNeedsMigration);
+  }, [personalList]);
+
+  const handleMigrateAllNpcs = async () => {
+    for (const npc of staleNpcs) {
+      const ref = db.doc("npc-personal", npc.id);
+      const migrated = applyNpcPostLoadTransforms(npc);
+      await db.setDoc(ref, applyNpcPreSaveTransforms(migrated));
+    }
+    setMigrationDialogOpen(false);
+    notify(t("All NPCs migrated successfully"));
+  };
 
   const tagCounts = personalList
     ? personalList.reduce((accumulator, npc) => {
         if (npc.tags) {
           npc.tags.forEach((tag) => {
             if (tag.name) {
-              const tagName = tag.name.toUpperCase(); // Convert to UpperCase
+              const tagName = tag.name.toUpperCase();
               accumulator[tagName] = (accumulator[tagName] || 0) + 1;
             }
           });
@@ -128,43 +246,36 @@ function Personal({ user }) {
     : {};
 
   const sortedTags = Object.keys(tagCounts).sort(
-    (a, b) => tagCounts[b] - tagCounts[a]
+    (a, b) => tagCounts[b] - tagCounts[a],
   );
 
-  // Create wrapper functions for state updates that also update URL
   const updateName = (value) => {
     setName(value);
     updateUrlParams({ name: value });
   };
-
   const updateRank = (value) => {
     setRank(value);
     updateUrlParams({ rank: value });
   };
-
   const updateSpecies = (value) => {
     setSpecies(value);
     updateUrlParams({ species: value });
   };
-
   const updateSort = (value) => {
     setSort(value);
     updateUrlParams({ sort: value });
   };
-
   const updateDirection = (value) => {
     setDirection(value);
     updateUrlParams({ direction: value });
   };
-
   const updateTagSort = (value) => {
     setTagSort(value);
     updateUrlParams({ tagSort: value });
   };
 
-  // Function to update URL parameters
   const updateUrlParams = (updatedParams) => {
-    if (loading) return; // Don't update URL while loading
+    if (loading) return;
 
     const currentParams = {
       name,
@@ -176,141 +287,394 @@ function Personal({ user }) {
       ...updatedParams,
     };
 
-    // Build the query string
     const queryString = new URLSearchParams(
       Object.entries(currentParams).reduce((acc, [key, value]) => {
-        if (value) acc[key] = value; // Only include non-empty values
+        if (value) acc[key] = value;
         return acc;
-      }, {})
+      }, {}),
     ).toString();
 
-    // Set it for later use
     setFilteredParams(queryString);
 
-    // Update the URL with the new query string
     navigate(`${location.pathname}?${queryString}`, {
       replace: true,
-      state: {
-        from: "/npc-gallery",
-        search: location.search,
-      },
+      state: { from: "/npc-gallery", search: location.search },
     });
   };
 
   const clearSearchFilters = () => {
-    // Reset all filter states
     setName("");
     setRank("");
     setSpecies("");
     setTagSort(null);
-    setSort("name"); // Reset to default sort
-    setDirection("ascending"); // Reset to default direction
-
-    // Clear the URL parameters
+    setSort("name");
+    setDirection("ascending");
     setFilteredParams("");
-
-    // Update the URL to remove all query parameters
     navigate(location.pathname, { replace: true });
   };
 
-  const addNpc = async function () {
-    const data = {
-      name: "-",
-      species: "Beast",
-      lvl: 5,
-      imgurl: "",
-      uid: user.uid,
-      attributes: {
-        dexterity: 8,
-        might: 8,
-        will: 8,
-        insight: 8,
+  const createNpc = async (options = defaultCreateNpcOptions) => {
+    const species = options.species || "Beast";
+    const { affinities, immunities } = applySpeciesEffects(species);
+    const useQuickAssembly = !!options.useQuickAssembly;
+    const role = useQuickAssembly ? options.role || "brute" : "custom";
+    const lvl = useQuickAssembly ? options.lvl || 5 : 5;
+    const data = applyRole(
+      {
+        name: options.name || "-",
+        species,
+        lvl,
+        role,
+        rank: options.rank || "soldier",
+        imgurl: "",
+        attributes: {
+          dexterity: { base: 8 },
+          insight: { base: 8 },
+          might: { base: 8 },
+          will: { base: 8 },
+        },
+        attacks: [],
+        affinities,
+        immunities,
+        ...(options.rank === "companion"
+          ? {
+              companionlvl: options.companionlvl ?? 1,
+              companionpclvl: options.companionpclvl ?? 5,
+            }
+          : {}),
       },
-      attacks: [],
-      affinities: {},
-    };
-    const ref = collection(firestore, "npc-personal");
-
+      { role, level: lvl },
+    );
     try {
-      const res = await addDoc(ref, data);
-      console.debug(res);
+      const docRef = await db.addDoc(
+        db.collection("npc-personal"),
+        stampCreate(data),
+      );
+      navigate(`/npc-gallery/${docRef.id}`);
     } catch (e) {
       console.debug(e);
     }
   };
 
+  const handleOpenCreateNpcModal = () => {
+    setCreateNpcOptions(defaultCreateNpcOptions);
+    setIsCreateNpcModalOpen(true);
+  };
+
+  const handleCloseCreateNpcModal = () => {
+    setIsCreateNpcModalOpen(false);
+  };
+
+  const handleCreateNpcOptionChange = (field, value) => {
+    setCreateNpcOptions((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+  const handleCreateNpcConfirm = async () => {
+    handleCloseCreateNpcModal();
+    await createNpc(createNpcOptions);
+    setCreateNpcOptions(defaultCreateNpcOptions);
+  };
+
   const handleFileUpload = async (jsonData) => {
     try {
-      if (!validateNpc(jsonData)) {
+      const data = applyNpcPostLoadTransforms(jsonData);
+
+      if (!validateNpc(data)) {
         console.error("Invalid NPC data.");
-        const alertMessage = t("Invalid NPC JSON data.");
-        alert(alertMessage);
+        alert(t("Invalid NPC JSON data."));
         return;
       }
 
-      delete jsonData.id; // Remove the id field if present
-      jsonData.uid = user.uid; // Assign the current user UID
-      jsonData.published = false; // Set the published field to false
+      delete data.id;
+      data.published = false;
 
-      // Reference to the Firestore collection
-      const ref = collection(firestore, "npc-personal");
-
-      // Add document to Firestore
-      const res = await addDoc(ref, jsonData);
+      const res = await db.addDoc(
+        db.collection("npc-personal"),
+        stampCreate(applyNpcPreSaveTransforms(data)),
+      );
       console.debug("Document added with ID: ", res.id);
     } catch (error) {
       console.error("Error uploading NPC from JSON:", error);
     }
   };
 
-  const copyNpc = function (npc) {
-    return async function () {
-      const data = Object.assign({}, npc);
-      data.uid = user.uid;
-      delete data.id;
-      data.published = false;
-
-      const ref = collection(firestore, "npc-personal");
-      if (window.confirm("Are you sure you want to copy?")) {
-        addDoc(ref, data)
-          .then(function (docRef) {
-            window.location.href = `/npc-gallery/${docRef.id}`;
-          })
-          .catch(function (error) {
-            console.error("Error adding document: ", error);
-          });
-      }
-    };
+  const copyNpc = (npc) => async () => {
+    const data = { ...npc, published: false };
+    delete data.id;
+    try {
+      const docRef = await db.addDoc(
+        db.collection("npc-personal"),
+        stampCreate(data),
+      );
+      notify(t("NPC copied"));
+      navigate(`/npc-gallery/${docRef.id}`);
+    } catch {
+      notify(t("Failed to copy NPC"));
+    }
   };
 
-  const deleteNpc = function (npc) {
-    return function () {
-      if (window.confirm("Are you sure you want to delete?")) {
-        deleteDoc(doc(firestore, "npc-personal", npc.id));
-      }
-    };
+  const deleteNpc = (npc) => () => {
+    setNpcToDelete(npc);
+    setIsBulkDelete(false);
+    setDeleteDialogOpen(true);
   };
 
-  const [open, setOpen] = useState(false);
+  const [snackMsg, setSnackMsg] = useState(null);
+  const notify = (msg) => setSnackMsg(msg);
 
-  const handleClose = () => {
-    setOpen(false);
+  const [selectedIds, setSelectedIds] = useState(new Set());
+  const [selectMode, setSelectMode] = useState(false);
+
+  const toggleSelectMode = () => {
+    setSelectMode((prev) => {
+      if (prev) setSelectedIds(new Set());
+      return !prev;
+    });
+  };
+
+  const toggleSelectNpc = (id) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const deleteSelected = async () => {
+    setIsBulkDelete(true);
+    setDeleteDialogOpen(true);
+  };
+
+  const [copyAnchor, setCopyAnchor] = useState(null);
+  const [moveAnchor, setMoveAnchor] = useState(null);
+  const [exportAnchor, setExportAnchor] = useState(null);
+
+  // Bulk cross-DB copy / move
+  const bulkCopyToDb = async (npcs, targetDb, target) => {
+    for (const npc of npcs) {
+      const canonical = canonicalizeForTransfer("npc", npc);
+      const data = normalizeOwnershipForTarget(
+        { ...canonical, published: false },
+        target,
+        cloudUser?.uid,
+      );
+      await targetDb.addDoc(
+        targetDb.collection("npc-personal"),
+        stampSave(data, data.createdAt ?? data.publishedAt),
+      );
+    }
+  };
+
+  const bulkDeleteFromDb = async (npcs, sourceDb) => {
+    for (const npc of npcs) {
+      await sourceDb.deleteDoc(sourceDb.doc("npc-personal", npc.id));
+    }
+  };
+
+  const copySelectedToLocal = async () => {
+    const selected = filteredList.filter((npc) => selectedIds.has(npc.id));
+    try {
+      await bulkCopyToDb(selected, localDb, "local");
+      notify(t("Copied to Local"));
+      setSelectedIds(new Set());
+    } catch {
+      notify(t("Failed to copy to Local"));
+    }
+  };
+
+  const copySelectedToCloud = async () => {
+    if (!cloudUser) {
+      notify(t("Sign in to copy to Cloud"));
+      return;
+    }
+    const selected = filteredList.filter((npc) => selectedIds.has(npc.id));
+    try {
+      await bulkCopyToDb(selected, cloudDb, "cloud");
+      notify(t("Copied to Cloud"));
+      setSelectedIds(new Set());
+    } catch {
+      notify(t("Failed to copy to Cloud"));
+    }
+  };
+
+  const moveSelectedToLocal = async () => {
+    const selected = filteredList.filter((npc) => selectedIds.has(npc.id));
+    try {
+      await bulkCopyToDb(selected, localDb, "local");
+      await bulkDeleteFromDb(selected, db);
+      notify(t("Moved to Local"));
+      setSelectedIds(new Set());
+    } catch {
+      notify(t("Failed to move to Local"));
+    }
+  };
+
+  const moveSelectedToCloud = async () => {
+    if (!cloudUser) {
+      notify(t("Sign in to move to Cloud"));
+      return;
+    }
+    const selected = filteredList.filter((npc) => selectedIds.has(npc.id));
+    try {
+      await bulkCopyToDb(selected, cloudDb, "cloud");
+      await bulkDeleteFromDb(selected, db);
+      notify(t("Moved to Cloud"));
+      setSelectedIds(new Set());
+    } catch {
+      notify(t("Failed to move to Cloud"));
+    }
+  };
+
+  const copyAllToLocal = async () => {
+    if (!window.confirm(`Copy all ${filteredList.length} NPC(s) to Local?`))
+      return;
+    try {
+      await bulkCopyToDb(filteredList, localDb, "local");
+      notify(t("Copied to Local"));
+    } catch {
+      notify(t("Failed to copy to Local"));
+    }
+  };
+
+  const copyAllToCloud = async () => {
+    if (!cloudUser) {
+      notify(t("Sign in to copy to Cloud"));
+      return;
+    }
+    if (!window.confirm(`Copy all ${filteredList.length} NPC(s) to Cloud?`))
+      return;
+    try {
+      await bulkCopyToDb(filteredList, cloudDb, "cloud");
+      notify(t("Copied to Cloud"));
+    } catch {
+      notify(t("Failed to copy to Cloud"));
+    }
+  };
+
+  const moveAllToLocal = async () => {
+    if (!window.confirm(`Move all ${filteredList.length} NPC(s) to Local?`))
+      return;
+    try {
+      await bulkCopyToDb(filteredList, localDb, "local");
+      await bulkDeleteFromDb(filteredList, db);
+      notify(t("Moved to Local"));
+    } catch {
+      notify(t("Failed to move to Local"));
+    }
+  };
+
+  const moveAllToCloud = async () => {
+    if (!cloudUser) {
+      notify(t("Sign in to move to Cloud"));
+      return;
+    }
+    if (!window.confirm(`Move all ${filteredList.length} NPC(s) to Cloud?`))
+      return;
+    try {
+      await bulkCopyToDb(filteredList, cloudDb, "cloud");
+      await bulkDeleteFromDb(filteredList, db);
+      notify(t("Moved to Cloud"));
+    } catch {
+      notify(t("Failed to move to Cloud"));
+    }
+  };
+
+  const exportSelectedAsJSON = async () => {
+    const selected = filteredList.filter((npc) => selectedIds.has(npc.id));
+    const zip = new JSZip();
+    selected.forEach((npc) => {
+      const canonical = canonicalizeForExport("npc", npc);
+      zip.file(
+        `${npc.name.replace(/\s/g, "_").toLowerCase()}.json`,
+        JSON.stringify(canonical, null, 2),
+      );
+    });
+    const blob = await zip.generateAsync({ type: "blob" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "selected_npcs.zip";
+    a.click();
+    URL.revokeObjectURL(url);
+    setExportAnchor(null);
+  };
+
+  const copySelectedAsText = async (fmt) => {
+    const selected = filteredList.filter((npc) => selectedIds.has(npc.id));
+    const separator = fmt === "obsidian" ? "\n\n" : "\n\n---\n\n";
+    const text = selected
+      .map((npc) =>
+        buildItemText("npc", canonicalizeForTransfer("npc", npc), fmt),
+      )
+      .join(separator);
+    await navigator.clipboard.writeText(text);
+    setExportAnchor(null);
+    notify(t("Copied to Clipboard!"));
+  };
+
+  const exportSelectedAsText = async (fmt) => {
+    const selected = filteredList.filter((npc) => selectedIds.has(npc.id));
+    const ext = fmt === "plain" ? "txt" : "md";
+    const zip = new JSZip();
+    selected.forEach((npc) => {
+      const text = buildItemText(
+        "npc",
+        canonicalizeForTransfer("npc", npc),
+        fmt,
+      );
+      zip.file(`${npc.name.replace(/\s+/g, "_").toLowerCase()}.${ext}`, text);
+    });
+    const blob = await zip.generateAsync({ type: "blob" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `selected_npcs_${fmt}.zip`;
+    a.click();
+    URL.revokeObjectURL(url);
+    setExportAnchor(null);
+  };
+
+  const downloadCallbacksRef = useRef(new Map());
+
+  const downloadSelectedAsImages = () => {
+    const selected = filteredList.filter((npc) => selectedIds.has(npc.id));
+    selected.forEach((npc, i) => {
+      const fn = downloadCallbacksRef.current.get(npc.id);
+      if (fn) setTimeout(fn, i * 400);
+    });
+  };
+
+  const handlePasteNpc = async () => {
+    try {
+      const text = await navigator.clipboard.readText();
+      const jsonData = JSON.parse(text);
+      await handleFileUpload(jsonData);
+    } catch (err) {
+      console.error("Failed to parse clipboard content:", err);
+      alert(t("Could not parse clipboard content as JSON."));
+    }
   };
 
   const shareNpc = async (id) => {
-    const baseUrl = window.location.href.replace(/\/[^/]+$/, "");
-    const fullUrl = `${baseUrl}/npc-gallery/${id}`;
-    await navigator.clipboard.writeText(fullUrl);
-    setOpen(true);
+    let baseUrl = window.location.href.replace(/\/[^/]+$/, "");
+    if (IS_ELECTRON) {
+      baseUrl = "https://fultimator.com";
+    }
+    await navigator.clipboard.writeText(`${baseUrl}/npc-gallery/${id}`);
+    notify(t("Copied to Clipboard!"));
   };
 
   const isMobile = window.innerWidth < 900;
 
-  if (err?.code === "resource-exhausted") {
+  if (err?.code === "quota-exceeded") {
     return (
       <Paper elevation={3} sx={{ marginBottom: 5, padding: 4 }}>
         {t(
-          "Apologies, fultimator has reached its read quota at the moment, please try again tomorrow. (Around 12-24 hours)"
+          "Apologies, fultimator has reached its read quota at the moment, please try again tomorrow. (Around 12-24 hours)",
         )}
       </Paper>
     );
@@ -319,7 +683,6 @@ function Personal({ user }) {
   const filteredList = personalList
     ? personalList
         .filter((item) => {
-          // Filter based on name, species, and rank
           if (
             name !== "" &&
             !item.name.toLowerCase().includes(name.toLowerCase())
@@ -331,51 +694,45 @@ function Personal({ user }) {
             !item.tags?.some(
               (tag) =>
                 tag.name &&
-                tag.name.toLowerCase().includes(tagSearch.toLowerCase())
+                tag.name.toLowerCase().includes(tagSearch.toLowerCase()),
             )
           )
             return false;
 
           if (species && item.species !== species) return false;
-
           if (rank && item.rank !== rank) return false;
 
           return true;
         })
-        // eslint-disable-next-line array-callback-return
         .sort((item1, item2) => {
-          // Sort based on selected sort and direction
+          // Fall back to publishedAt for NPCs that predate the createdAt field.
+          const createdAtOf = (item) => item.createdAt ?? item.publishedAt;
           if (direction === "ascending") {
-            if (sort === "name") {
-              return item1.name.localeCompare(item2.name);
-            } else if (sort === "level") {
-              return item1.lvl - item2.lvl;
-            } else if (sort === "publishedAt") {
-              return (
-                (item1.publishedAt ? item1.publishedAt : 0) -
-                (item2.publishedAt ? item2.publishedAt : 0)
-              );
-            }
+            if (sort === "name") return item1.name.localeCompare(item2.name);
+            else if (sort === "level") return item1.lvl - item2.lvl;
+            else if (sort === "publishedAt")
+              return compareTimestamps(item1.publishedAt, item2.publishedAt);
+            else if (sort === "createdAt")
+              return compareTimestamps(createdAtOf(item1), createdAtOf(item2));
+            else if (sort === "updatedAt")
+              return compareTimestamps(item1.updatedAt, item2.updatedAt);
           } else {
-            if (sort === "name") {
-              return item2.name.localeCompare(item1.name);
-            } else if (sort === "level") {
-              return item2.lvl - item1.lvl;
-            } else if (sort === "publishedAt") {
-              return (
-                (item2.publishedAt ? item2.publishedAt : 0) -
-                (item1.publishedAt ? item1.publishedAt : 0)
-              );
-            }
+            if (sort === "name") return item2.name.localeCompare(item1.name);
+            else if (sort === "level") return item2.lvl - item1.lvl;
+            else if (sort === "publishedAt")
+              return compareTimestamps(item2.publishedAt, item1.publishedAt);
+            else if (sort === "createdAt")
+              return compareTimestamps(createdAtOf(item2), createdAtOf(item1));
+            else if (sort === "updatedAt")
+              return compareTimestamps(item2.updatedAt, item1.updatedAt);
           }
         })
         .filter((item) => {
-          // Filter based on selected tag sort
           if (
             tagSort !== "" &&
             tagSort !== null &&
             !item.tags?.some(
-              (tag) => tag.name.toUpperCase() === tagSort.toUpperCase()
+              (tag) => tag.name.toUpperCase() === tagSort.toUpperCase(),
             )
           ) {
             return false;
@@ -384,21 +741,65 @@ function Personal({ user }) {
         })
     : [];
 
+  const copyNpcToLocal = (npc) => async () => {
+    try {
+      await bulkCopyToDb([npc], localDb, "local");
+      notify(t("NPC copied to Local"));
+    } catch {
+      notify(t("Failed to copy NPC to Local"));
+    }
+  };
+
+  const copyNpcToCloud = (npc) => async () => {
+    if (!cloudUser) {
+      notify(t("Sign in to copy to Cloud"));
+      return;
+    }
+    try {
+      await bulkCopyToDb([npc], cloudDb, "cloud");
+      notify(t("NPC copied to Cloud"));
+    } catch {
+      notify(t("Failed to copy NPC to Cloud"));
+    }
+  };
+
+  const moveNpcToLocal = (npc) => async () => {
+    try {
+      await bulkCopyToDb([npc], localDb, "local");
+      await db.deleteDoc(db.doc("npc-personal", npc.id));
+      notify(t("NPC moved to Local"));
+    } catch {
+      notify(t("Failed to move NPC to Local"));
+    }
+  };
+
+  const moveNpcToCloud = (npc) => async () => {
+    if (!cloudUser) {
+      notify(t("Sign in to move to Cloud"));
+      return;
+    }
+    try {
+      await bulkCopyToDb([npc], cloudDb, "cloud");
+      await db.deleteDoc(db.doc("npc-personal", npc.id));
+      notify(t("NPC moved to Cloud"));
+    } catch {
+      notify(t("Failed to move NPC to Cloud"));
+    }
+  };
+
   return (
     <>
       <div style={{ display: "flex", alignItems: "center", marginBottom: 20 }}>
         <Paper sx={{ width: "100%", px: 2, py: 1 }}>
-          <Grid container spacing={1} sx={{ py: 1 }} justifyContent="center">
+          {/* Zone 1: Filters */}
+          <Grid container spacing={1} sx={{ alignItems: "center" }}>
             <Grid
-              item
-              xs={12}
-              md={3}
-              alignItems="center"
-              justifyContent="center"
-              sx={{ display: "flex" }}
+              size={{
+                xs: 12,
+                md: 3,
+              }}
             >
               <TextField
-                id="outlined-basic"
                 label={t("Adversary Name")}
                 variant="outlined"
                 size="small"
@@ -409,14 +810,11 @@ function Personal({ user }) {
                 }}
               />
             </Grid>
-
             <Grid
-              item
-              xs={12}
-              md={2}
-              alignItems="center"
-              justifyContent="center"
-              sx={{ display: "flex" }}
+              size={{
+                xs: 12,
+                md: 2,
+              }}
             >
               <Autocomplete
                 fullWidth
@@ -429,7 +827,7 @@ function Personal({ user }) {
                 filterOptions={(options, { inputValue }) => {
                   const inputValueUpper = inputValue.toUpperCase();
                   return options.filter((option) =>
-                    option.toUpperCase().includes(inputValueUpper)
+                    option.toUpperCase().includes(inputValueUpper),
                   );
                 }}
                 isOptionEqualToValue={(option, value) => option === value}
@@ -443,14 +841,12 @@ function Personal({ user }) {
                 )}
               />
             </Grid>
-
             <Grid
-              item
-              xs={6}
-              md={1.5}
-              alignItems="center"
-              justifyContent="center"
-              sx={{ display: "flex" }}
+              size={{
+                xs: 6,
+                sm: 4,
+                md: "grow",
+              }}
             >
               <FormControl fullWidth size="small">
                 <InputLabel id="rank">{t("Rank:")}</InputLabel>
@@ -480,15 +876,14 @@ function Personal({ user }) {
               </FormControl>
             </Grid>
             <Grid
-              item
-              xs={6}
-              md={1.5}
-              alignItems="center"
-              justifyContent="center"
-              sx={{ display: "flex" }}
+              size={{
+                xs: 6,
+                sm: 4,
+                md: "grow",
+              }}
             >
               <FormControl fullWidth size="small">
-                <InputLabel id="rank">{t("Species:")}</InputLabel>
+                <InputLabel id="species">{t("Species:")}</InputLabel>
                 <Select
                   labelId="species"
                   id="select-species"
@@ -511,12 +906,11 @@ function Personal({ user }) {
               </FormControl>
             </Grid>
             <Grid
-              item
-              xs={5}
-              md={1.5}
-              alignItems="center"
-              justifyContent="center"
-              sx={{ display: "flex" }}
+              size={{
+                xs: 6,
+                sm: 4,
+                md: "grow",
+              }}
             >
               <FormControl fullWidth size="small">
                 <InputLabel id="sort">{t("Sort:")}</InputLabel>
@@ -531,6 +925,8 @@ function Personal({ user }) {
                 >
                   <MenuItem value={"name"}>{t("Name")}</MenuItem>
                   <MenuItem value={"level"}>{t("Level")}</MenuItem>
+                  <MenuItem value={"createdAt"}>{t("creation_date")}</MenuItem>
+                  <MenuItem value={"updatedAt"}>{t("updated_date")}</MenuItem>
                   <MenuItem value={"publishedAt"}>
                     {t("Published Date")}
                   </MenuItem>
@@ -538,12 +934,11 @@ function Personal({ user }) {
               </FormControl>
             </Grid>
             <Grid
-              item
-              xs={5}
-              md={1.5}
-              alignItems="center"
-              justifyContent="center"
-              sx={{ display: "flex" }}
+              size={{
+                xs: 6,
+                sm: 4,
+                md: "grow",
+              }}
             >
               <FormControl fullWidth size="small">
                 <InputLabel id="direction">{t("Direction:")}</InputLabel>
@@ -562,124 +957,461 @@ function Personal({ user }) {
               </FormControl>
             </Grid>
             <Grid
-              item
-              xs={2}
-              md={1}
-              alignItems="center"
-              justifyContent="center"
-              sx={{ display: "flex" }}
+              sx={{
+                display: "flex",
+                justifyContent: { xs: "flex-end", sm: "center" },
+              }}
+              size={{
+                xs: 12,
+                sm: "auto",
+              }}
             >
               <Tooltip title={t("clear_search_filters")} placement="top">
-                <Button
-                  onClick={clearSearchFilters}
-                  variant="outlined"
-                  fullWidth
-                  sx={{
-                    height: "100%",
-                    padding: 0, // Remove default padding
-                    minWidth: 0, // Ensure the button doesn't enforce a minimum width
-                  }}
-                >
-                  <DeleteSweepIcon />
-                </Button>
+                <span>
+                  <IconButton
+                    onClick={clearSearchFilters}
+                    color={filteredParams ? "warning" : "default"}
+                    size="small"
+                  >
+                    <DeleteSweepIcon />
+                  </IconButton>
+                </span>
               </Tooltip>
             </Grid>
-            <Grid
-              item
-              xs={12}
-              md={4}
-              alignItems="center"
-              justifyContent="center"
-              sx={{ display: "flex" }}
+          </Grid>
+
+          <Divider sx={{ my: 0.75 }} />
+
+          {/* Actions + Status (single row) */}
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              flexWrap: "wrap",
+              gap: 1,
+            }}
+          >
+            <Button
+              variant="contained"
+              startIcon={<HistoryEdu />}
+              onClick={handleOpenCreateNpcModal}
+              disabled={dbMode === "cloud" && !cloudUser}
             >
-              <Button
-                fullWidth
-                variant="contained"
-                startIcon={<HistoryEdu />}
-                onClick={addNpc}
+              {t("create_npc")}
+            </Button>
+            {SUPPORTS_LOCAL_DB && (
+              <ToggleButtonGroup
+                value={dbMode}
+                exclusive
+                onChange={(_, val) => {
+                  if (val !== null) requestModeSwitch(val);
+                }}
+                size="small"
               >
-                {t("Create NPC")}
-              </Button>
-            </Grid>
-            <Grid item xs={12} md={3} sx={{ display: "flex" }}>
+                <ToggleButton value="local">
+                  <StorageIcon sx={{ mr: 0.5 }} fontSize="small" />
+                  {t("Local")}
+                </ToggleButton>
+                <ToggleButton value="cloud">
+                  <CloudIcon sx={{ mr: 0.5 }} fontSize="small" />
+                  {t("Cloud")}
+                </ToggleButton>
+              </ToggleButtonGroup>
+            )}
+            {dbMode === "local" && <DriveSync />}
+            <Box sx={{ flex: 1 }} />
+            <Box sx={{ "& button": { width: "auto !important" } }}>
               <ExportAllNPCs
                 npcs={filteredList?.length > 0 ? filteredList : []}
               />
-            </Grid>
-
-            <Grid item xs={12} md={3}>
-              <Button
-                variant="outlined"
-                startIcon={<UploadFile />}
-                fullWidth
+            </Box>
+            <Tooltip title={t("Add NPC from JSON")}>
+              <IconButton
+                size="small"
                 onClick={() => fileInputRef.current.click()}
               >
-                {t("Add NPC from JSON")}
-              </Button>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept=".json"
-                onChange={(e) => {
-                  const file = e.target.files[0];
-                  if (file) {
-                    const reader = new FileReader();
-                    reader.onload = () => {
-                      try {
-                        const result = JSON.parse(reader.result);
-                        handleFileUpload(result);
-                      } catch (err) {
-                        console.error("Error parsing JSON:", err);
-                      }
-                    };
-                    reader.readAsText(file);
-                  }
-                }}
-                style={{ display: "none" }}
-              />
-            </Grid>
-            <Grid
-              item
-              xs={12}
-              md={2}
-              alignItems="center"
-              sx={{ display: "flex" }}
-            >
-              <Button
-                variant="outlined"
-                fullWidth
-                startIcon={collapse ? <ExpandLess /> : <ExpandMore />}
+                <UploadFile />
+              </IconButton>
+            </Tooltip>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".json"
+              onChange={(e) => {
+                const file = e.target.files[0];
+                if (file) {
+                  const reader = new FileReader();
+                  reader.onload = () => {
+                    try {
+                      const result = JSON.parse(reader.result);
+                      handleFileUpload(result);
+                    } catch (err) {
+                      console.error("Error parsing JSON:", err);
+                    }
+                  };
+                  reader.readAsText(file);
+                }
+              }}
+              style={{ display: "none" }}
+            />
+            <Tooltip title={t("Add NPC from Clipboard")}>
+              <IconButton size="small" onClick={handlePasteNpc}>
+                <ContentPaste />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title={collapse ? t("Collapse") : t("Expand")}>
+              <IconButton
+                size="small"
                 onClick={() => {
                   setCollapse(!collapse);
                 }}
               >
-                {collapse ? t("Collapse") : t("Expand")}
+                {collapse ? <ExpandLess /> : <ExpandMore />}
+              </IconButton>
+            </Tooltip>
+            <Divider orientation="vertical" flexItem />
+            <Typography
+              variant="body1"
+              sx={{
+                fontWeight: 600,
+              }}
+            >
+              {t("filtered_npc_count") + " " + filteredList?.length}
+            </Typography>
+            {staleNpcs.length > 0 && (
+              <Tooltip title={t("Some NPCs need a data migration")}>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  color="warning"
+                  startIcon={<SystemUpdateAltIcon />}
+                  onClick={() => setMigrationDialogOpen(true)}
+                >
+                  {t("Migrate")} ({staleNpcs.length})
+                </Button>
+              </Tooltip>
+            )}
+            <Tooltip
+              title={selectMode ? t("Exit Select Mode") : t("Select NPCs")}
+            >
+              <Button
+                variant={selectMode ? "contained" : "outlined"}
+                size="small"
+                startIcon={<LibraryAddCheck />}
+                onClick={toggleSelectMode}
+              >
+                {t("Select")}
               </Button>
-            </Grid>
-            <Grid item xs={12}>
-              <Typography variant="h6" align="center" mt={1} mb={-1}>
-                {t("filtered_npc_count") + " " + filteredList?.length}
+            </Tooltip>
+          </Box>
+
+          {/* Select mode sub-bar */}
+          <Collapse in={selectMode}>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                flexWrap: "wrap",
+                gap: 1,
+                mt: 0.75,
+                pt: 0.75,
+                borderTop: 1,
+                borderColor: "divider",
+              }}
+            >
+              <Typography
+                variant="body2"
+                sx={{
+                  color: "text.secondary",
+                }}
+              >
+                {selectedIds.size} {t("selected")}
               </Typography>
-            </Grid>
-          </Grid>
+              <Box sx={{ flex: 1 }} />
+              <Button
+                size="small"
+                variant="outlined"
+                onClick={(e) => setCopyAnchor(e.currentTarget)}
+                startIcon={<FileCopy />}
+              >
+                {t("Copy")}
+              </Button>
+              <MuiMenu
+                anchorEl={copyAnchor}
+                open={Boolean(copyAnchor)}
+                onClose={() => setCopyAnchor(null)}
+              >
+                <MenuItem
+                  disabled={selectedIds.size === 0}
+                  onClick={() => {
+                    setCopyAnchor(null);
+                    copySelectedToLocal();
+                  }}
+                >
+                  <ListItemIcon>
+                    <StorageIcon fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={`${t("Copy Selected to Local")} (${selectedIds.size})`}
+                  />
+                </MenuItem>
+                <MenuItem
+                  disabled={selectedIds.size === 0 || !cloudUser}
+                  onClick={() => {
+                    setCopyAnchor(null);
+                    copySelectedToCloud();
+                  }}
+                >
+                  <ListItemIcon>
+                    <CloudIcon fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={`${t("Copy Selected to Cloud")} (${selectedIds.size})`}
+                  />
+                </MenuItem>
+                <Divider />
+                <MenuItem
+                  onClick={() => {
+                    setCopyAnchor(null);
+                    copyAllToLocal();
+                  }}
+                >
+                  <ListItemIcon>
+                    <StorageIcon fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText primary={t("Copy All to Local")} />
+                </MenuItem>
+                <MenuItem
+                  disabled={!cloudUser}
+                  onClick={() => {
+                    setCopyAnchor(null);
+                    copyAllToCloud();
+                  }}
+                >
+                  <ListItemIcon>
+                    <CloudIcon fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText primary={t("Copy All to Cloud")} />
+                </MenuItem>
+              </MuiMenu>
+              <Button
+                size="small"
+                variant="outlined"
+                onClick={(e) => setMoveAnchor(e.currentTarget)}
+                startIcon={<DriveFileMove />}
+              >
+                {t("Move")}
+              </Button>
+              <MuiMenu
+                anchorEl={moveAnchor}
+                open={Boolean(moveAnchor)}
+                onClose={() => setMoveAnchor(null)}
+              >
+                {dbMode !== "local" && (
+                  <MenuItem
+                    disabled={selectedIds.size === 0}
+                    onClick={() => {
+                      setMoveAnchor(null);
+                      moveSelectedToLocal();
+                    }}
+                  >
+                    <ListItemIcon>
+                      <StorageIcon fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={`${t("Move Selected to Local")} (${selectedIds.size})`}
+                    />
+                  </MenuItem>
+                )}
+                {dbMode !== "cloud" && (
+                  <MenuItem
+                    disabled={selectedIds.size === 0 || !cloudUser}
+                    onClick={() => {
+                      setMoveAnchor(null);
+                      moveSelectedToCloud();
+                    }}
+                  >
+                    <ListItemIcon>
+                      <CloudIcon fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={`${t("Move Selected to Cloud")} (${selectedIds.size})`}
+                    />
+                  </MenuItem>
+                )}
+                <Divider />
+                {dbMode !== "local" && (
+                  <MenuItem
+                    onClick={() => {
+                      setMoveAnchor(null);
+                      moveAllToLocal();
+                    }}
+                  >
+                    <ListItemIcon>
+                      <StorageIcon fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText primary={t("Move All to Local")} />
+                  </MenuItem>
+                )}
+                {dbMode !== "cloud" && (
+                  <MenuItem
+                    disabled={!cloudUser}
+                    onClick={() => {
+                      setMoveAnchor(null);
+                      moveAllToCloud();
+                    }}
+                  >
+                    <ListItemIcon>
+                      <CloudIcon fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText primary={t("Move All to Cloud")} />
+                  </MenuItem>
+                )}
+              </MuiMenu>
+              <Tooltip title={`${t("Delete Selected")} (${selectedIds.size})`}>
+                <span>
+                  <IconButton
+                    onClick={deleteSelected}
+                    disabled={selectedIds.size === 0}
+                    color="error"
+                  >
+                    <Delete />
+                  </IconButton>
+                </span>
+              </Tooltip>
+              <Tooltip
+                title={`${t("export_selected_npcs_button")} (${selectedIds.size})`}
+              >
+                <span>
+                  <IconButton
+                    onClick={(e) => setExportAnchor(e.currentTarget)}
+                    disabled={selectedIds.size === 0}
+                  >
+                    <Download />
+                  </IconButton>
+                </span>
+              </Tooltip>
+              <MuiMenu
+                anchorEl={exportAnchor}
+                open={Boolean(exportAnchor)}
+                onClose={() => setExportAnchor(null)}
+              >
+                <MenuItem
+                  disabled={selectedIds.size === 0}
+                  onClick={exportSelectedAsJSON}
+                >
+                  <ListItemText primary={t("export_json_file")} />
+                </MenuItem>
+                <Divider />
+                <MenuItem
+                  disabled={selectedIds.size === 0}
+                  onClick={() => copySelectedAsText("markdown")}
+                >
+                  <ListItemText primary={t("Copy Markdown to Clipboard")} />
+                </MenuItem>
+                <MenuItem
+                  disabled={selectedIds.size === 0}
+                  onClick={() => exportSelectedAsText("markdown")}
+                >
+                  <ListItemText primary={t("Export as Markdown (.zip)")} />
+                </MenuItem>
+                <MenuItem
+                  disabled={selectedIds.size === 0}
+                  onClick={() => copySelectedAsText("plain")}
+                >
+                  <ListItemText primary={t("Copy Plaintext to Clipboard")} />
+                </MenuItem>
+                <MenuItem
+                  disabled={selectedIds.size === 0}
+                  onClick={() => exportSelectedAsText("plain")}
+                >
+                  <ListItemText primary={t("Export as Plaintext (.zip)")} />
+                </MenuItem>
+                <MenuItem
+                  disabled={selectedIds.size === 0}
+                  onClick={() => copySelectedAsText("obsidian")}
+                >
+                  <ListItemText
+                    primary={t("Copy Obsidian (BlueCorvid) to Clipboard")}
+                  />
+                </MenuItem>
+                <MenuItem
+                  disabled={selectedIds.size === 0}
+                  onClick={() => exportSelectedAsText("obsidian")}
+                >
+                  <ListItemText primary={t("Export as Obsidian (.zip)")} />
+                </MenuItem>
+              </MuiMenu>
+              <Tooltip
+                title={`${t("Download Selected as Images")} (${selectedIds.size})`}
+              >
+                <span>
+                  <IconButton
+                    onClick={downloadSelectedAsImages}
+                    disabled={selectedIds.size === 0}
+                  >
+                    <PhotoLibrary />
+                  </IconButton>
+                </span>
+              </Tooltip>
+            </Box>
+          </Collapse>
         </Paper>
       </div>
-
+      {!cloudUser && (
+        <Paper
+          elevation={dbMode === "cloud" ? 3 : 0}
+          variant={dbMode === "cloud" ? "elevation" : "outlined"}
+          sx={{
+            p: 2,
+            mb: 2,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 2,
+            flexWrap: "wrap",
+          }}
+        >
+          <CloudIcon color={dbMode === "cloud" ? "primary" : "disabled"} />
+          <Typography
+            variant="body2"
+            color={dbMode === "cloud" ? "text.primary" : "text.secondary"}
+            sx={{ flex: 1, minWidth: 200 }}
+          >
+            {dbMode === "cloud"
+              ? t("You have to be logged in to access this feature")
+              : t(
+                  "Have a Google account? Sign in to sync your data between devices.",
+                )}
+          </Typography>
+          <SignIn />
+        </Paper>
+      )}
       {isMobile ? (
         <div>
-          {filteredList?.map((npc, i) => {
-            return (
-              <Npc
-                key={i}
-                npc={npc}
-                copyNpc={copyNpc}
-                deleteNpc={deleteNpc}
-                shareNpc={shareNpc}
-                collapseGet={collapse}
-                filterParams={filteredParams}
-              />
-            );
-          })}
+          {filteredList?.map((npc, i) => (
+            <Npc
+              key={i}
+              npc={npc}
+              copyNpc={copyNpc}
+              deleteNpc={deleteNpc}
+              shareNpc={shareNpc}
+              collapseGet={collapse}
+              filterParams={filteredParams}
+              dbMode={dbMode}
+              selectMode={selectMode}
+              isSelected={selectedIds.has(npc.id)}
+              onToggleSelect={toggleSelectNpc}
+              onRegisterDownload={(id, fn) => {
+                if (fn) downloadCallbacksRef.current.set(id, fn);
+                else downloadCallbacksRef.current.delete(id);
+              }}
+              copyNpcToLocal={copyNpcToLocal}
+              copyNpcToCloud={copyNpcToCloud}
+              moveNpcToLocal={moveNpcToLocal}
+              moveNpcToCloud={moveNpcToCloud}
+            />
+          ))}
         </div>
       ) : (
         <div
@@ -697,6 +1429,18 @@ function Personal({ user }) {
                   shareNpc={shareNpc}
                   collapseGet={collapse}
                   filterParams={filteredParams}
+                  dbMode={dbMode}
+                  selectMode={selectMode}
+                  isSelected={selectedIds.has(npc.id)}
+                  onToggleSelect={toggleSelectNpc}
+                  onRegisterDownload={(id, fn) => {
+                    if (fn) downloadCallbacksRef.current.set(id, fn);
+                    else downloadCallbacksRef.current.delete(id);
+                  }}
+                  copyNpcToLocal={copyNpcToLocal}
+                  copyNpcToCloud={copyNpcToCloud}
+                  moveNpcToLocal={moveNpcToLocal}
+                  moveNpcToCloud={moveNpcToCloud}
                 />
               );
             })}
@@ -713,6 +1457,18 @@ function Personal({ user }) {
                   shareNpc={shareNpc}
                   collapseGet={collapse}
                   filterParams={filteredParams}
+                  dbMode={dbMode}
+                  selectMode={selectMode}
+                  isSelected={selectedIds.has(npc.id)}
+                  onToggleSelect={toggleSelectNpc}
+                  onRegisterDownload={(id, fn) => {
+                    if (fn) downloadCallbacksRef.current.set(id, fn);
+                    else downloadCallbacksRef.current.delete(id);
+                  }}
+                  copyNpcToLocal={copyNpcToLocal}
+                  copyNpcToCloud={copyNpcToCloud}
+                  moveNpcToLocal={moveNpcToLocal}
+                  moveNpcToCloud={moveNpcToCloud}
                 />
               );
             })}
@@ -720,30 +1476,314 @@ function Personal({ user }) {
         </div>
       )}
       <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          marginBottom: 50,
-        }}
+        style={{ display: "flex", justifyContent: "center", marginBottom: 50 }}
       >
-        {loading && <CircularProgress />}
+        {loading && (dbMode !== "cloud" || cloudUser) && <CircularProgress />}
       </div>
-
       <Snackbar
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-        open={open}
-        autoHideDuration={2000}
-        onClose={handleClose}
-        message={t("Copied to Clipboard!")}
+        open={Boolean(snackMsg)}
+        autoHideDuration={2500}
+        onClose={() => setSnackMsg(null)}
+        message={snackMsg}
       />
+      <MigrationDialog
+        open={migrationDialogOpen}
+        onClose={() => setMigrationDialogOpen(false)}
+        actors={staleNpcs}
+        actorType="npc"
+        onMigrateAll={handleMigrateAllNpcs}
+        getMigrations={getPendingNpcMigrations}
+      />
+      <Dialog
+        open={isCreateNpcModalOpen}
+        onClose={handleCloseCreateNpcModal}
+        fullWidth
+        maxWidth="sm"
+      >
+        <DialogTitle>{t("create_npc")}</DialogTitle>
+        <DialogContent dividers>
+          <Box sx={{ mt: 1 }}>
+            <SettingRow label={t("Name")} hint={t("optional_name_hint")}>
+              <TextField
+                value={createNpcOptions.name}
+                onChange={(evt) =>
+                  handleCreateNpcOptionChange("name", evt.target.value)
+                }
+                size="small"
+                sx={{ minWidth: 220 }}
+              />
+            </SettingRow>
+
+            <SettingRow
+              label={t("role_use_quick_assembly")}
+              hint={t("role_hint")}
+              showDivider={!createNpcOptions.useQuickAssembly}
+            >
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={createNpcOptions.useQuickAssembly}
+                    onChange={(evt) =>
+                      handleCreateNpcOptionChange(
+                        "useQuickAssembly",
+                        evt.target.checked,
+                      )
+                    }
+                  />
+                }
+                label=""
+                sx={{ m: 0 }}
+              />
+            </SettingRow>
+
+            {createNpcOptions.useQuickAssembly && (
+              <SettingRow
+                label={t("role")}
+                hint={t("role_select_hint")}
+                showDivider={false}
+                dense
+              >
+                <FormControl
+                  variant="outlined"
+                  size="small"
+                  sx={{ minWidth: 180 }}
+                >
+                  <Select
+                    value={createNpcOptions.role}
+                    onChange={(evt) =>
+                      handleCreateNpcOptionChange("role", evt.target.value)
+                    }
+                  >
+                    {CREATE_NPC_ROLE_OPTIONS.map((option) => (
+                      <MenuItem key={option.value} value={option.value}>
+                        {t(option.label)}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </SettingRow>
+            )}
+
+            {createNpcOptions.useQuickAssembly && (
+              <SettingRow label={t("Level")} hint={t("role_level_hint")} dense>
+                <FormControl
+                  variant="outlined"
+                  size="small"
+                  sx={{ minWidth: 100 }}
+                >
+                  <Select
+                    value={createNpcOptions.lvl}
+                    onChange={(evt) =>
+                      handleCreateNpcOptionChange(
+                        "lvl",
+                        Number(evt.target.value),
+                      )
+                    }
+                  >
+                    {QA_LEVELS.map((n) => (
+                      <MenuItem key={n} value={n}>
+                        {n}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </SettingRow>
+            )}
+
+            <SettingRow label={t("Species")} hint={t("species_hint")}>
+              <FormControl
+                variant="outlined"
+                size="small"
+                sx={{ minWidth: 180 }}
+              >
+                <Select
+                  value={createNpcOptions.species}
+                  onChange={(evt) =>
+                    handleCreateNpcOptionChange("species", evt.target.value)
+                  }
+                >
+                  {CREATE_NPC_SPECIES_OPTIONS.map((option) => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {t(option.label)}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </SettingRow>
+
+            <SettingRow
+              label={t("Rank")}
+              hint={
+                createNpcOptions.rank === "companion"
+                  ? t("companion_type_hint")
+                  : t("set_npc_type_type")
+              }
+              showDivider={createNpcOptions.rank !== "companion"}
+            >
+              <FormControl
+                variant="outlined"
+                size="small"
+                sx={{ minWidth: 180 }}
+              >
+                <Select
+                  value={createNpcOptions.rank}
+                  onChange={(evt) =>
+                    handleCreateNpcOptionChange("rank", evt.target.value)
+                  }
+                >
+                  {CREATE_NPC_RANK_OPTIONS.map((option) => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {t(option.label)}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </SettingRow>
+
+            {createNpcOptions.rank === "companion" && (
+              <SettingRow
+                label={t("skill_level")}
+                hint={t("skill_level_hint")}
+                showDivider={false}
+                dense
+              >
+                <FormControl
+                  variant="outlined"
+                  size="small"
+                  sx={{ minWidth: 100 }}
+                >
+                  <Select
+                    value={createNpcOptions.companionlvl}
+                    onChange={(evt) =>
+                      handleCreateNpcOptionChange(
+                        "companionlvl",
+                        Number(evt.target.value),
+                      )
+                    }
+                  >
+                    {CREATE_NPC_COMPANION_LVL_OPTIONS.map((n) => (
+                      <MenuItem key={n} value={n}>
+                        {n}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </SettingRow>
+            )}
+
+            {createNpcOptions.rank === "companion" && (
+              <SettingRow
+                label={t("player_level")}
+                hint={t("player_level_hint")}
+                showDivider={false}
+                dense
+              >
+                <TextField
+                  type="number"
+                  value={createNpcOptions.companionpclvl}
+                  onChange={(evt) =>
+                    handleCreateNpcOptionChange(
+                      "companionpclvl",
+                      Number(evt.target.value) || 5,
+                    )
+                  }
+                  size="small"
+                  sx={{ minWidth: 100 }}
+                />
+              </SettingRow>
+            )}
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseCreateNpcModal}>{t("Cancel")}</Button>
+          <Button variant="contained" onClick={handleCreateNpcConfirm}>
+            {t("create_npc")}
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <DeleteConfirmationDialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+        onConfirm={async () => {
+          if (isBulkDelete) {
+            for (const id of selectedIds) {
+              await db.deleteDoc(db.doc("npc-personal", id));
+            }
+            setSelectedIds(new Set());
+            notify(t("NPCs deleted"));
+          } else if (npcToDelete) {
+            await db.deleteDoc(db.doc("npc-personal", npcToDelete.id));
+            setNpcToDelete(null);
+            notify(t("NPC deleted"));
+          }
+        }}
+        title={
+          isBulkDelete ? t("Confirm Bulk Deletion") : t("Confirm Deletion")
+        }
+        message={
+          isBulkDelete
+            ? t("Are you sure you want to delete {count} NPC(s)?").replace(
+                "{count}",
+                String(selectedIds.size),
+              )
+            : t("Are you sure you want to delete this NPC?")
+        }
+        itemPreview={
+          !isBulkDelete &&
+          npcToDelete && (
+            <Box>
+              <Typography variant="h4">{npcToDelete.name}</Typography>
+              <Typography variant="body2">
+                {t("Level")} {npcToDelete.lvl} - {t(npcToDelete.species)}
+              </Typography>
+            </Box>
+          )
+        }
+      />
+      {showScrollTop && (
+        <Tooltip title={t("Scroll to top")}>
+          <Fab
+            size="small"
+            color="primary"
+            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+            sx={{ position: "fixed", bottom: 24, right: 24, zIndex: 1200 }}
+          >
+            <KeyboardArrowUp />
+          </Fab>
+        </Tooltip>
+      )}
     </>
   );
 }
 
-function Npc({ npc, copyNpc, deleteNpc, shareNpc, collapseGet, filterParams }) {
+function Npc({
+  npc,
+  _copyNpc,
+  deleteNpc,
+  shareNpc,
+  collapseGet,
+  filterParams,
+  dbMode,
+  selectMode,
+  isSelected,
+  onToggleSelect,
+  onRegisterDownload,
+  copyNpcToLocal,
+  copyNpcToCloud,
+  moveNpcToLocal,
+  moveNpcToCloud,
+}) {
   const { t } = useTranslate();
+  const { cloudUser } = useDatabaseContext();
+  const navigate = useNavigate();
   const ref = useRef();
   const [downloadImage] = useDownloadImage(npc.name, ref);
+  const [transferAnchor, setTransferAnchor] = useState(null);
+  const [actionsAnchor, setActionsAnchor] = useState(null);
+  const [_exportAnchor, setExportAnchor] = useState(null);
+  const [actionsSubmenu, setActionsSubmenu] = useState(null); // "export" | "transfer" | null
+  const exportData = canonicalizeForExport("npc", npc);
 
   const [collapse, setCollapse] = useState(false);
 
@@ -751,63 +1791,388 @@ function Npc({ npc, copyNpc, deleteNpc, shareNpc, collapseGet, filterParams }) {
     setCollapse(collapseGet);
   }, [collapseGet]);
 
-  function expandAndDownloadImage() {
+  const expandAndDownloadImage = useCallback(() => {
     setCollapse(true);
     setTimeout(downloadImage, 100);
-  }
+  }, [downloadImage]);
+
+  useEffect(() => {
+    onRegisterDownload(npc.id, expandAndDownloadImage);
+    return () => onRegisterDownload(npc.id, null);
+  }, [npc.id, onRegisterDownload, expandAndDownloadImage]);
+
+  const closeMenus = () => {
+    setTransferAnchor(null);
+    setExportAnchor(null);
+    setActionsAnchor(null);
+    setActionsSubmenu(null);
+  };
+
+  const copyJsonToClipboard = async () => {
+    await navigator.clipboard.writeText(
+      JSON.stringify({ ...exportData, dataType: "npc" }, null, 2),
+    );
+    closeMenus();
+  };
+
+  const downloadJson = () => {
+    const safeName = (npc?.name || "npc").replace(/\s+/g, "_").toLowerCase();
+    const blob = new Blob(
+      [JSON.stringify({ ...exportData, dataType: "npc" }, null, 2)],
+      {
+        type: "application/json;charset=utf-8",
+      },
+    );
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${safeName}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    closeMenus();
+  };
+
+  const copyText = async (fmt) => {
+    const text = buildItemText("npc", exportData, fmt);
+    await navigator.clipboard.writeText(text);
+    closeMenus();
+  };
+
+  const downloadText = (fmt) => {
+    const text = buildItemText("npc", exportData, fmt);
+    const ext = fmt === "plain" ? "txt" : "md";
+    const safeName = (npc?.name || "npc").replace(/\s+/g, "_").toLowerCase();
+    const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${safeName}.${ext}`;
+    a.click();
+    URL.revokeObjectURL(url);
+    closeMenus();
+  };
 
   return (
-    <Grid item xs={12} md={12} sx={{ marginBottom: 3 }}>
-      <NpcPretty
-        npc={npc}
-        ref={ref}
-        npcImage={npc.imgurl}
-        collapse={collapse}
-        onClick={() => {
-          setCollapse(!collapse);
-        }}
-      />
-      {/* <NpcUgly npc={npc} /> */}
-      <Tooltip title={t("Copy")}>
-        <IconButton onClick={copyNpc(npc)}>
-          <ContentCopy />
-        </IconButton>
-      </Tooltip>
-      <Tooltip title={t("Edit")}>
-        <RouterLink
-          to={`/npc-gallery/${npc.id}${
-            filterParams
-              ? filterParams.startsWith("?")
-                ? filterParams
-                : `?${filterParams}`
-              : ""
-          }`}
-        >
-          <IconButton>
-            <Edit />
-          </IconButton>
-        </RouterLink>
-      </Tooltip>
-      <Tooltip title={t("Delete")}>
-        <IconButton onClick={deleteNpc(npc)}>
-          <Delete />
-        </IconButton>
-      </Tooltip>
-      <Tooltip title={t("Share URL")}>
-        <IconButton onClick={() => shareNpc(npc.id)}>
-          <Share />
-        </IconButton>
-      </Tooltip>
-      <Tooltip title={t("Download as Image")}>
-        <IconButton
+    <Grid
+      sx={{ marginBottom: 3 }}
+      size={{
+        xs: 12,
+        md: 12,
+      }}
+    >
+      <Box
+        sx={
+          isSelected
+            ? {
+                outline: "3px solid",
+                outlineColor: "primary.main",
+                borderRadius: 1,
+              }
+            : {}
+        }
+      >
+        <NpcActorCard
+          npc={npc}
+          cardRef={ref}
+          npcImage={npc.imgurl}
+          collapse={collapse}
+          variant="interactive"
           onClick={() => {
-            expandAndDownloadImage();
+            if (selectMode) onToggleSelect(npc.id);
+            else setCollapse(!collapse);
+          }}
+        />
+      </Box>
+      <Box
+        sx={{ display: "flex", alignItems: "center", gap: 1, flexWrap: "wrap" }}
+      >
+        <Tooltip title={t("Actions")}>
+          <IconButton onClick={(e) => setActionsAnchor(e.currentTarget)}>
+            <MenuIcon />
+          </IconButton>
+        </Tooltip>
+        <MuiMenu
+          anchorEl={actionsAnchor}
+          open={Boolean(actionsAnchor)}
+          onClose={closeMenus}
+          slotProps={{
+            transition: { onExited: () => setActionsSubmenu(null) },
           }}
         >
-          <Download />
-        </IconButton>
-      </Tooltip>
-      <Export name={`${npc.name}`} dataType="npc" data={npc} />
+          {actionsSubmenu === null && [
+            <MenuItem
+              key="edit"
+              onClick={() => {
+                closeMenus();
+                navigate(
+                  `/npc-gallery/${npc.id}${filterParams ? (filterParams.startsWith("?") ? filterParams : `?${filterParams}`) : ""}`,
+                );
+              }}
+            >
+              <ListItemIcon>
+                <Edit fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary={t("Edit")} />
+            </MenuItem>,
+            <MenuItem key="export" onClick={() => setActionsSubmenu("export")}>
+              <ListItemIcon>
+                <Code fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary={t("Export")} />
+              <ChevronRight fontSize="small" />
+            </MenuItem>,
+            <MenuItem
+              key="transfer"
+              onClick={() => setActionsSubmenu("transfer")}
+            >
+              <ListItemIcon>
+                <FileCopy fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary={t("Copy / Move")} />
+              <ChevronRight fontSize="small" />
+            </MenuItem>,
+            <MenuItem
+              key="delete"
+              onClick={() => {
+                closeMenus();
+                deleteNpc(npc)();
+              }}
+            >
+              <ListItemIcon>
+                <Delete fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary={t("Delete")} />
+            </MenuItem>,
+            <MenuItem
+              key="share"
+              disabled={dbMode !== "cloud"}
+              onClick={() => {
+                closeMenus();
+                shareNpc(npc.id);
+              }}
+            >
+              <ListItemIcon>
+                <Share fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary={t("Share URL")} />
+            </MenuItem>,
+            <MenuItem
+              key="download"
+              onClick={() => {
+                closeMenus();
+                expandAndDownloadImage();
+              }}
+            >
+              <ListItemIcon>
+                <Download fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary={t("Download as Image")} />
+            </MenuItem>,
+          ]}
+          {actionsSubmenu === "export" && [
+            <MenuItem key="back" onClick={() => setActionsSubmenu(null)}>
+              <ListItemIcon>
+                <ChevronLeft fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary={t("Export")} />
+            </MenuItem>,
+            <Divider key="div" />,
+            <MenuItem key="copy-json" onClick={copyJsonToClipboard}>
+              {t("copy_json_clipboard")}
+            </MenuItem>,
+            <MenuItem key="dl-json" onClick={downloadJson}>
+              {t("export_json_file")}
+            </MenuItem>,
+            <Divider key="div2" />,
+            <MenuItem key="copy-md" onClick={() => copyText("markdown")}>
+              {t("Copy Markdown to Clipboard")}
+            </MenuItem>,
+            <MenuItem key="dl-md" onClick={() => downloadText("markdown")}>
+              {t("Export as Markdown (.md)")}
+            </MenuItem>,
+            <Divider key="div3" />,
+            <MenuItem key="copy-plain" onClick={() => copyText("plain")}>
+              {t("Copy Plaintext to Clipboard")}
+            </MenuItem>,
+            <MenuItem key="dl-plain" onClick={() => downloadText("plain")}>
+              {t("Export as Plaintext (.txt)")}
+            </MenuItem>,
+            <MenuItem key="copy-obs" onClick={() => copyText("obsidian")}>
+              {t("Copy Obsidian (BlueCorvid) to Clipboard")}
+            </MenuItem>,
+            <MenuItem key="dl-obs" onClick={() => downloadText("obsidian")}>
+              {t("Export as Obsidian (.md)")}
+            </MenuItem>,
+          ]}
+          {actionsSubmenu === "transfer" && [
+            <MenuItem key="back" onClick={() => setActionsSubmenu(null)}>
+              <ListItemIcon>
+                <ChevronLeft fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary={t("Copy / Move")} />
+            </MenuItem>,
+            <Divider key="div" />,
+            <MenuItem
+              key="copy-local"
+              onClick={() => {
+                closeMenus();
+                copyNpcToLocal(npc)();
+              }}
+            >
+              <ListItemIcon>
+                <StorageIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary={t("Copy to Local")} />
+            </MenuItem>,
+            <MenuItem
+              key="copy-cloud"
+              disabled={!cloudUser}
+              onClick={() => {
+                closeMenus();
+                copyNpcToCloud(npc)();
+              }}
+            >
+              <ListItemIcon>
+                <CloudIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary={t("Copy to Cloud")} />
+            </MenuItem>,
+            <Divider key="div2" />,
+            <MenuItem
+              key="move-local"
+              onClick={() => {
+                closeMenus();
+                moveNpcToLocal(npc)();
+              }}
+            >
+              <ListItemIcon>
+                <StorageIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary={t("Move to Local")} />
+            </MenuItem>,
+            <MenuItem
+              key="move-cloud"
+              disabled={!cloudUser}
+              onClick={() => {
+                closeMenus();
+                moveNpcToCloud(npc)();
+              }}
+            >
+              <ListItemIcon>
+                <CloudIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary={t("Move to Cloud")} />
+            </MenuItem>,
+          ]}
+        </MuiMenu>
+        <Tooltip title={t("Edit")}>
+          <RouterLink
+            to={`/npc-gallery/${npc.id}${
+              filterParams
+                ? filterParams.startsWith("?")
+                  ? filterParams
+                  : `?${filterParams}`
+                : ""
+            }`}
+            style={{ display: "inline-flex", alignItems: "center" }}
+          >
+            <IconButton>
+              <Edit />
+            </IconButton>
+          </RouterLink>
+        </Tooltip>
+        <Export name={`${npc.name}`} dataType="npc" data={npc} />
+        <Tooltip title={t("Copy to...")}>
+          <IconButton onClick={(e) => setTransferAnchor(e.currentTarget)}>
+            <FileCopy />
+          </IconButton>
+        </Tooltip>
+        <MuiMenu
+          anchorEl={transferAnchor}
+          open={Boolean(transferAnchor)}
+          onClose={() => setTransferAnchor(null)}
+        >
+          <MenuItem
+            onClick={() => {
+              setTransferAnchor(null);
+              copyNpcToLocal(npc)();
+            }}
+          >
+            <ListItemIcon>
+              <StorageIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText primary={t("Copy to Local")} />
+          </MenuItem>
+          <MenuItem
+            disabled={!cloudUser}
+            onClick={() => {
+              setTransferAnchor(null);
+              copyNpcToCloud(npc)();
+            }}
+          >
+            <ListItemIcon>
+              <CloudIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText primary={t("Copy to Cloud")} />
+          </MenuItem>
+          <Divider />
+          {dbMode !== "local" && (
+            <MenuItem
+              onClick={() => {
+                setTransferAnchor(null);
+                moveNpcToLocal(npc)();
+              }}
+            >
+              <ListItemIcon>
+                <StorageIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary={t("Move to Local")} />
+            </MenuItem>
+          )}
+          {dbMode !== "cloud" && (
+            <MenuItem
+              disabled={!cloudUser}
+              onClick={() => {
+                setTransferAnchor(null);
+                moveNpcToCloud(npc)();
+              }}
+            >
+              <ListItemIcon>
+                <CloudIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText primary={t("Move to Cloud")} />
+            </MenuItem>
+          )}
+        </MuiMenu>
+        <Tooltip title={t("Delete")}>
+          <IconButton onClick={deleteNpc(npc)}>
+            <Delete />
+          </IconButton>
+        </Tooltip>
+        {dbMode === "cloud" && (
+          <Tooltip title={t("Share URL")}>
+            <IconButton onClick={() => shareNpc(npc.id)}>
+              <Share />
+            </IconButton>
+          </Tooltip>
+        )}
+        <Tooltip title={t("Download as Image")}>
+          <IconButton onClick={expandAndDownloadImage}>
+            <Download />
+          </IconButton>
+        </Tooltip>
+        <Tooltip
+          title={`Schema version ${npc.schemaVersion ?? 0} of ${NPC_CURRENT_SCHEMA_VERSION} (${npcNeedsMigration(npc) ? "migration needed" : "up to date"})`}
+        >
+          <Chip
+            label={`v${npc.schemaVersion ?? 0}`}
+            size="small"
+            color={npcNeedsMigration(npc) ? "warning" : "default"}
+            variant="outlined"
+            sx={{ fontSize: "0.85rem" }}
+          />
+        </Tooltip>
+      </Box>
     </Grid>
   );
 }
