@@ -167,14 +167,14 @@ export function getItems(type) {
       return heroics;
     case "mnemospheres":
       return mnemospheres;
+    case "effects":
+      return officialEffects;
     case "special":
     case "actions":
     case "custom-weapons":
     case "accessories":
     case "optionals":
     case "hoplospheres":
-    case "effects":
-      return officialEffects;
     default:
       return [];
   }
