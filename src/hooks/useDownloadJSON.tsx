@@ -1,7 +1,7 @@
 import useDownload from "./useDownload";
 
 // useDownloadJSON exposes a function that converts the given data to json and downloads it
-function useDownloadJSON(name: string, data: any) {
+function useDownloadJSON(name: string, data: Record<string, unknown>) {
   const [download] = useDownload();
 
   function downloadJSON() {

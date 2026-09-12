@@ -8,7 +8,7 @@ const NotesTab = ({
   setSelectedNPC,
   selectedNPCs,
   setSelectedNPCs,
-  addLog,
+  emitLog,
 }) => {
   const [customLog, setCustomLog] = useState("");
 
@@ -21,10 +21,9 @@ const NotesTab = ({
     const trimmedLog = customLog.trim();
     if (!trimmedLog) return;
 
-    // Add log entry
-    addLog(npcName + ": " + trimmedLog);
+    emitLog({ type: "text", text: npcName + ": " + trimmedLog });
 
-    setCustomLog(""); // Clear the textfield after sending
+    setCustomLog("");
   };
 
   return (
@@ -34,7 +33,6 @@ const NotesTab = ({
         variant="outlined"
         fullWidth
         rows={1}
-        inputProps={{ maxLength: 50 }}
         placeholder={t("combat_sim_combat_notes_detail")}
         value={
           selectedNPCs.find((npc) => npc.combatId === selectedNPC.combatId)
@@ -66,6 +64,9 @@ const NotesTab = ({
           }));
         }}
         sx={{ mt: 2 }}
+        slotProps={{
+          htmlInput: { maxLength: 50 },
+        }}
       />
       <TextField
         label={t("Notes")}
@@ -73,7 +74,6 @@ const NotesTab = ({
         fullWidth
         multiline
         rows={10}
-        inputProps={{ maxLength: 2000 }}
         value={
           selectedNPCs.find((npc) => npc.combatId === selectedNPC.combatId)
             ?.combatStats?.notes || ""
@@ -95,6 +95,9 @@ const NotesTab = ({
           setSelectedNPCs(updatedNPCs);
         }}
         sx={{ mt: 2 }}
+        slotProps={{
+          htmlInput: { maxLength: 2000 },
+        }}
       />
       <TextField
         label={t("combat_sim_custom_log")}
@@ -103,18 +106,20 @@ const NotesTab = ({
         value={customLog}
         onChange={(e) => setCustomLog(e.target.value)}
         sx={{ mt: 2 }}
-        InputProps={{
-          endAdornment: (
-            <Button
-              onClick={handleSendLog}
-              color="primary"
-              variant="contained"
-              startIcon={<Send />}
-              disabled={!customLog}
-            >
-              {t("combat_sim_send_log")}
-            </Button>
-          ),
+        slotProps={{
+          input: {
+            endAdornment: (
+              <Button
+                onClick={handleSendLog}
+                color="primary"
+                variant="contained"
+                startIcon={<Send />}
+                disabled={!customLog}
+              >
+                {t("combat_sim_send_log")}
+              </Button>
+            ),
+          },
         }}
       />
     </>

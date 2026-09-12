@@ -62,8 +62,8 @@ export default function EmptyList({ isMobile, showIcon = true }) {
         })}
       <Typography
         variant="h4"
-        color="text.secondary"
         sx={{
+          color: "text.secondary",
           fontStyle: "italic",
           userSelect: "none",
           WebkitUserSelect: "none",
@@ -75,8 +75,8 @@ export default function EmptyList({ isMobile, showIcon = true }) {
       </Typography>
       <Typography
         variant="body1"
-        color="text.secondary"
         sx={{
+          color: "text.secondary",
           fontStyle: "italic",
           userSelect: "none",
           WebkitUserSelect: "none",

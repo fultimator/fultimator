@@ -2,11 +2,45 @@ import React from "react";
 import Divider from "@mui/material/Divider";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
-import { useMediaQuery } from "@mui/material";
-import { Grid, Tooltip, TextField } from "@mui/material";
+import { AccordionSummary, useMediaQuery } from "@mui/material";
+import { Grid, Tooltip, TextField, Box } from "@mui/material";
 import { Edit } from "@mui/icons-material";
+import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import { useTranslate } from "../../translation/translate";
 import { useCustomTheme } from "../../hooks/useCustomTheme";
+
+function normalizeNestedButtons(node: React.ReactNode): React.ReactNode {
+  if (!React.isValidElement(node)) return node;
+  const element = node as React.ReactElement<{
+    children?: React.ReactNode;
+    component?: React.ElementType;
+  }>;
+
+  const elementType = element.type as {
+    muiName?: string;
+    displayName?: string;
+  };
+  const isIconButton =
+    elementType?.muiName === "IconButton" ||
+    elementType?.displayName === "IconButton";
+
+  const children = element.props?.children
+    ? React.Children.map(element.props.children, normalizeNestedButtons)
+    : element.props?.children;
+
+  if (isIconButton) {
+    return React.cloneElement(element, {
+      component: "span",
+      children,
+    });
+  }
+
+  if (children !== element.props?.children) {
+    return React.cloneElement(element, { children });
+  }
+
+  return node;
+}
 
 interface CustomHeaderClassesProps {
   editClassName: () => void;
@@ -17,6 +51,10 @@ interface CustomHeaderClassesProps {
   readOnlyNumber: number;
   onLevelChange: (newValue: number) => void;
   isEditMode: boolean;
+  isNumberReadOnly?: boolean;
+  isAccordion?: boolean;
+  isExpanded?: boolean;
+  actions?: React.ReactNode;
 }
 
 const CustomHeaderClasses: React.FC<CustomHeaderClassesProps> = ({
@@ -28,26 +66,172 @@ const CustomHeaderClasses: React.FC<CustomHeaderClassesProps> = ({
   readOnlyNumber,
   onLevelChange,
   isEditMode,
+  isNumberReadOnly = false,
+  isAccordion = false,
+  actions,
 }) => {
-
   const theme = useCustomTheme();
-  
-  const color = theme.mode === 'dark'
-  ? `#ffffff`
-  : `#000000`;
-
-  const background = theme.mode === 'dark'
-  ? `#212425`
-  : `#ffffff`;
-
+  const color = theme.mode === "dark" ? `#ffffff` : `#000000`;
+  const background = theme.mode === "dark" ? `#212425` : `#ffffff`;
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const { t } = useTranslate();
 
+  const headerStyles: React.CSSProperties = {
+    color: theme.white,
+    backgroundColor: theme.primary,
+    textTransform: "uppercase",
+    padding: "5px 10px",
+    fontSize: isMobile ? "1em" : "1.5em",
+    fontFamily: "Antonio, sans-serif",
+    fontWeight: "normal",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    lineHeight: "normal",
+    width: "100%",
+    boxSizing: "border-box",
+  };
+
+  const content = (
+    <>
+      {isEditMode && (
+        <Tooltip title={t("Edit Class Name")}>
+          <IconButton
+            component="span"
+            size="small"
+            sx={{ px: 1, "&:hover": { color: theme.primary } }}
+            onClick={(e) => {
+              e.stopPropagation();
+              editClassName();
+            }}
+          >
+            <Edit fontSize="large" style={{ color: "white" }} />
+          </IconButton>
+        </Tooltip>
+      )}
+      <div
+        style={{ flex: 1, textAlign: "left", paddingLeft: isEditMode ? 0 : 10 }}
+      >
+        {headerText}
+      </div>
+      <Box
+        onClick={(e) => e.stopPropagation()}
+        sx={{ display: "flex", alignItems: "center", gap: "2px" }}
+      >
+        <div style={{ marginRight: "10px" }}>{rightHeaderText}</div>
+        <TextField
+          value={editableNumber.toString()}
+          onChange={(e) => {
+            const value = e.target.value;
+            if (
+              value === "" ||
+              (/^\d+$/.test(value) && +value >= 1 && +value <= 10)
+            ) {
+              onLevelChange(value === "" ? 0 : parseInt(value, 10));
+            }
+          }}
+          onBlur={(e) => {
+            let value = parseInt(e.target.value, 10);
+            if (isNaN(value) || value < 1) value = 1;
+            else if (value > 10) value = 10;
+            onLevelChange(value);
+          }}
+          variant="outlined"
+          size="small"
+          sx={{
+            width: isMobile ? "40px" : "60px",
+            textAlign: "center",
+            marginRight: "4px",
+            fontFamily: "inherit",
+          }}
+          slotProps={{
+            input: {
+              inputProps: {
+                min: 1,
+                max: 10,
+                readOnly: !isEditMode || isNumberReadOnly,
+                style: { textAlign: "center" },
+              },
+              style: {
+                color,
+                fontFamily: "inherit",
+                fontSize: "inherit",
+                backgroundColor: background,
+              },
+            },
+          }}
+        />
+        {" / "}
+        <TextField
+          value={readOnlyNumber}
+          variant="outlined"
+          size="small"
+          sx={{
+            width: isMobile ? "40px" : "60px",
+            textAlign: "center",
+            border: "none",
+            fontFamily: "inherit",
+          }}
+          slotProps={{
+            input: {
+              inputProps: { readOnly: true, style: { textAlign: "center" } },
+              style: {
+                color,
+                fontFamily: "inherit",
+                fontSize: "inherit",
+                backgroundColor: background,
+              },
+            },
+          }}
+        />
+        {actions && (
+          <Box sx={{ display: "flex", alignItems: "center", ml: 1 }}>
+            {normalizeNestedButtons(actions)}
+          </Box>
+        )}
+      </Box>
+    </>
+  );
+
+  if (isAccordion) {
+    return (
+      <AccordionSummary
+        component="div"
+        expandIcon={<ArrowDownwardIcon sx={{ color: "#ffffff" }} />}
+        sx={{
+          backgroundColor: theme.primary,
+          padding: "0 16px 0 0 !important",
+          "&.Mui-expanded": {
+            padding: "0 16px 0 0 !important",
+            minHeight: "unset !important",
+          },
+          minHeight: "unset !important",
+          "& .MuiAccordionSummary-content": {
+            margin: "0 !important",
+            display: "flex",
+            alignItems: "center",
+            width: "100%",
+          },
+          "& .MuiAccordionSummary-expandIconWrapper": {
+            color: "#ffffff",
+            flexShrink: 0,
+            marginLeft: "8px",
+          },
+          "& .MuiAccordionSummary-expandIconWrapper.Mui-expanded": {
+            marginLeft: "8px",
+          },
+        }}
+      >
+        <div style={headerStyles}>{content}</div>
+      </AccordionSummary>
+    );
+  }
+
   return (
-    <Grid item xs={12} sx={{ width: "100%", margin: "15px" }}>
+    <Grid sx={{ width: "100%", margin: "15px" }} size={12}>
       <Typography
         variant="h2"
-        component="legend"
+        component="div"
         sx={{
           color: theme.white,
           backgroundColor: theme.primary,
@@ -61,91 +245,11 @@ const CustomHeaderClasses: React.FC<CustomHeaderClassesProps> = ({
           justifyContent: "space-between",
           lineHeight: "normal",
           textAlign: "center",
+          width: "calc(100% + 30px)",
+          boxSizing: "border-box",
         }}
       >
-        {isEditMode && <Tooltip title={t("Edit Class Name")}>
-          <IconButton
-            sx={{ px: 1, "&:hover": { color: theme.primary } }}
-            onClick={editClassName}
-          >
-            <Edit fontSize="large" style={{ color: "white" }}/>
-          </IconButton>
-        </Tooltip>}
-        <div style={{ flex: 1, textAlign: "left", paddingLeft: isEditMode ? 0 : 10 }}>
-          {headerText}
-        </div>
-        <div
-          style={{
-            textAlign: "right",
-            display: "flex",
-            alignItems: "center",
-            gap: "2px",
-          }}
-        >
-          <div style={{ marginRight: "10px" }}>
-            {rightHeaderText}
-          </div>
-          <TextField
-            InputProps={{
-              inputProps: { min: 1, max: 10, readOnly: !isEditMode, style: { textAlign: "center" }},
-              style: {
-                color: color,
-                fontFamily: "inherit",
-                fontSize: "inherit",
-                backgroundColor: background,
-              },
-            }}
-            value={editableNumber.toString()} // Ensure the value is a string
-            onChange={(e) => {
-              const value = e.target.value;
-              // Allow empty input for user convenience
-              if (
-                value === "" ||
-                (/^\d+$/.test(value) && +value >= 1 && +value <= 10)
-              ) {
-                onLevelChange(value === "" ? 0 : parseInt(value, 10)); // Assuming 0 as the default value for empty input
-              }
-            }}
-            onBlur={(e) => {
-              let value = parseInt(e.target.value, 10);
-              if (isNaN(value) || value < 1) {
-                value = 1;
-              } else if (value > 10) {
-                value = 10;
-              }
-              onLevelChange(value);
-            }}
-            variant="outlined"
-            size="small"
-            sx={{
-              width: isMobile ? "40px" : "60px",
-              textAlign: "center",
-              marginRight: "4px",
-              fontFamily: "inherit",
-            }}
-          />
-          {" / "}
-          <TextField
-            InputProps={{
-              inputProps: { min: 1, max: 10, readOnly: true, style: { textAlign: "center" } },
-              style: {
-                color: color,
-                fontFamily: "inherit",
-                fontSize: "inherit",
-                backgroundColor: background,
-              },
-            }}
-            value={readOnlyNumber}
-            variant="outlined"
-            size="small"
-            sx={{
-              width: isMobile ? "40px" : "60px",
-              textAlign: "center",
-              border: "none",
-              fontFamily: "inherit",
-            }}
-          />
-        </div>
+        {content}
       </Typography>
       {type === "top" && (
         <Divider

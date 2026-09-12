@@ -61,7 +61,7 @@ export const SETTINGS_CONFIG = {
   },
   studyValues: {
     key: "combatSimStudyValues",
-    defaultValue: "default",
+    defaultValue: "playtest",
   },
 
   // Log types

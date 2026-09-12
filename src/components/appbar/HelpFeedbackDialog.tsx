@@ -103,7 +103,7 @@ const HelpFeedbackDialog: React.FC<HelpFeedbackDialogProps> = ({
     } catch (error) {
       if (error instanceof Error) {
         setErrorMessage(
-          "There was a problem with the fetch operation: " + error.message
+          "There was a problem with the fetch operation: " + error.message,
         );
       } else {
         setErrorMessage("An unknown error occurred");
@@ -124,10 +124,12 @@ const HelpFeedbackDialog: React.FC<HelpFeedbackDialogProps> = ({
     <Dialog
       open={open}
       onClose={handleClose}
-      PaperProps={{
-        sx: {
-          width: "100%",
-          maxWidth: "sm",
+      slotProps={{
+        paper: {
+          sx: {
+            width: "100%",
+            maxWidth: "sm",
+          },
         },
       }}
     >
@@ -141,8 +143,10 @@ const HelpFeedbackDialog: React.FC<HelpFeedbackDialogProps> = ({
           fullWidth
           value={discordAccount}
           onChange={(e) => setDiscordAccount(e.target.value)}
-          inputProps={{
-            maxLength: 100,
+          slotProps={{
+            htmlInput: {
+              maxLength: 100,
+            },
           }}
         />
         <Typography variant="body2" sx={{ mt: 1 }}>
@@ -157,8 +161,10 @@ const HelpFeedbackDialog: React.FC<HelpFeedbackDialogProps> = ({
           rows={4}
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          inputProps={{
-            maxLength: 5000,
+          slotProps={{
+            htmlInput: {
+              maxLength: 5000,
+            },
           }}
         />
         {errorMessage && (
@@ -168,7 +174,12 @@ const HelpFeedbackDialog: React.FC<HelpFeedbackDialogProps> = ({
         )}
       </DialogContent>
       <DialogActions>
-        <Button variant="contained" color="secondary" onClick={handleClose} disabled={isSubmitting}>
+        <Button
+          variant="contained"
+          color="secondary"
+          onClick={handleClose}
+          disabled={isSubmitting}
+        >
           Cancel
         </Button>
         <Button

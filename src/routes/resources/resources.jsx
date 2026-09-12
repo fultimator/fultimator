@@ -8,7 +8,7 @@ import {
   Snackbar,
 } from "@mui/material";
 import Layout from "../../components/Layout";
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, useCallback } from "react";
 import { useTranslate } from "../../translation/translate";
 import { useTheme } from "@mui/material/styles";
 import HeaderSection from "../../components/resources/HeaderSection";
@@ -19,17 +19,14 @@ import CommunityResources from "../../components/resources/CommunityResources";
 import StatisticsFooter from "../../components/resources/StatisticsFooter";
 import AddResourceRequestDialog from "../../components/resources/AddResourceRequestDialog";
 import ResourceModerationPanel from "../../components/resources/ResourceModerationPanel";
-import { createClient } from "@supabase/supabase-js";
 import { languages } from "../../components/resources/resourceUtils";
-import { useAuthState } from "react-firebase-hooks/auth";
-import { auth } from "../../firebase";
+import { useAuthState, auth } from "@platform/db";
 import { moderators } from "../../libs/userGroups";
+import { getResourcesSupabaseClient } from "../../components/resources/supabaseClient";
 
 function Resources() {
-  const [user, loadingUser] = useAuthState(auth);
-  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-  const supabaseKey = import.meta.env.VITE_SUPABASE_KEY;
-  const supabase = createClient(supabaseUrl, supabaseKey);
+  const [user, _loadingUser] = useAuthState(auth);
+  const supabase = getResourcesSupabaseClient();
 
   // State for resources
   const [resources, setResources] = useState([]);
@@ -43,7 +40,7 @@ function Resources() {
   // Check if user is moderator
   const isModerator = user && moderators.includes(user.uid);
 
-  const fetchResources = async () => {
+  const fetchResources = useCallback(async () => {
     try {
       setLoading(true);
       let { data: resources, error } = await supabase
@@ -62,7 +59,7 @@ function Resources() {
       setError("Unexpected error occurred");
       return [];
     }
-  };
+  }, [supabase]);
 
   useEffect(() => {
     const loadResources = async () => {
@@ -71,7 +68,7 @@ function Resources() {
       setLoading(false);
     };
     loadResources();
-  }, []);
+  }, [fetchResources]);
 
   const muiTheme = useTheme();
   const { t } = useTranslate();
@@ -98,11 +95,11 @@ function Resources() {
   const getCollectionPriority = (collection) => {
     // Higher priority = lower number (sorts first)
     const priorities = {
-      'rulebook': 1,
-      'website': 2,
-      'social_media': 3,
-      'tools': 4,
-      'content': 5
+      rulebook: 1,
+      website: 2,
+      social_media: 3,
+      tools: 4,
+      content: 5,
     };
     return priorities[collection] || 6;
   };
@@ -111,20 +108,22 @@ function Resources() {
     if (!tags || !Array.isArray(tags)) return 4;
 
     // Higher priority = lower number (sorts first)
-    if (tags.includes('corebook')) return 1;
-    if (tags.includes('expansion')) return 2;
-    if (tags.includes('adventure')) return 3;
+    if (tags.includes("corebook")) return 1;
+    if (tags.includes("expansion")) return 2;
+    if (tags.includes("adventure")) return 3;
     return 4;
   };
 
-  const sortResourcesWithinLanguage = (resources) => {
+  const sortResourcesWithinLanguage = useCallback((resources) => {
     return resources.sort((a, b) => {
       // 1. Sort by collection priority (rulebook first, then website, etc.)
-      const collectionDiff = getCollectionPriority(a.collection) - getCollectionPriority(b.collection);
+      const collectionDiff =
+        getCollectionPriority(a.collection) -
+        getCollectionPriority(b.collection);
       if (collectionDiff !== 0) return collectionDiff;
 
       // 2. For rulebooks, sort by publish date (newest first) if both have dates
-      if (a.collection === 'rulebook' && b.collection === 'rulebook') {
+      if (a.collection === "rulebook" && b.collection === "rulebook") {
         const aDate = a.publish_date ? new Date(a.publish_date) : null;
         const bDate = b.publish_date ? new Date(b.publish_date) : null;
 
@@ -146,7 +145,7 @@ function Resources() {
       // 3. Final sort by title alphabetically
       return a.name.localeCompare(b.name);
     });
-  };
+  }, []);
 
   // Process resources from Supabase data
   const allResources = useMemo(() => {
@@ -220,18 +219,20 @@ function Resources() {
             .toLowerCase()
             .includes(searchQuery.toLowerCase()) ||
           (resource.author &&
-            resource.author.toLowerCase().includes(searchQuery.toLowerCase())) ||
+            resource.author
+              .toLowerCase()
+              .includes(searchQuery.toLowerCase())) ||
           // Also search in purchase options reseller names
           (resource.purchase_options &&
             resource.purchase_options.some((option) =>
-              option.reseller.toLowerCase().includes(searchQuery.toLowerCase())
-            ))
+              option.reseller.toLowerCase().includes(searchQuery.toLowerCase()),
+            )),
       );
     }
 
     if (typeFilter !== "all") {
       resourceList = resourceList.filter(
-        (resource) => resource.type === typeFilter
+        (resource) => resource.type === typeFilter,
       );
     }
 
@@ -265,7 +266,9 @@ function Resources() {
 
     // Sort resources within each language group
     Object.keys(grouped).forEach((langKey) => {
-      grouped[langKey].resources = sortResourcesWithinLanguage(grouped[langKey].resources);
+      grouped[langKey].resources = sortResourcesWithinLanguage(
+        grouped[langKey].resources,
+      );
     });
 
     // Create ordered object with selected language first
@@ -278,18 +281,23 @@ function Resources() {
 
     // Add all other languages in alphabetical order
     Object.keys(grouped)
-      .filter(langKey => langKey !== selectedLanguage)
+      .filter((langKey) => langKey !== selectedLanguage)
       .sort((a, b) => {
         const langA = languages[a]?.lang || "Other";
         const langB = languages[b]?.lang || "Other";
         return langA.localeCompare(langB);
       })
-      .forEach(langKey => {
+      .forEach((langKey) => {
         orderedGrouped[langKey] = grouped[langKey];
       });
 
     return orderedGrouped;
-  }, [filteredResources, activeTab, selectedLanguage]);
+  }, [
+    filteredResources,
+    activeTab,
+    selectedLanguage,
+    sortResourcesWithinLanguage,
+  ]);
 
   // Show loading state
   if (loading) {
@@ -405,7 +413,7 @@ function Resources() {
           severity="success"
           sx={{ width: "100%" }}
         >
-          {t("Resource request submitted successfully! We'll review it soon.")}
+          {t("resource_request_submitted_successfully")}
         </Alert>
       </Snackbar>
     </Layout>

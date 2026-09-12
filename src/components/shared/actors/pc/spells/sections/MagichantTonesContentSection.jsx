@@ -1,0 +1,107 @@
+import { useCallback, useState, useMemo } from "react";
+import ContentSection from "/src/components/shared/actors/pc/spells/sections/ContentSection";
+import MagichantToneItem from "/src/components/shared/actors/pc/spells/sections/MagichantToneItem";
+import { availableMagichantTones } from "/src/libs/player/spellOptionData";
+import CompendiumViewerModal from "/src/components/compendium/CompendiumViewerModal";
+
+export default function MagichantTonesContentSection({
+  formState,
+  setFormState,
+  t,
+}) {
+  const currentTones = useMemo(() => formState.tones || [], [formState.tones]);
+  const [compendiumOpen, setCompendiumOpen] = useState(false);
+
+  const createBlankTone = useCallback(() => {
+    return {
+      key: "magichant_custom_name",
+      effect: "",
+      customName: "",
+    };
+  }, []);
+
+  const getAvailablePresets = useCallback(() => {
+    const addedKeys = currentTones
+      .map((tone) => tone.key)
+      .filter((k) => k !== "magichant_custom_name");
+    return availableMagichantTones.filter(
+      (preset) =>
+        preset.name !== "magichant_custom_name" &&
+        !addedKeys.includes(preset.name),
+    );
+  }, [currentTones]);
+
+  const handleAddPreset = useCallback((presetName) => {
+    return (setState) => {
+      const preset = availableMagichantTones.find(
+        (tone) => tone.name === presetName,
+      );
+      if (!preset) return;
+      setState((prev) => ({
+        ...prev,
+        tones: [
+          ...(prev.tones || []),
+          {
+            key: preset.name,
+            effect: preset.effect,
+            customName: "",
+          },
+        ],
+      }));
+    };
+  }, []);
+
+  const presetAddButtons = getAvailablePresets().map((preset) => ({
+    label: t(preset.name),
+    onClick: handleAddPreset(preset.name),
+  }));
+
+  const handleCompendiumImport = useCallback(
+    (item) => {
+      const isToneItem =
+        item?.magichantSubtype === "tone" ||
+        (item?.effect && !item?.type && !item?.status);
+      if (!isToneItem) return;
+      setFormState((prev) => ({
+        ...prev,
+        tones: [
+          ...(prev.tones || []),
+          {
+            key: item.key || item.name || "magichant_custom_name",
+            effect: item.effect || "",
+            customName: item.customName || "",
+          },
+        ],
+      }));
+      setCompendiumOpen(false);
+    },
+    [setFormState],
+  );
+
+  return (
+    <>
+      <ContentSection
+        formState={formState}
+        setFormState={setFormState}
+        t={t}
+        itemsArrayName="tones"
+        itemComponent={MagichantToneItem}
+        itemComponentProps={{}}
+        onAddItem={createBlankTone}
+        addButtonLabel="magichant_add_tone"
+        emptyStateLabel="No tones added"
+        presetAddButtons={presetAddButtons}
+        onBrowseCompendium={() => setCompendiumOpen(true)}
+      />
+      <CompendiumViewerModal
+        open={compendiumOpen}
+        onClose={() => setCompendiumOpen(false)}
+        onAddItem={handleCompendiumImport}
+        initialType="player-spells"
+        restrictToTypes={["player-spells"]}
+        initialSpellClass="Chanter"
+        context="player"
+      />
+    </>
+  );
+}

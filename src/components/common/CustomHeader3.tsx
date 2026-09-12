@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Typography, IconButton, Tooltip } from "@mui/material";
-import { Add, Edit, Remove } from "@mui/icons-material";
+import { Add, Edit, Remove, Search } from "@mui/icons-material";
 import { useTranslate } from "../../translation/translate";
 import { useTheme } from "@mui/system";
 
@@ -11,8 +11,12 @@ interface CustomHeader3Props {
   onIncrease: () => void;
   onDecrease: () => void;
   onEdit: () => void;
+  onOpenCompendium?: () => void;
   isEditMode: boolean;
   isHeroicSkill: boolean;
+  hideEditButton?: boolean;
+  increaseDisabled?: boolean;
+  increaseTooltip?: string;
 }
 
 const CustomHeader3: React.FC<CustomHeader3Props> = ({
@@ -22,8 +26,12 @@ const CustomHeader3: React.FC<CustomHeader3Props> = ({
   onIncrease,
   onDecrease,
   onEdit,
+  onOpenCompendium,
   isEditMode,
   isHeroicSkill,
+  hideEditButton = false,
+  increaseDisabled = false,
+  increaseTooltip,
 }) => {
   const [isMobileView, setIsMobileView] = useState<boolean>(false);
 
@@ -94,7 +102,7 @@ const CustomHeader3: React.FC<CustomHeader3Props> = ({
         color: "white",
         textAlign: "left",
         marginBottom: "4px",
-        marginTop: "10px",
+        marginTop: "4px",
         textTransform: "uppercase",
         display: "flex",
         alignItems: "center",
@@ -118,7 +126,7 @@ const CustomHeader3: React.FC<CustomHeader3Props> = ({
                 <span key={index}>{FilledStarSVG}</span>
               ) : (
                 <span key={index}>{EmptyStarSVG}</span>
-              )
+              ),
             )}
           </>
         )}
@@ -140,22 +148,59 @@ const CustomHeader3: React.FC<CustomHeader3Props> = ({
               </Tooltip>
             </span>
             <span>
-              <Tooltip title={currentLvl >= maxLvl ? "" : t("Increase Level")}>
+              <Tooltip
+                title={
+                  currentLvl >= maxLvl || increaseDisabled
+                    ? (increaseTooltip ?? "")
+                    : t("Increase Level")
+                }
+              >
                 <span>
                   <IconButton
                     size="small"
                     onClick={onIncrease}
-                    disabled={currentLvl >= maxLvl}
+                    disabled={currentLvl >= maxLvl || increaseDisabled}
                   >
                     <Add
-                      style={{ color: currentLvl >= maxLvl ? "gray" : "white" }}
+                      style={{
+                        color:
+                          currentLvl >= maxLvl || increaseDisabled
+                            ? "gray"
+                            : "white",
+                      }}
                     />
                   </IconButton>
                 </span>
               </Tooltip>
             </span>
+            {!hideEditButton && (
+              <span>
+                <Tooltip title={t("Edit Skill")}>
+                  <span>
+                    <IconButton size="small" onClick={onEdit}>
+                      <Edit style={{ color: "white" }} />
+                    </IconButton>
+                  </span>
+                </Tooltip>
+              </span>
+            )}
+          </>
+        )}
+        {isEditMode && isHeroicSkill && (
+          <>
+            {onOpenCompendium && (
+              <span>
+                <Tooltip title={t("Search Heroic Skills")}>
+                  <span>
+                    <IconButton size="small" onClick={onOpenCompendium}>
+                      <Search style={{ color: "white" }} />
+                    </IconButton>
+                  </span>
+                </Tooltip>
+              </span>
+            )}
             <span>
-              <Tooltip title={t("Edit Skill")}>
+              <Tooltip title={t("Edit Heroic Skill")}>
                 <span>
                   <IconButton size="small" onClick={onEdit}>
                     <Edit style={{ color: "white" }} />
@@ -164,17 +209,6 @@ const CustomHeader3: React.FC<CustomHeader3Props> = ({
               </Tooltip>
             </span>
           </>
-        )}
-        {isEditMode && isHeroicSkill && (
-          <span>
-            <Tooltip title={t("Edit Heroic Skill")}>
-              <span>
-                <IconButton size="small" onClick={onEdit}>
-                  <Edit style={{ color: "white" }} />
-                </IconButton>
-              </span>
-            </Tooltip>
-          </span>
         )}
       </div>
     </div>

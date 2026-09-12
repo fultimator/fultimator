@@ -1,9 +1,26 @@
 import React from "react";
-import { Box, Button, IconButton, Typography } from "@mui/material";
-import { AccessTime, Notes, Replay } from "@mui/icons-material";
+import {
+  Box,
+  Button,
+  Divider,
+  IconButton,
+  ToggleButton,
+  ToggleButtonGroup,
+  Tooltip,
+} from "@mui/material";
+import {
+  AccessTime,
+  Close,
+  GroupAdd,
+  Notes,
+  Replay,
+  TouchApp,
+} from "@mui/icons-material";
 import { t } from "../../../translation/translate";
 import { useTheme } from "@mui/material/styles";
-import { calcInit } from "../../../libs/npcs";
+import { useCombatEncounterStore } from "../../../stores/combatEncounterStore";
+import { useAppDrawerStore } from "../../../store/appDrawerStore";
+import { useThemeStore } from "../../../store/themeStore";
 
 export default function SelectedNpcsHeader({
   selectedNPCs,
@@ -11,21 +28,19 @@ export default function SelectedNpcsHeader({
   onNotesClick,
   onClockClick,
   handleResetTurns,
+  onClearAll,
 }) {
   const theme = useTheme();
   const primary = theme.palette.primary.main;
-  const isDarkMode = theme.palette.mode === "dark";
+  const interactionMode = useCombatEncounterStore((s) => s.interactionMode);
+  const setInteractionMode = useCombatEncounterStore(
+    (s) => s.setInteractionMode,
+  );
+  const setDrawerTab = useAppDrawerStore((s) => s.setActiveTab);
+  const setDrawerOpen = useThemeStore((s) => s.setDrawerOpen);
 
   const isAllTurnsChecked = selectedNPCs?.every((npc) =>
-    npc.combatStats.turns?.every(Boolean)
-  );
-
-  // Calculate the highest initiative for the selected NPCs
-  const highestInit = Math.max(
-    ...selectedNPCs
-      .filter((npc) => npc.id !== undefined)
-      .map((npc) => calcInit(npc))
-      .concat([0]) // Add a default value in case the array is empty
+    npc.combatStats.turns?.every(Boolean),
   );
   return (
     <Box
@@ -34,43 +49,51 @@ export default function SelectedNpcsHeader({
         justifyContent: "space-between",
         alignItems: "center",
         flexShrink: 0,
-        borderBottom: "1px solid #ccc",
+        borderBottom: `1px solid ${theme.palette.divider}`,
         paddingBottom: 1,
         gap: 1,
       }}
     >
-      {/* Left side */}
-      {!isMobile && (
-        <Typography
-          variant={"h5"}
-          sx={{
-            userSelect: "none",
-            WebkitUserSelect: "none",
-            MozUserSelect: "none",
-            msUserSelect: "none",
+      {/* Left side - interaction mode toggle + clear button */}
+      <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+        <ToggleButtonGroup
+          exclusive
+          size="small"
+          value={interactionMode}
+          onChange={(_, val) => {
+            if (val !== null) setInteractionMode(val);
           }}
+          sx={{ "& .MuiToggleButton-root": { px: 0.75, py: 0.5 } }}
         >
-          {t("combat_sim_selected_npcs")}
-        </Typography>
-      )}
-
-      {/* Center - Initiative */}
-      <Box
-        sx={{
-          display: "flex",
-          flex: 1,
-          justifyContent: isMobile ? "left" : "center",
-        }}
-      >
-        {selectedNPCs.length > 0 && (
-          <Typography
-            variant={isMobile ? "h6" : "h5"}
-            color={isDarkMode ? "#fff" : primary}
+          <ToggleButton value="select">
+            <Tooltip title="Select mode: click to open actor sheet">
+              <TouchApp fontSize="small" />
+            </Tooltip>
+          </ToggleButton>
+          <ToggleButton value="target">
+            <Tooltip title="Target mode: T to target, Shift+T to multi-target">
+              <img
+                src="/assets/icons/checks/roll_target.png"
+                style={{ width: 16, height: 16 }}
+                alt="target"
+              />
+            </Tooltip>
+          </ToggleButton>
+        </ToggleButtonGroup>
+        <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
+        <Tooltip title="Clear targets & selection">
+          <IconButton
+            size="small"
+            onClick={onClearAll}
+            sx={{ color: "text.secondary" }}
           >
-            {t("combat_sim_npc_initiative")}: <strong>{highestInit}</strong>
-          </Typography>
-        )}
+            <Close fontSize="small" />
+          </IconButton>
+        </Tooltip>
       </Box>
+
+      {/* Spacer */}
+      <Box sx={{ flex: 1 }} />
 
       {/* Right side - Buttons */}
       <Box
@@ -85,10 +108,41 @@ export default function SelectedNpcsHeader({
             size="small"
             sx={{
               padding: 0.5,
-              border: `1px solid ${isDarkMode ? "#fff" : primary}`,
+              border: `1px solid ${primary}`,
               boxShadow: 3,
             }}
-            color={isDarkMode ? "inherit" : "primary"}
+            color="primary"
+            onClick={() => {
+              setDrawerTab("actorSelect");
+              setDrawerOpen(true);
+            }}
+          >
+            <GroupAdd />
+          </IconButton>
+        ) : (
+          <Button
+            size="small"
+            sx={{ padding: "0 0.5rem" }}
+            color="primary"
+            variant="outlined"
+            onClick={() => {
+              setDrawerTab("actorSelect");
+              setDrawerOpen(true);
+            }}
+            endIcon={<GroupAdd />}
+          >
+            Add Actors
+          </Button>
+        )}
+        {isMobile ? (
+          <IconButton
+            size="small"
+            sx={{
+              padding: 0.5,
+              border: `1px solid ${primary}`,
+              boxShadow: 3,
+            }}
+            color="primary"
             onClick={onNotesClick}
           >
             <Notes />
@@ -97,7 +151,7 @@ export default function SelectedNpcsHeader({
           <Button
             size="small"
             sx={{ padding: "0 0.5rem" }}
-            color={isDarkMode ? "white" : "primary"}
+            color="primary"
             variant="outlined"
             onClick={onNotesClick}
             endIcon={<Notes />}
@@ -110,10 +164,10 @@ export default function SelectedNpcsHeader({
             size="small"
             sx={{
               padding: 0.5,
-              border: `1px solid ${isDarkMode ? "#fff" : primary}`,
+              border: `1px solid ${primary}`,
               boxShadow: 3,
             }}
-            color={isDarkMode ? "inherit" : "primary"}
+            color="primary"
             onClick={onClockClick}
           >
             <AccessTime />
@@ -122,7 +176,7 @@ export default function SelectedNpcsHeader({
           <Button
             size="small"
             sx={{ padding: "0 0.5rem" }}
-            color={isDarkMode ? "white" : "primary"}
+            color="primary"
             variant="outlined"
             onClick={onClockClick}
             endIcon={<AccessTime />}
@@ -135,19 +189,11 @@ export default function SelectedNpcsHeader({
             size="small"
             sx={{
               padding: 0.5,
-              border: `1px solid ${isDarkMode ? "#fff" : primary}`,
+              border: `1px solid ${primary}`,
               backgroundColor: isAllTurnsChecked ? "primary.main" : "inherit",
               boxShadow: 3,
             }}
-            color={
-              isAllTurnsChecked
-                ? isDarkMode
-                  ? "inherit"
-                  : "white"
-                : isDarkMode
-                ? "inherit"
-                : "primary"
-            }
+            color="primary"
             onClick={handleResetTurns}
             disabled={selectedNPCs.length === 0}
           >
@@ -157,7 +203,7 @@ export default function SelectedNpcsHeader({
           <Button
             size="small"
             sx={{ padding: "0 0.5rem" }}
-            color={isDarkMode && !isAllTurnsChecked ? "white" : "primary"}
+            color="primary"
             variant={isAllTurnsChecked ? "contained" : "outlined"}
             onClick={handleResetTurns}
             endIcon={<Replay />}

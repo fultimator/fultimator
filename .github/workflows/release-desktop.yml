@@ -1,0 +1,242 @@
+name: Build and Release Desktop
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build-mac:
+    runs-on: macos-14
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: Build (tsc + vite)
+        run: npx tsc && npx vite build --config vite.electron.config.ts
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096
+          VITE_DISCORD_FEEDBACK_WEBHOOK_URL: ${{ secrets.DISCORD_FEEDBACK_WEBHOOK_URL }}
+          VITE_DISCORD_REPORT_BUG_WEBHOOK_URL: ${{ secrets.DISCORD_REPORT_BUG_WEBHOOK_URL }}
+          VITE_DISCORD_REPORT_CONTENT_WEBHOOK_URL: ${{ secrets.DISCORD_REPORT_CONTENT_WEBHOOK_URL }}
+          VITE_DISCORD_APPLICATIONS_WEBHOOK_URL: ${{ secrets.DISCORD_APPLICATIONS_WEBHOOK_URL }}
+          VITE_FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
+          VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.FIREBASE_AUTH_DOMAIN }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+          VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.FIREBASE_STORAGE_BUCKET }}
+          VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}
+          VITE_FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
+          VITE_FIREBASE_MEASUREMENT_ID: ${{ secrets.FIREBASE_MEASUREMENT_ID }}
+          VITE_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          VITE_SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+
+      - name: Package with electron-builder
+        run: npx electron-builder --mac --x64 --arm64 --publish never
+
+      - name: Upload DMG to release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release/**/*.dmg
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: Build (tsc + vite)
+        run: npx tsc && npx vite build --config vite.electron.config.ts
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096
+          VITE_DISCORD_FEEDBACK_WEBHOOK_URL: ${{ secrets.DISCORD_FEEDBACK_WEBHOOK_URL }}
+          VITE_DISCORD_REPORT_BUG_WEBHOOK_URL: ${{ secrets.DISCORD_REPORT_BUG_WEBHOOK_URL }}
+          VITE_DISCORD_REPORT_CONTENT_WEBHOOK_URL: ${{ secrets.DISCORD_REPORT_CONTENT_WEBHOOK_URL }}
+          VITE_DISCORD_APPLICATIONS_WEBHOOK_URL: ${{ secrets.DISCORD_APPLICATIONS_WEBHOOK_URL }}
+          VITE_FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
+          VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.FIREBASE_AUTH_DOMAIN }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+          VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.FIREBASE_STORAGE_BUCKET }}
+          VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}
+          VITE_FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
+          VITE_FIREBASE_MEASUREMENT_ID: ${{ secrets.FIREBASE_MEASUREMENT_ID }}
+          VITE_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          VITE_SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+
+      - name: Package with electron-builder
+        run: npx electron-builder --win --publish never
+
+      - name: Upload installers to release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release/**/*.exe
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install RPM build tools
+        run: sudo apt-get install -y rpm
+
+      - run: npm ci
+
+      - name: Build (tsc + vite)
+        run: npx tsc && npx vite build --config vite.electron.config.ts
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096
+          VITE_DISCORD_FEEDBACK_WEBHOOK_URL: ${{ secrets.DISCORD_FEEDBACK_WEBHOOK_URL }}
+          VITE_DISCORD_REPORT_BUG_WEBHOOK_URL: ${{ secrets.DISCORD_REPORT_BUG_WEBHOOK_URL }}
+          VITE_DISCORD_REPORT_CONTENT_WEBHOOK_URL: ${{ secrets.DISCORD_REPORT_CONTENT_WEBHOOK_URL }}
+          VITE_DISCORD_APPLICATIONS_WEBHOOK_URL: ${{ secrets.DISCORD_APPLICATIONS_WEBHOOK_URL }}
+          VITE_FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
+          VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.FIREBASE_AUTH_DOMAIN }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+          VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.FIREBASE_STORAGE_BUCKET }}
+          VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}
+          VITE_FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
+          VITE_FIREBASE_MEASUREMENT_ID: ${{ secrets.FIREBASE_MEASUREMENT_ID }}
+          VITE_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          VITE_SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+
+      - name: Package with electron-builder
+        run: npx electron-builder --linux AppImage deb rpm --publish never
+
+      - name: Upload packages to release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            release/**/*.AppImage
+            release/**/*.deb
+            release/**/*.rpm
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-linux-flatpak:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install Flatpak build tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --fix-missing flatpak flatpak-builder
+          flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+          flatpak install --user -y flathub org.freedesktop.Platform//23.08 org.freedesktop.Sdk//23.08
+
+      - run: npm ci
+
+      - name: Build (tsc + vite)
+        run: npx tsc && npx vite build --config vite.electron.config.ts
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096
+          VITE_DISCORD_FEEDBACK_WEBHOOK_URL: ${{ secrets.DISCORD_FEEDBACK_WEBHOOK_URL }}
+          VITE_DISCORD_REPORT_BUG_WEBHOOK_URL: ${{ secrets.DISCORD_REPORT_BUG_WEBHOOK_URL }}
+          VITE_DISCORD_REPORT_CONTENT_WEBHOOK_URL: ${{ secrets.DISCORD_REPORT_CONTENT_WEBHOOK_URL }}
+          VITE_DISCORD_APPLICATIONS_WEBHOOK_URL: ${{ secrets.DISCORD_APPLICATIONS_WEBHOOK_URL }}
+          VITE_FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
+          VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.FIREBASE_AUTH_DOMAIN }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+          VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.FIREBASE_STORAGE_BUCKET }}
+          VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}
+          VITE_FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
+          VITE_FIREBASE_MEASUREMENT_ID: ${{ secrets.FIREBASE_MEASUREMENT_ID }}
+          VITE_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          VITE_SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+
+      - name: Package with electron-builder
+        run: npx electron-builder --linux flatpak --publish never
+        env:
+          DEBUG: electron-builder
+
+      - name: Upload Flatpak to release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release/**/*.flatpak
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - run: npm ci
+
+      - name: Build web assets
+        run: npm run build:web
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096
+          VITE_DISCORD_FEEDBACK_WEBHOOK_URL: ${{ secrets.DISCORD_FEEDBACK_WEBHOOK_URL }}
+          VITE_DISCORD_REPORT_BUG_WEBHOOK_URL: ${{ secrets.DISCORD_REPORT_BUG_WEBHOOK_URL }}
+          VITE_DISCORD_REPORT_CONTENT_WEBHOOK_URL: ${{ secrets.DISCORD_REPORT_CONTENT_WEBHOOK_URL }}
+          VITE_DISCORD_APPLICATIONS_WEBHOOK_URL: ${{ secrets.DISCORD_APPLICATIONS_WEBHOOK_URL }}
+          VITE_FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
+          VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.FIREBASE_AUTH_DOMAIN }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+          VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.FIREBASE_STORAGE_BUCKET }}
+          VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}
+          VITE_FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
+          VITE_FIREBASE_MEASUREMENT_ID: ${{ secrets.FIREBASE_MEASUREMENT_ID }}
+          VITE_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          VITE_SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+
+      - name: Sync Capacitor
+        run: npx cap sync android
+
+      - name: Remove machine-specific JDK pin (CI provides JDK 21)
+        run: sed -i '/^org.gradle.java.home=/d' android/gradle.properties
+
+      - name: Build debug APK
+        run: ./gradlew assembleDebug
+        working-directory: android
+
+      - name: Rename APK
+        run: mv android/app/build/outputs/apk/debug/app-debug.apk fultimator-android.apk
+
+      - name: Upload APK to release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: fultimator-android.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
