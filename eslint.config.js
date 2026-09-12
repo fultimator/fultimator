@@ -4,6 +4,7 @@ import reactPlugin from "eslint-plugin-react";
 import reactRefreshPlugin from "eslint-plugin-react-refresh";
 import reactHooksPlugin from "eslint-plugin-react-hooks";
 import eslintConfigPrettier from "eslint-config-prettier";
+import globals from "globals";
 
 export default [
   {
@@ -120,6 +121,13 @@ export default [
     files: ["**/*.{ts,tsx}"],
     rules: {
       "no-undef": "off",
+    },
+  },
+  {
+    // Node scripts run outside the browser/bundler.
+    files: ["scripts/**/*.mjs"],
+    languageOptions: {
+      globals: globals.node,
     },
   },
   eslintConfigPrettier,
