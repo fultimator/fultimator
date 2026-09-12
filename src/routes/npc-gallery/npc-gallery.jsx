@@ -205,15 +205,18 @@ function Personal() {
     defaultCreateNpcOptions,
   );
 
-  const npcQuery = useMemo(
-    () =>
-      db.query(
-        db.collection("npc-personal"),
-        db.orderBy("lvl", "asc"),
-        db.orderBy("name", "asc"),
-      ),
-    [db],
-  );
+  const npcQuery = useMemo(() => {
+    const constraints =
+      dbMode === "cloud" && cloudUser
+        ? [db.where("uid", "==", cloudUser.uid)]
+        : [];
+    return db.query(
+      db.collection("npc-personal"),
+      ...constraints,
+      db.orderBy("lvl", "asc"),
+      db.orderBy("name", "asc"),
+    );
+  }, [db, dbMode, cloudUser]);
   const [personalList, loading, err] = db.useCollectionData(npcQuery);
 
   const staleNpcs = useMemo(() => {

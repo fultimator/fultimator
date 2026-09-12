@@ -189,10 +189,13 @@ function Personal() {
   const cloudDb = useDatabase("cloud");
   const [download] = useDownload();
 
-  const playerQuery = useMemo(
-    () => db.query(db.collection("player-personal")),
-    [db],
-  );
+  const playerQuery = useMemo(() => {
+    const constraints =
+      dbMode === "cloud" && cloudUser
+        ? [db.where("uid", "==", cloudUser.uid)]
+        : [];
+    return db.query(db.collection("player-personal"), ...constraints);
+  }, [db, dbMode, cloudUser]);
   const [personalList, loading, err] = db.useCollectionData(playerQuery);
 
   const [snackMsg, setSnackMsg] = useState(null);

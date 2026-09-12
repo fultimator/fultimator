@@ -74,14 +74,20 @@ export default function Combat() {
 
 function AuthCombat() {
   const { t } = useTranslate();
+  const { cloudUser } = useDatabaseContext();
   const db = useDatabase("cloud");
 
   const [personalList, setPersonalList] = useState<TypeNpc[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!cloudUser) {
+      setLoading(false);
+      return;
+    }
     const q = db.query(
       db.collection("npc-personal"),
+      db.where("uid", "==", cloudUser.uid),
       db.orderBy("lvl", "asc"),
       db.orderBy("name", "asc"),
     );
@@ -93,7 +99,7 @@ function AuthCombat() {
       )
       .catch((e) => console.error("Error loading NPCs:", e))
       .finally(() => setLoading(false));
-  }, [db]);
+  }, [db, cloudUser]);
 
   const [npcs, setNpcs] = useState<TypeNpc[]>([]);
 
