@@ -72,6 +72,7 @@ import {
   isSpeciesGrantApplied,
 } from "/src/libs/quickAssembly/speciesGrants";
 import CompendiumViewerModal from "/src/components/compendium/CompendiumViewerModal";
+import DeleteConfirmationDialog from "/src/components/common/DeleteConfirmationDialog";
 
 const ROLE_OPTIONS = QA_ROLE_KEYS.map((key) => ({
   value: key,
@@ -103,6 +104,7 @@ export default function EditQuickAssembly({ npc, setNpc }) {
   const [activeSlot, setActiveSlot] = React.useState(null);
   const [activeStep, setActiveStep] = React.useState(0);
   const [showAll, setShowAll] = React.useState(false);
+  const [pendingDelete, setPendingDelete] = React.useState(null);
   const background =
     theme.mode === "dark"
       ? `linear-gradient(to right, ${theme.primary}, ${theme.quaternary})`
@@ -191,6 +193,64 @@ export default function EditQuickAssembly({ npc, setNpc }) {
       ...prev,
       [ref.list]: (prev[ref.list] ?? []).filter((_, i) => i !== ref.index),
     }));
+
+  const requestRemoveReference = (ref) =>
+    setPendingDelete({
+      title: t("role_qa_remove_skill_title"),
+      message: t("role_qa_remove_skill_confirm"),
+      itemPreview: (
+        <Typography variant="h4">
+          {ref.name || t("role_grant_roleSkill")}
+        </Typography>
+      ),
+      onConfirm: () => removeReference(ref),
+    });
+
+  const negativeSkills = npc.qaNegativeSkills ?? [];
+
+  const addNegativeSkill = () =>
+    setNpc((prev) => ({
+      ...prev,
+      qaNegativeSkills: [
+        ...(prev.qaNegativeSkills ?? []),
+        { id: crypto.randomUUID(), bonusKind: "roleSkill" },
+      ],
+    }));
+
+  const setNegativeBonusKind = (id, bonusKind) =>
+    setNpc((prev) => ({
+      ...prev,
+      qaNegativeSkills: (prev.qaNegativeSkills ?? []).map((n) =>
+        n.id === id ? { ...n, bonusKind } : n,
+      ),
+    }));
+
+  const removeNegativeSkill = (id) =>
+    setNpc((prev) => {
+      const slots = new Set([`neg-${id}-drawback`, `neg-${id}-bonus`]);
+      const strip = (arr) =>
+        (arr ?? []).filter((s) => !(s._qaAdded && slots.has(s._qaSlot)));
+      return {
+        ...prev,
+        qaNegativeSkills: (prev.qaNegativeSkills ?? []).filter(
+          (n) => n.id !== id,
+        ),
+        special: strip(prev.special),
+        actions: strip(prev.actions),
+      };
+    });
+
+  const requestRemoveNegativeSkill = (id, index) =>
+    setPendingDelete({
+      title: t("role_qa_remove_negative_title"),
+      message: t("role_qa_remove_negative_confirm"),
+      itemPreview: (
+        <Typography variant="h4">
+          {t("role_negative_skill")} {index + 1}
+        </Typography>
+      ),
+      onConfirm: () => removeNegativeSkill(id),
+    });
 
   // Route and combat-sim modal use different anchor ids; try both.
   const scrollToSection = (list) => {
@@ -416,6 +476,7 @@ export default function EditQuickAssembly({ npc, setNpc }) {
             <Tooltip title={t("role_reapply_hint")}>
               <Button
                 fullWidth
+                size="small"
                 variant="outlined"
                 startIcon={<Refresh />}
                 onClick={() => seedRole(npc.role)}
@@ -482,7 +543,7 @@ export default function EditQuickAssembly({ npc, setNpc }) {
               {t("role_step_grants")}
             </StepLabel>
             <StepContent>
-              {allGrants.length > 0 && (
+              {(allGrants.length > 0 || rankGrants.length > 0) && (
                 <>
                   <Typography
                     variant="caption"
@@ -491,75 +552,232 @@ export default function EditQuickAssembly({ npc, setNpc }) {
                   >
                     {t("role_progression_hint")}
                   </Typography>
-                  <Stack spacing={1} sx={{ mb: rankGrants.length ? 2 : 0 }}>
-                    {allGrants
-                      .filter(
-                        (grant) => !grant.locked || activeStep === 1 || showAll,
-                      )
-                      .map((grant, i) => {
-                        const slotId = grantSlotId(grant, grant.source, i);
+                  <TableContainer sx={{ overflowX: "auto" }}>
+                    <Table size="small">
+                      <TableBody>
+                        {allGrants
+                          .filter(
+                            (grant) =>
+                              !grant.locked || activeStep === 1 || showAll,
+                          )
+                          .map((grant, i) => {
+                            const slotId = grantSlotId(grant, grant.source, i);
+                            return (
+                              <GrantRow
+                                key={`${grant.level}-${grant.kind}`}
+                                grant={grant}
+                                locked={grant.locked}
+                                npc={npc}
+                                t={t}
+                                onToggleAffinity={toggleAffinity}
+                                onToggleStatusImmunity={toggleStatusImmunity}
+                                onToggleFeature={toggleFeature}
+                                onToggleDefBonus={toggleDefBonus}
+                                onOpenCompendium={openCompendium}
+                                slotId={slotId}
+                                qaSpecials={qaSpecialsForSlot(slotId)}
+                                onRemoveReference={requestRemoveReference}
+                                onScrollTo={scrollToSection}
+                              />
+                            );
+                          })}
+                        {rankGrants.length > 0 && (
+                          <TableRow>
+                            <TableCell
+                              colSpan={2}
+                              sx={{ borderBottom: "none", pt: 2 }}
+                            >
+                              <Typography
+                                variant="overline"
+                                color="text.secondary"
+                                sx={{ display: "block", lineHeight: 1.6 }}
+                              >
+                                {t("role_rank_grants")}
+                              </Typography>
+                              <Typography
+                                variant="caption"
+                                color="text.secondary"
+                                sx={{ display: "block" }}
+                              >
+                                {t("role_rank_grants_hint")}
+                              </Typography>
+                            </TableCell>
+                          </TableRow>
+                        )}
+                        {rankGrants.map((grant, i) => {
+                          const slotId = grantSlotId(grant, "rank", i);
+                          return (
+                            <GrantRow
+                              key={`rank-${grant.kind}-${i}`}
+                              grant={grant}
+                              npc={npc}
+                              t={t}
+                              onToggleAffinity={toggleAffinity}
+                              onToggleStatusImmunity={toggleStatusImmunity}
+                              onToggleFeature={toggleFeature}
+                              onToggleDefBonus={toggleDefBonus}
+                              onOpenCompendium={openCompendium}
+                              slotId={slotId}
+                              qaSpecials={qaSpecialsForSlot(slotId)}
+                              onRemoveReference={requestRemoveReference}
+                              onScrollTo={scrollToSection}
+                            />
+                          );
+                        })}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </>
+              )}
+            </StepContent>
+          </Step>
+
+          <Step expanded={showAll || undefined} active={activeStep === 2}>
+            <StepLabel
+              onClick={() => setActiveStep(2)}
+              sx={{ cursor: "pointer" }}
+              optional={
+                <Typography variant="caption" color="text.secondary">
+                  {t("role_step_optional")}
+                </Typography>
+              }
+            >
+              {t("role_step_negative_skills")}
+            </StepLabel>
+            <StepContent>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ display: "block", mb: 1.5 }}
+              >
+                {t("role_negative_skills_hint")}
+              </Typography>
+              {negativeSkills.length > 0 && (
+                <TableContainer sx={{ overflowX: "auto" }}>
+                  <Table
+                    size="small"
+                    sx={{ "& td, & th": { verticalAlign: "middle" } }}
+                  >
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>{t("role_negative_drawback")}</TableCell>
+                        <TableCell>{t("role_negative_grants")}</TableCell>
+                        <TableCell>{t("role_negative_bonus_skill")}</TableCell>
+                        <TableCell padding="checkbox" />
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {negativeSkills.map((neg, i) => {
+                        const drawbackSlot = `neg-${neg.id}-drawback`;
+                        const bonusSlot = `neg-${neg.id}-bonus`;
                         return (
-                          <GrantRow
-                            key={`${grant.level}-${grant.kind}`}
-                            grant={grant}
-                            locked={grant.locked}
-                            npc={npc}
-                            t={t}
-                            onToggleAffinity={toggleAffinity}
-                            onToggleStatusImmunity={toggleStatusImmunity}
-                            onToggleFeature={toggleFeature}
-                            onToggleDefBonus={toggleDefBonus}
-                            onOpenCompendium={openCompendium}
-                            slotId={slotId}
-                            qaSpecials={qaSpecialsForSlot(slotId)}
-                            onRemoveReference={removeReference}
-                            onScrollTo={scrollToSection}
-                          />
+                          <TableRow key={neg.id}>
+                            <TableCell>
+                              <Box
+                                sx={{
+                                  display: "inline-flex",
+                                  maxWidth: "100%",
+                                }}
+                              >
+                                <GrantFiller
+                                  grant={{ kind: "roleSkill" }}
+                                  npc={npc}
+                                  t={t}
+                                  slotId={drawbackSlot}
+                                  qaSpecials={qaSpecialsForSlot(drawbackSlot)}
+                                  onOpenCompendium={openCompendium}
+                                  onRemoveReference={requestRemoveReference}
+                                  onScrollTo={scrollToSection}
+                                />
+                              </Box>
+                            </TableCell>
+                            <TableCell>
+                              <Stack
+                                direction="row"
+                                spacing={0.5}
+                                sx={{ flexWrap: "wrap", gap: 0.5 }}
+                              >
+                                <Chip
+                                  size="small"
+                                  label={t("role_grant_roleSkill")}
+                                  color={
+                                    neg.bonusKind === "roleSkill"
+                                      ? "primary"
+                                      : "default"
+                                  }
+                                  variant={
+                                    neg.bonusKind === "roleSkill"
+                                      ? "filled"
+                                      : "outlined"
+                                  }
+                                  onClick={() =>
+                                    setNegativeBonusKind(neg.id, "roleSkill")
+                                  }
+                                />
+                                <Chip
+                                  size="small"
+                                  label={t("role_grant_bossSkill")}
+                                  color={
+                                    neg.bonusKind === "bossSkill"
+                                      ? "primary"
+                                      : "default"
+                                  }
+                                  variant={
+                                    neg.bonusKind === "bossSkill"
+                                      ? "filled"
+                                      : "outlined"
+                                  }
+                                  onClick={() =>
+                                    setNegativeBonusKind(neg.id, "bossSkill")
+                                  }
+                                />
+                              </Stack>
+                            </TableCell>
+                            <TableCell>
+                              <Box
+                                sx={{
+                                  display: "inline-flex",
+                                  maxWidth: "100%",
+                                }}
+                              >
+                                <GrantFiller
+                                  grant={{ kind: neg.bonusKind }}
+                                  npc={npc}
+                                  t={t}
+                                  slotId={bonusSlot}
+                                  qaSpecials={qaSpecialsForSlot(bonusSlot)}
+                                  onOpenCompendium={openCompendium}
+                                  onRemoveReference={requestRemoveReference}
+                                  onScrollTo={scrollToSection}
+                                />
+                              </Box>
+                            </TableCell>
+                            <TableCell align="right" padding="checkbox">
+                              <IconButton
+                                size="small"
+                                color="error"
+                                onClick={() =>
+                                  requestRemoveNegativeSkill(neg.id, i)
+                                }
+                              >
+                                <Delete fontSize="small" />
+                              </IconButton>
+                            </TableCell>
+                          </TableRow>
                         );
                       })}
-                  </Stack>
-                </>
+                    </TableBody>
+                  </Table>
+                </TableContainer>
               )}
-              {rankGrants.length > 0 && (
-                <>
-                  <Typography
-                    variant="overline"
-                    color="text.secondary"
-                    sx={{ display: "block", lineHeight: 1.6 }}
-                  >
-                    {t("role_rank_grants")}
-                  </Typography>
-                  <Typography
-                    variant="caption"
-                    color="text.secondary"
-                    sx={{ display: "block", mb: 1 }}
-                  >
-                    {t("role_rank_grants_hint")}
-                  </Typography>
-                  <Stack spacing={1}>
-                    {rankGrants.map((grant, i) => {
-                      const slotId = grantSlotId(grant, "rank", i);
-                      return (
-                        <GrantRow
-                          key={`rank-${grant.kind}-${i}`}
-                          grant={grant}
-                          npc={npc}
-                          t={t}
-                          onToggleAffinity={toggleAffinity}
-                          onToggleStatusImmunity={toggleStatusImmunity}
-                          onToggleFeature={toggleFeature}
-                          onToggleDefBonus={toggleDefBonus}
-                          onOpenCompendium={openCompendium}
-                          slotId={slotId}
-                          qaSpecials={qaSpecialsForSlot(slotId)}
-                          onRemoveReference={removeReference}
-                          onScrollTo={scrollToSection}
-                        />
-                      );
-                    })}
-                  </Stack>
-                </>
-              )}
+              <Button
+                size="small"
+                startIcon={<AutoFixHigh />}
+                onClick={addNegativeSkill}
+                sx={{ mt: negativeSkills.length ? 1.5 : 0 }}
+              >
+                {t("role_negative_add")}
+              </Button>
             </StepContent>
           </Step>
 
@@ -569,7 +787,7 @@ export default function EditQuickAssembly({ npc, setNpc }) {
               completed={speciesChosen >= speciesChooseTarget}
             >
               <StepLabel
-                onClick={() => setActiveStep(2)}
+                onClick={() => setActiveStep(3)}
                 sx={{ cursor: "pointer" }}
                 optional={
                   <Typography variant="caption" color="text.secondary">
@@ -700,7 +918,7 @@ export default function EditQuickAssembly({ npc, setNpc }) {
                           selected={!!npc.qaSelections?.[slotId]}
                           slotId={slotId}
                           qaSpecials={qaSpecialsForSlot(slotId)}
-                          onRemoveReference={removeReference}
+                          onRemoveReference={requestRemoveReference}
                           onScrollTo={scrollToSection}
                         />
                       );
@@ -743,6 +961,16 @@ export default function EditQuickAssembly({ npc, setNpc }) {
             ],
           }));
         }}
+      />
+
+      <DeleteConfirmationDialog
+        open={!!pendingDelete}
+        onClose={() => setPendingDelete(null)}
+        onConfirm={() => pendingDelete?.onConfirm?.()}
+        title={pendingDelete?.title ?? ""}
+        message={pendingDelete?.message ?? ""}
+        itemPreview={pendingDelete?.itemPreview}
+        enableCtrlBypass={false}
       />
     </Card>
   );
@@ -808,8 +1036,8 @@ function StatChangesTable({ rows, currentLevel, t }) {
   );
 }
 
-// A single unlocked grant slot: label on the left, kind-specific filler on the right.
-// "Done" is derived from the NPC fields, never stored.
+// A single unlocked grant slot rendered as a table row: label cell on the left,
+// kind-specific filler cell on the right. "Done" is derived from NPC fields.
 function GrantRow({
   grant,
   locked,
@@ -832,43 +1060,53 @@ function GrantRow({
   const noteKey = grant.note ? NOTE_KEYS[grant.note] : null;
 
   return (
-    <Box
+    <TableRow
       sx={{
-        display: "flex",
-        flexWrap: "wrap",
-        alignItems: "center",
-        gap: 1,
-        justifyContent: "space-between",
         opacity: locked ? 0.45 : 1,
         pointerEvents: locked ? "none" : "auto",
       }}
     >
-      <Typography variant="body2" sx={{ flex: "1 1 200px" }}>
-        {label}
-        {noteKey && (
-          <Typography component="span" variant="caption" color="text.secondary">
-            {" - "}
-            {t(noteKey)}
-          </Typography>
-        )}
-      </Typography>
-      <Box sx={{ flex: "0 0 auto" }}>
-        <GrantFiller
-          grant={grant}
-          npc={npc}
-          t={t}
-          onToggleAffinity={onToggleAffinity}
-          onToggleStatusImmunity={onToggleStatusImmunity}
-          onToggleFeature={onToggleFeature}
-          onToggleDefBonus={onToggleDefBonus}
-          onOpenCompendium={onOpenCompendium}
-          slotId={slotId}
-          qaSpecials={qaSpecials}
-          onRemoveReference={onRemoveReference}
-          onScrollTo={onScrollTo}
-        />
-      </Box>
-    </Box>
+      <TableCell sx={{ verticalAlign: "middle" }}>
+        <Typography variant="body2">
+          {label}
+          {noteKey && (
+            <Typography
+              component="span"
+              variant="caption"
+              color="text.secondary"
+            >
+              {" - "}
+              {t(noteKey)}
+            </Typography>
+          )}
+        </Typography>
+      </TableCell>
+      <TableCell align="right" sx={{ verticalAlign: "middle" }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "flex-end",
+            flexWrap: "wrap",
+            gap: 0.5,
+          }}
+        >
+          <GrantFiller
+            grant={grant}
+            npc={npc}
+            t={t}
+            onToggleAffinity={onToggleAffinity}
+            onToggleStatusImmunity={onToggleStatusImmunity}
+            onToggleFeature={onToggleFeature}
+            onToggleDefBonus={onToggleDefBonus}
+            onOpenCompendium={onOpenCompendium}
+            slotId={slotId}
+            qaSpecials={qaSpecials}
+            onRemoveReference={onRemoveReference}
+            onScrollTo={onScrollTo}
+          />
+        </Box>
+      </TableCell>
+    </TableRow>
   );
 }
 
@@ -1003,6 +1241,7 @@ function GrantFiller({
           <Button
             size="small"
             variant={precisionOn ? "contained" : "outlined"}
+            color={precisionOn ? "success" : "primary"}
             startIcon={precisionOn ? <Check /> : undefined}
             onClick={() => {
               onToggleFeature("precision");
@@ -1014,6 +1253,7 @@ function GrantFiller({
           <Button
             size="small"
             variant={magicOn ? "contained" : "outlined"}
+            color={magicOn ? "success" : "primary"}
             startIcon={magicOn ? <Check /> : undefined}
             onClick={() => {
               onToggleFeature("magic");
@@ -1124,8 +1364,8 @@ function QaReferenceChip({ reference, t, onClick, onDelete }) {
     <Tooltip title={t("role_qa_ref_jump", [name])}>
       <Chip
         size="small"
-        color="secondary"
-        variant="outlined"
+        color="primary"
+        variant="filled"
         label={name}
         onClick={onClick}
         onDelete={onDelete}
@@ -1340,12 +1580,10 @@ function SpeciesGrantFiller({
               <Chip
                 key={opt.fuid}
                 size="small"
-                icon={on ? <Check /> : undefined}
                 label={opt.name}
-                color={on ? "success" : "default"}
+                color={on ? "primary" : "default"}
                 variant={on ? "filled" : "outlined"}
                 onClick={() => onToggleSpell(opt.fuid)}
-                onDelete={on ? () => onToggleSpell(opt.fuid) : undefined}
               />
             );
           })}
