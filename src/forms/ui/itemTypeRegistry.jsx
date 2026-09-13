@@ -110,6 +110,7 @@ export const ITEM_TYPE_REGISTRY = {
     groups: [
       { key: "core", label: "Core", cols: 2 },
       { key: "body", label: "Body", cols: 1 },
+      { key: "resource", label: "Resource Points", cols: 2 },
       { key: "meta", label: "Meta", cols: 2 },
     ],
     PreviewCard: HeroicPreviewCard,

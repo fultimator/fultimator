@@ -61,3 +61,38 @@ export function useNumericClock(maxSections, value, onChange) {
 
   return { filledCount: value, state, set, increment, decrement, reset };
 }
+
+/**
+ * Business logic for a resource-point track (skill resource points).
+ * Like a numeric clock, but max can be 0 to mean "uncapped" (grows without
+ * limit), and increments/decrements move by a configurable step.
+ *
+ * @param {number}   max      - Maximum value; 0 means uncapped
+ * @param {number}   value    - Current value
+ * @param {function} onChange - Called with the new numeric value
+ * @param {number}   step     - Amount added/removed per increment/decrement (default 1)
+ */
+export function useResourceTrack(max, value, onChange, step = 1) {
+  const cap = max === 0 ? Infinity : max;
+
+  const increment = () => onChange(Math.min(value + step, cap));
+  const decrement = () => onChange(Math.max(value - step, 0));
+  const set = (n) => onChange(Math.min(Math.max(n, 0), cap));
+  const reset = () => onChange(0);
+
+  const isMax = value >= cap;
+  const isMin = value <= 0;
+
+  return {
+    current: value,
+    max,
+    cap,
+    step,
+    isMax,
+    isMin,
+    set,
+    increment,
+    decrement,
+    reset,
+  };
+}

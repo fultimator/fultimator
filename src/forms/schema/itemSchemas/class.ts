@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { MetaSchema } from "../meta";
 import { BehaviorSchema } from "../shared/behaviorSchemas";
+import { ResourceTrackSchema } from "../shared/resourceTrackSchema";
 import { PlayerSpellSchema } from "./spells";
 
 export const SkillSchema = z.looseObject({
@@ -11,6 +12,7 @@ export const SkillSchema = z.looseObject({
   description: z.string().default(""),
   specialSkill: z.string().default(""),
   behaviors: z.array(BehaviorSchema).optional(),
+  resource: ResourceTrackSchema.optional(),
 });
 
 export const HeroicSkillSchema = z.object({
@@ -21,6 +23,7 @@ export const HeroicSkillSchema = z.object({
   specialSkill: z.string().optional(),
   meta: MetaSchema.optional(),
   behaviors: z.array(BehaviorSchema).optional(),
+  resource: ResourceTrackSchema.optional(),
 });
 
 export const BenefitOtherSchema = z.object({

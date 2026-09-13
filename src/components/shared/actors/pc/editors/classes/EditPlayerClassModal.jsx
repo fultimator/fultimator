@@ -16,6 +16,7 @@ import { createDefaultStateFromFields } from "/src/forms/registry/helpers";
 import { SharedClassCard } from "/src/components/shared/items/class/SharedClassCards";
 import PanelLayout from "/src/forms/ui/PanelLayout";
 import DeleteConfirmationDialog from "/src/components/common/DeleteConfirmationDialog";
+import { emptyResourceTrack } from "/src/forms/schema/shared/resourceTrackSchema";
 
 // Map player class object → schema form state
 function playerClassToFormState(cls) {
@@ -26,6 +27,7 @@ function playerClassToFormState(cls) {
     maxLvl: 1,
     description: "",
     specialSkill: "",
+    resource: emptyResourceTrack(),
   };
   const skills = Array.from({ length: 5 }, (_, i) => {
     const s = cls.skills?.[i];
@@ -36,6 +38,7 @@ function playerClassToFormState(cls) {
       maxLvl: s.maxLvl ?? 1,
       description: s.description ?? "",
       specialSkill: s.specialSkill ?? "",
+      resource: s.resource ?? emptyResourceTrack(),
     };
   });
   return {
@@ -79,6 +82,7 @@ function formStateToClassPatch(formState) {
       currentLvl: 0,
       description: s.description ?? "",
       specialSkill: s.specialSkill ?? "",
+      ...(s.resource?.enabled ? { resource: s.resource } : {}),
     }));
 
   return {

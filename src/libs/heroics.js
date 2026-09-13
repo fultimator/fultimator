@@ -436,6 +436,15 @@ const heroics = [
     source: t("rising_tide_source", true),
     applicableTo: ["Fury", "Weaponmaster"],
     meta: { book: "high", page: "", isOfficial: true },
+    resource: {
+      enabled: true,
+      name: t("rising_tide_points", true),
+      current: 0,
+      step: 1,
+      max: 0,
+      maxScalesWithLevel: false,
+      maxLevelBonus: 0,
+    },
   },
   {
     fuid: "ritual-seals",
@@ -472,6 +481,15 @@ const heroics = [
     source: t("swirling_swarm_source", true),
     applicableTo: ["Dancer", "Fury", "Sharpshooter"],
     meta: { book: "high", page: "", isOfficial: true },
+    resource: {
+      enabled: true,
+      name: t("swirling_swarm_points", true),
+      current: 0,
+      step: 1,
+      max: 5,
+      maxScalesWithLevel: false,
+      maxLevelBonus: 0,
+    },
   },
   {
     fuid: "tabula-rasa",
@@ -618,6 +636,15 @@ const heroics = [
     source: t("nebulization_source", true),
     applicableTo: ["Tinkerer"],
     meta: { book: "techno", page: "", isOfficial: true },
+    resource: {
+      enabled: true,
+      name: t("nebulization_points", true),
+      current: 0,
+      step: 1,
+      max: 5,
+      maxScalesWithLevel: false,
+      maxLevelBonus: 0,
+    },
   },
   {
     fuid: "overload-burst",

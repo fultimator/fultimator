@@ -18,6 +18,10 @@ const BLANK_SKILL = {
   specialSkill: "",
 };
 
+type ResourceRow = {
+  resource?: { enabled?: boolean; maxScalesWithLevel?: boolean };
+};
+
 // Group special skills by class name for the grouped-select.
 const groupedSpecialSkills = specialSkillsList.reduce<
   Record<string, { name: string; fuid: string }[]>
@@ -105,6 +109,77 @@ const skillRowFields: ItemFieldConfig<Record<string, unknown>> = [
     componentProps: {
       groups: specialSkillGroups,
       allowClear: true,
+    },
+  },
+  {
+    key: "resource.enabled",
+    kind: "editable",
+    label: "class_skill_resource_enabled",
+    component: "checkbox",
+    defaultValue: false,
+    order: 5,
+    gridSize: 12,
+  },
+  {
+    key: "resource.name",
+    kind: "editable",
+    label: "class_skill_resource_name",
+    component: "text",
+    defaultValue: "",
+    order: 6,
+    gridSize: { xs: 12, sm: 6 },
+    componentProps: { maxLength: 50 },
+    dependencies: (row) => !!(row as ResourceRow).resource?.enabled,
+  },
+  {
+    key: "resource.step",
+    kind: "editable",
+    label: "class_skill_resource_step",
+    component: "number",
+    defaultValue: 1,
+    order: 7,
+    gridSize: { xs: 6, sm: 3 },
+    parse: (v) => Math.max(1, Number(v) || 1),
+    validationHints: { min: 1 },
+    dependencies: (row) => !!(row as ResourceRow).resource?.enabled,
+  },
+  {
+    key: "resource.maxScalesWithLevel",
+    kind: "editable",
+    label: "class_skill_resource_max_scales_with_level",
+    component: "checkbox",
+    defaultValue: false,
+    order: 8,
+    gridSize: 12,
+    dependencies: (row) => !!(row as ResourceRow).resource?.enabled,
+  },
+  {
+    key: "resource.max",
+    kind: "editable",
+    label: "class_skill_resource_max",
+    component: "number",
+    defaultValue: 0,
+    order: 9,
+    gridSize: { xs: 6, sm: 3 },
+    parse: (v) => Math.max(0, Number(v) || 0),
+    validationHints: { min: 0 },
+    dependencies: (row) => {
+      const r = (row as ResourceRow).resource;
+      return !!r?.enabled && !r?.maxScalesWithLevel;
+    },
+  },
+  {
+    key: "resource.maxLevelBonus",
+    kind: "editable",
+    label: "class_skill_resource_max_level_bonus",
+    component: "number",
+    defaultValue: 0,
+    order: 10,
+    gridSize: { xs: 6, sm: 3 },
+    parse: (v) => Number(v) || 0,
+    dependencies: (row) => {
+      const r = (row as ResourceRow).resource;
+      return !!r?.enabled && !!r?.maxScalesWithLevel;
     },
   },
 ];
