@@ -602,6 +602,32 @@ export const SharedClassCard = React.memo(function SharedClassCard({
         imageSlot={imageSlot}
         customTheme={customTheme}
       >
+        {item.also?.trim() && (
+          <Box
+            sx={{
+              background,
+              px: 2,
+              py: 1,
+              borderBottom: `1px solid ${customTheme.secondary}`,
+            }}
+          >
+            <Typography variant="body2">
+              <Box
+                component="span"
+                sx={{
+                  fontWeight: "bold",
+                  textTransform: "uppercase",
+                  fontSize: "0.75rem",
+                  letterSpacing: "0.05em",
+                }}
+              >
+                {t("Also")}:
+              </Box>{" "}
+              {item.also}
+            </Typography>
+          </Box>
+        )}
+
         {benefitLines.length > 0 && (
           <Box
             sx={{
@@ -772,36 +798,47 @@ export const SharedClassCard = React.memo(function SharedClassCard({
         )}
 
         {item.skills?.map((skill, i) => (
-          <Box
-            key={i}
-            sx={{
-              borderBottom:
-                i < (item.skills?.length ?? 0) - 1
-                  ? `1px solid ${customTheme.secondary}`
-                  : undefined,
-            }}
-          >
+          <Box key={i}>
             <Box
               sx={{
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
+                gap: 1,
                 px: 2,
-                pt: 0.75,
-                pb: 0.25,
+                py: 0.5,
+                background: customTheme.primary,
+                color: "#ffffff",
+                borderTop: `1px solid ${customTheme.secondary}`,
               }}
             >
-              <Typography variant="body2" sx={{ fontWeight: "bold" }}>
-                {t(skill.skillName)}
+              <Typography
+                sx={{
+                  color: "inherit",
+                  fontFamily: "Antonio",
+                  fontWeight: "bold",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.5px",
+                  fontSize: scale.body,
+                  lineHeight: 1.4,
+                }}
+              >
+                {t(skill.skillName ?? skill.name)}
               </Typography>
               <Chip
                 label={`Max ${skill.maxLvl}`}
                 size="small"
-                variant="outlined"
-                sx={{ fontSize: "0.65rem", height: 18, flexShrink: 0 }}
+                sx={{
+                  fontSize: "0.65rem",
+                  height: 18,
+                  flexShrink: 0,
+                  backgroundColor: "rgba(255,255,255,0.2)",
+                  color: "#ffffff",
+                  fontWeight: "bold",
+                }}
               />
             </Box>
-            <Box sx={{ px: 2, pb: 0.75 }}>
+            <Box sx={{ px: 2, py: 0.75 }}>
               <Typography
                 variant="body2"
                 component="div"

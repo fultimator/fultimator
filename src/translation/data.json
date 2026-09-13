@@ -17028,6 +17028,30 @@
     "ru": "Name"
   },
   {
+    "key": "class.also",
+    "en": "Also",
+    "it": "Also",
+    "de": "Also",
+    "pl": "Also",
+    "fr": "Also",
+    "es": "Also",
+    "pt-BR": "Also",
+    "zh": "Also",
+    "ru": "Also"
+  },
+  {
+    "key": "class.skill.name",
+    "en": "Skill Name",
+    "it": "Skill Name",
+    "de": "Skill Name",
+    "pl": "Skill Name",
+    "fr": "Skill Name",
+    "es": "Skill Name",
+    "pt-BR": "Skill Name",
+    "zh": "Skill Name",
+    "ru": "Skill Name"
+  },
+  {
     "key": "class.skills",
     "en": "Skills",
     "it": "Skills",

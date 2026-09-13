@@ -50,6 +50,7 @@ export const ClassBenefitsSchema = z.object({
 export const ClassSchema = z.object({
   itemType: z.literal("class").default("class"),
   name: z.string().min(1),
+  also: z.string().default(""),
   fuid: z.string().optional(),
   lvl: z.number().int().default(1),
   meta: MetaSchema.optional(),

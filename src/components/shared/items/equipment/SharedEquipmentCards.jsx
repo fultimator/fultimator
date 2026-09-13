@@ -1314,37 +1314,48 @@ export const SharedMnemosphereCard = React.memo(function SharedMnemosphereCard({
         <Divider />
 
         {skills.map((sk, i) => (
-          <Box
-            key={i}
-            sx={{
-              borderBottom:
-                i < skills.length - 1 || heroic.length > 0 || spells.length > 0
-                  ? `1px solid ${customTheme.secondary}`
-                  : undefined,
-            }}
-          >
+          <Box key={i}>
             <Box
               sx={{
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
+                gap: 1,
                 px: 2,
-                pt: 0.75,
-                pb: 0.25,
+                py: 0.5,
+                background: customTheme.primary,
+                color: "#ffffff",
+                borderTop: `1px solid ${customTheme.secondary}`,
               }}
             >
-              <Typography variant="body2" sx={{ fontWeight: "bold" }}>
-                {t(sk.name)}
+              <Typography
+                sx={{
+                  color: "inherit",
+                  fontFamily: "Antonio",
+                  fontWeight: "bold",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.5px",
+                  fontSize: scale.body,
+                  lineHeight: 1.4,
+                }}
+              >
+                {t(sk.skillName ?? sk.name)}
               </Typography>
               <Chip
                 label={`Max ${sk.maxLvl}`}
                 size="small"
-                variant="outlined"
-                sx={{ fontSize: "0.65rem", height: 18, flexShrink: 0 }}
+                sx={{
+                  fontSize: "0.65rem",
+                  height: 18,
+                  flexShrink: 0,
+                  backgroundColor: "rgba(255,255,255,0.2)",
+                  color: "#ffffff",
+                  fontWeight: "bold",
+                }}
               />
             </Box>
             {sk.description && (
-              <Box sx={{ px: 2, pb: 0.75 }}>
+              <Box sx={{ px: 2, py: 0.75 }}>
                 <Typography
                   variant="body2"
                   component="div"
