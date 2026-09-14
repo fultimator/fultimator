@@ -42,7 +42,7 @@ const NpcImmunitiesSchema = z.object({
 });
 
 const NpcExtraSchema = z.object({
-  statusImmunity: z.number().int().min(0).max(3).optional(),
+  statusImmunity: z.number().min(0).max(3).multipleOf(0.5).optional(),
 });
 
 const NpcFeatureSchema = z.object({

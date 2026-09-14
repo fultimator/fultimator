@@ -378,7 +378,7 @@ export function calcUsedSkills(npc) {
 }
 
 export function calcUsedSkillsFromStatusImmunity(npc) {
-  return parseInt(npc.extra?.statusImmunity) || 0;
+  return parseFloat(npc.extra?.statusImmunity) || 0;
 }
 
 export function calcUsedSkillsFromOtherActions(npc) {

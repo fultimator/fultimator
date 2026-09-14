@@ -48,8 +48,9 @@ export default function EditExtra({ npc, setNpc }) {
 
   const handleStatusImmunityChange = useCallback(
     (e) => {
-      let value = parseInt(e.target.value);
+      let value = parseFloat(e.target.value);
       if (isNaN(value)) value = 0;
+      value = Math.round(value * 2) / 2;
       if (value < 0) value = 0;
       if (value > 3) value = 3;
       setNpc((prev) => ({
@@ -132,9 +133,10 @@ export default function EditExtra({ npc, setNpc }) {
                       type="number"
                       slotProps={{
                         htmlInput: {
-                          inputMode: "numeric",
-                          pattern: "[0-9]*",
+                          inputMode: "decimal",
                           min: 0,
+                          max: 3,
+                          step: 0.5,
                         },
                         formHelperText: {
                           sx: {
@@ -245,9 +247,10 @@ export default function EditExtra({ npc, setNpc }) {
                 type="number"
                 slotProps={{
                   htmlInput: {
-                    inputMode: "numeric",
-                    pattern: "[0-9]*",
+                    inputMode: "decimal",
                     min: 0,
+                    max: 3,
+                    step: 0.5,
                   },
                   formHelperText: {
                     sx: {
