@@ -45,6 +45,7 @@ function playerClassToFormState(cls) {
     ...defaults,
     name: cls.name ?? "",
     also: cls.also ?? "",
+    description: cls.description ?? "",
     fuid: cls.fuid ?? undefined,
     benefits: {
       hpplus: cls.benefits?.hpplus ?? 0,
@@ -89,6 +90,7 @@ function formStateToClassPatch(formState) {
   return {
     name: String(formState.name ?? "").trim(),
     also: String(formState.also ?? "").trim(),
+    description: String(formState.description ?? "").trim(),
     fuid: formState.fuid ?? undefined,
     benefits: {
       hpplus: formState.benefits?.hpplus ?? 0,

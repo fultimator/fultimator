@@ -4636,7 +4636,7 @@
     "en": "Martial",
     "it": "Marziale",
     "de": "Martial",
-    "pl": "Martial",
+    "pl": "Żołnierski/Żołnierskie",
     "fr": "Martial(e)",
     "es": "Marcial",
     "pt-BR": "Marcial",
@@ -5020,7 +5020,7 @@
     "en": "Offensive Spell",
     "it": "Incantesimo Offensivo",
     "de": "Offensiver Zauber",
-    "pl": "Offensive Spell",
+    "pl": "Zaklęcie ofensywne",
     "fr": "Sort Offensif",
     "es": "Hechizo ofensivo",
     "pt-BR": "Feitiço Ofensivo",
@@ -6376,7 +6376,7 @@
     "en": "Total:",
     "it": "Total:",
     "de": "Total:",
-    "pl": "Total:",
+    "pl": "Suma:",
     "fr": "Total:",
     "es": "Total:",
     "pt-BR": "Total:",
@@ -7720,7 +7720,7 @@
     "en": "more...",
     "it": "altri tag...",
     "de": "weitere...",
-    "pl": "more...",
+    "pl": "więcej...",
     "fr": "plus...",
     "es": "más...",
     "pt-BR": "mais...",
@@ -8476,7 +8476,7 @@
     "en": "Add Modifier",
     "it": "Add Modifier",
     "de": "Add Modifier",
-    "pl": "Add Modifier",
+    "pl": "Dodaj modyfikator",
     "fr": "Add Modifier",
     "es": "Add Modifier",
     "pt-BR": "Adicionar Modificador",
@@ -8488,7 +8488,7 @@
     "en": "No modifiers",
     "it": "No modifiers",
     "de": "No modifiers",
-    "pl": "No modifiers",
+    "pl": "Brak modyfikatorów",
     "fr": "No modifiers",
     "es": "No modifiers",
     "pt-BR": "Sem Modificadores",
@@ -10900,7 +10900,7 @@
     "en": "Special",
     "it": "Speciale",
     "de": "Speziell",
-    "pl": "Special",
+    "pl": "Specjalny",
     "fr": "Spécial",
     "es": "Especial",
     "pt-BR": "Especial",
@@ -11308,7 +11308,7 @@
     "en": "Current Rank",
     "it": "Rango Raggiunto",
     "de": "Aktueller Rang",
-    "pl": "Current Rank",
+    "pl": "Obecna ranga",
     "fr": "Rang actuel",
     "es": "Rango actual",
     "pt-BR": "Patente Atual",
@@ -15741,7 +15741,8 @@
     "es": "FUID",
     "pt-BR": "FUID",
     "zh": "FUID",
-    "ru": "FUID"
+    "ru": "FUID",
+    "Column 11": ""
   },
   {
     "key": "shared.name",
@@ -15753,7 +15754,8 @@
     "es": "Name",
     "pt-BR": "Name",
     "zh": "Name",
-    "ru": "Name"
+    "ru": "Name",
+    "Column 11": ""
   },
   {
     "key": "shared.base",
@@ -15765,7 +15767,8 @@
     "es": "Base",
     "pt-BR": "Base",
     "zh": "Base",
-    "ru": "Base"
+    "ru": "Base",
+    "Column 11": ""
   },
   {
     "key": "shared.martial",
@@ -15777,7 +15780,8 @@
     "es": "Martial",
     "pt-BR": "Martial",
     "zh": "Martial",
-    "ru": "Martial"
+    "ru": "Martial",
+    "Column 11": ""
   },
   {
     "key": "shared.description",
@@ -15789,7 +15793,8 @@
     "es": "Description",
     "pt-BR": "Description",
     "zh": "Description",
-    "ru": "Description"
+    "ru": "Description",
+    "Column 11": ""
   },
   {
     "key": "shared.cost",
@@ -15801,7 +15806,8 @@
     "es": "Cost",
     "pt-BR": "Cost",
     "zh": "Cost",
-    "ru": "Cost"
+    "ru": "Cost",
+    "Column 11": ""
   },
   {
     "key": "shared.type",
@@ -15813,7 +15819,8 @@
     "es": "Type",
     "pt-BR": "Type",
     "zh": "Type",
-    "ru": "Type"
+    "ru": "Type",
+    "Column 11": ""
   },
   {
     "key": "shared.category",
@@ -15825,7 +15832,8 @@
     "es": "Category",
     "pt-BR": "Category",
     "zh": "Category",
-    "ru": "Category"
+    "ru": "Category",
+    "Column 11": ""
   },
   {
     "key": "shared.range",
@@ -15837,7 +15845,8 @@
     "es": "Range",
     "pt-BR": "Range",
     "zh": "Range",
-    "ru": "Range"
+    "ru": "Range",
+    "Column 11": ""
   },
   {
     "key": "shared.hands",
@@ -15849,7 +15858,8 @@
     "es": "Hands",
     "pt-BR": "Hands",
     "zh": "Hands",
-    "ru": "Hands"
+    "ru": "Hands",
+    "Column 11": ""
   },
   {
     "key": "shared.class",
@@ -15861,7 +15871,8 @@
     "es": "Class",
     "pt-BR": "Class",
     "zh": "Class",
-    "ru": "Class"
+    "ru": "Class",
+    "Column 11": ""
   },
   {
     "key": "shared.book",
@@ -15873,7 +15884,8 @@
     "es": "Book",
     "pt-BR": "Book",
     "zh": "Book",
-    "ru": "Book"
+    "ru": "Book",
+    "Column 11": ""
   },
   {
     "key": "shared.target",
@@ -15885,7 +15897,8 @@
     "es": "Target",
     "pt-BR": "Target",
     "zh": "Target",
-    "ru": "Target"
+    "ru": "Target",
+    "Column 11": ""
   },
   {
     "key": "shared.maxTargets",
@@ -15897,7 +15910,8 @@
     "es": "Max Targets",
     "pt-BR": "Max Targets",
     "zh": "Max Targets",
-    "ru": "Max Targets"
+    "ru": "Max Targets",
+    "Column 11": ""
   },
   {
     "key": "shared.duration",
@@ -15909,7 +15923,8 @@
     "es": "Duration",
     "pt-BR": "Duration",
     "zh": "Duration",
-    "ru": "Duration"
+    "ru": "Duration",
+    "Column 11": ""
   },
   {
     "key": "shared.offensive",
@@ -15921,7 +15936,8 @@
     "es": "Offensive",
     "pt-BR": "Offensive",
     "zh": "Offensive",
-    "ru": "Offensive"
+    "ru": "Offensive",
+    "Column 11": ""
   },
   {
     "key": "shared.effect",
@@ -15933,7 +15949,8 @@
     "es": "Effect",
     "pt-BR": "Effect",
     "zh": "Effect",
-    "ru": "Effect"
+    "ru": "Effect",
+    "Column 11": ""
   },
   {
     "key": "shared.rework",
@@ -15945,7 +15962,8 @@
     "es": "Rework",
     "pt-BR": "Rework",
     "zh": "Rework",
-    "ru": "Rework"
+    "ru": "Rework",
+    "Column 11": ""
   },
   {
     "key": "shared.isEquipped",
@@ -15957,7 +15975,8 @@
     "es": "Is Equipped",
     "pt-BR": "Is Equipped",
     "zh": "Is Equipped",
-    "ru": "Is Equipped"
+    "ru": "Is Equipped",
+    "Column 11": ""
   },
   {
     "key": "shared.spCost",
@@ -15969,7 +15988,8 @@
     "es": "SP Cost",
     "pt-BR": "SP Cost",
     "zh": "SP Cost",
-    "ru": "SP Cost"
+    "ru": "SP Cost",
+    "Column 11": ""
   },
   {
     "key": "shared.quality.preset",
@@ -15981,7 +16001,8 @@
     "es": "Preset",
     "pt-BR": "Preset",
     "zh": "Preset",
-    "ru": "Preset"
+    "ru": "Preset",
+    "Column 11": ""
   },
   {
     "key": "shared.quality.text",
@@ -15993,7 +16014,8 @@
     "es": "Text",
     "pt-BR": "Text",
     "zh": "Text",
-    "ru": "Text"
+    "ru": "Text",
+    "Column 11": ""
   },
   {
     "key": "shared.quality.cost",
@@ -16005,7 +16027,8 @@
     "es": "Cost",
     "pt-BR": "Cost",
     "zh": "Cost",
-    "ru": "Cost"
+    "ru": "Cost",
+    "Column 11": ""
   },
   {
     "key": "shared.cost.resource",
@@ -16017,7 +16040,8 @@
     "es": "Resource",
     "pt-BR": "Resource",
     "zh": "Resource",
-    "ru": "Resource"
+    "ru": "Resource",
+    "Column 11": ""
   },
   {
     "key": "shared.cost.amount",
@@ -16029,7 +16053,8 @@
     "es": "Amount",
     "pt-BR": "Amount",
     "zh": "Amount",
-    "ru": "Amount"
+    "ru": "Amount",
+    "Column 11": ""
   },
   {
     "key": "shared.cost.amountPerTarget",
@@ -16041,7 +16066,8 @@
     "es": "Amount Per Target",
     "pt-BR": "Amount Per Target",
     "zh": "Amount Per Target",
-    "ru": "Amount Per Target"
+    "ru": "Amount Per Target",
+    "Column 11": ""
   },
   {
     "key": "shared.cost.perTarget",
@@ -16053,7 +16079,8 @@
     "es": "Per Target",
     "pt-BR": "Per Target",
     "zh": "Per Target",
-    "ru": "Per Target"
+    "ru": "Per Target",
+    "Column 11": ""
   },
   {
     "key": "shared.accuracy.attr1",
@@ -16065,7 +16092,8 @@
     "es": "Attr 5",
     "pt-BR": "Attr 6",
     "zh": "Attr 7",
-    "ru": "Attr 8"
+    "ru": "Attr 8",
+    "Column 11": ""
   },
   {
     "key": "shared.accuracy.attr2",
@@ -16077,7 +16105,8 @@
     "es": "Attr 6",
     "pt-BR": "Attr 7",
     "zh": "Attr 8",
-    "ru": "Attr 9"
+    "ru": "Attr 9",
+    "Column 11": ""
   },
   {
     "key": "shared.accuracy.bonus",
@@ -16089,7 +16118,8 @@
     "es": "Bonus",
     "pt-BR": "Bonus",
     "zh": "Bonus",
-    "ru": "Bonus"
+    "ru": "Bonus",
+    "Column 11": ""
   },
   {
     "key": "shared.accuracy.defense",
@@ -16101,7 +16131,8 @@
     "es": "Defense",
     "pt-BR": "Defense",
     "zh": "Defense",
-    "ru": "Defense"
+    "ru": "Defense",
+    "Column 11": ""
   },
   {
     "key": "shared.damage.value",
@@ -16113,7 +16144,8 @@
     "es": "Value",
     "pt-BR": "Value",
     "zh": "Value",
-    "ru": "Value"
+    "ru": "Value",
+    "Column 11": ""
   },
   {
     "key": "shared.damage.type",
@@ -16125,7 +16157,8 @@
     "es": "Type",
     "pt-BR": "Type",
     "zh": "Type",
-    "ru": "Type"
+    "ru": "Type",
+    "Column 11": ""
   },
   {
     "key": "shared.damage.hrZero",
@@ -16137,7 +16170,8 @@
     "es": "HR4",
     "pt-BR": "HR5",
     "zh": "HR6",
-    "ru": "HR7"
+    "ru": "HR7",
+    "Column 11": ""
   },
   {
     "key": "shared.modifiers.accuracy",
@@ -16149,7 +16183,8 @@
     "es": "Accuracy Bonus",
     "pt-BR": "Accuracy Bonus",
     "zh": "Accuracy Bonus",
-    "ru": "Accuracy Bonus"
+    "ru": "Accuracy Bonus",
+    "Column 11": ""
   },
   {
     "key": "shared.modifiers.damage",
@@ -16161,7 +16196,8 @@
     "es": "Damage Bonus",
     "pt-BR": "Damage Bonus",
     "zh": "Damage Bonus",
-    "ru": "Damage Bonus"
+    "ru": "Damage Bonus",
+    "Column 11": ""
   },
   {
     "key": "shared.modifiers.damageMelee",
@@ -16173,7 +16209,8 @@
     "es": "Damage Melee Bonus",
     "pt-BR": "Damage Melee Bonus",
     "zh": "Damage Melee Bonus",
-    "ru": "Damage Melee Bonus"
+    "ru": "Damage Melee Bonus",
+    "Column 11": ""
   },
   {
     "key": "shared.modifiers.damageRanged",
@@ -16185,7 +16222,8 @@
     "es": "Damage Ranged Bonus",
     "pt-BR": "Damage Ranged Bonus",
     "zh": "Damage Ranged Bonus",
-    "ru": "Damage Ranged Bonus"
+    "ru": "Damage Ranged Bonus",
+    "Column 11": ""
   },
   {
     "key": "shared.modifiers.def",
@@ -16197,7 +16235,8 @@
     "es": "DEF",
     "pt-BR": "DEF",
     "zh": "DEF",
-    "ru": "DEF"
+    "ru": "DEF",
+    "Column 11": ""
   },
   {
     "key": "shared.modifiers.init",
@@ -16209,7 +16248,8 @@
     "es": "Init",
     "pt-BR": "Init",
     "zh": "Init",
-    "ru": "Init"
+    "ru": "Init",
+    "Column 11": ""
   },
   {
     "key": "shared.modifiers.magic",
@@ -16221,7 +16261,8 @@
     "es": "Magic",
     "pt-BR": "Magic",
     "zh": "Magic",
-    "ru": "Magic"
+    "ru": "Magic",
+    "Column 11": ""
   },
   {
     "key": "shared.modifiers.mdef",
@@ -16233,7 +16274,8 @@
     "es": "MDEF",
     "pt-BR": "MDEF",
     "zh": "MDEF",
-    "ru": "MDEF"
+    "ru": "MDEF",
+    "Column 11": ""
   },
   {
     "key": "meta.book",
@@ -16245,7 +16287,8 @@
     "es": "Book",
     "pt-BR": "Book",
     "zh": "Book",
-    "ru": "Book"
+    "ru": "Book",
+    "Column 11": ""
   },
   {
     "key": "meta.bookName",
@@ -16257,7 +16300,8 @@
     "es": "Book Name",
     "pt-BR": "Book Name",
     "zh": "Book Name",
-    "ru": "Book Name"
+    "ru": "Book Name",
+    "Column 11": ""
   },
   {
     "key": "meta.isOfficial",
@@ -16269,7 +16313,8 @@
     "es": "Official",
     "pt-BR": "Official",
     "zh": "Official",
-    "ru": "Official"
+    "ru": "Official",
+    "Column 11": ""
   },
   {
     "key": "meta.page",
@@ -16281,7 +16326,8 @@
     "es": "Page",
     "pt-BR": "Page",
     "zh": "Page",
-    "ru": "Page"
+    "ru": "Page",
+    "Column 11": ""
   },
   {
     "key": "weapon.totalBonus",
@@ -16293,7 +16339,8 @@
     "es": "Total Bonus",
     "pt-BR": "Total Bonus",
     "zh": "Total Bonus",
-    "ru": "Total Bonus"
+    "ru": "Total Bonus",
+    "Column 11": ""
   },
   {
     "key": "weapon.accuracy",
@@ -16305,7 +16352,8 @@
     "es": "Accuracy",
     "pt-BR": "Accuracy",
     "zh": "Accuracy",
-    "ru": "Accuracy"
+    "ru": "Accuracy",
+    "Column 11": ""
   },
   {
     "key": "weapon.damage",
@@ -16317,7 +16365,8 @@
     "es": "Damage",
     "pt-BR": "Damage",
     "zh": "Damage",
-    "ru": "Damage"
+    "ru": "Damage",
+    "Column 11": ""
   },
   {
     "key": "weapon.quality.name",
@@ -16329,7 +16378,8 @@
     "es": "Name",
     "pt-BR": "Name",
     "zh": "Name",
-    "ru": "Name"
+    "ru": "Name",
+    "Column 11": ""
   },
   {
     "key": "weapon.rare.bonuses",
@@ -16341,7 +16391,8 @@
     "es": "Bonuses",
     "pt-BR": "Bonuses",
     "zh": "Bonuses",
-    "ru": "Bonuses"
+    "ru": "Bonuses",
+    "Column 11": ""
   },
   {
     "key": "customWeapon.hasTransforming",
@@ -16353,7 +16404,8 @@
     "es": "Has Transforming",
     "pt-BR": "Has Transforming",
     "zh": "Has Transforming",
-    "ru": "Has Transforming"
+    "ru": "Has Transforming",
+    "Column 11": ""
   },
   {
     "key": "customWeapon.slotted",
@@ -16365,7 +16417,8 @@
     "es": "Slotted",
     "pt-BR": "Slotted",
     "zh": "Slotted",
-    "ru": "Slotted"
+    "ru": "Slotted",
+    "Column 11": ""
   },
   {
     "key": "customWeapon.slots",
@@ -16377,7 +16430,8 @@
     "es": "Slots",
     "pt-BR": "Slots",
     "zh": "Slots",
-    "ru": "Slots"
+    "ru": "Slots",
+    "Column 11": ""
   },
   {
     "key": "customWeapon.customizations",
@@ -16389,7 +16443,8 @@
     "es": "Customizations",
     "pt-BR": "Customizations",
     "zh": "Customizations",
-    "ru": "Customizations"
+    "ru": "Customizations",
+    "Column 11": ""
   },
   {
     "key": "customWeapon.accuracy.attrs",
@@ -16401,7 +16456,8 @@
     "es": "Attrs",
     "pt-BR": "Attrs",
     "zh": "Attrs",
-    "ru": "Attrs"
+    "ru": "Attrs",
+    "Column 11": ""
   },
   {
     "key": "customWeapon.rare.accuracyBonus",
@@ -16413,7 +16469,8 @@
     "es": "Accuracy Bonus",
     "pt-BR": "Accuracy Bonus",
     "zh": "Accuracy Bonus",
-    "ru": "Accuracy Bonus"
+    "ru": "Accuracy Bonus",
+    "Column 11": ""
   },
   {
     "key": "customWeapon.rare.damageBonus",
@@ -16425,7 +16482,8 @@
     "es": "Damage Bonus",
     "pt-BR": "Damage Bonus",
     "zh": "Damage Bonus",
-    "ru": "Damage Bonus"
+    "ru": "Damage Bonus",
+    "Column 11": ""
   },
   {
     "key": "customWeapon.rare.overrideAccuracyAttributes",
@@ -16437,7 +16495,8 @@
     "es": "Override Accuracy Attributes",
     "pt-BR": "Override Accuracy Attributes",
     "zh": "Override Accuracy Attributes",
-    "ru": "Override Accuracy Attributes"
+    "ru": "Override Accuracy Attributes",
+    "Column 11": ""
   },
   {
     "key": "customWeapon.rare.overrideAccuracyAttrs",
@@ -16449,7 +16508,8 @@
     "es": "Override Accuracy Attrs",
     "pt-BR": "Override Accuracy Attrs",
     "zh": "Override Accuracy Attrs",
-    "ru": "Override Accuracy Attrs"
+    "ru": "Override Accuracy Attrs",
+    "Column 11": ""
   },
   {
     "key": "customWeapon.rare.overrideDamageType",
@@ -16461,7 +16521,8 @@
     "es": "Override Damage Type",
     "pt-BR": "Override Damage Type",
     "zh": "Override Damage Type",
-    "ru": "Override Damage Type"
+    "ru": "Override Damage Type",
+    "Column 11": ""
   },
   {
     "key": "customWeapon.rare.overrideDamageTypeValue",
@@ -16473,7 +16534,8 @@
     "es": "Override Damage Type Value",
     "pt-BR": "Override Damage Type Value",
     "zh": "Override Damage Type Value",
-    "ru": "Override Damage Type Value"
+    "ru": "Override Damage Type Value",
+    "Column 11": ""
   },
   {
     "key": "customWeapon.second.accuracy.attrs",
@@ -16485,7 +16547,8 @@
     "es": "Attrs",
     "pt-BR": "Attrs",
     "zh": "Attrs",
-    "ru": "Attrs"
+    "ru": "Attrs",
+    "Column 11": ""
   },
   {
     "key": "customWeapon.second.rare.overrideDamageType",
@@ -16497,7 +16560,8 @@
     "es": "Override Damage Type",
     "pt-BR": "Override Damage Type",
     "zh": "Override Damage Type",
-    "ru": "Override Damage Type"
+    "ru": "Override Damage Type",
+    "Column 11": ""
   },
   {
     "key": "customWeapon.second.rare.overrideDamageTypeValue",
@@ -16509,7 +16573,8 @@
     "es": "Override Damage Type Value",
     "pt-BR": "Override Damage Type Value",
     "zh": "Override Damage Type Value",
-    "ru": "Override Damage Type Value"
+    "ru": "Override Damage Type Value",
+    "Column 11": ""
   },
   {
     "key": "customWeapon.second.customizations",
@@ -16521,7 +16586,8 @@
     "es": "Customizations",
     "pt-BR": "Customizations",
     "zh": "Customizations",
-    "ru": "Customizations"
+    "ru": "Customizations",
+    "Column 11": ""
   },
   {
     "key": "armor.isSlotsVariant",
@@ -16533,7 +16599,8 @@
     "es": "Is Slots Variant",
     "pt-BR": "Is Slots Variant",
     "zh": "Is Slots Variant",
-    "ru": "Is Slots Variant"
+    "ru": "Is Slots Variant",
+    "Column 11": ""
   },
   {
     "key": "armor.slotted",
@@ -16545,7 +16612,8 @@
     "es": "Slotted",
     "pt-BR": "Slotted",
     "zh": "Slotted",
-    "ru": "Slotted"
+    "ru": "Slotted",
+    "Column 11": ""
   },
   {
     "key": "armor.slots",
@@ -16557,7 +16625,8 @@
     "es": "Slots",
     "pt-BR": "Slots",
     "zh": "Slots",
-    "ru": "Slots"
+    "ru": "Slots",
+    "Column 11": ""
   },
   {
     "key": "spell.arcanist.domain",
@@ -16569,7 +16638,8 @@
     "es": "Domain",
     "pt-BR": "Domain",
     "zh": "Domain",
-    "ru": "Domain"
+    "ru": "Domain",
+    "Column 11": ""
   },
   {
     "key": "spell.arcanist.domainDesc",
@@ -16581,7 +16651,8 @@
     "es": "Domain Desc",
     "pt-BR": "Domain Desc",
     "zh": "Domain Desc",
-    "ru": "Domain Desc"
+    "ru": "Domain Desc",
+    "Column 11": ""
   },
   {
     "key": "spell.arcanist.merge",
@@ -16593,7 +16664,8 @@
     "es": "Merge",
     "pt-BR": "Merge",
     "zh": "Merge",
-    "ru": "Merge"
+    "ru": "Merge",
+    "Column 11": ""
   },
   {
     "key": "spell.arcanist.mergeDesc",
@@ -16605,7 +16677,8 @@
     "es": "Merge Desc",
     "pt-BR": "Merge Desc",
     "zh": "Merge Desc",
-    "ru": "Merge Desc"
+    "ru": "Merge Desc",
+    "Column 11": ""
   },
   {
     "key": "spell.arcanist.pulse",
@@ -16617,7 +16690,8 @@
     "es": "Pulse",
     "pt-BR": "Pulse",
     "zh": "Pulse",
-    "ru": "Pulse"
+    "ru": "Pulse",
+    "Column 11": ""
   },
   {
     "key": "spell.arcanist.pulseDesc",
@@ -16629,7 +16703,8 @@
     "es": "Pulse Desc",
     "pt-BR": "Pulse Desc",
     "zh": "Pulse Desc",
-    "ru": "Pulse Desc"
+    "ru": "Pulse Desc",
+    "Column 11": ""
   },
   {
     "key": "spell.arcanist.dismiss",
@@ -16641,7 +16716,8 @@
     "es": "Dismiss",
     "pt-BR": "Dismiss",
     "zh": "Dismiss",
-    "ru": "Dismiss"
+    "ru": "Dismiss",
+    "Column 11": ""
   },
   {
     "key": "spell.arcanist.dismissDesc",
@@ -16653,7 +16729,8 @@
     "es": "Dismiss Desc",
     "pt-BR": "Dismiss Desc",
     "zh": "Dismiss Desc",
-    "ru": "Dismiss Desc"
+    "ru": "Dismiss Desc",
+    "Column 11": ""
   },
   {
     "key": "spell.cooking.effect",
@@ -16665,7 +16742,8 @@
     "es": "Effect",
     "pt-BR": "Effect",
     "zh": "Effect",
-    "ru": "Effect"
+    "ru": "Effect",
+    "Column 11": ""
   },
   {
     "key": "spell.cooking.effects",
@@ -16677,7 +16755,8 @@
     "es": "Effects",
     "pt-BR": "Effects",
     "zh": "Effects",
-    "ru": "Effects"
+    "ru": "Effects",
+    "Column 11": ""
   },
   {
     "key": "spell.dance.effect",
@@ -16689,7 +16768,8 @@
     "es": "Effect",
     "pt-BR": "Effect",
     "zh": "Effect",
-    "ru": "Effect"
+    "ru": "Effect",
+    "Column 11": ""
   },
   {
     "key": "spell.gift.event",
@@ -16701,7 +16781,8 @@
     "es": "Event",
     "pt-BR": "Event",
     "zh": "Event",
-    "ru": "Event"
+    "ru": "Event",
+    "Column 11": ""
   },
   {
     "key": "spell.gift.effect",
@@ -16713,7 +16794,8 @@
     "es": "Effect",
     "pt-BR": "Effect",
     "zh": "Effect",
-    "ru": "Effect"
+    "ru": "Effect",
+    "Column 11": ""
   },
   {
     "key": "spell.invocation.type",
@@ -16725,7 +16807,8 @@
     "es": "Type",
     "pt-BR": "Type",
     "zh": "Type",
-    "ru": "Type"
+    "ru": "Type",
+    "Column 11": ""
   },
   {
     "key": "spell.invocation.effect",
@@ -16737,7 +16820,8 @@
     "es": "Effect",
     "pt-BR": "Effect",
     "zh": "Effect",
-    "ru": "Effect"
+    "ru": "Effect",
+    "Column 11": ""
   },
   {
     "key": "spell.invocation.wellspring",
@@ -16749,7 +16833,8 @@
     "es": "Wellspring",
     "pt-BR": "Wellspring",
     "zh": "Wellspring",
-    "ru": "Wellspring"
+    "ru": "Wellspring",
+    "Column 11": ""
   },
   {
     "key": "spell.wellspring.color",
@@ -16761,7 +16846,8 @@
     "es": "Wellspring Color",
     "pt-BR": "Wellspring Color",
     "zh": "Wellspring Color",
-    "ru": "Wellspring Color"
+    "ru": "Wellspring Color",
+    "Column 11": ""
   },
   {
     "key": "spell.wellspring.textColor",
@@ -16773,7 +16859,8 @@
     "es": "Wellspring Text Color",
     "pt-BR": "Wellspring Text Color",
     "zh": "Wellspring Text Color",
-    "ru": "Wellspring Text Color"
+    "ru": "Wellspring Text Color",
+    "Column 11": ""
   },
   {
     "key": "spell.wellspring.icon",
@@ -16785,7 +16872,8 @@
     "es": "Wellspring Icon",
     "pt-BR": "Wellspring Icon",
     "zh": "Wellspring Icon",
-    "ru": "Wellspring Icon"
+    "ru": "Wellspring Icon",
+    "Column 11": ""
   },
   {
     "key": "spell.magichant.keyType",
@@ -16797,7 +16885,8 @@
     "es": "Key Type",
     "pt-BR": "Key Type",
     "zh": "Key Type",
-    "ru": "Key Type"
+    "ru": "Key Type",
+    "Column 11": ""
   },
   {
     "key": "spell.magichant.keyStatus",
@@ -16809,7 +16898,8 @@
     "es": "Key Status",
     "pt-BR": "Key Status",
     "zh": "Key Status",
-    "ru": "Key Status"
+    "ru": "Key Status",
+    "Column 11": ""
   },
   {
     "key": "spell.magichant.keyAttribute",
@@ -16821,7 +16911,8 @@
     "es": "Key Attribute",
     "pt-BR": "Key Attribute",
     "zh": "Key Attribute",
-    "ru": "Key Attribute"
+    "ru": "Key Attribute",
+    "Column 11": ""
   },
   {
     "key": "spell.magichant.keyRecovery",
@@ -16833,7 +16924,8 @@
     "es": "Key Recovery",
     "pt-BR": "Key Recovery",
     "zh": "Key Recovery",
-    "ru": "Key Recovery"
+    "ru": "Key Recovery",
+    "Column 11": ""
   },
   {
     "key": "spell.magichant.toneEffect",
@@ -16845,7 +16937,8 @@
     "es": "Tone Effect",
     "pt-BR": "Tone Effect",
     "zh": "Tone Effect",
-    "ru": "Tone Effect"
+    "ru": "Tone Effect",
+    "Column 11": ""
   },
   {
     "key": "spell.magiseed.rangeStart",
@@ -16857,7 +16950,8 @@
     "es": "Range Start",
     "pt-BR": "Range Start",
     "zh": "Range Start",
-    "ru": "Range Start"
+    "ru": "Range Start",
+    "Column 11": ""
   },
   {
     "key": "spell.magiseed.rangeEnd",
@@ -16869,7 +16963,8 @@
     "es": "Range End",
     "pt-BR": "Range End",
     "zh": "Range End",
-    "ru": "Range End"
+    "ru": "Range End",
+    "Column 11": ""
   },
   {
     "key": "spell.magiseed.description",
@@ -16881,7 +16976,8 @@
     "es": "Description",
     "pt-BR": "Description",
     "zh": "Description",
-    "ru": "Description"
+    "ru": "Description",
+    "Column 11": ""
   },
   {
     "key": "spell.symbol.effect",
@@ -16893,7 +16989,8 @@
     "es": "Effect",
     "pt-BR": "Effect",
     "zh": "Effect",
-    "ru": "Effect"
+    "ru": "Effect",
+    "Column 11": ""
   },
   {
     "key": "spell.therioform.genoclepsis",
@@ -16905,7 +17002,8 @@
     "es": "Genoclepsis",
     "pt-BR": "Genoclepsis",
     "zh": "Genoclepsis",
-    "ru": "Genoclepsis"
+    "ru": "Genoclepsis",
+    "Column 11": ""
   },
   {
     "key": "spell.tinkerer.category",
@@ -16917,7 +17015,8 @@
     "es": "Category",
     "pt-BR": "Category",
     "zh": "Category",
-    "ru": "Category"
+    "ru": "Category",
+    "Column 11": ""
   },
   {
     "key": "spell.tinkerer.infusionRank",
@@ -16929,7 +17028,8 @@
     "es": "Infusion Rank",
     "pt-BR": "Infusion Rank",
     "zh": "Infusion Rank",
-    "ru": "Infusion Rank"
+    "ru": "Infusion Rank",
+    "Column 11": ""
   },
   {
     "key": "heroic.applicableTo",
@@ -16941,7 +17041,8 @@
     "es": "Applicable To",
     "pt-BR": "Applicable To",
     "zh": "Applicable To",
-    "ru": "Applicable To"
+    "ru": "Applicable To",
+    "Column 11": ""
   },
   {
     "key": "heroic.quote",
@@ -16953,7 +17054,8 @@
     "es": "Quote",
     "pt-BR": "Quote",
     "zh": "Quote",
-    "ru": "Quote"
+    "ru": "Quote",
+    "Column 11": ""
   },
   {
     "key": "heroic.description",
@@ -16965,7 +17067,8 @@
     "es": "Description",
     "pt-BR": "Description",
     "zh": "Description",
-    "ru": "Description"
+    "ru": "Description",
+    "Column 11": ""
   },
   {
     "key": "quality.category",
@@ -16977,7 +17080,8 @@
     "es": "Category",
     "pt-BR": "Category",
     "zh": "Category",
-    "ru": "Category"
+    "ru": "Category",
+    "Column 11": ""
   },
   {
     "key": "quality.cost",
@@ -16989,7 +17093,8 @@
     "es": "Cost",
     "pt-BR": "Cost",
     "zh": "Cost",
-    "ru": "Cost"
+    "ru": "Cost",
+    "Column 11": ""
   },
   {
     "key": "quality.effect",
@@ -17001,7 +17106,8 @@
     "es": "Effect",
     "pt-BR": "Effect",
     "zh": "Effect",
-    "ru": "Effect"
+    "ru": "Effect",
+    "Column 11": ""
   },
   {
     "key": "quality.applicableTo",
@@ -17013,7 +17119,8 @@
     "es": "Applicable To",
     "pt-BR": "Applicable To",
     "zh": "Applicable To",
-    "ru": "Applicable To"
+    "ru": "Applicable To",
+    "Column 11": ""
   },
   {
     "key": "class.name",
@@ -17025,7 +17132,8 @@
     "es": "Name",
     "pt-BR": "Name",
     "zh": "Name",
-    "ru": "Name"
+    "ru": "Name",
+    "Column 11": ""
   },
   {
     "key": "class.also",
@@ -17037,7 +17145,21 @@
     "es": "Also",
     "pt-BR": "Also",
     "zh": "Also",
-    "ru": "Also"
+    "ru": "Also",
+    "Column 11": ""
+  },
+  {
+    "key": "class.description",
+    "en": "Description",
+    "it": "Description",
+    "de": "Description",
+    "pl": "Description",
+    "fr": "Description",
+    "es": "Description",
+    "pt-BR": "Description",
+    "zh": "Description",
+    "ru": "Description",
+    "Column 11": "Description"
   },
   {
     "key": "class.skill.name",
@@ -17049,7 +17171,8 @@
     "es": "Skill Name",
     "pt-BR": "Skill Name",
     "zh": "Skill Name",
-    "ru": "Skill Name"
+    "ru": "Skill Name",
+    "Column 11": ""
   },
   {
     "key": "class.skills",
@@ -17061,7 +17184,8 @@
     "es": "Skills",
     "pt-BR": "Skills",
     "zh": "Skills",
-    "ru": "Skills"
+    "ru": "Skills",
+    "Column 11": ""
   },
   {
     "key": "class.benefits.hp",
@@ -17073,7 +17197,8 @@
     "es": "HP",
     "pt-BR": "HP",
     "zh": "HP",
-    "ru": "HP"
+    "ru": "HP",
+    "Column 11": ""
   },
   {
     "key": "class.benefits.mp",
@@ -17085,7 +17210,8 @@
     "es": "MP",
     "pt-BR": "MP",
     "zh": "MP",
-    "ru": "MP"
+    "ru": "MP",
+    "Column 11": ""
   },
   {
     "key": "class.benefits.ip",
@@ -17097,7 +17223,8 @@
     "es": "IP",
     "pt-BR": "IP",
     "zh": "IP",
-    "ru": "IP"
+    "ru": "IP",
+    "Column 11": ""
   },
   {
     "key": "class.benefits.martial",
@@ -17109,7 +17236,8 @@
     "es": "Martial",
     "pt-BR": "Martial",
     "zh": "Martial",
-    "ru": "Martial"
+    "ru": "Martial",
+    "Column 11": ""
   },
   {
     "key": "class.benefits.rituals",
@@ -17121,7 +17249,8 @@
     "es": "Rituals",
     "pt-BR": "Rituals",
     "zh": "Rituals",
-    "ru": "Rituals"
+    "ru": "Rituals",
+    "Column 11": ""
   },
   {
     "key": "class.benefits.spellClasses",
@@ -17133,7 +17262,8 @@
     "es": "Spell Classes",
     "pt-BR": "Spell Classes",
     "zh": "Spell Classes",
-    "ru": "Spell Classes"
+    "ru": "Spell Classes",
+    "Column 11": ""
   },
   {
     "key": "class.benefits.custom",
@@ -17145,7 +17275,8 @@
     "es": "Custom",
     "pt-BR": "Custom",
     "zh": "Custom",
-    "ru": "Custom"
+    "ru": "Custom",
+    "Column 11": ""
   },
   {
     "key": "class.benefits.customItem",
@@ -17157,7 +17288,8 @@
     "es": "Custom Item",
     "pt-BR": "Custom Item",
     "zh": "Custom Item",
-    "ru": "Custom Item"
+    "ru": "Custom Item",
+    "Column 11": ""
   },
   {
     "key": "class.skill.maxLevel",
@@ -17169,7 +17301,8 @@
     "es": "Max Level",
     "pt-BR": "Max Level",
     "zh": "Max Level",
-    "ru": "Max Level"
+    "ru": "Max Level",
+    "Column 11": ""
   },
   {
     "key": "class.skill.description",
@@ -17181,7 +17314,8 @@
     "es": "Description",
     "pt-BR": "Description",
     "zh": "Description",
-    "ru": "Description"
+    "ru": "Description",
+    "Column 11": ""
   },
   {
     "key": "class.skill.specialEffect",
@@ -17193,7 +17327,8 @@
     "es": "Special Effect",
     "pt-BR": "Special Effect",
     "zh": "Special Effect",
-    "ru": "Special Effect"
+    "ru": "Special Effect",
+    "Column 11": ""
   },
   {
     "key": "optional.subtype",
@@ -17205,7 +17340,8 @@
     "es": "Subtype",
     "pt-BR": "Subtype",
     "zh": "Subtype",
-    "ru": "Subtype"
+    "ru": "Subtype",
+    "Column 11": ""
   },
   {
     "key": "optional.targetDescription",
@@ -17217,7 +17353,8 @@
     "es": "Target Description",
     "pt-BR": "Target Description",
     "zh": "Target Description",
-    "ru": "Target Description"
+    "ru": "Target Description",
+    "Column 11": ""
   },
   {
     "key": "optional.effect",
@@ -17229,7 +17366,8 @@
     "es": "Effect",
     "pt-BR": "Effect",
     "zh": "Effect",
-    "ru": "Effect"
+    "ru": "Effect",
+    "Column 11": ""
   },
   {
     "key": "optional.showClock",
@@ -17241,7 +17379,8 @@
     "es": "Show Clock",
     "pt-BR": "Show Clock",
     "zh": "Show Clock",
-    "ru": "Show Clock"
+    "ru": "Show Clock",
+    "Column 11": ""
   },
   {
     "key": "optional.clockSections",
@@ -17253,7 +17392,8 @@
     "es": "Clock Sections",
     "pt-BR": "Clock Sections",
     "zh": "Clock Sections",
-    "ru": "Clock Sections"
+    "ru": "Clock Sections",
+    "Column 11": ""
   },
   {
     "key": "optional.zeroTriggerRef",
@@ -17265,7 +17405,8 @@
     "es": "Zero Trigger Ref",
     "pt-BR": "Zero Trigger Ref",
     "zh": "Zero Trigger Ref",
-    "ru": "Zero Trigger Ref"
+    "ru": "Zero Trigger Ref",
+    "Column 11": ""
   },
   {
     "key": "optional.zeroEffectRef",
@@ -17277,7 +17418,8 @@
     "es": "Zero Effect Ref",
     "pt-BR": "Zero Effect Ref",
     "zh": "Zero Effect Ref",
-    "ru": "Zero Effect Ref"
+    "ru": "Zero Effect Ref",
+    "Column 11": ""
   },
   {
     "key": "mnemosphere.class",
@@ -17289,7 +17431,8 @@
     "es": "Class",
     "pt-BR": "Class",
     "zh": "Class",
-    "ru": "Class"
+    "ru": "Class",
+    "Column 11": ""
   },
   {
     "key": "mnemosphere.level",
@@ -17301,7 +17444,8 @@
     "es": "Level",
     "pt-BR": "Level",
     "zh": "Level",
-    "ru": "Level"
+    "ru": "Level",
+    "Column 11": ""
   },
   {
     "key": "mnemosphere.cost",
@@ -17313,7 +17457,8 @@
     "es": "Cost",
     "pt-BR": "Cost",
     "zh": "Cost",
-    "ru": "Cost"
+    "ru": "Cost",
+    "Column 11": ""
   },
   {
     "key": "hoplosphere.requiredSlots",
@@ -17325,7 +17470,8 @@
     "es": "Required Slots",
     "pt-BR": "Required Slots",
     "zh": "Required Slots",
-    "ru": "Required Slots"
+    "ru": "Required Slots",
+    "Column 11": ""
   },
   {
     "key": "hoplosphere.socketable",
@@ -17337,7 +17483,8 @@
     "es": "Socketable",
     "pt-BR": "Socketable",
     "zh": "Socketable",
-    "ru": "Socketable"
+    "ru": "Socketable",
+    "Column 11": ""
   },
   {
     "key": "hoplosphere.cost",
@@ -17349,7 +17496,8 @@
     "es": "Cost",
     "pt-BR": "Cost",
     "zh": "Cost",
-    "ru": "Cost"
+    "ru": "Cost",
+    "Column 11": ""
   },
   {
     "key": "hoplosphere.description",
@@ -17361,7 +17509,8 @@
     "es": "Description",
     "pt-BR": "Description",
     "zh": "Description",
-    "ru": "Description"
+    "ru": "Description",
+    "Column 11": ""
   },
   {
     "key": "hoplosphere.coagulationEffects",
@@ -17373,7 +17522,8 @@
     "es": "Coagulation Effects",
     "pt-BR": "Coagulation Effects",
     "zh": "Coagulation Effects",
-    "ru": "Coagulation Effects"
+    "ru": "Coagulation Effects",
+    "Column 11": ""
   },
   {
     "key": "hoplosphere.coag.effect",
@@ -17385,7 +17535,8 @@
     "es": "Effect",
     "pt-BR": "Effect",
     "zh": "Effect",
-    "ru": "Effect"
+    "ru": "Effect",
+    "Column 11": ""
   },
   {
     "key": "section.accuracy",
@@ -17397,7 +17548,8 @@
     "es": "Accuracy",
     "pt-BR": "Accuracy",
     "zh": "Accuracy",
-    "ru": "Accuracy"
+    "ru": "Accuracy",
+    "Column 11": ""
   },
   {
     "key": "section.damage",
@@ -17409,7 +17561,8 @@
     "es": "Damage",
     "pt-BR": "Damage",
     "zh": "Damage",
-    "ru": "Damage"
+    "ru": "Damage",
+    "Column 11": ""
   },
   {
     "key": "section.quality",
@@ -17421,7 +17574,8 @@
     "es": "Quality",
     "pt-BR": "Quality",
     "zh": "Quality",
-    "ru": "Quality"
+    "ru": "Quality",
+    "Column 11": ""
   },
   {
     "key": "section.modifiers",
@@ -17433,7 +17587,8 @@
     "es": "Modifiers",
     "pt-BR": "Modifiers",
     "zh": "Modifiers",
-    "ru": "Modifiers"
+    "ru": "Modifiers",
+    "Column 11": ""
   },
   {
     "key": "section.effect",
@@ -17445,7 +17600,8 @@
     "es": "Effect",
     "pt-BR": "Effect",
     "zh": "Effect",
-    "ru": "Effect"
+    "ru": "Effect",
+    "Column 11": ""
   },
   {
     "key": "section.details",
@@ -17457,7 +17613,8 @@
     "es": "Details",
     "pt-BR": "Details",
     "zh": "Details",
-    "ru": "Details"
+    "ru": "Details",
+    "Column 11": ""
   },
   {
     "key": "section.slots",
@@ -17469,7 +17626,8 @@
     "es": "Slots",
     "pt-BR": "Slots",
     "zh": "Slots",
-    "ru": "Slots"
+    "ru": "Slots",
+    "Column 11": ""
   },
   {
     "key": "section.meta",
@@ -17481,7 +17639,8 @@
     "es": "Meta",
     "pt-BR": "Meta",
     "zh": "Meta",
-    "ru": "Meta"
+    "ru": "Meta",
+    "Column 11": ""
   },
   {
     "key": "section.core",
@@ -17493,7 +17652,8 @@
     "es": "Core",
     "pt-BR": "Core",
     "zh": "Core",
-    "ru": "Core"
+    "ru": "Core",
+    "Column 11": ""
   },
   {
     "key": "section.body",
@@ -17505,7 +17665,8 @@
     "es": "Body",
     "pt-BR": "Body",
     "zh": "Body",
-    "ru": "Body"
+    "ru": "Body",
+    "Column 11": ""
   },
   {
     "key": "section.rareBonus",
@@ -17517,7 +17678,8 @@
     "es": "Rare Bonus",
     "pt-BR": "Rare Bonus",
     "zh": "Rare Bonus",
-    "ru": "Rare Bonus"
+    "ru": "Rare Bonus",
+    "Column 11": ""
   },
   {
     "key": "section.secondary",
@@ -17529,7 +17691,8 @@
     "es": "Secondary",
     "pt-BR": "Secondary",
     "zh": "Secondary",
-    "ru": "Secondary"
+    "ru": "Secondary",
+    "Column 11": ""
   },
   {
     "key": "section.secondaryModifiers",
@@ -17541,7 +17704,8 @@
     "es": "Secondary Modifiers",
     "pt-BR": "Secondary Modifiers",
     "zh": "Secondary Modifiers",
-    "ru": "Secondary Modifiers"
+    "ru": "Secondary Modifiers",
+    "Column 11": ""
   },
   {
     "key": "section.benefits",
@@ -17553,7 +17717,8 @@
     "es": "Benefits",
     "pt-BR": "Benefits",
     "zh": "Benefits",
-    "ru": "Benefits"
+    "ru": "Benefits",
+    "Column 11": ""
   },
   {
     "key": "section.martials",
@@ -17565,7 +17730,8 @@
     "es": "Martials",
     "pt-BR": "Martials",
     "zh": "Martials",
-    "ru": "Martials"
+    "ru": "Martials",
+    "Column 11": ""
   },
   {
     "key": "section.spellClasses",
@@ -17577,7 +17743,8 @@
     "es": "Spell Classes",
     "pt-BR": "Spell Classes",
     "zh": "Spell Classes",
-    "ru": "Spell Classes"
+    "ru": "Spell Classes",
+    "Column 11": ""
   },
   {
     "key": "section.skills",
@@ -17589,7 +17756,8 @@
     "es": "Skills",
     "pt-BR": "Skills",
     "zh": "Skills",
-    "ru": "Skills"
+    "ru": "Skills",
+    "Column 11": ""
   },
   {
     "key": "section.clock",
@@ -17601,7 +17769,8 @@
     "es": "Clock",
     "pt-BR": "Clock",
     "zh": "Clock",
-    "ru": "Clock"
+    "ru": "Clock",
+    "Column 11": ""
   },
   {
     "key": "section.zero",
@@ -17613,7 +17782,8 @@
     "es": "Zero",
     "pt-BR": "Zero",
     "zh": "Zero",
-    "ru": "Zero"
+    "ru": "Zero",
+    "Column 11": ""
   },
   {
     "key": "tab.attributes",
@@ -17625,7 +17795,8 @@
     "es": "Attributes",
     "pt-BR": "Attributes",
     "zh": "Attributes",
-    "ru": "Attributes"
+    "ru": "Attributes",
+    "Column 11": ""
   },
   {
     "key": "tab.behavior",
@@ -17637,7 +17808,8 @@
     "es": "Behavior",
     "pt-BR": "Behavior",
     "zh": "Behavior",
-    "ru": "Behavior"
+    "ru": "Behavior",
+    "Column 11": ""
   },
   {
     "key": "tab.effects",
@@ -17649,7 +17821,8 @@
     "es": "Effects",
     "pt-BR": "Effects",
     "zh": "Effects",
-    "ru": "Effects"
+    "ru": "Effects",
+    "Column 11": ""
   },
   {
     "key": "tab.passives",
@@ -17661,7 +17834,8 @@
     "es": "Passives",
     "pt-BR": "Passives",
     "zh": "Passives",
-    "ru": "Passives"
+    "ru": "Passives",
+    "Column 11": ""
   },
   {
     "key": "tab.behaviors",
@@ -17673,7 +17847,8 @@
     "es": "Behaviors",
     "pt-BR": "Behaviors",
     "zh": "Behaviors",
-    "ru": "Behaviors"
+    "ru": "Behaviors",
+    "Column 11": ""
   },
   {
     "key": "behavior.trigger.kind",
@@ -17685,7 +17860,8 @@
     "es": "Trigger",
     "pt-BR": "Trigger",
     "zh": "Trigger",
-    "ru": "Trigger"
+    "ru": "Trigger",
+    "Column 11": ""
   },
   {
     "key": "behavior.trigger.action",
@@ -17697,7 +17873,8 @@
     "es": "Action Type",
     "pt-BR": "Action Type",
     "zh": "Action Type",
-    "ru": "Action Type"
+    "ru": "Action Type",
+    "Column 11": ""
   },
   {
     "key": "behavior.trigger.guardVariant",
@@ -17709,7 +17886,8 @@
     "es": "Guard Variant",
     "pt-BR": "Guard Variant",
     "zh": "Guard Variant",
-    "ru": "Guard Variant"
+    "ru": "Guard Variant",
+    "Column 11": ""
   },
   {
     "key": "behavior.trigger.event",
@@ -17721,7 +17899,8 @@
     "es": "Event",
     "pt-BR": "Event",
     "zh": "Event",
-    "ru": "Event"
+    "ru": "Event",
+    "Column 11": ""
   },
   {
     "key": "behavior.trigger.cooldown",
@@ -17733,7 +17912,8 @@
     "es": "Cooldown",
     "pt-BR": "Cooldown",
     "zh": "Cooldown",
-    "ru": "Cooldown"
+    "ru": "Cooldown",
+    "Column 11": ""
   },
   {
     "key": "behavior.trigger.singleTarget",
@@ -17745,7 +17925,8 @@
     "es": "Single Target Only",
     "pt-BR": "Single Target Only",
     "zh": "Single Target Only",
-    "ru": "Single Target Only"
+    "ru": "Single Target Only",
+    "Column 11": ""
   },
   {
     "key": "behavior.trigger.targetHasStatusEffects",
@@ -17757,7 +17938,8 @@
     "es": "Target Has Status Effects",
     "pt-BR": "Target Has Status Effects",
     "zh": "Target Has Status Effects",
-    "ru": "Target Has Status Effects"
+    "ru": "Target Has Status Effects",
+    "Column 11": ""
   },
   {
     "key": "trigger.kind.none",
@@ -17769,7 +17951,8 @@
     "es": "None",
     "pt-BR": "None",
     "zh": "None",
-    "ru": "None"
+    "ru": "None",
+    "Column 11": ""
   },
   {
     "key": "trigger.kind.passive",
@@ -17781,7 +17964,8 @@
     "es": "Passive",
     "pt-BR": "Passive",
     "zh": "Passive",
-    "ru": "Passive"
+    "ru": "Passive",
+    "Column 11": ""
   },
   {
     "key": "trigger.kind.active",
@@ -17793,7 +17977,8 @@
     "es": "Active",
     "pt-BR": "Active",
     "zh": "Active",
-    "ru": "Active"
+    "ru": "Active",
+    "Column 11": ""
   },
   {
     "key": "trigger.kind.chat-action",
@@ -17805,7 +17990,8 @@
     "es": "Chat Action",
     "pt-BR": "Chat Action",
     "zh": "Chat Action",
-    "ru": "Chat Action"
+    "ru": "Chat Action",
+    "Column 11": ""
   },
   {
     "key": "trigger.kind.reactive",
@@ -17817,7 +18003,8 @@
     "es": "Reactive",
     "pt-BR": "Reactive",
     "zh": "Reactive",
-    "ru": "Reactive"
+    "ru": "Reactive",
+    "Column 11": ""
   },
   {
     "key": "trigger.kind.combat-start",
@@ -17829,7 +18016,8 @@
     "es": "Combat Start",
     "pt-BR": "Combat Start",
     "zh": "Combat Start",
-    "ru": "Combat Start"
+    "ru": "Combat Start",
+    "Column 11": ""
   },
   {
     "key": "trigger.kind.combat-end",
@@ -17841,7 +18029,8 @@
     "es": "Combat End",
     "pt-BR": "Combat End",
     "zh": "Combat End",
-    "ru": "Combat End"
+    "ru": "Combat End",
+    "Column 11": ""
   },
   {
     "key": "trigger.kind.on-hit",
@@ -17853,7 +18042,8 @@
     "es": "On Hit",
     "pt-BR": "On Hit",
     "zh": "On Hit",
-    "ru": "On Hit"
+    "ru": "On Hit",
+    "Column 11": ""
   },
   {
     "key": "trigger.kind.on-damage-taken",
@@ -17865,7 +18055,8 @@
     "es": "On Damage Taken",
     "pt-BR": "On Damage Taken",
     "zh": "On Damage Taken",
-    "ru": "On Damage Taken"
+    "ru": "On Damage Taken",
+    "Column 11": ""
   },
   {
     "key": "trigger.action.guard",
@@ -17877,7 +18068,8 @@
     "es": "Guard",
     "pt-BR": "Guard",
     "zh": "Guard",
-    "ru": "Guard"
+    "ru": "Guard",
+    "Column 11": ""
   },
   {
     "key": "trigger.action.attack",
@@ -17889,7 +18081,8 @@
     "es": "Attack",
     "pt-BR": "Attack",
     "zh": "Attack",
-    "ru": "Attack"
+    "ru": "Attack",
+    "Column 11": ""
   },
   {
     "key": "trigger.action.spell",
@@ -17901,7 +18094,8 @@
     "es": "Spell",
     "pt-BR": "Spell",
     "zh": "Spell",
-    "ru": "Spell"
+    "ru": "Spell",
+    "Column 11": ""
   },
   {
     "key": "trigger.action.equipment",
@@ -17913,7 +18107,8 @@
     "es": "Equipment",
     "pt-BR": "Equipment",
     "zh": "Equipment",
-    "ru": "Equipment"
+    "ru": "Equipment",
+    "Column 11": ""
   },
   {
     "key": "trigger.guardVariant.either",
@@ -17925,7 +18120,8 @@
     "es": "Either",
     "pt-BR": "Either",
     "zh": "Either",
-    "ru": "Either"
+    "ru": "Either",
+    "Column 11": ""
   },
   {
     "key": "trigger.guardVariant.cover",
@@ -17937,7 +18133,8 @@
     "es": "Cover",
     "pt-BR": "Cover",
     "zh": "Cover",
-    "ru": "Cover"
+    "ru": "Cover",
+    "Column 11": ""
   },
   {
     "key": "trigger.guardVariant.no-cover",
@@ -17949,7 +18146,8 @@
     "es": "No Cover",
     "pt-BR": "No Cover",
     "zh": "No Cover",
-    "ru": "No Cover"
+    "ru": "No Cover",
+    "Column 11": ""
   },
   {
     "key": "trigger.event.ally-targeted",
@@ -17961,7 +18159,8 @@
     "es": "Ally Targeted",
     "pt-BR": "Ally Targeted",
     "zh": "Ally Targeted",
-    "ru": "Ally Targeted"
+    "ru": "Ally Targeted",
+    "Column 11": ""
   },
   {
     "key": "trigger.cooldown.none",
@@ -17973,7 +18172,8 @@
     "es": "None",
     "pt-BR": "None",
     "zh": "None",
-    "ru": "None"
+    "ru": "None",
+    "Column 11": ""
   },
   {
     "key": "trigger.cooldown.until-next-turn",
@@ -17985,7 +18185,8 @@
     "es": "Until Next Turn",
     "pt-BR": "Until Next Turn",
     "zh": "Until Next Turn",
-    "ru": "Until Next Turn"
+    "ru": "Until Next Turn",
+    "Column 11": ""
   },
   {
     "key": "trigger.cooldown.until-next-round",
@@ -17997,7 +18198,8 @@
     "es": "Until Next Round",
     "pt-BR": "Until Next Round",
     "zh": "Until Next Round",
-    "ru": "Until Next Round"
+    "ru": "Until Next Round",
+    "Column 11": ""
   },
   {
     "key": "behavior.voluntaryNoDamage",
@@ -18009,7 +18211,8 @@
     "es": "May deal no damage",
     "pt-BR": "May deal no damage",
     "zh": "May deal no damage",
-    "ru": "May deal no damage"
+    "ru": "May deal no damage",
+    "Column 11": ""
   },
   {
     "key": "behavior.effects",
@@ -18021,7 +18224,8 @@
     "es": "Self Effects",
     "pt-BR": "Self Effects",
     "zh": "Self Effects",
-    "ru": "Self Effects"
+    "ru": "Self Effects",
+    "Column 11": ""
   },
   {
     "key": "behavior.addEffect",
@@ -18033,7 +18237,8 @@
     "es": "Add Effect",
     "pt-BR": "Add Effect",
     "zh": "Add Effect",
-    "ru": "Add Effect"
+    "ru": "Add Effect",
+    "Column 11": ""
   },
   {
     "key": "behavior.name",
@@ -18045,7 +18250,8 @@
     "es": "Name",
     "pt-BR": "Name",
     "zh": "Name",
-    "ru": "Name"
+    "ru": "Name",
+    "Column 11": ""
   },
   {
     "key": "behavior.description",
@@ -18057,7 +18263,8 @@
     "es": "Description",
     "pt-BR": "Description",
     "zh": "Description",
-    "ru": "Description"
+    "ru": "Description",
+    "Column 11": ""
   },
   {
     "key": "behavior.chatOutput.text",
@@ -18069,7 +18276,8 @@
     "es": "Chat Output Text",
     "pt-BR": "Chat Output Text",
     "zh": "Chat Output Text",
-    "ru": "Chat Output Text"
+    "ru": "Chat Output Text",
+    "Column 11": ""
   },
   {
     "key": "behavior.add",
@@ -18081,7 +18289,8 @@
     "es": "Add Behavior",
     "pt-BR": "Add Behavior",
     "zh": "Add Behavior",
-    "ru": "Add Behavior"
+    "ru": "Add Behavior",
+    "Column 11": ""
   },
   {
     "key": "behavior.transfer.true",
@@ -18093,7 +18302,8 @@
     "es": "Actor Effect",
     "pt-BR": "Actor Effect",
     "zh": "Actor Effect",
-    "ru": "Actor Effect"
+    "ru": "Actor Effect",
+    "Column 11": ""
   },
   {
     "key": "behavior.transfer.false",
@@ -18105,7 +18315,8 @@
     "es": "Item Effect",
     "pt-BR": "Item Effect",
     "zh": "Item Effect",
-    "ru": "Item Effect"
+    "ru": "Item Effect",
+    "Column 11": ""
   },
   {
     "key": "behavior.transfer.label",
@@ -18117,7 +18328,8 @@
     "es": "Effect Type",
     "pt-BR": "Effect Type",
     "zh": "Effect Type",
-    "ru": "Effect Type"
+    "ru": "Effect Type",
+    "Column 11": ""
   },
   {
     "key": "behavior.effect.transfer",
@@ -18129,7 +18341,8 @@
     "es": "Transfer to actor when equipped",
     "pt-BR": "Transfer to actor when equipped",
     "zh": "Transfer to actor when equipped",
-    "ru": "Transfer to actor when equipped"
+    "ru": "Transfer to actor when equipped",
+    "Column 11": ""
   },
   {
     "key": "behavior.effect.disabled",
@@ -18141,7 +18354,8 @@
     "es": "Disabled",
     "pt-BR": "Disabled",
     "zh": "Disabled",
-    "ru": "Disabled"
+    "ru": "Disabled",
+    "Column 11": ""
   },
   {
     "key": "behavior.effect.duration",
@@ -18153,7 +18367,8 @@
     "es": "Duration",
     "pt-BR": "Duration",
     "zh": "Duration",
-    "ru": "Duration"
+    "ru": "Duration",
+    "Column 11": ""
   },
   {
     "key": "behavior.effect.tracking",
@@ -18165,7 +18380,8 @@
     "es": "Tracking",
     "pt-BR": "Tracking",
     "zh": "Tracking",
-    "ru": "Tracking"
+    "ru": "Tracking",
+    "Column 11": ""
   },
   {
     "key": "behavior.effect.crisisInteraction",
@@ -18177,7 +18393,8 @@
     "es": "Active in Crisis",
     "pt-BR": "Active in Crisis",
     "zh": "Active in Crisis",
-    "ru": "Active in Crisis"
+    "ru": "Active in Crisis",
+    "Column 11": ""
   },
   {
     "key": "behavior.effect.changes",
@@ -18189,7 +18406,8 @@
     "es": "Stat Changes",
     "pt-BR": "Stat Changes",
     "zh": "Stat Changes",
-    "ru": "Stat Changes"
+    "ru": "Stat Changes",
+    "Column 11": ""
   },
   {
     "key": "behavior.addFromCompendium",
@@ -18201,7 +18419,8 @@
     "es": "Add from Compendium",
     "pt-BR": "Add from Compendium",
     "zh": "Add from Compendium",
-    "ru": "Add from Compendium"
+    "ru": "Add from Compendium",
+    "Column 11": ""
   },
   {
     "key": "behavior.experimental.notice",
@@ -18213,7 +18432,8 @@
     "es": "Behaviors are an advanced experimental feature. Options and stat keys are subject to change between updates.",
     "pt-BR": "Behaviors are an advanced experimental feature. Options and stat keys are subject to change between updates.",
     "zh": "Behaviors are an advanced experimental feature. Options and stat keys are subject to change between updates.",
-    "ru": "Behaviors are an advanced experimental feature. Options and stat keys are subject to change between updates."
+    "ru": "Behaviors are an advanced experimental feature. Options and stat keys are subject to change between updates.",
+    "Column 11": ""
   },
   {
     "key": "effect.defineBehavior",
@@ -18225,7 +18445,8 @@
     "es": "Define Behavior",
     "pt-BR": "Define Behavior",
     "zh": "Define Behavior",
-    "ru": "Define Behavior"
+    "ru": "Define Behavior",
+    "Column 11": ""
   },
   {
     "key": "effect.behavior",
@@ -18237,7 +18458,8 @@
     "es": "Behavior",
     "pt-BR": "Behavior",
     "zh": "Behavior",
-    "ru": "Behavior"
+    "ru": "Behavior",
+    "Column 11": ""
   },
   {
     "key": "effect.applicableTypes",
@@ -18249,7 +18471,8 @@
     "es": "Applicable Item Types",
     "pt-BR": "Applicable Item Types",
     "zh": "Applicable Item Types",
-    "ru": "Applicable Item Types"
+    "ru": "Applicable Item Types",
+    "Column 11": ""
   },
   {
     "key": "effect.applicableTypes.placeholder",
@@ -18261,7 +18484,8 @@
     "es": "All item types (no restriction)",
     "pt-BR": "All item types (no restriction)",
     "zh": "All item types (no restriction)",
-    "ru": "All item types (no restriction)"
+    "ru": "All item types (no restriction)",
+    "Column 11": ""
   },
   {
     "key": "New Effect",
@@ -18273,7 +18497,8 @@
     "es": "New Effect",
     "pt-BR": "New Effect",
     "zh": "New Effect",
-    "ru": "New Effect"
+    "ru": "New Effect",
+    "Column 11": ""
   },
   {
     "key": "Unnamed Effect",
@@ -18285,7 +18510,8 @@
     "es": "Unnamed Effect",
     "pt-BR": "Unnamed Effect",
     "zh": "Unnamed Effect",
-    "ru": "Unnamed Effect"
+    "ru": "Unnamed Effect",
+    "Column 11": ""
   },
   {
     "key": "effect.trigger.passive",
@@ -18297,7 +18523,8 @@
     "es": "Passive",
     "pt-BR": "Passive",
     "zh": "Passive",
-    "ru": "Passive"
+    "ru": "Passive",
+    "Column 11": ""
   },
   {
     "key": "effect.trigger.active",
@@ -18309,7 +18536,8 @@
     "es": "Active",
     "pt-BR": "Active",
     "zh": "Active",
-    "ru": "Active"
+    "ru": "Active",
+    "Column 11": ""
   },
   {
     "key": "effect.trigger.reactive",
@@ -18321,7 +18549,8 @@
     "es": "Reactive",
     "pt-BR": "Reactive",
     "zh": "Reactive",
-    "ru": "Reactive"
+    "ru": "Reactive",
+    "Column 11": ""
   },
   {
     "key": "effect.trigger.chat-action",
@@ -18333,7 +18562,8 @@
     "es": "Chat Action",
     "pt-BR": "Chat Action",
     "zh": "Chat Action",
-    "ru": "Chat Action"
+    "ru": "Chat Action",
+    "Column 11": ""
   },
   {
     "key": "change",
@@ -18345,7 +18575,8 @@
     "es": "change",
     "pt-BR": "change",
     "zh": "change",
-    "ru": "change"
+    "ru": "change",
+    "Column 11": ""
   },
   {
     "key": "change",
@@ -18357,7 +18588,8 @@
     "es": "changes",
     "pt-BR": "changes",
     "zh": "changes",
-    "ru": "changes"
+    "ru": "changes",
+    "Column 11": ""
   },
   {
     "key": "effect.duration.none",
@@ -18369,7 +18601,8 @@
     "es": "None",
     "pt-BR": "None",
     "zh": "None",
-    "ru": "None"
+    "ru": "None",
+    "Column 11": ""
   },
   {
     "key": "effect.duration.rest",
@@ -18381,7 +18614,8 @@
     "es": "Until Rest",
     "pt-BR": "Until Rest",
     "zh": "Until Rest",
-    "ru": "Until Rest"
+    "ru": "Until Rest",
+    "Column 11": ""
   },
   {
     "key": "effect.duration.end-of-scene",
@@ -18393,7 +18627,8 @@
     "es": "End of Scene",
     "pt-BR": "End of Scene",
     "zh": "End of Scene",
-    "ru": "End of Scene"
+    "ru": "End of Scene",
+    "Column 11": ""
   },
   {
     "key": "effect.duration.start-of-turn",
@@ -18405,7 +18640,8 @@
     "es": "Start of Turn",
     "pt-BR": "Start of Turn",
     "zh": "Start of Turn",
-    "ru": "Start of Turn"
+    "ru": "Start of Turn",
+    "Column 11": ""
   },
   {
     "key": "effect.duration.end-of-turn",
@@ -18417,7 +18653,8 @@
     "es": "End of Turn",
     "pt-BR": "End of Turn",
     "zh": "End of Turn",
-    "ru": "End of Turn"
+    "ru": "End of Turn",
+    "Column 11": ""
   },
   {
     "key": "effect.duration.end-of-round",
@@ -18429,7 +18666,8 @@
     "es": "End of Round",
     "pt-BR": "End of Round",
     "zh": "End of Round",
-    "ru": "End of Round"
+    "ru": "End of Round",
+    "Column 11": ""
   },
   {
     "key": "effect.tracking.self",
@@ -18441,7 +18679,8 @@
     "es": "Self",
     "pt-BR": "Self",
     "zh": "Self",
-    "ru": "Self"
+    "ru": "Self",
+    "Column 11": ""
   },
   {
     "key": "effect.tracking.source",
@@ -18453,7 +18692,8 @@
     "es": "Source",
     "pt-BR": "Source",
     "zh": "Source",
-    "ru": "Source"
+    "ru": "Source",
+    "Column 11": ""
   },
   {
     "key": "effect.crisis.none",
@@ -18465,7 +18705,8 @@
     "es": "Always",
     "pt-BR": "Always",
     "zh": "Always",
-    "ru": "Always"
+    "ru": "Always",
+    "Column 11": ""
   },
   {
     "key": "effect.crisis.active",
@@ -18477,7 +18718,8 @@
     "es": "Only in Crisis",
     "pt-BR": "Only in Crisis",
     "zh": "Only in Crisis",
-    "ru": "Only in Crisis"
+    "ru": "Only in Crisis",
+    "Column 11": ""
   },
   {
     "key": "effect.crisis.inactive",
@@ -18489,7 +18731,8 @@
     "es": "Only out of Crisis",
     "pt-BR": "Only out of Crisis",
     "zh": "Only out of Crisis",
-    "ru": "Only out of Crisis"
+    "ru": "Only out of Crisis",
+    "Column 11": ""
   },
   {
     "key": "behavior.change.key",
@@ -18501,7 +18744,8 @@
     "es": "Stat Key",
     "pt-BR": "Stat Key",
     "zh": "Stat Key",
-    "ru": "Stat Key"
+    "ru": "Stat Key",
+    "Column 11": ""
   },
   {
     "key": "behavior.change.mode",
@@ -18513,7 +18757,8 @@
     "es": "Mode",
     "pt-BR": "Mode",
     "zh": "Mode",
-    "ru": "Mode"
+    "ru": "Mode",
+    "Column 11": ""
   },
   {
     "key": "behavior.change.value",
@@ -18525,7 +18770,8 @@
     "es": "Value",
     "pt-BR": "Value",
     "zh": "Value",
-    "ru": "Value"
+    "ru": "Value",
+    "Column 11": ""
   },
   {
     "key": "behavior.addChange",
@@ -18537,7 +18783,8 @@
     "es": "Add Change",
     "pt-BR": "Add Change",
     "zh": "Add Change",
-    "ru": "Add Change"
+    "ru": "Add Change",
+    "Column 11": ""
   },
   {
     "key": "effect.mode.override",
@@ -18549,7 +18796,8 @@
     "es": "Override",
     "pt-BR": "Override",
     "zh": "Override",
-    "ru": "Override"
+    "ru": "Override",
+    "Column 11": ""
   },
   {
     "key": "effect.mode.multiply",
@@ -18561,7 +18809,8 @@
     "es": "Multiply",
     "pt-BR": "Multiply",
     "zh": "Multiply",
-    "ru": "Multiply"
+    "ru": "Multiply",
+    "Column 11": ""
   },
   {
     "key": "effect.mode.add",
@@ -18573,7 +18822,8 @@
     "es": "Add",
     "pt-BR": "Add",
     "zh": "Add",
-    "ru": "Add"
+    "ru": "Add",
+    "Column 11": ""
   },
   {
     "key": "effect.mode.downgrade",
@@ -18585,7 +18835,8 @@
     "es": "Downgrade",
     "pt-BR": "Downgrade",
     "zh": "Downgrade",
-    "ru": "Downgrade"
+    "ru": "Downgrade",
+    "Column 11": ""
   },
   {
     "key": "effect.mode.upgrade",
@@ -18597,7 +18848,8 @@
     "es": "Upgrade",
     "pt-BR": "Upgrade",
     "zh": "Upgrade",
-    "ru": "Upgrade"
+    "ru": "Upgrade",
+    "Column 11": ""
   },
   {
     "key": "effect.mode.custom",
@@ -18609,7 +18861,8 @@
     "es": "Custom",
     "pt-BR": "Custom",
     "zh": "Custom",
-    "ru": "Custom"
+    "ru": "Custom",
+    "Column 11": ""
   },
   {
     "key": "behavior.appliesEffect.label",
@@ -18621,7 +18874,8 @@
     "es": "Effect Label",
     "pt-BR": "Effect Label",
     "zh": "Effect Label",
-    "ru": "Effect Label"
+    "ru": "Effect Label",
+    "Column 11": ""
   },
   {
     "key": "behavior.appliesEffect.target",
@@ -18633,7 +18887,8 @@
     "es": "Target",
     "pt-BR": "Target",
     "zh": "Target",
-    "ru": "Target"
+    "ru": "Target",
+    "Column 11": ""
   },
   {
     "key": "behavior.appliesEffect.duration",
@@ -18645,7 +18900,8 @@
     "es": "Duration",
     "pt-BR": "Duration",
     "zh": "Duration",
-    "ru": "Duration"
+    "ru": "Duration",
+    "Column 11": ""
   },
   {
     "key": "behavior.appliesEffect.tracking",
@@ -18657,7 +18913,8 @@
     "es": "Tracking",
     "pt-BR": "Tracking",
     "zh": "Tracking",
-    "ru": "Tracking"
+    "ru": "Tracking",
+    "Column 11": ""
   },
   {
     "key": "behavior.appliesEffect.crisisInteraction",
@@ -18669,7 +18926,8 @@
     "es": "Active in Crisis",
     "pt-BR": "Active in Crisis",
     "zh": "Active in Crisis",
-    "ru": "Active in Crisis"
+    "ru": "Active in Crisis",
+    "Column 11": ""
   },
   {
     "key": "behavior.appliesEffect.changes",
@@ -18681,7 +18939,8 @@
     "es": "Stat Changes",
     "pt-BR": "Stat Changes",
     "zh": "Stat Changes",
-    "ru": "Stat Changes"
+    "ru": "Stat Changes",
+    "Column 11": ""
   },
   {
     "key": "appliesEffect.target.single",
@@ -18693,7 +18952,8 @@
     "es": "Single Target",
     "pt-BR": "Single Target",
     "zh": "Single Target",
-    "ru": "Single Target"
+    "ru": "Single Target",
+    "Column 11": ""
   },
   {
     "key": "appliesEffect.target.all",
@@ -18705,7 +18965,8 @@
     "es": "All Targets",
     "pt-BR": "All Targets",
     "zh": "All Targets",
-    "ru": "All Targets"
+    "ru": "All Targets",
+    "Column 11": ""
   },
   {
     "key": "appliesEffect.target.self",
@@ -18717,7 +18978,8 @@
     "es": "Self",
     "pt-BR": "Self",
     "zh": "Self",
-    "ru": "Self"
+    "ru": "Self",
+    "Column 11": ""
   },
   {
     "key": "appliesEffect.target.cover-target",
@@ -18729,7 +18991,8 @@
     "es": "Cover Target",
     "pt-BR": "Cover Target",
     "zh": "Cover Target",
-    "ru": "Cover Target"
+    "ru": "Cover Target",
+    "Column 11": ""
   },
   {
     "key": "behavior.afterEffects",
@@ -18741,7 +19004,8 @@
     "es": "After Effects",
     "pt-BR": "After Effects",
     "zh": "After Effects",
-    "ru": "After Effects"
+    "ru": "After Effects",
+    "Column 11": ""
   },
   {
     "key": "behavior.addAfterEffect",
@@ -18753,7 +19017,8 @@
     "es": "Add After Effect",
     "pt-BR": "Add After Effect",
     "zh": "Add After Effect",
-    "ru": "Add After Effect"
+    "ru": "Add After Effect",
+    "Column 11": ""
   },
   {
     "key": "behavior.afterEffect.resource",
@@ -18765,7 +19030,8 @@
     "es": "Resource",
     "pt-BR": "Resource",
     "zh": "Resource",
-    "ru": "Resource"
+    "ru": "Resource",
+    "Column 11": ""
   },
   {
     "key": "behavior.afterEffect.direction",
@@ -18777,7 +19043,8 @@
     "es": "Direction",
     "pt-BR": "Direction",
     "zh": "Direction",
-    "ru": "Direction"
+    "ru": "Direction",
+    "Column 11": ""
   },
   {
     "key": "behavior.afterEffect.amount",
@@ -18789,7 +19056,8 @@
     "es": "Amount",
     "pt-BR": "Amount",
     "zh": "Amount",
-    "ru": "Amount"
+    "ru": "Amount",
+    "Column 11": ""
   },
   {
     "key": "behavior.afterEffect.amountValue",
@@ -18801,7 +19069,8 @@
     "es": "Amount (fixed)",
     "pt-BR": "Amount (fixed)",
     "zh": "Amount (fixed)",
-    "ru": "Amount (fixed)"
+    "ru": "Amount (fixed)",
+    "Column 11": ""
   },
   {
     "key": "behavior.afterEffect.amountExpr",
@@ -18813,7 +19082,8 @@
     "es": "Expression",
     "pt-BR": "Expression",
     "zh": "Expression",
-    "ru": "Expression"
+    "ru": "Expression",
+    "Column 11": ""
   },
   {
     "key": "behavior.afterEffect.target",
@@ -18825,7 +19095,8 @@
     "es": "Target",
     "pt-BR": "Target",
     "zh": "Target",
-    "ru": "Target"
+    "ru": "Target",
+    "Column 11": ""
   },
   {
     "key": "behavior.afterEffect.crisisInteraction",
@@ -18837,7 +19108,8 @@
     "es": "Active in Crisis",
     "pt-BR": "Active in Crisis",
     "zh": "Active in Crisis",
-    "ru": "Active in Crisis"
+    "ru": "Active in Crisis",
+    "Column 11": ""
   },
   {
     "key": "resource.hp",
@@ -18849,7 +19121,8 @@
     "es": "HP",
     "pt-BR": "HP",
     "zh": "HP",
-    "ru": "HP"
+    "ru": "HP",
+    "Column 11": ""
   },
   {
     "key": "resource.mp",
@@ -18861,7 +19134,8 @@
     "es": "MP",
     "pt-BR": "MP",
     "zh": "MP",
-    "ru": "MP"
+    "ru": "MP",
+    "Column 11": ""
   },
   {
     "key": "resource.ip",
@@ -18873,7 +19147,8 @@
     "es": "IP",
     "pt-BR": "IP",
     "zh": "IP",
-    "ru": "IP"
+    "ru": "IP",
+    "Column 11": ""
   },
   {
     "key": "afterEffect.direction.loss",
@@ -18885,7 +19160,8 @@
     "es": "Loss",
     "pt-BR": "Loss",
     "zh": "Loss",
-    "ru": "Loss"
+    "ru": "Loss",
+    "Column 11": ""
   },
   {
     "key": "afterEffect.direction.recovery",
@@ -18897,7 +19173,8 @@
     "es": "Recovery",
     "pt-BR": "Recovery",
     "zh": "Recovery",
-    "ru": "Recovery"
+    "ru": "Recovery",
+    "Column 11": ""
   },
   {
     "key": "afterEffect.amount.fixed",
@@ -18909,7 +19186,8 @@
     "es": "Fixed Number",
     "pt-BR": "Fixed Number",
     "zh": "Fixed Number",
-    "ru": "Fixed Number"
+    "ru": "Fixed Number",
+    "Column 11": ""
   },
   {
     "key": "afterEffect.amount.half-damage",
@@ -18921,7 +19199,8 @@
     "es": "Half Damage",
     "pt-BR": "Half Damage",
     "zh": "Half Damage",
-    "ru": "Half Damage"
+    "ru": "Half Damage",
+    "Column 11": ""
   },
   {
     "key": "afterEffect.amount.half-loss",
@@ -18933,7 +19212,8 @@
     "es": "Half Loss",
     "pt-BR": "Half Loss",
     "zh": "Half Loss",
-    "ru": "Half Loss"
+    "ru": "Half Loss",
+    "Column 11": ""
   },
   {
     "key": "afterEffect.amount.expr",
@@ -18945,7 +19225,8 @@
     "es": "Expression",
     "pt-BR": "Expression",
     "zh": "Expression",
-    "ru": "Expression"
+    "ru": "Expression",
+    "Column 11": ""
   },
   {
     "key": "afterEffect.target.self",
@@ -18957,7 +19238,8 @@
     "es": "Self",
     "pt-BR": "Self",
     "zh": "Self",
-    "ru": "Self"
+    "ru": "Self",
+    "Column 11": ""
   },
   {
     "key": "afterEffect.target.targets",
@@ -18969,7 +19251,8 @@
     "es": "Targets",
     "pt-BR": "Targets",
     "zh": "Targets",
-    "ru": "Targets"
+    "ru": "Targets",
+    "Column 11": ""
   },
   {
     "key": "afterEffect.target.cover-target",
@@ -18981,7 +19264,8 @@
     "es": "Cover Target ",
     "pt-BR": "Cover Target ",
     "zh": "Cover Target ",
-    "ru": "Cover Target "
+    "ru": "Cover Target ",
+    "Column 11": ""
   },
   {
     "key": "behavior.branches",
@@ -18993,7 +19277,8 @@
     "es": "Outcome Branches",
     "pt-BR": "Outcome Branches",
     "zh": "Outcome Branches",
-    "ru": "Outcome Branches"
+    "ru": "Outcome Branches",
+    "Column 11": ""
   },
   {
     "key": "behavior.branch.label",
@@ -19005,7 +19290,8 @@
     "es": "Branch Label",
     "pt-BR": "Branch Label",
     "zh": "Branch Label",
-    "ru": "Branch Label"
+    "ru": "Branch Label",
+    "Column 11": ""
   },
   {
     "key": "behavior.branch.appliesEffect",
@@ -19017,7 +19303,8 @@
     "es": "Applies Effect",
     "pt-BR": "Applies Effect",
     "zh": "Applies Effect",
-    "ru": "Applies Effect"
+    "ru": "Applies Effect",
+    "Column 11": ""
   },
   {
     "key": "behavior.branch.afterEffects",
@@ -19029,7 +19316,8 @@
     "es": "After Effects",
     "pt-BR": "After Effects",
     "zh": "After Effects",
-    "ru": "After Effects"
+    "ru": "After Effects",
+    "Column 11": ""
   },
   {
     "key": "behavior.addBranch",
@@ -19041,7 +19329,8 @@
     "es": "Add Branch",
     "pt-BR": "Add Branch",
     "zh": "Add Branch",
-    "ru": "Add Branch"
+    "ru": "Add Branch",
+    "Column 11": ""
   },
   {
     "key": "behavior.manual.reason",
@@ -19053,7 +19342,8 @@
     "es": "Reason",
     "pt-BR": "Reason",
     "zh": "Reason",
-    "ru": "Reason"
+    "ru": "Reason",
+    "Column 11": ""
   },
   {
     "key": "behavior.manual.hint",
@@ -19065,7 +19355,8 @@
     "es": "Resolution Hint",
     "pt-BR": "Resolution Hint",
     "zh": "Resolution Hint",
-    "ru": "Resolution Hint"
+    "ru": "Resolution Hint",
+    "Column 11": ""
   },
   {
     "key": "manual.reason.prompt-required",
@@ -19077,7 +19368,8 @@
     "es": "Prompt Required",
     "pt-BR": "Prompt Required",
     "zh": "Prompt Required",
-    "ru": "Prompt Required"
+    "ru": "Prompt Required",
+    "Column 11": ""
   },
   {
     "key": "manual.reason.free-attack",
@@ -19089,7 +19381,8 @@
     "es": "Free Attack",
     "pt-BR": "Free Attack",
     "zh": "Free Attack",
-    "ru": "Free Attack"
+    "ru": "Free Attack",
+    "Column 11": ""
   },
   {
     "key": "manual.reason.future-effect",
@@ -19101,7 +19394,8 @@
     "es": "Future Effect",
     "pt-BR": "Future Effect",
     "zh": "Future Effect",
-    "ru": "Future Effect"
+    "ru": "Future Effect",
+    "Column 11": ""
   },
   {
     "key": "manual.reason.other",
@@ -19113,7 +19407,8 @@
     "es": "Other",
     "pt-BR": "Other",
     "zh": "Other",
-    "ru": "Other"
+    "ru": "Other",
+    "Column 11": ""
   },
   {
     "key": "passive.add",
@@ -19125,7 +19420,8 @@
     "es": "Add Passive Effect",
     "pt-BR": "Add Passive Effect",
     "zh": "Add Passive Effect",
-    "ru": "Add Passive Effect"
+    "ru": "Add Passive Effect",
+    "Column 11": ""
   },
   {
     "key": "passive.transfer",
@@ -19137,7 +19433,8 @@
     "es": "Transfer Effect to Actor",
     "pt-BR": "Transfer Effect to Actor",
     "zh": "Transfer Effect to Actor",
-    "ru": "Transfer Effect to Actor"
+    "ru": "Transfer Effect to Actor",
+    "Column 11": ""
   },
   {
     "key": "passive.disabled",
@@ -19149,7 +19446,8 @@
     "es": "Disable Effect",
     "pt-BR": "Disable Effect",
     "zh": "Disable Effect",
-    "ru": "Disable Effect"
+    "ru": "Disable Effect",
+    "Column 11": ""
   },
   {
     "key": "passive.name",
@@ -19161,7 +19459,8 @@
     "es": "Name",
     "pt-BR": "Name",
     "zh": "Name",
-    "ru": "Name"
+    "ru": "Name",
+    "Column 11": ""
   },
   {
     "key": "passive.description",
@@ -19173,7 +19472,8 @@
     "es": "Description",
     "pt-BR": "Description",
     "zh": "Description",
-    "ru": "Description"
+    "ru": "Description",
+    "Column 11": ""
   },
   {
     "key": "passive.duration",
@@ -19185,7 +19485,8 @@
     "es": "Duration",
     "pt-BR": "Duration",
     "zh": "Duration",
-    "ru": "Duration"
+    "ru": "Duration",
+    "Column 11": ""
   },
   {
     "key": "passive.crisisInteraction",
@@ -19197,7 +19498,8 @@
     "es": "Crisis Interaction",
     "pt-BR": "Crisis Interaction",
     "zh": "Crisis Interaction",
-    "ru": "Crisis Interaction"
+    "ru": "Crisis Interaction",
+    "Column 11": ""
   },
   {
     "key": "passive.changes",
@@ -19209,7 +19511,8 @@
     "es": "Changes",
     "pt-BR": "Changes",
     "zh": "Changes",
-    "ru": "Changes"
+    "ru": "Changes",
+    "Column 11": ""
   },
   {
     "key": "passive.addChange",
@@ -19221,7 +19524,8 @@
     "es": "Add Change",
     "pt-BR": "Add Change",
     "zh": "Add Change",
-    "ru": "Add Change"
+    "ru": "Add Change",
+    "Column 11": ""
   },
   {
     "key": "vehicle_module.group.armor",
@@ -19233,7 +19537,8 @@
     "es": "Armor",
     "pt-BR": "Armor",
     "zh": "Armor",
-    "ru": "Armor"
+    "ru": "Armor",
+    "Column 11": ""
   },
   {
     "key": "vehicle_module.group.weapon",
@@ -19245,7 +19550,8 @@
     "es": "Weapon",
     "pt-BR": "Weapon",
     "zh": "Weapon",
-    "ru": "Weapon"
+    "ru": "Weapon",
+    "Column 11": ""
   },
   {
     "key": "vehicle_module.group.accuracy",
@@ -19257,7 +19563,8 @@
     "es": "Accuracy",
     "pt-BR": "Accuracy",
     "zh": "Accuracy",
-    "ru": "Accuracy"
+    "ru": "Accuracy",
+    "Column 11": ""
   },
   {
     "key": "vehicle_module.group.damage",
@@ -19269,7 +19576,8 @@
     "es": "Damage",
     "pt-BR": "Damage",
     "zh": "Damage",
-    "ru": "Damage"
+    "ru": "Damage",
+    "Column 11": ""
   },
   {
     "key": "vehicle_module.group.quality",
@@ -19281,7 +19589,8 @@
     "es": "Quality",
     "pt-BR": "Quality",
     "zh": "Quality",
-    "ru": "Quality"
+    "ru": "Quality",
+    "Column 11": ""
   },
   {
     "key": "vehicle_module.group.support",
@@ -19293,7 +19602,8 @@
     "es": "Support",
     "pt-BR": "Support",
     "zh": "Support",
-    "ru": "Support"
+    "ru": "Support",
+    "Column 11": ""
   },
   {
     "key": "vehicle_module.name",
@@ -19305,7 +19615,8 @@
     "es": "Name",
     "pt-BR": "Name",
     "zh": "Name",
-    "ru": "Name"
+    "ru": "Name",
+    "Column 11": ""
   },
   {
     "key": "vehicle_module.cumbersome",
@@ -19317,7 +19628,8 @@
     "es": "Cumbersome",
     "pt-BR": "Cumbersome",
     "zh": "Cumbersome",
-    "ru": "Cumbersome"
+    "ru": "Cumbersome",
+    "Column 11": ""
   },
   {
     "key": "vehicle_module.shield",
@@ -19329,7 +19641,8 @@
     "es": "Shield",
     "pt-BR": "Shield",
     "zh": "Shield",
-    "ru": "Shield"
+    "ru": "Shield",
+    "Column 11": ""
   },
   {
     "key": "vehicle_module.isComplex",
@@ -19341,7 +19654,8 @@
     "es": "Is Complex?",
     "pt-BR": "Is Complex?",
     "zh": "Is Complex?",
-    "ru": "Is Complex?"
+    "ru": "Is Complex?",
+    "Column 11": ""
   },
   {
     "key": "vehicle_module.customName",
@@ -19353,7 +19667,8 @@
     "es": "Custom Name",
     "pt-BR": "Custom Name",
     "zh": "Custom Name",
-    "ru": "Custom Name"
+    "ru": "Custom Name",
+    "Column 11": ""
   },
   {
     "key": "pilot.frame",
@@ -19365,7 +19680,8 @@
     "es": "Frame",
     "pt-BR": "Frame",
     "zh": "Frame",
-    "ru": "Frame"
+    "ru": "Frame",
+    "Column 11": ""
   },
   {
     "key": "pilot.maxEnabledModules",
@@ -19377,7 +19693,8 @@
     "es": "Max Enabled Modules",
     "pt-BR": "Max Enabled Modules",
     "zh": "Max Enabled Modules",
-    "ru": "Max Enabled Modules"
+    "ru": "Max Enabled Modules",
+    "Column 11": ""
   },
   {
     "key": "magiseed.rangeStart",
@@ -19389,7 +19706,8 @@
     "es": "Range Start",
     "pt-BR": "Range Start",
     "zh": "Range Start",
-    "ru": "Range Start"
+    "ru": "Range Start",
+    "Column 11": ""
   },
   {
     "key": "magiseed.rangeEnd",
@@ -19401,7 +19719,8 @@
     "es": "Range End",
     "pt-BR": "Range End",
     "zh": "Range End",
-    "ru": "Range End"
+    "ru": "Range End",
+    "Column 11": ""
   },
   {
     "key": "magiseed.effect_0",
@@ -19413,7 +19732,8 @@
     "es": "T = 0",
     "pt-BR": "T = 0",
     "zh": "T = 0",
-    "ru": "T = 0"
+    "ru": "T = 0",
+    "Column 11": ""
   },
   {
     "key": "magiseed.effect_1",
@@ -19425,7 +19745,8 @@
     "es": "T = 1",
     "pt-BR": "T = 1",
     "zh": "T = 1",
-    "ru": "T = 1"
+    "ru": "T = 1",
+    "Column 11": ""
   },
   {
     "key": "magiseed.effect_2",
@@ -19437,7 +19758,8 @@
     "es": "T = 2",
     "pt-BR": "T = 2",
     "zh": "T = 2",
-    "ru": "T = 2"
+    "ru": "T = 2",
+    "Column 11": ""
   },
   {
     "key": "magiseed.effect_3",
@@ -19449,7 +19771,8 @@
     "es": "T = 3",
     "pt-BR": "T = 3",
     "zh": "T = 3",
-    "ru": "T = 3"
+    "ru": "T = 3",
+    "Column 11": ""
   },
   {
     "key": "core",

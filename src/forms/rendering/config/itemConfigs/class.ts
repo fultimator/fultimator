@@ -237,6 +237,17 @@ export const classFieldConfig: ItemFieldConfig<ClassFormState> = [
     componentProps: { maxLength: 150, placeholder: "Druid, Shapeshifter" },
   },
   {
+    key: "description",
+    kind: "editable",
+    label: "class.description",
+    component: "textarea",
+    defaultValue: "",
+    group: G.core,
+    order: 3,
+    gridSize: 12,
+    componentProps: { maxLength: 1500 },
+  },
+  {
     key: "benefits.hpplus",
     kind: "editable",
     label: "class.benefits.hp",

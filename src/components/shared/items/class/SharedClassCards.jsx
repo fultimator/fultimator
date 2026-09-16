@@ -628,6 +628,30 @@ export const SharedClassCard = React.memo(function SharedClassCard({
           </Box>
         )}
 
+        {item.description?.trim() && (
+          <Box
+            sx={{
+              background,
+              px: 2,
+              py: 1,
+              borderBottom: `1px solid ${customTheme.secondary}`,
+            }}
+          >
+            <Typography
+              variant="body2"
+              component="div"
+              sx={{ color: "text.secondary" }}
+            >
+              <StyledMarkdown
+                allowedElements={["p", "strong", "em", "ul", "ol", "li", "br"]}
+                unwrapDisallowed
+              >
+                {item.isHomebrew ? item.description : t(item.description)}
+              </StyledMarkdown>
+            </Typography>
+          </Box>
+        )}
+
         {benefitLines.length > 0 && (
           <Box
             sx={{
