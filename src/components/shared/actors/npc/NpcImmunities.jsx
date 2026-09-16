@@ -15,12 +15,12 @@ export function NpcImmunities({ npc }) {
   const backgroundColor = theme.mode === "dark" ? `#583871` : `#6e468d`;
 
   const immunitiesLabels = {
-    slow: t("slow"),
-    dazed: t("dazed"),
-    weak: t("weak"),
-    shaken: t("shaken"),
-    enraged: t("enraged"),
-    poisoned: t("poisoned"),
+    slow: t("Slow"),
+    dazed: t("Dazed"),
+    weak: t("Weak"),
+    shaken: t("Shaken"),
+    enraged: t("Enraged"),
+    poisoned: t("Poisoned"),
   };
 
   const trueImmunities = Object.keys(immunitiesLabels)
