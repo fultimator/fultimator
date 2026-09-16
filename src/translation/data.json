@@ -3124,7 +3124,7 @@
     "en": "Delete Selected",
     "it": "Delete Selected",
     "de": "Delete Selected",
-    "pl": "Delete Selected",
+    "pl": "Usuń zaznaczone",
     "fr": "Delete Selected",
     "es": "Eliminar Seleccionados",
     "pt-BR": "Deletar selecionados",
@@ -4048,7 +4048,7 @@
     "en": "Variant Humanoid",
     "it": "Umanoide Variante",
     "de": "Humanoid-Variante",
-    "pl": "Wariant Humanoid",
+    "pl": "Wariant Humanoida",
     "fr": "Humanoïde Variant",
     "es": "Humanoide Variante",
     "pt-BR": "Humanóide Variante",
@@ -39825,6 +39825,30 @@
     "pt-BR": "Quantidade",
     "zh": "Amount",
     "ru": "Amount"
+  },
+  {
+    "key": "combat_sim_last_saved_just_now",
+    "en": "Last saved just now",
+    "it": "Last saved just now",
+    "de": "Last saved just now",
+    "pl": "Last saved just now",
+    "fr": "Last saved just now",
+    "es": "Last saved just now",
+    "pt-BR": "Last saved just now",
+    "zh": "Last saved just now",
+    "ru": "Last saved just now"
+  },
+  {
+    "key": "combat_sim_last_saved_minutes_ago",
+    "en": "Last saved minutes ago",
+    "it": "Last saved minutes ago",
+    "de": "Last saved minutes ago",
+    "pl": "Last saved minutes ago",
+    "fr": "Last saved minutes ago",
+    "es": "Last saved minutes ago",
+    "pt-BR": "Last saved minutes ago",
+    "zh": "Last saved minutes ago",
+    "ru": "Last saved minutes ago"
   },
   {
     "key": "combat_sim_auto_saved",
