@@ -20,6 +20,7 @@ import { useTheme } from "@mui/material/styles";
 import BattleHeader from "../../components/combatSim/BattleHeader";
 import PCDetail from "../../components/combatSim/PCDetail";
 import { calcHP, calcMP } from "../../libs/npcs";
+import { clamp } from "../../libs/playerCalculations";
 import SelectedActors from "../../components/combatSim/SelectedActors";
 import useDownloadImage from "../../hooks/useDownloadImage";
 import NPCDetail from "../../components/combatSim/NPCDetail";
@@ -273,6 +274,9 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
   );
   const clearTargets = useCombatEncounterStore((s) => s.clearTargets);
   const runtimeActors = useCombatEncounterStore((s) => s.runtimeActors);
+  const updateRuntimeActor = useCombatEncounterStore(
+    (s) => s.updateRuntimeActor,
+  );
   const setActorSelectPanelData = useCombatActorSelectStore(
     (s) => s.setPanelData,
   );
@@ -282,6 +286,54 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
   useEffect(() => {
     setEncounterActors(id, selectedNPCs, selectedPCs);
   }, [id, selectedNPCs, selectedPCs]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const mirrorRuntimeResources = useCallback(
+    (prev) => {
+      let changed = false;
+      const next = prev.map((doc) => {
+        const runtime = runtimeActors[doc.combatId];
+        if (!runtime) return doc;
+        const stats = doc.combatStats ?? {};
+        const rtHp = runtime.currentHp;
+        const rtMp = runtime.currentMp;
+        const hpDiffers =
+          Number.isFinite(rtHp) &&
+          stats.currentHp !== undefined &&
+          rtHp !== stats.currentHp;
+        const mpDiffers =
+          Number.isFinite(rtMp) &&
+          stats.currentMp !== undefined &&
+          rtMp !== stats.currentMp;
+        if (!hpDiffers && !mpDiffers) return doc;
+        changed = true;
+        return {
+          ...doc,
+          combatStats: {
+            ...stats,
+            currentHp: hpDiffers ? rtHp : stats.currentHp,
+            currentMp: mpDiffers ? rtMp : stats.currentMp,
+          },
+        };
+      });
+      return changed ? next : prev;
+    },
+    [runtimeActors],
+  );
+
+  useEffect(() => {
+    setSelectedNPCs(mirrorRuntimeResources);
+    setSelectedPCs(mirrorRuntimeResources);
+  }, [mirrorRuntimeResources]);
+
+  const syncRuntimeResource = (combatId, statType, delta, maxForStat) => {
+    if (statType !== "HP" && statType !== "MP") return;
+    const key = statType === "HP" ? "currentHp" : "currentMp";
+    updateRuntimeActor(combatId, (actor) => ({
+      ...actor,
+      [key]: clamp(actor[key] + delta, 0, maxForStat),
+    }));
+  };
+
   useEffect(
     () => () => {
       clearEncounterActors();
@@ -1109,6 +1161,13 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
         }),
       );
 
+      syncRuntimeResource(
+        npcClicked.combatId,
+        statType,
+        adjustedValue,
+        statType === "HP" ? maxHP : maxMP,
+      );
+
       if (selectedPC && selectedPC.combatId === npcClicked.combatId) {
         const newHp = Math.min(
           Math.max(
@@ -1269,6 +1328,13 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
     });
 
     setSelectedNPCs(updatedNPCs);
+
+    syncRuntimeResource(
+      npcClicked.combatId,
+      statType,
+      adjustedValue,
+      statType === "HP" ? calcHP(npcClicked) : calcMP(npcClicked),
+    );
 
     if (selectedNPC && selectedNPC.combatId === npcClicked.combatId) {
       const maxHP = calcHP(npcClicked);
