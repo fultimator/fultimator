@@ -63,7 +63,13 @@ export default function SelectedNpcsHeader({
           onChange={(_, val) => {
             if (val !== null) setInteractionMode(val);
           }}
-          sx={{ "& .MuiToggleButton-root": { px: 0.75, py: 0.5 } }}
+          sx={{
+            "& .MuiToggleButton-root": {
+              width: 36,
+              height: 36,
+              padding: 0,
+            },
+          }}
         >
           <ToggleButton value="select">
             <Tooltip title="Select mode: click to open actor sheet">
@@ -85,7 +91,11 @@ export default function SelectedNpcsHeader({
           <IconButton
             size="small"
             onClick={onClearAll}
-            sx={{ color: "text.secondary" }}
+            sx={{
+              color: "text.secondary",
+              width: 36,
+              height: 36,
+            }}
           >
             <Close fontSize="small" />
           </IconButton>
@@ -107,6 +117,8 @@ export default function SelectedNpcsHeader({
           <IconButton
             size="small"
             sx={{
+              width: 36,
+              height: 36,
               padding: 0.5,
               border: `1px solid ${primary}`,
               boxShadow: 3,
@@ -138,6 +150,8 @@ export default function SelectedNpcsHeader({
           <IconButton
             size="small"
             sx={{
+              width: 36,
+              height: 36,
               padding: 0.5,
               border: `1px solid ${primary}`,
               boxShadow: 3,
@@ -163,6 +177,8 @@ export default function SelectedNpcsHeader({
           <IconButton
             size="small"
             sx={{
+              width: 36,
+              height: 36,
               padding: 0.5,
               border: `1px solid ${primary}`,
               boxShadow: 3,
@@ -188,12 +204,19 @@ export default function SelectedNpcsHeader({
           <IconButton
             size="small"
             sx={{
+              width: 36,
+              height: 36,
               padding: 0.5,
               border: `1px solid ${primary}`,
               backgroundColor: isAllTurnsChecked ? "primary.main" : "inherit",
+              color: isAllTurnsChecked
+                ? "primary.contrastText"
+                : "primary.main",
               boxShadow: 3,
+              "&:hover": {
+                backgroundColor: isAllTurnsChecked ? "primary.dark" : undefined,
+              },
             }}
-            color="primary"
             onClick={handleResetTurns}
             disabled={selectedNPCs.length === 0}
           >

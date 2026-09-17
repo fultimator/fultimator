@@ -178,6 +178,11 @@ export default function NpcListItem({
               color: text.primary,
             },
             touchAction: "none",
+            "@container initiative-row (max-width: 620px)": {
+              width: "16px",
+              marginRight: 0,
+              "& svg": { fontSize: "1.1rem" },
+            },
           }}
         >
           <DragIndicator />
@@ -252,6 +257,10 @@ export default function NpcListItem({
           borderRight: `1px solid ${theme.palette.divider}`,
           padding: "0 7px",
           gap: "2px",
+          "@container initiative-row (max-width: 620px)": {
+            width: 18,
+            padding: "0 3px",
+          },
         }}
       >
         <Typography
@@ -375,6 +384,9 @@ export default function NpcListItem({
             flexShrink: 0,
             zIndex: 5, // Prevent overlap with turn counter
             gap: 0.25,
+            "@container initiative-row (max-width: 620px)": {
+              minWidth: "96px",
+            },
           }}
         >
           {/* Turn tokens */}
@@ -398,7 +410,12 @@ export default function NpcListItem({
                 e.stopPropagation();
                 handleMenuOpen(e, npc.combatId);
               }}
-              sx={{ padding: 0.5 }}
+              sx={{
+                padding: 0.5,
+                "@container initiative-row (max-width: 620px)": {
+                  padding: 1,
+                },
+              }}
             >
               <MoreVert fontSize="small" />
             </IconButton>
@@ -450,6 +467,9 @@ export default function NpcListItem({
             flexShrink: 0,
             zIndex: 5, // Prevent overlap with turn counter
             gap: 0.25,
+            "@container initiative-row (max-width: 620px)": {
+              minWidth: "96px",
+            },
           }}
         >
           <IconButton
