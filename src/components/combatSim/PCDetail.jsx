@@ -692,7 +692,7 @@ export default function PCDetail({
     },
   };
 
-  const pcSpeaker = { name: selectedPC?.name ?? "", type: "pc" };
+  const pcSpeaker = selectedPC?.name ?? "";
 
   const handlePcAction = (command) => {
     window.dispatchEvent(
@@ -704,6 +704,25 @@ export default function PCDetail({
         },
       }),
     );
+  };
+
+  const handleQuickCheck = (payload) => {
+    if (typeof payload === "string" || !payload) return;
+    const kind = payload.kind === "attribute" ? "attribute" : "open";
+    const primary = payload.primary || "dex";
+    const secondary = payload.secondary || "ins";
+    const modifier = Number(payload.modifier) || 0;
+    const hasDifficulty =
+      Number.isFinite(payload.difficulty) && Number(payload.difficulty) > 0;
+    const command = [
+      "/check",
+      kind,
+      primary,
+      secondary,
+      String(modifier),
+      ...(hasDifficulty ? [String(Number(payload.difficulty))] : []),
+    ].join(" ");
+    handlePcAction(command);
   };
 
   const handleRoll = (
@@ -780,6 +799,7 @@ export default function PCDetail({
         <PlayerSheetCompact
           pc={previewPc}
           onUpdate={() => {}}
+          onQuickCheck={handleQuickCheck}
           characterImage={previewPc?.info?.imgurl ?? null}
           id={previewPc?.id}
         />

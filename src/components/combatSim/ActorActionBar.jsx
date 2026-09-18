@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import { createPortal } from "react-dom";
 import {
   Box,
@@ -19,6 +19,7 @@ import {
   resolveSpellOptions,
   resolveEquipmentSlots,
 } from "../app-drawer/panels/chat/domain/speakers";
+import { t } from "../../translation/translate";
 
 const NPC_ACTIONS = [
   "attack",
@@ -57,6 +58,18 @@ const ACTION_ICONS = {
 
 const ATTRS = ["dex", "ins", "mig", "wlp"];
 
+const detectCoarsePointer = () =>
+  typeof window !== "undefined" &&
+  typeof window.matchMedia === "function" &&
+  window.matchMedia("(hover: none), (pointer: coarse)").matches;
+
+const buildSkillItem = ({ key, name, description, tag, showActionIcon }) => ({
+  key,
+  label: name,
+  ...(showActionIcon ? { showActionIcon: true } : {}),
+  displayMessage: { name, description, tags: [tag], itemType: "skill" },
+});
+
 /**
  * ActorActionBar - standalone action bar used in SelectedActors list,
  * NPC StatsTab, and PC StatsTab.
@@ -73,9 +86,12 @@ export default function ActorActionBar({
   expand = false,
 }) {
   const actionBarRef = useRef(null);
+  const menuPaperRef = useRef(null);
   const menuCloseTimer = useRef(null);
   const menuOpenTimer = useRef(null);
   const activeActionKeyRef = useRef(null);
+
+  const isCoarsePointer = useMemo(() => detectCoarsePointer(), []);
 
   const [activeActionKey, setActiveActionKey] = useState(null);
   const [openUpward, setOpenUpward] = useState(false);
@@ -170,23 +186,29 @@ export default function ActorActionBar({
         const otherActions = Array.isArray(actorDoc.actions)
           ? actorDoc.actions
               .filter((a) => a && typeof a === "object")
-              .map((a, idx) => ({
-                key: `npc-action-${idx}`,
-                label: a.name || `Action ${idx + 1}`,
-                showActionIcon: true,
-                command: "/action skill",
-              }))
+              .map((a, idx) =>
+                buildSkillItem({
+                  key: `npc-action-${idx}`,
+                  name: a.name || `Action ${idx + 1}`,
+                  description: a.effect ?? "",
+                  tag: "Action",
+                  showActionIcon: true,
+                }),
+              )
           : [];
 
         const specialRules = Array.isArray(actorDoc.special)
           ? actorDoc.special
               .filter((s) => s && typeof s === "object")
-              .map((s, idx) => ({
-                key: `npc-special-${idx}`,
-                label: s.name || `Special ${idx + 1}`,
-                showActionIcon: true,
-                command: "/action skill",
-              }))
+              .map((s, idx) =>
+                buildSkillItem({
+                  key: `npc-special-${idx}`,
+                  name: s.name || `Special ${idx + 1}`,
+                  description: s.effect ?? "",
+                  tag: "Special",
+                  showActionIcon: true,
+                }),
+              )
           : [];
 
         return [...otherActions, ...specialRules];
@@ -197,20 +219,26 @@ export default function ActorActionBar({
         const skills = Array.isArray(cls?.skills) ? cls.skills : [];
         return skills
           .filter((sk) => (sk?.currentLvl ?? 0) > 0)
-          .map((sk, skillIdx) => ({
-            key: `pc-skill-${classIdx}-${skillIdx}`,
-            label: sk.skillName || sk.name || `Skill ${skillIdx + 1}`,
-            command: "/action skill",
-          }));
+          .map((sk, skillIdx) =>
+            buildSkillItem({
+              key: `pc-skill-${classIdx}-${skillIdx}`,
+              name: t(sk.skillName || sk.name || `Skill ${skillIdx + 1}`),
+              description: t(sk.description ?? ""),
+              tag: "Skill",
+            }),
+          );
       });
 
       const heroicSkills = classes
         .filter((cls) => cls?.heroic?.name)
-        .map((cls, classIdx) => ({
-          key: `pc-heroic-${classIdx}`,
-          label: cls.heroic.name,
-          command: "/action skill",
-        }));
+        .map((cls, classIdx) =>
+          buildSkillItem({
+            key: `pc-heroic-${classIdx}`,
+            name: t(cls.heroic.name),
+            description: t(cls.heroic.description ?? ""),
+            tag: "Heroic Skill",
+          }),
+        );
 
       return [...classSkills, ...heroicSkills];
     }
@@ -241,10 +269,53 @@ export default function ActorActionBar({
     }
   };
 
+  useEffect(() => {
+    if (!activeActionKey || !isCoarsePointer) return;
+    const handleOutside = (e) => {
+      const path = e.composedPath ? e.composedPath() : [];
+      const inBar =
+        path.includes(actionBarRef.current) ||
+        actionBarRef.current?.contains(e.target);
+      const inMenu =
+        path.includes(menuPaperRef.current) ||
+        menuPaperRef.current?.contains(e.target);
+      if (!inBar && !inMenu) closeMenu();
+    };
+    const id = window.setTimeout(() => {
+      document.addEventListener("click", handleOutside);
+    }, 0);
+    return () => {
+      window.clearTimeout(id);
+      document.removeEventListener("click", handleOutside);
+    };
+  }, [activeActionKey, isCoarsePointer]);
+
   const scheduleClose = () => {
     cancelOpen();
     if (customizerTarget || spellCustomizerTarget) return;
     menuCloseTimer.current = setTimeout(closeMenu, 300);
+  };
+
+  const positionMenuFor = (actionKey, buttonEl) => {
+    if (!actionBarRef.current || !buttonEl) return;
+    const btnRect = buttonEl.getBoundingClientRect();
+    const itemHeight = 36;
+    const itemCount = Math.max(1, getActionMenuItems(actionKey).length);
+    const estimatedMenuHeight = itemCount * itemHeight + 16;
+    const spaceBelow = window.innerHeight - btnRect.bottom;
+    const spaceAbove = btnRect.top;
+    setOpenUpward(spaceBelow < estimatedMenuHeight && spaceAbove > spaceBelow);
+    const menuWidth = 240;
+    const clampedLeft = Math.max(
+      8,
+      Math.min(btnRect.left, window.innerWidth - menuWidth - 8),
+    );
+    const menuGap = 3;
+    setMenuAnchorPos({
+      top: btnRect.bottom + menuGap,
+      bottom: window.innerHeight - btnRect.top + menuGap,
+      left: clampedLeft,
+    });
   };
 
   const openMenu = (actionKey, buttonEl) => {
@@ -255,30 +326,22 @@ export default function ActorActionBar({
     menuOpenTimer.current = setTimeout(() => {
       menuOpenTimer.current = null;
       activeActionKeyRef.current = actionKey;
-      if (actionBarRef.current && buttonEl) {
-        const btnRect = buttonEl.getBoundingClientRect();
-        const itemHeight = 36;
-        const itemCount = Math.max(1, getActionMenuItems(actionKey).length);
-        const estimatedMenuHeight = itemCount * itemHeight + 16;
-        const spaceBelow = window.innerHeight - btnRect.bottom;
-        const spaceAbove = btnRect.top;
-        const shouldOpenUpward =
-          spaceBelow < estimatedMenuHeight && spaceAbove > spaceBelow;
-        setOpenUpward(shouldOpenUpward);
-        const menuWidth = 240;
-        const clampedLeft = Math.max(
-          8,
-          Math.min(btnRect.left, window.innerWidth - menuWidth - 8),
-        );
-        const menuGap = 3;
-        setMenuAnchorPos({
-          top: btnRect.bottom + menuGap,
-          bottom: window.innerHeight - btnRect.top + menuGap,
-          left: clampedLeft,
-        });
-      }
+      positionMenuFor(actionKey, buttonEl);
       setActiveActionKey(actionKey);
     }, 200);
+  };
+
+  const openMenuNow = (actionKey, buttonEl) => {
+    cancelClose();
+    cancelOpen();
+    if (activeActionKeyRef.current === actionKey) {
+      closeMenu();
+      return;
+    }
+    if (getActionMenuItems(actionKey).length === 0) return;
+    activeActionKeyRef.current = actionKey;
+    positionMenuFor(actionKey, buttonEl);
+    setActiveActionKey(actionKey);
   };
 
   const openCustomizer = (opt, buttonEl) => {
@@ -340,7 +403,10 @@ export default function ActorActionBar({
   return (
     <Box
       ref={actionBarRef}
-      onMouseLeave={scheduleClose}
+      onMouseLeave={() => {
+        if (isCoarsePointer) return;
+        scheduleClose();
+      }}
       sx={{ px: 0.5, pb: 0.25 }}
     >
       <Box
@@ -363,7 +429,10 @@ export default function ActorActionBar({
               ...(!expand && { textTransform: "none" }),
               "&:hover": { backgroundColor: "action.selected" },
             }}
-            onMouseEnter={(e) => openMenu(action, e.currentTarget)}
+            onMouseEnter={(e) => {
+              if (isCoarsePointer) return;
+              openMenu(action, e.currentTarget);
+            }}
             onClick={(e) => {
               const directFire = ["guard", "inventory", "objective", "other"];
               if (action === "study") {
@@ -380,6 +449,8 @@ export default function ActorActionBar({
                 cancelOpen();
                 closeMenu();
                 applyCommand(`/action ${action}`);
+              } else if (isCoarsePointer) {
+                openMenuNow(action, e.currentTarget);
               } else {
                 openMenu(action, e.currentTarget);
               }
@@ -406,6 +477,7 @@ export default function ActorActionBar({
       {activeActionKey &&
         createPortal(
           <Paper
+            ref={menuPaperRef}
             elevation={0}
             onMouseEnter={cancelClose}
             onMouseLeave={scheduleClose}
@@ -488,8 +560,19 @@ export default function ActorActionBar({
                           }
                           setActiveActionKey(null);
                           activeActionKeyRef.current = null;
+                        } else if (item.displayMessage) {
+                          window.dispatchEvent(
+                            new window.CustomEvent("chat:add-message", {
+                              detail: {
+                                ...item.displayMessage,
+                                speaker: actorDoc?.name ?? "",
+                              },
+                            }),
+                          );
+                          closeMenu();
                         } else {
                           applyCommand(item.command);
+                          closeMenu();
                         }
                       }}
                     >

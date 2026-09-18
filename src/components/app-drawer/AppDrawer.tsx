@@ -240,7 +240,7 @@ export const AppDrawer: React.FC<AppDrawerProps> = ({
       ModalProps={
         isMobile
           ? {
-              keepMounted: false,
+              keepMounted: true,
               disableEnforceFocus: true,
               disableScrollLock: true,
               slotProps: {
@@ -412,7 +412,14 @@ export const AppDrawer: React.FC<AppDrawerProps> = ({
         >
           {activeTab === "chat" && <ChatPanelHeader />}
           <Box sx={{ flex: 1, overflowY: "auto" }}>
-            {activeTab === "chat" && <ChatPanel />}
+            <Box
+              sx={{
+                display: activeTab === "chat" ? "block" : "none",
+                height: "100%",
+              }}
+            >
+              <ChatPanel />
+            </Box>
             {activeTab === "actorSelect" && actorSelectEnabled && (
               <ActorSelectPanel />
             )}

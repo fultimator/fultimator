@@ -435,6 +435,34 @@ export const ChatPanel: React.FC = () => {
       window.removeEventListener("chat:run-command", handler);
     };
   }, []);
+  useEffect(() => {
+    const handler = (event: Event) => {
+      const detail = (
+        event as CustomEvent<{
+          name?: string;
+          description?: string;
+          itemType?: string;
+          tags?: string[];
+          speaker?: string;
+        }>
+      ).detail;
+      if (!detail?.name) return;
+      addMessage({
+        id: crypto.randomUUID(),
+        createdAt: Date.now(),
+        speaker: detail.speaker,
+        kind: "display",
+        itemType: detail.itemType ?? "skill",
+        name: detail.name,
+        tags: detail.tags ?? [],
+        description: detail.description,
+      });
+    };
+    window.addEventListener("chat:add-message", handler);
+    return () => {
+      window.removeEventListener("chat:add-message", handler);
+    };
+  }, [addMessage]);
 
   useEffect(() => {
     const handler = (event: Event) => {

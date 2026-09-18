@@ -28,6 +28,12 @@ interface ToastEntry {
   exiting: boolean;
 }
 
+function toastSpeakerLabel(message: ChatMessage): string {
+  const speaker = "speaker" in message ? message.speaker : undefined;
+  if (typeof speaker === "string" && speaker) return speaker;
+  return "NPC";
+}
+
 function shouldToastMessage(message: ChatMessage): boolean {
   if (message.kind === "log") return false;
   return (
@@ -37,7 +43,8 @@ function shouldToastMessage(message: ChatMessage): boolean {
     message.kind === "opposed" ||
     message.kind === "accuracy" ||
     message.kind === "magic" ||
-    message.kind === "display"
+    message.kind === "display" ||
+    message.kind === "action"
   );
 }
 
@@ -333,8 +340,7 @@ const ToastCard: React.FC<ToastCardProps> = ({
         }}
       >
         <Typography variant="body2" sx={{ fontWeight: 700 }} noWrap>
-          {("speaker" in toast.message ? toast.message.speaker : undefined) ??
-            "NPC"}
+          {toastSpeakerLabel(toast.message)}
         </Typography>
         <IconButton
           size="small"
