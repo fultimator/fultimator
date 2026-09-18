@@ -73,6 +73,7 @@ export type AccuracyCheckResult = {
   critical: boolean;
   fumble: boolean;
   targetsSnapshot?: DamagePipelineTarget[];
+  appliedMap?: Record<string, boolean>;
   retargetSuperseded?: boolean;
 };
 
@@ -115,6 +116,7 @@ export type MagicCheckResult = {
   critical: boolean;
   fumble: boolean;
   targetsSnapshot?: DamagePipelineTarget[];
+  appliedMap?: Record<string, boolean>;
   retargetSuperseded?: boolean;
 };
 

@@ -1,29 +1,42 @@
 import React, { useState, useEffect } from "react";
-import { Box, Button, Divider, Tooltip, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Divider,
+  Snackbar,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 import { useTheme, alpha } from "@mui/material/styles";
 import { Undo as UndoIcon } from "@mui/icons-material";
 import { useCombatEncounterStore } from "../../../../../stores/combatEncounterStore";
+import { useEncounterChatStore } from "../../../../../stores/encounterChatStore";
 import { devLog } from "../../../../../utils/devLog";
 import type { DamagePipelineTarget } from "../types";
 import { TypeIcon } from "../../../../types";
 import { normalizeDamageType } from "./primitives-utils";
 
 interface DamagePipelineTargetsProps {
+  messageId: string;
   targets: DamagePipelineTarget[];
   damage: number;
   damageType: string;
   fumble: boolean;
+  persistedAppliedMap?: Record<string, boolean>;
 }
 
 export const DamagePipelineTargets: React.FC<DamagePipelineTargetsProps> = ({
+  messageId,
   targets,
   damage,
   damageType,
   fumble,
+  persistedAppliedMap,
 }) => {
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
   const { applyHpDamage, revertHpDamage } = useCombatEncounterStore();
+  const updateChatMessage = useEncounterChatStore((s) => s.updateMessage);
   const normalizedType = normalizeDamageType(damageType);
 
   const defaultHit = fumble ? false : true;
@@ -31,13 +44,36 @@ export const DamagePipelineTargets: React.FC<DamagePipelineTargetsProps> = ({
   const [hitMap, setHitMap] = useState<Record<string, boolean>>(() =>
     Object.fromEntries(targets.map((t) => [t.combatId, defaultHit])),
   );
-  const [appliedMap, setAppliedMap] = useState<Record<string, boolean>>({});
+  const [appliedMap, setAppliedMap] = useState<Record<string, boolean>>(
+    () => persistedAppliedMap ?? {},
+  );
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   useEffect(() => {
     setHitMap(Object.fromEntries(targets.map((t) => [t.combatId, defaultHit])));
-    setAppliedMap({});
+    setAppliedMap(persistedAppliedMap ?? {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [targets.map((t) => t.combatId).join(","), fumble]);
+
+  const persistAppliedMap = (map: Record<string, boolean>) => {
+    updateChatMessage(messageId, (message) => {
+      if (message.kind === "accuracy") {
+        return { ...message, check: { ...message.check, appliedMap: map } };
+      }
+      if (message.kind === "magic") {
+        return { ...message, check: { ...message.check, appliedMap: map } };
+      }
+      return message;
+    });
+  };
+
+  const commitAppliedMap = (map: Record<string, boolean>) => {
+    setAppliedMap(map);
+    persistAppliedMap(map);
+  };
+
+  const nameOf = (id: string) =>
+    targets.find((t) => t.combatId === id)?.name ?? "target";
 
   if (targets.length === 0) return null;
 
@@ -58,8 +94,13 @@ export const DamagePipelineTargets: React.FC<DamagePipelineTargetsProps> = ({
       combatId: id,
       success,
     });
-    if (!success) return;
-    setAppliedMap((prev) => ({ ...prev, [id]: true }));
+    if (!success) {
+      setErrorMsg(
+        `Could not apply damage to ${nameOf(id)} (no longer in combat).`,
+      );
+      return;
+    }
+    commitAppliedMap({ ...appliedMap, [id]: true });
   };
 
   const revertOne = (id: string) => {
@@ -73,8 +114,13 @@ export const DamagePipelineTargets: React.FC<DamagePipelineTargetsProps> = ({
       combatId: id,
       success,
     });
-    if (!success) return;
-    setAppliedMap((prev) => ({ ...prev, [id]: false }));
+    if (!success) {
+      setErrorMsg(
+        `Could not revert damage on ${nameOf(id)} (no longer in combat).`,
+      );
+      return;
+    }
+    commitAppliedMap({ ...appliedMap, [id]: false });
   };
 
   const applyHits = () => {
@@ -85,6 +131,7 @@ export const DamagePipelineTargets: React.FC<DamagePipelineTargetsProps> = ({
       appliedMap,
     });
     const next = { ...appliedMap };
+    const failed: string[] = [];
     targets.forEach((t) => {
       if (hitMap[t.combatId] && !appliedMap[t.combatId]) {
         const success = applyHpDamage(t.combatId, damage, normalizedType);
@@ -94,10 +141,17 @@ export const DamagePipelineTargets: React.FC<DamagePipelineTargetsProps> = ({
         });
         if (success) {
           next[t.combatId] = true;
+        } else {
+          failed.push(t.name);
         }
       }
     });
-    setAppliedMap(next);
+    commitAppliedMap(next);
+    if (failed.length > 0) {
+      setErrorMsg(
+        `Could not apply damage to ${failed.join(", ")} (no longer in combat).`,
+      );
+    }
   };
 
   const hitTargets = targets.filter((t) => hitMap[t.combatId]);
@@ -110,226 +164,238 @@ export const DamagePipelineTargets: React.FC<DamagePipelineTargetsProps> = ({
   const appliedHitBg = isDark ? "rgba(91,169,91,0.2)" : "rgba(91,169,91,0.12)";
 
   return (
-    <Box
-      sx={{
-        mt: 0.75,
-        borderRadius: 1.5,
-        overflow: "hidden",
-        border: "1px solid",
-        borderColor: "divider",
-        backgroundColor: "background.default",
-      }}
-    >
-      {/* Target rows */}
-      {targets.map((target, i) => {
-        const isHit = hitMap[target.combatId] ?? true;
-        const isApplied = appliedMap[target.combatId] ?? false;
+    <>
+      <Box
+        sx={{
+          mt: 0.75,
+          borderRadius: 1.5,
+          overflow: "hidden",
+          border: "1px solid",
+          borderColor: "divider",
+          backgroundColor: "background.default",
+        }}
+      >
+        {/* Target rows */}
+        {targets.map((target, i) => {
+          const isHit = hitMap[target.combatId] ?? true;
+          const isApplied = appliedMap[target.combatId] ?? false;
 
-        const rowBg = isApplied
-          ? isHit
-            ? appliedHitBg
-            : "action.disabledBackground"
-          : isHit
-            ? hitBg
-            : missBg;
+          const rowBg = isApplied
+            ? isHit
+              ? appliedHitBg
+              : "action.disabledBackground"
+            : isHit
+              ? hitBg
+              : missBg;
 
-        const statusColor = isHit
-          ? theme.palette.success.main
-          : theme.palette.error.main;
+          const statusColor = isHit
+            ? theme.palette.success.main
+            : theme.palette.error.main;
 
-        return (
-          <React.Fragment key={target.combatId}>
-            {i > 0 && <Divider />}
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                px: 1,
-                py: 0.55,
-                gap: 0.75,
-                background: rowBg,
-                transition: "background-color 0.15s",
-              }}
-            >
-              <Typography
-                variant="body2"
+          return (
+            <React.Fragment key={target.combatId}>
+              {i > 0 && <Divider />}
+              <Box
                 sx={{
-                  flex: 1,
-                  fontWeight: 700,
-                  fontSize: "0.8rem",
-                  color: isApplied ? "text.disabled" : "text.primary",
-                  textDecoration: isApplied && !isHit ? "line-through" : "none",
+                  display: "flex",
+                  alignItems: "center",
+                  px: 1,
+                  py: 0.55,
+                  gap: 0.75,
+                  background: rowBg,
+                  transition: "background-color 0.15s",
                 }}
               >
-                {target.name}
-              </Typography>
-
-              <Tooltip
-                title={isApplied ? "" : isHit ? "Mark as Miss" : "Mark as Hit"}
-              >
-                <Box
-                  component="button"
-                  onClick={() => toggleHit(target.combatId)}
-                  disabled={isApplied}
+                <Typography
+                  variant="body2"
                   sx={{
-                    minWidth: 52,
-                    height: 28,
-                    px: 1.1,
-                    py: 0,
-                    border: "1px solid",
-                    borderColor: statusColor,
-                    borderRadius: 5,
-                    background: alpha(statusColor, isApplied ? 0.18 : 0.1),
-                    cursor: isApplied ? "default" : "pointer",
-                    lineHeight: 1,
-                    "&:hover:not(:disabled)": {
-                      background: alpha(statusColor, 0.22),
-                    },
+                    flex: 1,
+                    fontWeight: 700,
+                    fontSize: "0.8rem",
+                    color: isApplied ? "text.disabled" : "text.primary",
+                    textDecoration:
+                      isApplied && !isHit ? "line-through" : "none",
                   }}
                 >
-                  <Typography
-                    variant="caption"
-                    sx={{
-                      fontWeight: 800,
-                      fontSize: "0.72rem",
-                      color: statusColor,
-                      textTransform: "uppercase",
-                      letterSpacing: "0.06em",
-                      lineHeight: 1,
-                    }}
-                  >
-                    {isHit ? "Hit" : "Miss"}
-                  </Typography>
-                </Box>
-              </Tooltip>
+                  {target.name}
+                </Typography>
 
-              <Tooltip
-                title={
-                  isApplied
-                    ? "Revert damage"
-                    : isHit
-                      ? "Apply damage"
-                      : "No damage (miss)"
-                }
-              >
-                <span>
-                  <Button
-                    size="small"
-                    onClick={() =>
-                      isApplied
-                        ? revertOne(target.combatId)
-                        : applyOne(target.combatId)
-                    }
-                    disabled={!isApplied && !isHit}
+                <Tooltip
+                  title={
+                    isApplied ? "" : isHit ? "Mark as Miss" : "Mark as Hit"
+                  }
+                >
+                  <Box
+                    component="button"
+                    onClick={() => toggleHit(target.combatId)}
+                    disabled={isApplied}
                     sx={{
-                      minWidth: 34,
-                      width: 42,
-                      height: 30,
-                      px: 0,
+                      minWidth: 52,
+                      height: 28,
+                      px: 1.1,
                       py: 0,
-                      fontSize: "0.66rem",
-                      fontWeight: 800,
-                      borderRadius: 5,
-                      opacity: !isApplied && !isHit ? 0.35 : 1,
-                      textTransform: "uppercase",
                       border: "1px solid",
-                      borderColor: "divider",
-                      color: "text.primary",
-                      backgroundColor: "background.paper",
-                      "&:hover": {
-                        backgroundColor: "action.hover",
+                      borderColor: statusColor,
+                      borderRadius: 5,
+                      background: alpha(statusColor, isApplied ? 0.18 : 0.1),
+                      cursor: isApplied ? "default" : "pointer",
+                      lineHeight: 1,
+                      "&:hover:not(:disabled)": {
+                        background: alpha(statusColor, 0.22),
                       },
                     }}
                   >
-                    {isApplied ? (
-                      <UndoIcon sx={{ fontSize: 14 }} />
-                    ) : (
-                      <Box
-                        sx={{
-                          lineHeight: 0,
-                          "& svg": { width: 13, height: 13 },
-                        }}
-                      >
-                        <TypeIcon type={normalizedType} disabled={!isHit} />
-                      </Box>
-                    )}
-                  </Button>
-                </span>
-              </Tooltip>
-            </Box>
-          </React.Fragment>
-        );
-      })}
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        fontWeight: 800,
+                        fontSize: "0.72rem",
+                        color: statusColor,
+                        textTransform: "uppercase",
+                        letterSpacing: "0.06em",
+                        lineHeight: 1,
+                      }}
+                    >
+                      {isHit ? "Hit" : "Miss"}
+                    </Typography>
+                  </Box>
+                </Tooltip>
 
-      {/* Stat bar */}
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          gap: 0.75,
-          px: 1,
-          py: 0.5,
-          borderTop: "1px solid",
-          borderColor: "divider",
-          backgroundColor: "background.paper",
-        }}
-      >
-        <Typography
-          variant="caption"
+                <Tooltip
+                  title={
+                    isApplied
+                      ? "Revert damage"
+                      : isHit
+                        ? "Apply damage"
+                        : "No damage (miss)"
+                  }
+                >
+                  <span>
+                    <Button
+                      size="small"
+                      onClick={() =>
+                        isApplied
+                          ? revertOne(target.combatId)
+                          : applyOne(target.combatId)
+                      }
+                      disabled={!isApplied && !isHit}
+                      sx={{
+                        minWidth: 34,
+                        width: 42,
+                        height: 30,
+                        px: 0,
+                        py: 0,
+                        fontSize: "0.66rem",
+                        fontWeight: 800,
+                        borderRadius: 5,
+                        opacity: !isApplied && !isHit ? 0.35 : 1,
+                        textTransform: "uppercase",
+                        border: "1px solid",
+                        borderColor: "divider",
+                        color: "text.primary",
+                        backgroundColor: "background.paper",
+                        "&:hover": {
+                          backgroundColor: "action.hover",
+                        },
+                      }}
+                    >
+                      {isApplied ? (
+                        <UndoIcon sx={{ fontSize: 14 }} />
+                      ) : (
+                        <Box
+                          sx={{
+                            lineHeight: 0,
+                            "& svg": { width: 13, height: 13 },
+                          }}
+                        >
+                          <TypeIcon type={normalizedType} disabled={!isHit} />
+                        </Box>
+                      )}
+                    </Button>
+                  </span>
+                </Tooltip>
+              </Box>
+            </React.Fragment>
+          );
+        })}
+
+        {/* Stat bar */}
+        <Box
           sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 0.75,
+            px: 1,
+            py: 0.5,
+            borderTop: "1px solid",
+            borderColor: "divider",
+            backgroundColor: "background.paper",
+          }}
+        >
+          <Typography
+            variant="caption"
+            sx={{
+              fontWeight: 800,
+              fontSize: "0.71rem",
+              textTransform: "uppercase",
+              letterSpacing: "0.05em",
+              color: "text.secondary",
+            }}
+          >
+            {damage} {damageType} damage
+          </Typography>
+          <Box sx={{ flex: 1 }} />
+          <Typography
+            variant="caption"
+            sx={{
+              fontSize: "0.7rem",
+              fontWeight: 700,
+              color: "text.secondary",
+            }}
+          >
+            {hitTargets.length}/{targets.length} hit
+          </Typography>
+        </Box>
+
+        {/* Apply button */}
+        <Button
+          fullWidth
+          variant="contained"
+          onClick={applyHits}
+          disabled={hitTargets.length === 0 || allHitsApplied}
+          sx={{
+            borderRadius: 0,
+            py: 0.6,
+            fontSize: "0.72rem",
             fontWeight: 800,
-            fontSize: "0.71rem",
             textTransform: "uppercase",
-            letterSpacing: "0.05em",
-            color: "text.secondary",
-          }}
-        >
-          {damage} {damageType} damage
-        </Typography>
-        <Box sx={{ flex: 1 }} />
-        <Typography
-          variant="caption"
-          sx={{
-            fontSize: "0.7rem",
-            fontWeight: 700,
-            color: "text.secondary",
-          }}
-        >
-          {hitTargets.length}/{targets.length} hit
-        </Typography>
-      </Box>
-
-      {/* Apply button */}
-      <Button
-        fullWidth
-        variant="contained"
-        onClick={applyHits}
-        disabled={hitTargets.length === 0 || allHitsApplied}
-        sx={{
-          borderRadius: 0,
-          py: 0.6,
-          fontSize: "0.72rem",
-          fontWeight: 800,
-          textTransform: "uppercase",
-          letterSpacing: "0.06em",
-          backgroundImage: undefined,
-          backgroundColor:
-            hitTargets.length === 0 || allHitsApplied
-              ? undefined
-              : theme.palette.primary.dark,
-          color:
-            hitTargets.length === 0 || allHitsApplied
-              ? undefined
-              : theme.palette.primary.contrastText,
-          boxShadow: "none",
-          "&:hover": {
-            backgroundColor: theme.palette.primary.main,
+            letterSpacing: "0.06em",
+            backgroundImage: undefined,
+            backgroundColor:
+              hitTargets.length === 0 || allHitsApplied
+                ? undefined
+                : theme.palette.primary.dark,
+            color:
+              hitTargets.length === 0 || allHitsApplied
+                ? undefined
+                : theme.palette.primary.contrastText,
             boxShadow: "none",
-          },
-        }}
-      >
-        Apply Damage
-      </Button>
-    </Box>
+            "&:hover": {
+              backgroundColor: theme.palette.primary.main,
+              boxShadow: "none",
+            },
+          }}
+        >
+          Apply Damage
+        </Button>
+      </Box>
+      <Snackbar
+        open={errorMsg !== null}
+        autoHideDuration={4000}
+        onClose={() => setErrorMsg(null)}
+        message={errorMsg}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      />
+    </>
   );
 };
