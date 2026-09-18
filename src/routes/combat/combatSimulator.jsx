@@ -15,6 +15,7 @@ import {
   useMediaQuery,
   Snackbar,
   Alert,
+  Button,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import BattleHeader from "../../components/combatSim/BattleHeader";
@@ -219,6 +220,7 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
   const [pcTabIndex, setPcTabIndex] = useState(0); // PC sheet tab index
   const [selectedStudy, setSelectedStudy] = useState(0); // NPC study level (0 = full sheet, 1-3 = study tiers)
   const [isSaveSnackbarOpen, setIsSaveSnackbarOpen] = useState(false); // Save notification state
+  const [undoRemoval, setUndoRemoval] = useState(null);
   const isDifferentUser = !isLocalMode && encounter?.uid !== user?.uid;
   const isPrivate = encounter?.private && isDifferentUser;
   const [notesDialogOpen, setNotesDialogOpen] = useState(false);
@@ -946,7 +948,10 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
       );
       if (!confirmRemove) return;
     }
-    const pcToRemove = selectedPCs.find((pc) => pc.combatId === pcCombatId);
+    const removedIndex = selectedPCs.findIndex(
+      (pc) => pc.combatId === pcCombatId,
+    );
+    const pcToRemove = selectedPCs[removedIndex];
     setSelectedPCs((prev) => prev.filter((pc) => pc.combatId !== pcCombatId));
     if (selectedPC?.combatId === pcCombatId) {
       setSelectedPC(null);
@@ -954,6 +959,16 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
 
     if (pcToRemove) {
       emitLog({ type: "actor-removed", name: pcToRemove.name });
+      setUndoRemoval({
+        name: pcToRemove.name,
+        restore: () =>
+          setSelectedPCs((prev) => {
+            if (prev.some((pc) => pc.combatId === pcCombatId)) return prev;
+            const next = [...prev];
+            next.splice(Math.min(removedIndex, next.length), 0, pcToRemove);
+            return next;
+          }),
+      });
     }
   };
 
@@ -997,9 +1012,10 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
       if (!confirmRemove) return;
     }
 
-    const npcToRemove = selectedNPCs.find(
+    const removedIndex = selectedNPCs.findIndex(
       (npc) => npc.combatId === npcCombatId,
     );
+    const npcToRemove = selectedNPCs[removedIndex];
     setSelectedNPCs((prev) =>
       prev.filter((npc) => npc.combatId !== npcCombatId),
     );
@@ -1010,6 +1026,16 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
 
     if (npcToRemove) {
       emitLog({ type: "actor-removed", name: npcToRemove.name });
+      setUndoRemoval({
+        name: npcToRemove.name,
+        restore: () =>
+          setSelectedNPCs((prev) => {
+            if (prev.some((npc) => npc.combatId === npcCombatId)) return prev;
+            const next = [...prev];
+            next.splice(Math.min(removedIndex, next.length), 0, npcToRemove);
+            return next;
+          }),
+      });
     }
   };
 
@@ -1968,6 +1994,29 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
         </Snackbar>
       )}
       {downloadSnackbar}
+      <Snackbar
+        open={undoRemoval !== null}
+        autoHideDuration={6000}
+        onClose={() => setUndoRemoval(null)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        message={
+          undoRemoval
+            ? t("combat_sim_actor_removed", [undoRemoval.name], true)
+            : ""
+        }
+        action={
+          <Button
+            color="secondary"
+            size="small"
+            onClick={() => {
+              undoRemoval?.restore();
+              setUndoRemoval(null);
+            }}
+          >
+            {t("combat_sim_undo", undefined, true)}
+          </Button>
+        }
+      />
       <NpcEditModal
         npcId={selectedNPC?.id}
         open={npcEditModalOpen}

@@ -39851,6 +39851,18 @@
     "ru": "Last saved minutes ago"
   },
   {
+    "key": "combat_sim_last_saved_hours_ago",
+    "en": "Last saved hours ago",
+    "it": "Last saved hours ago",
+    "de": "Last saved hours ago",
+    "pl": "Last saved hours ago",
+    "fr": "Last saved hours ago",
+    "es": "Last saved hours ago",
+    "pt-BR": "Last saved hours ago",
+    "zh": "Last saved hours ago",
+    "ru": "Last saved hours ago"
+  },
+  {
     "key": "combat_sim_auto_saved",
     "en": "Automatically saved {{minutes}} minutes ago",
     "it": "Salvato automaticamente {{minutes}} minuti fa",
@@ -41817,6 +41829,30 @@
     "pt-BR": "seg",
     "zh": "sec",
     "ru": "sec"
+  },
+  {
+    "key": "combat_sim_actor_removed",
+    "en": "{0} removed",
+    "it": "{0} rimosso",
+    "de": "{0} entfernt",
+    "pl": "{0} usunięto",
+    "fr": "{0} retiré",
+    "es": "{0} eliminado",
+    "pt-BR": "{0} removido",
+    "zh": "已移除 {0}",
+    "ru": "{0} удалён"
+  },
+  {
+    "key": "combat_sim_undo",
+    "en": "Undo",
+    "it": "Annulla",
+    "de": "Rückgängig",
+    "pl": "Cofnij",
+    "fr": "Annuler",
+    "es": "Deshacer",
+    "pt-BR": "Desfazer",
+    "zh": "撤销",
+    "ru": "Отменить"
   },
   {
     "key": "mkeditor_tooltip_bold",
