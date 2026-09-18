@@ -1103,6 +1103,83 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
     setSelectedStudy(event.target.value);
   };
 
+  // Desktop keyboard shortcuts
+  useEffect(() => {
+    if (isMobile || isDifferentUser) return;
+
+    const isTypingTarget = (el) => {
+      if (!el) return false;
+      const tag = el.tagName;
+      return (
+        tag === "INPUT" ||
+        tag === "TEXTAREA" ||
+        tag === "SELECT" ||
+        el.isContentEditable
+      );
+    };
+
+    const handleKeyDown = (e) => {
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      if (isTypingTarget(e.target)) return;
+
+      if (e.key === "Escape") {
+        if (selectedNPC || selectedPC) {
+          e.preventDefault();
+          setSelectedNPC(null);
+          setSelectedPC(null);
+        }
+        return;
+      }
+
+      if (e.key === " " || e.key === "Enter") {
+        if (activeTurn) {
+          e.preventDefault();
+          handleEndActorTurn(
+            activeTurn.combatId,
+            activeTurn.turnIndex,
+            activeTurn.faction,
+            activeTurn.faction === "npcs",
+          );
+        }
+        return;
+      }
+
+      // 1-9 select the Nth actor in on-screen order
+      if (e.key >= "1" && e.key <= "9") {
+        const index = Number(e.key) - 1;
+        const pcs = selectedPCs.map((pc) => ({ id: pc.combatId, isPc: true }));
+        const npcs = selectedNPCs.map((npc) => ({
+          id: npc.combatId,
+          isPc: false,
+        }));
+        const pcsFirst = combatActive && initiative === "players";
+        const roster = pcsFirst ? [...pcs, ...npcs] : [...npcs, ...pcs];
+        const actor = roster[index];
+        if (!actor) return;
+        e.preventDefault();
+        if (actor.isPc) {
+          handlePcClick(actor.id);
+        } else {
+          handleNpcClick(actor.id);
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    isMobile,
+    isDifferentUser,
+    activeTurn,
+    selectedNPC,
+    selectedPC,
+    selectedNPCs,
+    selectedPCs,
+    combatActive,
+    initiative,
+  ]);
+
   // Handle Open HP/MP Dialog
   const handleOpen = (type, entity, entityType = "npc") => {
     setStatType(type);
@@ -1758,6 +1835,60 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
         isDirty={isDirty}
       />
 
+      {/* Mobile sticky "active turn" bar: only while an actor's turn is in
+          progress, so End Turn stays reachable without scrolling the list. */}
+      {isMobile &&
+        activeTurn &&
+        (() => {
+          const roster = [...selectedNPCs, ...selectedPCs];
+          const active = roster.find((a) => a.combatId === activeTurn.combatId);
+          if (!active) return null;
+          return (
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
+                px: 1.5,
+                py: 0.75,
+                borderRadius: 2,
+                bgcolor:
+                  activeTurn.faction === "npcs" ? "error.main" : "primary.main",
+                color: "#fff",
+              }}
+            >
+              <Typography
+                variant="body2"
+                noWrap
+                sx={{ flex: 1, minWidth: 0, fontWeight: 700 }}
+              >
+                {t("combat_sim_active_turn")}: {active.name}
+              </Typography>
+              <Button
+                size="small"
+                variant="contained"
+                sx={{
+                  bgcolor: "#fff",
+                  color: "text.primary",
+                  fontWeight: 700,
+                  flexShrink: 0,
+                  "&:hover": { bgcolor: "rgba(255,255,255,0.85)" },
+                }}
+                onClick={() =>
+                  handleEndActorTurn(
+                    activeTurn.combatId,
+                    activeTurn.turnIndex,
+                    activeTurn.faction,
+                    activeTurn.faction === "npcs",
+                  )
+                }
+              >
+                {t("combat_sim_end_turn")}
+              </Button>
+            </Box>
+          );
+        })()}
+
       {/* Clock Management Dialog */}
       <CombatSimClocks
         open={clockDialogOpen}
@@ -1806,7 +1937,7 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
             isMobile={isMobile}
             selectedNpcID={selectedNPC?.combatId}
             isDifferentUser={isDifferentUser}
-            useDragAndDrop={npcReorderingMethod === "dragAndDrop"}
+            useDragAndDrop={!isMobile && npcReorderingMethod === "dragAndDrop"}
             onSortEnd={handleSortEnd}
             onSortEndPC={handlePcSortEnd}
             onClockClick={() => setClockDialogOpen(true)}
@@ -1833,7 +1964,7 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
           />
         </Box>
         {/* Detail Resize Handle */}
-        {(selectedNPC || selectedPC) && (
+        {!isMobile && (selectedNPC || selectedPC) && (
           <Box
             sx={{
               width: "5px",
@@ -1972,7 +2103,7 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
         onClose={() => setNotesDialogOpen(false)}
         onSave={handleNotesSave}
         notes={encounterNotes}
-        useDragAndDrop={noteReorderingMethod === "dragAndDrop"}
+        useDragAndDrop={!isMobile && noteReorderingMethod === "dragAndDrop"}
         maxNotesCount={5} // unlimited in desktop version
         maxNoteLength={500} // unlimited in desktop version
       />

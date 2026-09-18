@@ -41855,6 +41855,30 @@
     "ru": "Отменить"
   },
   {
+    "key": "combat_sim_active_turn",
+    "en": "Active turn",
+    "it": "Turno attivo",
+    "de": "Aktiver Zug",
+    "pl": "Aktywna tura",
+    "fr": "Tour actif",
+    "es": "Turno activo",
+    "pt-BR": "Turno ativo",
+    "zh": "当前回合",
+    "ru": "Активный ход"
+  },
+  {
+    "key": "combat_sim_end_turn",
+    "en": "End Turn",
+    "it": "Fine turno",
+    "de": "Zug beenden",
+    "pl": "Zakończ turę",
+    "fr": "Fin du tour",
+    "es": "Terminar turno",
+    "pt-BR": "Encerrar turno",
+    "zh": "结束回合",
+    "ru": "Завершить ход"
+  },
+  {
     "key": "mkeditor_tooltip_bold",
     "en": "Bold",
     "it": "Grassetto",
