@@ -13,6 +13,7 @@ import {
 import { useTranslate } from "/src/translation/translate";
 import CustomTextarea from "/src/components/common/CustomTextarea";
 import SectionCard from "/src/components/shared/actors/common/SectionCard";
+import EditResourcesModal from "/src/components/shared/actors/common/EditResourcesModal";
 import ExpIcon from "/src/components/svgs/exp.svg?react";
 import ExpDisabledIcon from "/src/components/svgs/exp_disabled.svg?react";
 
@@ -33,6 +34,8 @@ export default function EditPlayerBasics({
   const [isImageError, setIsImageError] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState("");
   const [open, setOpen] = React.useState(false);
+  const [fpDialogOpen, setFpDialogOpen] = React.useState(false);
+  const [zenitDialogOpen, setZenitDialogOpen] = React.useState(false);
 
   const handleClose = () => {
     setOpen(false);
@@ -59,6 +62,30 @@ export default function EditPlayerBasics({
       }));
     },
     [setPlayer],
+  );
+
+  const setFabulaPointsCurrent = useCallback(
+    (nextCurrent) => {
+      onChangeInfo("fabulapoints")(
+        Math.max(0, Math.min(9999, nextCurrent ?? 0)),
+      );
+    },
+    [onChangeInfo],
+  );
+
+  const applyZenitChange = useCallback(
+    (payload) => {
+      const amount = Math.max(0, parseInt(payload?.amount, 10) || 0);
+      if (amount <= 0) return;
+      const delta = payload.mode === "heal" ? amount : -amount;
+      onChangeInfo("zenit")(
+        Math.max(
+          0,
+          Math.min(99999999, (parseInt(player.info.zenit, 10) || 0) + delta),
+        ),
+      );
+    },
+    [onChangeInfo, player.info.zenit],
   );
 
   const checkImageSize = useCallback(async (imageUrl) => {
@@ -203,7 +230,12 @@ export default function EditPlayerBasics({
                     readOnly: !isEditMode,
                     endAdornment: (
                       <InputAdornment position="end">
-                        <IconButton>
+                        <IconButton
+                          onClick={
+                            isEditMode ? () => setFpDialogOpen(true) : undefined
+                          }
+                          disabled={!isEditMode}
+                        >
                           <img
                             src={fpBorderlessIcon}
                             alt="FP"
@@ -291,7 +323,14 @@ export default function EditPlayerBasics({
                     readOnly: !isEditMode,
                     endAdornment: (
                       <InputAdornment position="end">
-                        <IconButton>
+                        <IconButton
+                          onClick={
+                            isEditMode
+                              ? () => setZenitDialogOpen(true)
+                              : undefined
+                          }
+                          disabled={!isEditMode}
+                        >
                           <img
                             src={zenitIcon}
                             alt="Zenit"
@@ -389,6 +428,34 @@ export default function EditPlayerBasics({
           ) : null}
         </Grid>
       </Box>
+      {fpDialogOpen && (
+        <EditResourcesModal
+          open
+          onClose={() => setFpDialogOpen(false)}
+          title="FP"
+          resourceKey="fp"
+          current={parseInt(player.info.fabulapoints, 10) || 0}
+          max={9999}
+          resolvePreviewDelta={({ amount, mode }) =>
+            mode === "heal" ? amount : -amount
+          }
+          onSetCurrent={setFabulaPointsCurrent}
+        />
+      )}
+      {zenitDialogOpen && (
+        <EditResourcesModal
+          open
+          onClose={() => setZenitDialogOpen(false)}
+          title={t("Zenit")}
+          resourceKey="zenit"
+          current={parseInt(player.info.zenit, 10) || 0}
+          resolvePreviewDelta={({ amount, mode }) =>
+            mode === "heal" ? amount : -amount
+          }
+          showQuickHpTargets={false}
+          onApply={applyZenitChange}
+        />
+      )}
     </SectionCard>
   );
 }

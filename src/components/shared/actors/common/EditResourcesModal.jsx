@@ -29,6 +29,7 @@ import {
   IpResourceIcon,
   FpResourceIcon,
   UpResourceIcon,
+  ZenitResourceIcon,
 } from "/src/components/icons";
 import { GradientLinearProgress } from "/src/components/shared/actors/pc/shared";
 import { newShade } from "/src/libs/playerCalculations";
@@ -128,7 +129,8 @@ export default function EditResourcesModal({
     }
     return -parsedAmount;
   })();
-  const previewCurrent = Math.max(0, Math.min(max, current + previewDelta));
+  const previewRaw = Math.max(0, current + previewDelta);
+  const previewCurrent = hasMax ? Math.min(max, previewRaw) : previewRaw;
   const currentPct =
     max > 0 ? Math.max(0, Math.min(100, (current / max) * 100)) : 0;
   const previewPct =
@@ -245,6 +247,14 @@ export default function EditResourcesModal({
           Icon: UpResourceIcon,
           color1: palette.up?.color1 ?? defaultPalette.up?.color1,
           color2: palette.up?.color2 ?? defaultPalette.up?.color2,
+        },
+        zenit: {
+          label: t("Z"),
+          Icon: ZenitResourceIcon,
+          color1: isDark
+            ? newShade(theme.palette.warning.main, 10)
+            : newShade(theme.palette.warning.main, 80),
+          color2: theme.palette.warning.main,
         },
       })[resourceKey] ?? {
         label: title,
