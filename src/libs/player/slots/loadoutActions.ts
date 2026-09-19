@@ -11,7 +11,12 @@ import {
   CustomWeaponCustomization,
   PlayerEquipment,
 } from "../../../types/Players";
-import { resolveEffectiveSlot, syncSlots } from "./equipmentSlots";
+import {
+  resolveEffectiveSlot,
+  syncSlots,
+  rehydrateIsEquipped,
+  deriveVehicleSlots,
+} from "./equipmentSlots";
 import type { PilotSpellInfo } from "./loadoutSelectors";
 
 // Technosphere conflict detection
@@ -309,8 +314,6 @@ export function equipItemToSlot(
     }),
   );
 
-  updated = syncSlots(updated);
-
   const candidateRef: SlotRef = {
     source: candidate.source,
     name: candidate.label,
@@ -333,6 +336,8 @@ export function equipItemToSlot(
       ...(displaceMainHand ? { mainHand: null } : {}),
     },
   };
+
+  updated = rehydrateIsEquipped(updated);
 
   const settings = updated.settings ?? {};
   if (settings.autoEquipUnarmed && isHandSlot && !isTwoHand) {
@@ -357,6 +362,8 @@ export function equipItemToSlot(
     }
   }
 
+  updated = { ...updated, vehicleSlots: deriveVehicleSlots(updated) };
+
   return updated;
 }
 
@@ -369,7 +376,12 @@ export function clearSlotAction(player: TypePlayer, slot: string): TypePlayer {
 
   let updated = unequipRef(player, currentRef);
 
-  updated = syncSlots(updated);
+  updated = {
+    ...updated,
+    equippedSlots: { ...updated.equippedSlots, [slot]: null },
+  };
+  updated = rehydrateIsEquipped(updated);
+  updated = { ...updated, vehicleSlots: deriveVehicleSlots(updated) };
 
   const settings = updated.settings ?? {};
   if (
