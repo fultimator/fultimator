@@ -273,6 +273,27 @@ export function equipItemToSlot(
     updated = unequipRef(updated, updated.equippedSlots?.offHand);
   }
 
+  let displaceMainHand = false;
+  if (slot === "offHand") {
+    const mainRef = player.equippedSlots?.mainHand;
+    if (mainRef) {
+      if (mainRef.source === "customWeapons") {
+        displaceMainHand = true;
+      } else {
+        const inv = player.equipment?.[0];
+        const mainWeapon =
+          mainRef.index !== undefined
+            ? (inv?.weapons ?? [])[mainRef.index]
+            : (inv?.weapons ?? []).find((w) => w.name === mainRef.name);
+        if (mainWeapon?.hands === 2 || mainWeapon?.isTwoHand)
+          displaceMainHand = true;
+      }
+    }
+    if (displaceMainHand) {
+      updated = unequipRef(updated, updated.equippedSlots?.mainHand);
+    }
+  }
+
   // Block equip if candidate's mnemospheres conflict with existing equipped spheres.
   // Use `updated` (post-unequip) so the displaced item's spheres don't falsely conflict.
   const conflicts = checkMnemosphereConflict(updated, slot, candidate);
@@ -309,6 +330,7 @@ export function equipItemToSlot(
       [slot]: candidateRef,
       ...(otherHandDisplaced && otherHand ? { [otherHand]: null } : {}),
       ...(slot === "mainHand" && isTwoHand ? { offHand: null } : {}),
+      ...(displaceMainHand ? { mainHand: null } : {}),
     },
   };
 

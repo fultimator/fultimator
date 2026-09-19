@@ -50,10 +50,7 @@ import {
 import { useTranslate } from "/src/translation/translate";
 import { useCustomTheme } from "/src/hooks/useCustomTheme";
 import { calculateAttribute } from "/src/libs/playerCalculations";
-import {
-  deriveVehicleSlots,
-  isTwoHandedEquipped,
-} from "/src/libs/player/slots/equipmentSlots";
+import { isTwoHandedEquipped } from "/src/libs/player/slots/equipmentSlots";
 import {
   clearSlotAction,
   equipItemToSlot,
@@ -324,6 +321,7 @@ function CompactItemRow({
         defaultRef && defaultRef.source === source && defaultRef.name === name;
       const autoEquipEnabled = settings.autoEquipUnarmed ?? !!defaultRef;
       if (isDefaultUnarmed && autoEquipEnabled) {
+        if (isTwoHandedEquipped(player)) return null;
         const mE = !slots.mainHand,
           oE = !slots.offHand;
         if (mE && oE) return "M+O";
@@ -543,7 +541,7 @@ function CompactItemRow({
                 key="main"
                 disabled={!canEquip}
                 onClick={() => {
-                  equipToSlot(source, item.name, idx, "mainHand", false);
+                  equipToSlot(source, item.name, idx, "mainHand");
                   setMenuAnchor(null);
                 }}
               >
@@ -554,7 +552,7 @@ function CompactItemRow({
                 key="off"
                 disabled={!canEquip}
                 onClick={() => {
-                  equipToSlot(source, item.name, idx, "offHand", false);
+                  equipToSlot(source, item.name, idx, "offHand");
                   setMenuAnchor(null);
                 }}
               >
@@ -576,7 +574,7 @@ function CompactItemRow({
                 key="main"
                 disabled={!canEquip}
                 onClick={() => {
-                  equipToSlot(source, item.name, idx, "mainHand", false);
+                  equipToSlot(source, item.name, idx, "mainHand");
                   setMenuAnchor(null);
                 }}
               >
@@ -587,7 +585,7 @@ function CompactItemRow({
                 key="off"
                 disabled={!canEquip}
                 onClick={() => {
-                  equipToSlot(source, item.name, idx, "offHand", false);
+                  equipToSlot(source, item.name, idx, "offHand");
                   setMenuAnchor(null);
                 }}
               >
@@ -1773,77 +1771,37 @@ export default function PcEquipment({
 
   // ---- equip helpers ----
   const equipToSlot = useCallback(
-    (source, itemName, itemIndex, slot, isTwoHand) => {
-      if (slot === "offHand") {
-        const mainRef = player.equippedSlots?.mainHand;
-        if (mainRef) {
-          if (mainRef.source === "customWeapons") return;
-          const inv0 = player.equipment?.[0];
-          const mainWeapon =
-            mainRef.index !== undefined
-              ? inv0?.weapons?.[mainRef.index]
-              : inv0?.weapons?.find((w) => w.name === mainRef.name);
-          if (mainWeapon?.hands === 2 || mainWeapon?.isTwoHand) return;
-        }
-      }
-      const unequipRef = (p, ref) => {
-        if (!ref) return p;
-        return patchInv(p, ref.source, (arr) =>
-          arr.map((it, idx) => {
-            const match =
-              ref.index !== undefined
-                ? idx === ref.index
-                : it.name === ref.name;
-            return match ? { ...it, isEquipped: false } : it;
-          }),
-        );
-      };
-      let updated = unequipRef(player, player.equippedSlots?.[slot]);
-      if (isTwoHand && slot === "mainHand")
-        updated = unequipRef(updated, updated.equippedSlots?.offHand);
-      updated = patchInv(updated, source, (arr) =>
-        arr.map((it, idx) => {
-          const match =
-            itemIndex !== undefined ? idx === itemIndex : it.name === itemName;
-          return match ? { ...it, isEquipped: true } : it;
-        }),
-      );
-      const prevSlots = updated.equippedSlots ?? {
-        mainHand: null,
-        offHand: null,
-        armor: null,
-        accessory: null,
-      };
-      setPlayer({
-        ...updated,
-        equippedSlots: {
-          ...prevSlots,
-          [slot]: { source, name: itemName, index: itemIndex },
-          ...(isTwoHand && slot === "mainHand" ? { offHand: null } : {}),
-        },
-        vehicleSlots: deriveVehicleSlots(updated),
+    (source, itemName, itemIndex, slot) => {
+      if (!setPlayer) return;
+      setPlayer((prev) => {
+        const arr = prev.equipment?.[0]?.[source] ?? [];
+        const item =
+          itemIndex !== undefined
+            ? arr[itemIndex]
+            : arr.find((it) => it.name === itemName);
+        return equipItemToSlot(prev, slot, {
+          source,
+          label: itemName,
+          index: itemIndex,
+          item: item ?? { name: itemName },
+        });
       });
     },
-    [player, setPlayer, patchInv],
+    [setPlayer],
   );
 
   const unequipItem = useCallback(
     (source, itemName) => {
-      const slots = player.equippedSlots ?? {};
-      const slotKey = Object.keys(slots).find(
-        (k) => slots[k]?.source === source && slots[k]?.name === itemName,
-      );
-      if (slotKey) setPlayer((prev) => clearSlotAction(prev, slotKey));
-      else {
-        const updated = patchInv(player, source, (arr) =>
-          arr.map((it) =>
-            it.name === itemName ? { ...it, isEquipped: false } : it,
-          ),
+      if (!setPlayer) return;
+      setPlayer((prev) => {
+        const slots = prev.equippedSlots ?? {};
+        const slotKey = Object.keys(slots).find(
+          (k) => slots[k]?.source === source && slots[k]?.name === itemName,
         );
-        setPlayer({ ...updated, vehicleSlots: deriveVehicleSlots(updated) });
-      }
+        return slotKey ? clearSlotAction(prev, slotKey) : prev;
+      });
     },
-    [player, setPlayer, patchInv],
+    [setPlayer],
   );
 
   const checkIfEquippable = useCallback(
@@ -1890,7 +1848,6 @@ export default function PcEquipment({
             cw.name,
             cwIndex >= 0 ? cwIndex : undefined,
             "mainHand",
-            true,
           );
         return;
       }
@@ -1920,13 +1877,12 @@ export default function PcEquipment({
           if (hasDualShieldBearer && event) {
             setShieldMenuAnchor({ top: event.clientY, left: event.clientX });
             setShieldMenuItem({ name: invItem.name, index: idx });
-          } else equipToSlot("shields", invItem.name, idx, "offHand", false);
+          } else equipToSlot("shields", invItem.name, idx, "offHand");
         } else if (item.equipType === "armor") {
-          equipToSlot("armor", invItem.name, idx, "armor", false);
+          equipToSlot("armor", invItem.name, idx, "armor");
         } else if (item.equipType === "weapon") {
           const isTwoHand = invItem.hands === 2 || invItem.isTwoHand;
-          if (isTwoHand)
-            equipToSlot("weapons", invItem.name, idx, "mainHand", true);
+          if (isTwoHand) equipToSlot("weapons", invItem.name, idx, "mainHand");
           else if (event) {
             setSlotMenuAnchor({ top: event.clientY, left: event.clientX });
             setSlotMenuWeapon({ name: invItem.name, index: idx });
@@ -1937,10 +1893,10 @@ export default function PcEquipment({
               : !slots.offHand
                 ? "offHand"
                 : null;
-            if (slot) equipToSlot("weapons", invItem.name, idx, slot, false);
+            if (slot) equipToSlot("weapons", invItem.name, idx, slot);
           }
         } else if (item.equipType === "accessory") {
-          equipToSlot("accessories", invItem.name, idx, "accessory", false);
+          equipToSlot("accessories", invItem.name, idx, "accessory");
         }
       }
     },
@@ -2505,7 +2461,6 @@ export default function PcEquipment({
                   slotMenuWeapon.name,
                   slotMenuWeapon.index,
                   "mainHand",
-                  false,
                 );
               setSlotMenuAnchor(null);
               setSlotMenuWeapon(null);
@@ -2521,7 +2476,6 @@ export default function PcEquipment({
                   slotMenuWeapon.name,
                   slotMenuWeapon.index,
                   "offHand",
-                  false,
                 );
               setSlotMenuAnchor(null);
               setSlotMenuWeapon(null);
@@ -2547,7 +2501,6 @@ export default function PcEquipment({
                   shieldMenuItem.name,
                   shieldMenuItem.index,
                   "mainHand",
-                  false,
                 );
               setShieldMenuAnchor(null);
               setShieldMenuItem(null);
@@ -2563,7 +2516,6 @@ export default function PcEquipment({
                   shieldMenuItem.name,
                   shieldMenuItem.index,
                   "offHand",
-                  false,
                 );
               setShieldMenuAnchor(null);
               setShieldMenuItem(null);
