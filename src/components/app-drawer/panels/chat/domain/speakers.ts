@@ -715,9 +715,6 @@ export const resolveAttributeDie = (
   return typeof val === "number" && val > 0 ? val : 8;
 };
 
-const UUID_RE =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-
 export const resolveSpeakerOptions = (contextActorName: string): string[] => [
   DEFAULT_SPEAKER,
   ...(contextActorName ? [contextActorName] : []),
@@ -761,20 +758,14 @@ export const useRouteActor = (): {
   const npcIdMatch = location.pathname.match(/^\/npc-gallery\/([^/]+)$/);
   const playerId = playerIdMatch?.[1] ?? "";
   const npcId = npcIdMatch?.[1] ?? "";
-  const isLocalPlayer = UUID_RE.test(playerId);
-  const isLocalNpc = UUID_RE.test(npcId);
-
-  // Only open the one relevant listener, null skips the Firestore subscription entirely.
-  const localPlayerRef = isLocalPlayer
+  const localPlayerRef = playerId
     ? localDb.doc("player-personal", playerId)
     : null;
-  const cloudPlayerRef =
-    !isLocalPlayer && playerId
-      ? cloudDb.doc("player-personal", playerId)
-      : null;
-  const localNpcRef = isLocalNpc ? localDb.doc("npc-personal", npcId) : null;
-  const cloudNpcRef =
-    !isLocalNpc && npcId ? cloudDb.doc("npc-personal", npcId) : null;
+  const cloudPlayerRef = playerId
+    ? cloudDb.doc("player-personal", playerId)
+    : null;
+  const localNpcRef = npcId ? localDb.doc("npc-personal", npcId) : null;
+  const cloudNpcRef = npcId ? cloudDb.doc("npc-personal", npcId) : null;
 
   const [localPlayerDoc] = localDb.useDocumentData(localPlayerRef) as [
     Record<string, unknown> | null,
