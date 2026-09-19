@@ -1,6 +1,7 @@
 import weapons from "./weapons";
 import armor from "./armor";
 import shield from "./shields";
+import consumables from "./consumables";
 import heroics from "./heroics";
 import qualities from "./qualities";
 import { npcSpells } from "./npcSpells";
@@ -67,6 +68,11 @@ export const ITEM_TYPES = [
     label: staticT("Accessories", true),
     context: "player",
   },
+  {
+    key: "consumables",
+    label: staticT("Consumables", true),
+    context: "player",
+  },
   { key: "spells", label: staticT("NPC Spells", true), context: "npc" },
   { key: "attacks", label: staticT("NPC Attacks", true), context: "npc" },
   { key: "special", label: staticT("Special Rules", true), context: "npc" },
@@ -103,6 +109,11 @@ export const PACK_ITEM_TYPES = [
     label: staticT("Accessories", true),
     context: "player",
   },
+  {
+    key: "consumables",
+    label: staticT("Consumables", true),
+    context: "player",
+  },
   { key: "spells", label: staticT("NPC Spells", true), context: "npc" },
   { key: "attacks", label: staticT("NPC Attacks", true), context: "npc" },
   { key: "special", label: staticT("Special Rules", true), context: "npc" },
@@ -131,6 +142,7 @@ export const VIEWER_TO_PACK_TYPE = {
   shields: "shield",
   "custom-weapons": "custom-weapon",
   accessories: "accessory",
+  consumables: "consumable",
   spells: "npc-spell",
   attacks: "npc-attack",
   special: "npc-special",
@@ -153,6 +165,8 @@ export function getItems(type) {
       return armors;
     case "shields":
       return shields;
+    case "consumables":
+      return consumables;
     case "spells":
       return npcSpells;
     case "attacks":

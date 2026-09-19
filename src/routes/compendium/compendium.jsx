@@ -95,6 +95,7 @@ import {
   SharedShieldCard,
   SharedCustomWeaponCard,
   SharedAccessoryCard,
+  SharedConsumableCard,
   SharedQualityCard,
   SharedMnemosphereCard,
   SharedHoplosphereCard,
@@ -131,6 +132,7 @@ function SidebarSecondaryValue(type, item, t) {
   if (type === "armor") return `${item.cost}z`;
   if (type === "shields") return `${item.cost}z`;
   if (type === "accessories") return `${item.cost}z`;
+  if (type === "consumables") return `${item.ipCost ?? 0} IP`;
   if (type === "qualities") return `${item.cost}z`;
   if (type === "spells") return `${item.cost?.amount} MP`;
   if (type === "player-spells")
@@ -157,6 +159,7 @@ function SidebarSecondaryLabel(type, t) {
   if (type === "mnemospheres") return t("Class");
   if (type === "hoplospheres") return t("Cost");
   if (type === "optionals") return t("Subtype");
+  if (type === "consumables") return t("IP");
   return t("Cost");
 }
 // Sidebar
@@ -1009,6 +1012,8 @@ export const ItemCard = React.memo(function ItemCard({
       return <SharedCustomWeaponCard {...sharedProps} />;
     case "accessories":
       return <SharedAccessoryCard {...sharedProps} />;
+    case "consumables":
+      return <SharedConsumableCard {...sharedProps} />;
     case "special":
       return <SharedSpecialRuleCard {...sharedProps} />;
     case "actions":

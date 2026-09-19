@@ -1,5 +1,13 @@
-import React from "react";
-import { Box, Button, Typography } from "@mui/material";
+import React, { useState } from "react";
+import {
+  Box,
+  Button,
+  IconButton,
+  Popover,
+  TextField,
+  Typography,
+} from "@mui/material";
+import SettingsIcon from "@mui/icons-material/Settings";
 import type { DisplayMessage } from "../types";
 import Diamond from "../../../../Diamond";
 import NotesMarkdown from "../../../../common/NotesMarkdown";
@@ -16,7 +24,11 @@ interface DisplayMessageTemplateProps {
 export const DisplayMessageTemplate: React.FC<DisplayMessageTemplateProps> = ({
   message,
 }) => {
-  const { onLossResource } = useChatActions();
+  const { onLossResource, onUpdateCost } = useChatActions();
+  const [costEditAnchor, setCostEditAnchor] = useState<HTMLElement | null>(
+    null,
+  );
+  const [costEditValue, setCostEditValue] = useState("");
   const tags = message.tags.map((t) =>
     t === "default" ? formatSpellType(t) : t,
   );
@@ -207,7 +219,7 @@ export const DisplayMessageTemplate: React.FC<DisplayMessageTemplateProps> = ({
         </Box>
       )}
       {message.cost != null && (
-        <Box sx={{ mt: 1 }}>
+        <Box sx={{ mt: 1, display: "flex", gap: 0.5 }}>
           <Button
             variant="outlined"
             size="small"
@@ -226,6 +238,50 @@ export const DisplayMessageTemplate: React.FC<DisplayMessageTemplateProps> = ({
           >
             Spend {message.cost.amount} {message.cost.resource.toUpperCase()}
           </Button>
+          {onUpdateCost && (
+            <IconButton
+              size="small"
+              onClick={(e) => {
+                setCostEditValue(String(message.cost!.amount));
+                setCostEditAnchor(e.currentTarget);
+              }}
+            >
+              <SettingsIcon fontSize="small" />
+            </IconButton>
+          )}
+          <Popover
+            open={Boolean(costEditAnchor)}
+            anchorEl={costEditAnchor}
+            onClose={() => setCostEditAnchor(null)}
+            anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+            transformOrigin={{ vertical: "top", horizontal: "right" }}
+            slotProps={{
+              paper: { sx: { p: 1.5, display: "flex", gap: 1 } },
+            }}
+          >
+            <TextField
+              autoFocus
+              type="number"
+              size="small"
+              label={`Spend ${message.cost?.resource.toUpperCase()}`}
+              value={costEditValue}
+              onChange={(e) => setCostEditValue(e.target.value)}
+              slotProps={{ htmlInput: { min: 0 } }}
+              sx={{ width: 120 }}
+            />
+            <Button
+              variant="contained"
+              size="small"
+              onClick={() => {
+                const amount = Math.max(0, parseInt(costEditValue, 10) || 0);
+                onUpdateCost?.(message, amount);
+                onLossResource?.(message, message.cost!.resource, amount);
+                setCostEditAnchor(null);
+              }}
+            >
+              Spend
+            </Button>
+          </Popover>
         </Box>
       )}
     </Box>

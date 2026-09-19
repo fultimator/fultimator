@@ -27,6 +27,7 @@ export interface ChatActionsContextValue {
         amount: number,
       ) => void)
     | null;
+  onUpdateCost: ((message: DisplayMessage, amount: number) => void) | null;
   selectedSpeaker: string;
 }
 
@@ -35,6 +36,7 @@ export const chatActionsDefaultValue: ChatActionsContextValue = {
   onRerollOpposed: null,
   onLossResource: null,
   onGainResource: null,
+  onUpdateCost: null,
   selectedSpeaker: "",
 };
 

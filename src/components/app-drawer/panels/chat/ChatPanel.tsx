@@ -735,6 +735,27 @@ export const ChatPanel: React.FC = () => {
     ],
   );
 
+  const handleUpdateCost = useCallback(
+    (message: import("./types").DisplayMessage, amount: number) => {
+      const inEncounter = encounterMessages.some((m) => m.id === message.id);
+      const updateCost = (m: ChatMessage): ChatMessage => {
+        if (m.id !== message.id || m.kind !== "display" || !m.cost) return m;
+        return { ...m, cost: { ...m.cost, amount } };
+      };
+
+      if (inEncounter) {
+        if (!encounterId) return;
+        setEncounterMessages(
+          encounterId,
+          (encounterMessages as ChatMessage[]).map(updateCost),
+        );
+      } else {
+        store.setMessages(store.messages.map(updateCost));
+      }
+    },
+    [store, encounterMessages, encounterId, setEncounterMessages],
+  );
+
   const handleToggleResourceApplication = useCallback(
     (logMsg: LogMessage) => {
       const event = logMsg.event;
@@ -868,6 +889,7 @@ export const ChatPanel: React.FC = () => {
             handleResourceChange(msg, resource, amount, "loss"),
           onGainResource: (msg, resource, amount) =>
             handleResourceChange(msg, resource, amount, "gain"),
+          onUpdateCost: handleUpdateCost,
           selectedSpeaker,
         }}
       >

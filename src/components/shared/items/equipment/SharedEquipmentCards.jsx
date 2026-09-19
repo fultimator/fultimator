@@ -1245,6 +1245,131 @@ export const SharedAccessoryCard = React.memo(function SharedAccessoryCard({
   );
 });
 
+export const SharedConsumableCard = React.memo(function SharedConsumableCard({
+  item,
+  id = CARD_DEFAULTS.id,
+  onHeaderClick = CARD_DEFAULTS.onHeaderClick,
+  showHeader = CARD_DEFAULTS.showHeader,
+  showCard = CARD_DEFAULTS.showCard,
+  variant = CARD_DEFAULTS.variant,
+  imageMode = CARD_DEFAULTS.imageMode,
+  imageSize = CARD_DEFAULTS.imageSize,
+  imageSlot = CARD_DEFAULTS.imageSlot,
+  showImageToggle = CARD_DEFAULTS.showImageToggle,
+  showImage = CARD_DEFAULTS.showImage,
+  onShowImageChange = CARD_DEFAULTS.onShowImageChange,
+  showImageTempInfo = CARD_DEFAULTS.showImageTempInfo,
+  imageTempInfoTextKey = CARD_DEFAULTS.imageTempInfoTextKey,
+  actionContent = CARD_DEFAULTS.actionContent,
+  defaultImageVisible = CARD_DEFAULTS.defaultImageVisible,
+}) {
+  const {
+    t,
+    customTheme,
+    scale,
+    background,
+    imageVisible,
+    setImageVisible,
+    imageTempInfoText,
+  } = useCardSetup({
+    variant,
+    showImage,
+    onShowImageChange,
+    defaultImageVisible,
+    imageTempInfoTextKey,
+  });
+
+  const withImage = isImageMode(imageMode);
+  const cols = withImage ? { name: 8, cost: 4 } : { name: 9, cost: 3 };
+
+  return (
+    <CardContentWrapper
+      showCard={showCard}
+      id={id}
+      showImageToggle={showImageToggle}
+      imageMode={imageMode}
+      imageVisible={imageVisible}
+      setImageVisible={setImageVisible}
+      showImageTempInfo={showImageTempInfo}
+      imageTempInfoText={imageTempInfoText}
+      actionContent={actionContent}
+    >
+      <RowsWithOptionalImage
+        header={
+          showHeader && (
+            <Grid
+              container
+              onClick={onHeaderClick}
+              sx={headerSx(customTheme, scale, onHeaderClick, imageMode)}
+            >
+              <Grid
+                container
+                sx={{ flex: 1, pl: rowPl(imageMode), pr: rowPl(imageMode) }}
+              >
+                <Grid size={cols.name}>
+                  <Typography>{t("Consumable")}</Typography>
+                </Grid>
+                <Grid size={cols.cost}>
+                  <Typography sx={{ textAlign: "center" }}>
+                    {t("IP")}
+                  </Typography>
+                </Grid>
+              </Grid>
+            </Grid>
+          )
+        }
+        imageMode={imageMode}
+        imageSize={imageSize}
+        imageVisible={imageVisible}
+        imageSlot={imageSlot}
+        customTheme={customTheme}
+      >
+        <Grid
+          container
+          sx={dataRowSx(customTheme, imageMode, background, {
+            pr: rowPl(imageMode),
+            borderBottom: `1px solid ${customTheme.secondary}`,
+          })}
+        >
+          <Grid size={cols.name}>
+            <Typography
+              sx={{
+                fontWeight: 600,
+                fontSize: scale.headingRow,
+                lineHeight: 1,
+                margin: 0,
+              }}
+            >
+              {t(item.name)}
+            </Typography>
+          </Grid>
+          <Grid size={cols.cost}>
+            <Typography
+              sx={{
+                textAlign: "center",
+                fontSize: scale.body,
+                lineHeight: 1,
+                margin: 0,
+              }}
+            >
+              {item.ipCost ?? 0}
+            </Typography>
+          </Grid>
+        </Grid>
+
+        <DescriptionRow
+          item={{
+            ...item,
+            description: item.description && t(item.description),
+          }}
+          customTheme={customTheme}
+          imageMode={imageMode}
+        />
+      </RowsWithOptionalImage>
+    </CardContentWrapper>
+  );
+});
+
 export const SharedMnemosphereCard = React.memo(function SharedMnemosphereCard({
   item,
   id = CARD_DEFAULTS.id,

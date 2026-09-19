@@ -70,6 +70,7 @@ import {
   SharedShieldCard,
   SharedCustomWeaponCard,
   SharedAccessoryCard,
+  SharedConsumableCard,
   SharedQualityCard,
   SharedMnemosphereCard,
   SharedHoplosphereCard,
@@ -3565,6 +3566,7 @@ function ConsumablePanel() {
           }}
         />
       }
+      previewContent={<SharedConsumableCard item={data} />}
       addButton={
         <AddToCompendiumButton
           itemType={REG.consumable.addItemType}

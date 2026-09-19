@@ -2,6 +2,7 @@ import React from "react";
 import {
   SharedAccessoryCard,
   SharedArmorCard,
+  SharedConsumableCard,
   SharedCustomWeaponCard,
   SharedHeroicCard,
   SharedOptionalCard,
@@ -21,6 +22,18 @@ export function AccessoryPreviewCard({ formState }) {
         name: formState.name,
         cost: formState.cost,
         quality: formState.quality,
+        description: formState.description,
+      }}
+    />
+  );
+}
+
+export function ConsumablePreviewCard({ formState }) {
+  return (
+    <SharedConsumableCard
+      item={{
+        name: formState.name,
+        ipCost: formState.ipCost,
         description: formState.description,
       }}
     />

@@ -1,5 +1,6 @@
 import { accessoryFieldConfig } from "../rendering/config/itemConfigs/accessory";
 import { armorFieldConfig } from "../rendering/config/itemConfigs/armor";
+import { consumableFieldConfig } from "../rendering/config/itemConfigs/consumable";
 import { customWeaponFieldConfig } from "../rendering/config/itemConfigs/customWeapon";
 import { otherOptionalFieldConfig } from "../rendering/config/itemConfigs/otherOptional";
 import { campActivityFieldConfig } from "../rendering/config/itemConfigs/campActivity";
@@ -13,6 +14,12 @@ import {
   buildAccessorySavePayload,
   validateAccessoryPersisted,
 } from "../schema/itemSchemas/accessory";
+import {
+  buildConsumableFormState,
+  buildConsumableSavePayload,
+  normalizeConsumable,
+  validateConsumable,
+} from "../schema/itemSchemas/consumable";
 import {
   buildArmorFormState,
   buildArmorSavePayload,
@@ -77,6 +84,7 @@ import groupBy from "../../libs/groupby";
 import {
   AccessoryPreviewCard,
   ArmorPreviewCard,
+  ConsumablePreviewCard,
   CustomWeaponPreviewCard,
   HeroicPreviewCard,
   ShieldPreviewCard,
@@ -128,6 +136,22 @@ export const ITEM_TYPE_REGISTRY = {
       { key: "modifiers", label: "Modifiers", cols: 2 },
     ],
     PreviewCard: AccessoryPreviewCard,
+  },
+
+  consumable: {
+    buildState: (item) => buildConsumableFormState(item),
+    buildSavePayload: (formState) => buildConsumableSavePayload(formState),
+    normalizeUpload: (raw) => {
+      try {
+        return normalizeConsumable(raw);
+      } catch {
+        return null;
+      }
+    },
+    validate: validateConsumable,
+    fieldConfig: consumableFieldConfig,
+    groups: [{ key: "core", label: "Consumable", cols: 2 }],
+    PreviewCard: ConsumablePreviewCard,
   },
 
   armor: {
