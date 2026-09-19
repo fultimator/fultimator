@@ -113,6 +113,7 @@ import useLevelUpFlow from "../../libs/player/hooks/useLevelUpFlow";
 import {
   canLevelUpFromExp as canLevelUpFromExpCheck,
   applyExpLevelUp,
+  MAX_LEVEL,
 } from "../../libs/player/levelUpLogic";
 import { executeCommand } from "../../components/app-drawer/panels/chat/domain/commands";
 
@@ -643,7 +644,7 @@ export default function PlayerEdit() {
     null;
   const canLevelUpFromExp =
     (parseInt(playerTemp?.info?.exp, 10) || 0) >= 10 &&
-    (playerTemp?.lvl || 0) < 50;
+    (playerTemp?.lvl || 0) < MAX_LEVEL;
 
   const clearAllSlottedState = (player) => {
     const eq0 = player?.equipment?.[0];

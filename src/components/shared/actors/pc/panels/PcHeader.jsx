@@ -1,4 +1,4 @@
-import React, { useState, useRef, useLayoutEffect } from "react";
+import { useState, useEffect, useRef, useLayoutEffect } from "react";
 import {
   Box,
   Typography,
@@ -20,6 +20,11 @@ import avatar_image from "/images/components/avatar.jpg";
 import ExpIcon from "/src/components/svgs/exp.svg?react";
 import ExpDisabledIcon from "/src/components/svgs/exp_disabled.svg?react";
 import { StyledMarkdown } from "/src/components/shared/actors/pc/shared";
+import {
+  MIN_LEVEL,
+  MAX_LEVEL,
+  clampLevel,
+} from "/src/libs/player/levelUpLogic";
 
 const THEMES = [
   "Ambition",
@@ -100,6 +105,22 @@ export function PcNameBar({
   const { t } = useTranslate();
   const theme = useTheme();
   const primary = theme.palette.primary.main;
+
+  const [levelInput, setLevelInput] = useState(String(pc.lvl ?? ""));
+
+  useEffect(() => {
+    setLevelInput(String(pc.lvl ?? ""));
+  }, [pc.lvl]);
+
+  const commitLevel = () => {
+    const parsed = parseInt(levelInput, 10);
+    const next = Number.isNaN(parsed)
+      ? (pc.lvl ?? MIN_LEVEL)
+      : clampLevel(parsed);
+    setLevelInput(String(next));
+    onUpdate?.((p) => ({ ...p, lvl: next }));
+    updateMaxStats?.();
+  };
 
   const bumpExp = (delta) => {
     const current = parseInt(pc.info?.exp, 10) || 0;
@@ -213,14 +234,14 @@ export function PcNameBar({
             >
               <Typography sx={LABEL_FONT}>{t("Lvl")}</Typography>
               <TextField
-                value={pc.lvl}
-                onChange={(e) => {
-                  const next = parseInt(e.target.value, 10);
-                  const lvl = Number.isNaN(next)
-                    ? 5
-                    : Math.max(5, Math.min(50, next));
-                  onUpdate?.((p) => ({ ...p, lvl }));
-                  updateMaxStats?.();
+                value={levelInput}
+                onChange={(e) => setLevelInput(e.target.value)}
+                onBlur={commitLevel}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    commitLevel();
+                  }
                 }}
                 variant="standard"
                 size="small"
@@ -234,7 +255,7 @@ export function PcNameBar({
                     textAlign: "center",
                   },
                 }}
-                slotProps={{ htmlInput: { min: 5, max: 50 } }}
+                slotProps={{ htmlInput: { min: MIN_LEVEL, max: MAX_LEVEL } }}
               />
             </Box>
             <Diamond color={primary} />

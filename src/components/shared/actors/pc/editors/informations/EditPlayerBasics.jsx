@@ -14,6 +14,11 @@ import { useTranslate } from "/src/translation/translate";
 import CustomTextarea from "/src/components/common/CustomTextarea";
 import SectionCard from "/src/components/shared/actors/common/SectionCard";
 import EditResourcesModal from "/src/components/shared/actors/common/EditResourcesModal";
+import {
+  MIN_LEVEL,
+  MAX_LEVEL,
+  clampLevel,
+} from "/src/libs/player/levelUpLogic";
 import ExpIcon from "/src/components/svgs/exp.svg?react";
 import ExpDisabledIcon from "/src/components/svgs/exp_disabled.svg?react";
 
@@ -468,8 +473,6 @@ function EditPlayerLevel({
   advancement,
 }) {
   const { t } = useTranslate();
-  const MIN_LEVEL = 5;
-  const MAX_LEVEL = 50;
   const [levelInput, setLevelInput] = React.useState(String(player.lvl ?? ""));
 
   React.useEffect(() => {
@@ -480,7 +483,7 @@ function EditPlayerLevel({
     (value) => {
       const parsed = Number(value);
       if (!Number.isFinite(parsed)) return player.lvl;
-      return Math.min(MAX_LEVEL, Math.max(MIN_LEVEL, Math.round(parsed)));
+      return clampLevel(parsed);
     },
     [player.lvl],
   );

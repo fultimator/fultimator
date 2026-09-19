@@ -25,6 +25,7 @@ import CustomTextarea from "/src/components/common/CustomTextarea";
 import NotesMarkdown from "/src/components/common/NotesMarkdown";
 import ExpIcon from "/src/components/svgs/exp.svg?react";
 import ExpDisabledIcon from "/src/components/svgs/exp_disabled.svg?react";
+import { MIN_LEVEL, MAX_LEVEL } from "/src/libs/player/levelUpLogic";
 
 function RenderTraits({ pc, isInteractive = false, onUpdate }) {
   const { t } = useTranslate();
@@ -354,7 +355,10 @@ export default function PcCompactHeader({
               <IconButton
                 size="small"
                 onClick={() => {
-                  onUpdate?.((p) => ({ ...p, lvl: Math.max(5, p.lvl - 1) }));
+                  onUpdate?.((p) => ({
+                    ...p,
+                    lvl: Math.max(MIN_LEVEL, p.lvl - 1),
+                  }));
                   updateMaxStats?.();
                 }}
               >
@@ -375,7 +379,10 @@ export default function PcCompactHeader({
               <IconButton
                 size="small"
                 onClick={() => {
-                  onUpdate?.((p) => ({ ...p, lvl: Math.min(50, p.lvl + 1) }));
+                  onUpdate?.((p) => ({
+                    ...p,
+                    lvl: Math.min(MAX_LEVEL, p.lvl + 1),
+                  }));
                   updateMaxStats?.();
                 }}
               >
