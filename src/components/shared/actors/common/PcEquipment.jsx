@@ -288,6 +288,8 @@ function CompactItemRow({
   handleEquipment,
   handleDiceRoll,
   handleEdit,
+  handleDelete,
+  handleAddToCompendium,
   checkIfEquippable,
   equipToSlot,
   _unequipItem,
@@ -296,6 +298,21 @@ function CompactItemRow({
   t,
   _onPreviewItem,
 }) {
+  const itemSource =
+    item.equipType === "weapon"
+      ? "weapons"
+      : item.equipType === "custom-weapon"
+        ? "customWeapons"
+        : item.equipType === "shield"
+          ? "shields"
+          : item.equipType === "armor"
+            ? "armor"
+            : "accessories";
+  const itemRawIndex = item.originalIndex;
+  const itemRawData =
+    item.originalData ??
+    player.equipment?.[0]?.[itemSource]?.[itemRawIndex] ??
+    item;
   const slotMatches = (ref, source, name, index, sourceArr) => {
     if (!ref || ref.source !== source) return false;
     if (ref.index !== undefined) return ref.index === index;
@@ -619,6 +636,28 @@ function CompactItemRow({
           <Edit fontSize="small" sx={{ mr: 1.5, flexShrink: 0 }} />
           <ListItemText>{t("Edit")}</ListItemText>
         </MenuItem>
+        <MenuItem
+          disabled={!isEditMode}
+          onClick={() => {
+            handleDelete?.(itemSource, itemRawIndex, itemRawData);
+            setMenuAnchor(null);
+          }}
+          sx={{ "&:not(.Mui-disabled)": { color: "error.main" } }}
+        >
+          <Delete fontSize="small" sx={{ mr: 1.5, flexShrink: 0 }} />
+          <ListItemText>{t("Delete")}</ListItemText>
+        </MenuItem>
+        {handleAddToCompendium && (
+          <MenuItem
+            onClick={async () => {
+              await handleAddToCompendium(itemSource, itemRawData);
+              setMenuAnchor(null);
+            }}
+          >
+            <AddToPhotosIcon fontSize="small" sx={{ mr: 1.5, flexShrink: 0 }} />
+            <ListItemText>{t("Add to Compendium")}</ListItemText>
+          </MenuItem>
+        )}
       </Menu>
     </>
   );
@@ -635,6 +674,8 @@ function TransformingFormCard({
   onEquip,
   onRoll,
   onEdit,
+  onDelete,
+  onAddToCompendium,
   checkIfEquippable,
   searchQuery,
   theme,
@@ -756,6 +797,28 @@ function TransformingFormCard({
           <Edit fontSize="small" sx={{ mr: 1.5, flexShrink: 0 }} />
           <ListItemText>{t("Edit")}</ListItemText>
         </MenuItem>
+        <MenuItem
+          disabled={!isEditMode}
+          onClick={() => {
+            onDelete?.();
+            setMenuAnchor(null);
+          }}
+          sx={{ "&:not(.Mui-disabled)": { color: "error.main" } }}
+        >
+          <Delete fontSize="small" sx={{ mr: 1.5, flexShrink: 0 }} />
+          <ListItemText>{t("Delete")}</ListItemText>
+        </MenuItem>
+        {onAddToCompendium && (
+          <MenuItem
+            onClick={async () => {
+              await onAddToCompendium();
+              setMenuAnchor(null);
+            }}
+          >
+            <AddToPhotosIcon fontSize="small" sx={{ mr: 1.5, flexShrink: 0 }} />
+            <ListItemText>{t("Add to Compendium")}</ListItemText>
+          </MenuItem>
+        )}
       </Menu>
     </>
   );
@@ -770,6 +833,8 @@ function CompactTransformingPair({
   handleDiceRoll,
   handleSwapForm,
   handleEdit,
+  handleDelete,
+  handleAddToCompendium,
   checkIfEquippable,
   theme,
   t,
@@ -782,6 +847,11 @@ function CompactTransformingPair({
     slots.mainHand?.source === "customWeapons" &&
     slots.mainHand?.name === cwName;
   const swapFn = () => handleSwapForm(item.primaryForm);
+  const onDeleteParent = () =>
+    handleDelete?.("customWeapons", item.originalIndex, item.originalData);
+  const onAddParentToCompendium = handleAddToCompendium
+    ? () => handleAddToCompendium("customWeapons", item.originalData)
+    : undefined;
 
   return (
     <Box
@@ -801,6 +871,8 @@ function CompactTransformingPair({
         onEquip={handleEquipment}
         onRoll={handleDiceRoll}
         onEdit={handleEdit}
+        onDelete={onDeleteParent}
+        onAddToCompendium={onAddParentToCompendium}
         checkIfEquippable={checkIfEquippable}
         searchQuery={searchQuery}
         theme={theme}
@@ -815,6 +887,8 @@ function CompactTransformingPair({
         onEquip={handleEquipment}
         onRoll={handleDiceRoll}
         onEdit={handleEdit}
+        onDelete={onDeleteParent}
+        onAddToCompendium={onAddParentToCompendium}
         checkIfEquippable={checkIfEquippable}
         searchQuery={searchQuery}
         theme={theme}
@@ -2415,6 +2489,8 @@ export default function PcEquipment({
                   handleDiceRoll={handleDiceRoll}
                   handleSwapForm={handleSwapForm}
                   handleEdit={handleEdit}
+                  handleDelete={requestDelete}
+                  handleAddToCompendium={handleAddToCompendium}
                   checkIfEquippable={checkIfEquippable}
                   theme={theme}
                   t={t}
@@ -2431,6 +2507,8 @@ export default function PcEquipment({
                   handleDiceRoll={handleDiceRoll}
                   handleEdit={handleEdit}
                   checkIfEquippable={checkIfEquippable}
+                  handleDelete={requestDelete}
+                  handleAddToCompendium={handleAddToCompendium}
                   equipToSlot={equipToSlot}
                   unequipItem={unequipItem}
                   hasDualShieldBearer={hasDualShieldBearer}
@@ -2596,6 +2674,16 @@ export default function PcEquipment({
             </Button>
           </DialogActions>
         </Dialog>
+        <DeleteConfirmationDialog
+          open={Boolean(deleteConfirm)}
+          onClose={() => setDeleteConfirm(null)}
+          onConfirm={() => {
+            if (deleteConfirm)
+              handleDelete(deleteConfirm.source, deleteConfirm.index);
+          }}
+          title={t("Delete Item")}
+          message={`${t("Are you sure you want to delete")} ${deleteConfirm?.name ?? t("this item")}?`}
+        />
       </Box>
     );
   }
