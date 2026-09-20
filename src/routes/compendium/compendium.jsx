@@ -62,6 +62,7 @@ import { useCompendiumPacks } from "../../hooks/useCompendiumPacks";
 import CompendiumItemCreateDialog from "../../components/compendium/CompendiumItemCreateDialog";
 import QuickCreateModal from "../../components/compendium/QuickCreateModal";
 import CompendiumBrowser from "../../components/compendium/CompendiumBrowser";
+import DeleteConfirmationDialog from "../../components/common/DeleteConfirmationDialog";
 import { useTranslate } from "../../translation/translate";
 import { useCustomTheme } from "../../hooks/useCustomTheme";
 import { IS_ELECTRON } from "../../platform";
@@ -1053,6 +1054,7 @@ function CompendiumViewer() {
   const [quickCreateOpen, setQuickCreateOpen] = useState(false);
   const [editClassItem, setEditClassItem] = useState(null);
   const [manageDialogOpen, setManageDialogOpen] = useState(false);
+  const [deletePackConfirmOpen, setDeletePackConfirmOpen] = useState(false);
   const [editingPackName, setEditingPackName] = useState("");
   const [editingPackFuid, setEditingPackFuid] = useState("");
   const [editingPackFuidTouched, setEditingPackFuidTouched] = useState(false);
@@ -2000,11 +2002,7 @@ function CompendiumViewer() {
             <Button
               color="error"
               disabled={exporting}
-              onClick={async () => {
-                await deletePack(activePack.id);
-                setPendingNavPackId("official");
-                setManageDialogOpen(false);
-              }}
+              onClick={() => setDeletePackConfirmOpen(true)}
             >
               {t("Delete Pack")}
             </Button>
@@ -2065,6 +2063,33 @@ function CompendiumViewer() {
           </Box>
         </DialogActions>
       </Dialog>
+
+      {/* Delete pack confirmation */}
+      <DeleteConfirmationDialog
+        open={deletePackConfirmOpen}
+        onClose={() => setDeletePackConfirmOpen(false)}
+        onConfirm={async () => {
+          if (!activePack) return;
+          await deletePack(activePack.id);
+          setPendingNavPackId("official");
+          setDeletePackConfirmOpen(false);
+          setManageDialogOpen(false);
+        }}
+        title={t("Confirm Deletion")}
+        message={t(
+          "Are you sure you want to delete this pack and all its items?",
+        )}
+        itemPreview={
+          activePack ? (
+            <Box>
+              <Typography variant="h4">{activePack.name}</Typography>
+              <Typography variant="body2" sx={{ color: "text.secondary" }}>
+                {activePack.items?.length ?? 0} {t("items")}
+              </Typography>
+            </Box>
+          ) : null
+        }
+      />
 
       <ManageModulesModal
         open={manageModulesOpen}

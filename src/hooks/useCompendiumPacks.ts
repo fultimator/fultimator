@@ -781,6 +781,18 @@ export function useCompendiumPacks() {
         typeof manifest.version === "string"
           ? manifest.version.trim() || undefined
           : undefined,
+      homepageUrl:
+        typeof manifest.homepageUrl === "string"
+          ? manifest.homepageUrl.trim() || undefined
+          : undefined,
+      manifestUrl:
+        typeof manifest.manifestUrl === "string"
+          ? manifest.manifestUrl.trim() || undefined
+          : undefined,
+      downloadUrl:
+        typeof manifest.downloadUrl === "string"
+          ? manifest.downloadUrl.trim() || undefined
+          : undefined,
       requiresManual: importedRequires,
       requiresAuto: [],
       requires: importedRequires,
