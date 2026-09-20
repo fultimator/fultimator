@@ -241,6 +241,10 @@ export function useCompendiumPacks() {
           | "requires"
           | "requiresManual"
           | "optional"
+          | "version"
+          | "homepageUrl"
+          | "manifestUrl"
+          | "downloadUrl"
         >
       >,
     ): Promise<void> => {

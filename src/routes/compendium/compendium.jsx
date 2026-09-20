@@ -1574,10 +1574,10 @@ function CompendiumViewer() {
               setEditingAutoRequires(activePack?.requiresAuto ?? []);
               setEditingOptional(activePack?.optional ?? []);
               setExportMeta({
-                version: "1.0.0",
-                homepageUrl: "",
-                manifestUrl: "",
-                downloadUrl: "",
+                version: activePack?.version ?? "1.0.0",
+                homepageUrl: activePack?.homepageUrl ?? "",
+                manifestUrl: activePack?.manifestUrl ?? "",
+                downloadUrl: activePack?.downloadUrl ?? "",
               });
               setManageDialogOpen(true);
             }}
@@ -2051,6 +2051,10 @@ function CompendiumViewer() {
                   author: editingAuthor.trim() || undefined,
                   requiresManual: editingRequires,
                   optional: editingOptional,
+                  version: exportMeta.version.trim() || undefined,
+                  homepageUrl: exportMeta.homepageUrl.trim() || undefined,
+                  manifestUrl: exportMeta.manifestUrl.trim() || undefined,
+                  downloadUrl: exportMeta.downloadUrl.trim() || undefined,
                 };
                 await updatePack(activePack.id, changes);
                 setManageDialogOpen(false);
