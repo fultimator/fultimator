@@ -306,14 +306,10 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
     keepMounted: true,
     slotProps: {
       root: {
-        sx: {
-          zIndex: (theme) => theme.zIndex.modal + 3,
-        },
+        sx: { zIndex: 1500 },
       },
       paper: {
-        sx: {
-          zIndex: (theme) => theme.zIndex.modal + 3,
-        },
+        sx: { zIndex: 1500 },
       },
     },
   };
