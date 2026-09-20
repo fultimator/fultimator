@@ -27,7 +27,6 @@ import {
   Tooltip,
   Divider,
   InputAdornment,
-  ThemeProvider,
   Snackbar,
   Autocomplete,
   useMediaQuery,
@@ -1541,7 +1540,7 @@ function CompendiumViewer() {
   );
 
   return (
-    <ThemeProvider theme={customTheme}>
+    <>
       <Layout>
         <Box
           sx={{
@@ -2071,7 +2070,7 @@ function CompendiumViewer() {
           handlers.handleCompendiumChange(id);
         }}
       />
-    </ThemeProvider>
+    </>
   );
 }
 

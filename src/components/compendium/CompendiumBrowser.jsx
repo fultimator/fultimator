@@ -145,6 +145,7 @@ const CompendiumBrowser = React.memo(function CompendiumBrowser({
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const mainRef = useRef(null);
+  const stickyHeaderRef = useRef(null);
   const selectedCardRef = useRef(null);
   const [itemMenuAnchor, setItemMenuAnchor] = useState(null); // { el, idx }
   const [bulkAddAnchor, setBulkAddAnchor] = useState(null);
@@ -291,8 +292,20 @@ const CompendiumBrowser = React.memo(function CompendiumBrowser({
     const id = itemIds[selectedIdx];
     if (!id) return;
     return afterNextPaint(() => {
+      const container = mainRef.current;
       const el = document.getElementById(id);
-      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+      if (!el || !container) return;
+      const headerHeight = stickyHeaderRef.current?.offsetHeight ?? 0;
+      const extraGap = 12;
+      const containerRect = container.getBoundingClientRect();
+      const elRect = el.getBoundingClientRect();
+      const offset =
+        elRect.top -
+        containerRect.top -
+        headerHeight -
+        extraGap +
+        container.scrollTop;
+      container.scrollTo({ top: offset, behavior: "smooth" });
     });
   }, [selectedIdx, itemIds]);
 
@@ -619,6 +632,7 @@ const CompendiumBrowser = React.memo(function CompendiumBrowser({
       <Box ref={mainRef} sx={{ flex: 1, overflowY: "auto" }}>
         {/* Header row (sticky) */}
         <Box
+          ref={stickyHeaderRef}
           sx={{
             position: "sticky",
             top: 0,
