@@ -229,7 +229,7 @@ function ThemedSpellEntropistGamble({ gamble, onEdit, isEditMode }) {
                 ...bodyTextSx,
               }}
             >
-              {attributes[gamble.attr].shortcaps}
+              {attributes[gamble.attr]?.shortcaps}
             </Typography>
           </Grid>
         </Grid>
