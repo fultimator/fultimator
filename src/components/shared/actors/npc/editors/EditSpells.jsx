@@ -575,6 +575,7 @@ export default function EditSpells({ npc, setNpc }) {
         onClose={() => setModalOpen(false)}
         context="npc"
         initialType="spells"
+        allowMultiSelect
         onAddItem={(item, sourceType) => {
           setNpc((prev) => {
             const isPlayerSpell = sourceType === "player-spells";

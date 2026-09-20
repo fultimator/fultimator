@@ -937,6 +937,7 @@ export default function EditQuickAssembly({ npc, setNpc }) {
         context="npc"
         initialType={compendiumType}
         initialCompendium="personal"
+        allowMultiSelect
         onAddItem={(item) => {
           if (compendiumType === "spells") {
             setNpc((prev) => ({

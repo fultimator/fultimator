@@ -42,6 +42,7 @@ export default [
         URL: "readonly",
         URLSearchParams: "readonly",
         requestAnimationFrame: "readonly",
+        cancelAnimationFrame: "readonly",
         structuredClone: "readonly",
         Response: "readonly",
         setTimeout: "readonly",

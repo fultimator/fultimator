@@ -288,6 +288,7 @@ export default function EditNotes({ npc, setNpc }) {
         context="npc"
         initialType="note"
         initialCompendium="personal"
+        allowMultiSelect
         onAddItem={(item) => {
           setNpc((prev) => ({
             ...prev,

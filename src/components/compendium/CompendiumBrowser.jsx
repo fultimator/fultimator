@@ -19,6 +19,11 @@ import {
   MenuItem,
   ListItemIcon,
   ListItemText,
+  ToggleButtonGroup,
+  ToggleButton,
+  Snackbar,
+  Alert,
+  CircularProgress,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -26,7 +31,17 @@ import CloseIcon from "@mui/icons-material/Close";
 import ShareIcon from "@mui/icons-material/Share";
 import DownloadIcon from "@mui/icons-material/Download";
 import LinkIcon from "@mui/icons-material/Link";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
+import LooksOneIcon from "@mui/icons-material/LooksOne";
+import ChecklistIcon from "@mui/icons-material/Checklist";
+import LibraryAddIcon from "@mui/icons-material/LibraryAdd";
+import CodeIcon from "@mui/icons-material/Code";
+import StarIcon from "@mui/icons-material/Star";
+import CollectionsBookmarkIcon from "@mui/icons-material/CollectionsBookmark";
 
+import html2canvas from "html2canvas";
+import JSZip from "jszip";
 import { useTranslate } from "../../translation/translate";
 import { useCustomTheme } from "../../hooks/useCustomTheme";
 import useDownloadImage from "../../hooks/useDownloadImage";
@@ -34,6 +49,7 @@ import {
   ITEM_TYPES,
   VIEWER_TO_PACK_TYPE,
   getItems,
+  toSlug,
 } from "../../libs/compendium";
 import {
   CompendiumSidebar,
@@ -44,6 +60,17 @@ import Export from "../Export";
 import { useCompendiumItems } from "./hooks/useCompendiumItems";
 
 const SIDEBAR_WIDTH = 300;
+
+function afterNextPaint(fn) {
+  let inner;
+  const outer = requestAnimationFrame(() => {
+    inner = requestAnimationFrame(fn);
+  });
+  return () => {
+    cancelAnimationFrame(outer);
+    if (inner) cancelAnimationFrame(inner);
+  };
+}
 
 /**
  * Layout-agnostic compendium browser.
@@ -65,6 +92,16 @@ const CompendiumBrowser = React.memo(function CompendiumBrowser({
   setSelectedIdx,
   searchQuery,
   setSearchQuery,
+
+  // Multi-select (opt-in; used by import modal to add several items at once)
+  allowMultiSelect = false,
+  multiSelect = false,
+  onMultiSelectModeChange,
+  selectedIndices,
+  onToggleSelectedIndex,
+  onClearSelection,
+  onBulkExport,
+  onBulkAddToCompendium,
 
   // Pack data
   packs,
@@ -110,6 +147,14 @@ const CompendiumBrowser = React.memo(function CompendiumBrowser({
   const mainRef = useRef(null);
   const selectedCardRef = useRef(null);
   const [itemMenuAnchor, setItemMenuAnchor] = useState(null); // { el, idx }
+  const [bulkAddAnchor, setBulkAddAnchor] = useState(null);
+  const [bulkExportAnchor, setBulkExportAnchor] = useState(null);
+  const [bulkImageProgress, setBulkImageProgress] = useState(null); // { done, total } | null
+  const [bulkSnackbar, setBulkSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
 
   const { selectedType, selectedCompendium } = filters;
 
@@ -128,26 +173,163 @@ const CompendiumBrowser = React.memo(function CompendiumBrowser({
     selectedCardRef,
   );
 
-  // Scroll selected item into view when selection changes
+  const handleBulkDownloadImages = useCallback(async () => {
+    const indices = Array.from(selectedIndices ?? []);
+    if (indices.length === 0) return;
+
+    const background = customTheme.mode === "dark" ? "#1f1f1f" : "#ffffff";
+    const zip = new JSZip();
+    const usedNames = new Set();
+    let failed = 0;
+
+    setBulkImageProgress({ done: 0, total: indices.length });
+    for (let i = 0; i < indices.length; i++) {
+      const idx = indices[i];
+      const item = filteredItems[idx];
+      const el = document.getElementById(itemIds[idx]);
+      if (!el || !item) {
+        failed += 1;
+        setBulkImageProgress({ done: i + 1, total: indices.length });
+        continue;
+      }
+      try {
+        const canvas = await html2canvas(el, {
+          logging: false,
+          useCORS: true,
+          allowTaint: true,
+          scale: 2,
+          backgroundColor: background,
+        });
+        const blob = await new Promise((resolve) =>
+          canvas.toBlob(resolve, "image/png", 1.0),
+        );
+        if (blob) {
+          const baseName = (item.name || `item_${idx}`)
+            .replace(/\s+/g, "_")
+            .toLowerCase();
+          let filename = `${baseName}.png`;
+          let suffix = 2;
+          while (usedNames.has(filename)) {
+            filename = `${baseName}_${suffix}.png`;
+            suffix += 1;
+          }
+          usedNames.add(filename);
+          zip.file(filename, blob);
+        } else {
+          failed += 1;
+        }
+      } catch {
+        failed += 1;
+      }
+      setBulkImageProgress({ done: i + 1, total: indices.length });
+    }
+
+    setBulkImageProgress(null);
+    if (Object.keys(zip.files).length === 0) {
+      setBulkSnackbar({
+        open: true,
+        message: t("Failed to generate images"),
+        severity: "error",
+      });
+      return;
+    }
+
+    const zipBlob = await zip.generateAsync({ type: "blob" });
+    const url = URL.createObjectURL(zipBlob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${selectedType || "items"}_images.zip`;
+    a.click();
+    URL.revokeObjectURL(url);
+
+    setBulkSnackbar({
+      open: true,
+      message:
+        failed > 0
+          ? `${t("Downloaded")} ${indices.length - failed}/${indices.length} ${t("images")}`
+          : `${t("Downloaded")} ${indices.length} ${t("images")}`,
+      severity: failed > 0 ? "error" : "success",
+    });
+  }, [
+    selectedIndices,
+    filteredItems,
+    itemIds,
+    customTheme.mode,
+    selectedType,
+    t,
+  ]);
+
+  const handleBulkShareLinks = useCallback(() => {
+    const indices = Array.from(selectedIndices ?? []);
+    if (indices.length === 0) return;
+
+    const urls = indices
+      .map((idx) => filteredItems[idx])
+      .filter(Boolean)
+      .map((item) => {
+        const url = new URL(window.location.href);
+        url.searchParams.set("type", selectedType);
+        if (selectedCompendium !== "official") {
+          url.searchParams.set("compendium", selectedCompendium);
+        }
+        if (item.name) url.searchParams.set("item", toSlug(item.name));
+        return url.toString();
+      });
+
+    const blob = new Blob([urls.join("\n")], { type: "text/plain" });
+    const downloadUrl = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = downloadUrl;
+    a.download = `${selectedType || "items"}_share_links.txt`;
+    a.click();
+    URL.revokeObjectURL(downloadUrl);
+  }, [selectedIndices, filteredItems, selectedType, selectedCompendium]);
+
+  // Scroll selected item into view when selection changes.
   useEffect(() => {
     if (selectedIdx === null || !mainRef.current) return;
     const id = itemIds[selectedIdx];
     if (!id) return;
-    const el = document.getElementById(id);
-    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    return afterNextPaint(() => {
+      const el = document.getElementById(id);
+      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
   }, [selectedIdx, itemIds]);
 
   const handleItemClick = useCallback(
-    (item, idx) => {
+    (item, idx, event) => {
+      if (multiSelect) {
+        onToggleSelectedIndex?.(idx);
+        return;
+      }
+      if (
+        (event?.ctrlKey || event?.metaKey) &&
+        allowMultiSelect &&
+        onMultiSelectModeChange
+      ) {
+        onMultiSelectModeChange(true);
+        onToggleSelectedIndex?.(idx);
+        return;
+      }
       handlers.handleItemClick(item, idx, { isDesktop, setDrawerOpen });
       if (!isDesktop) setDrawerOpen(false);
     },
-    [handlers, isDesktop],
+    [
+      handlers,
+      isDesktop,
+      multiSelect,
+      onToggleSelectedIndex,
+      allowMultiSelect,
+      onMultiSelectModeChange,
+    ],
   );
 
   // Stable per-item click handlers so ItemCard doesn't re-render due to closures
   const itemClickHandlers = useMemo(
-    () => filteredItems.map((item, idx) => () => handleItemClick(item, idx)),
+    () =>
+      filteredItems.map(
+        (item, idx) => (event) => handleItemClick(item, idx, event),
+      ),
     [filteredItems, handleItemClick],
   );
 
@@ -288,9 +470,6 @@ const CompendiumBrowser = React.memo(function CompendiumBrowser({
             </IconButton>
           </Tooltip>
         )}
-        {showExport && (
-          <Export name={item.name} dataType={selectedType} data={item} />
-        )}
         {VIEWER_TO_PACK_TYPE[selectedType] && (
           <AddToCompendiumButton
             itemType={VIEWER_TO_PACK_TYPE[selectedType]}
@@ -304,6 +483,9 @@ const CompendiumBrowser = React.memo(function CompendiumBrowser({
                 : undefined
             }
           />
+        )}
+        {showExport && (
+          <Export name={item.name} dataType={selectedType} data={item} />
         )}
       </>
     );
@@ -362,11 +544,6 @@ const CompendiumBrowser = React.memo(function CompendiumBrowser({
               <ListItemText>{t("Download as Image")}</ListItemText>
             </MenuItem>
           )}
-          {showExport && (
-            <Box sx={{ px: 1 }}>
-              <Export name={item.name} dataType={selectedType} data={item} />
-            </Box>
-          )}
           {VIEWER_TO_PACK_TYPE[selectedType] && (
             <Box sx={{ px: 1 }}>
               <AddToCompendiumButton
@@ -378,6 +555,11 @@ const CompendiumBrowser = React.memo(function CompendiumBrowser({
                     : undefined
                 }
               />
+            </Box>
+          )}
+          {showExport && (
+            <Box sx={{ px: 1 }}>
+              <Export name={item.name} dataType={selectedType} data={item} />
             </Box>
           )}
           {renderItemActions && renderItemActions(item, idx, selectedItem)}
@@ -434,64 +616,293 @@ const CompendiumBrowser = React.memo(function CompendiumBrowser({
       )}
 
       {/* ---- Main content ---- */}
-      <Box
-        ref={mainRef}
-        sx={{ flex: 1, overflowY: "auto", p: { xs: 1.5, md: 2 } }}
-      >
-        {/* Mobile header row */}
-        {!isDesktop && (
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1.5 }}>
-            <IconButton
-              size="small"
-              onClick={() => setDrawerOpen(true)}
-              sx={{ mr: 0.5 }}
-            >
-              <MenuIcon />
-            </IconButton>
-            <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
-              {t(ITEM_TYPES.find((x) => x.key === selectedType)?.label ?? "")}
-            </Typography>
-            <Typography variant="body2" sx={{ color: "text.secondary" }}>
-              ({filteredItems.length})
-            </Typography>
+      <Box ref={mainRef} sx={{ flex: 1, overflowY: "auto" }}>
+        {/* Header row (sticky) */}
+        <Box
+          sx={{
+            position: "sticky",
+            top: 0,
+            zIndex: 2,
+            px: { xs: 1.5, md: 2 },
+            py: 1,
+            display: "flex",
+            flexDirection: "column",
+            gap: 1,
+            bgcolor: "background.default",
+            borderBottom: `1px solid ${muiTheme.palette.divider}`,
+          }}
+        >
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: 1,
+            }}
+          >
+            {!isDesktop ? (
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <IconButton
+                  size="small"
+                  onClick={() => setDrawerOpen(true)}
+                  sx={{ mr: 0.5 }}
+                >
+                  <MenuIcon />
+                </IconButton>
+                <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
+                  {t(
+                    ITEM_TYPES.find((x) => x.key === selectedType)?.label ?? "",
+                  )}
+                </Typography>
+                <Typography variant="body2" sx={{ color: "text.secondary" }}>
+                  ({filteredItems.length})
+                </Typography>
+              </Box>
+            ) : (
+              <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+                {t(ITEM_TYPES.find((x) => x.key === selectedType)?.label ?? "")}
+                <Typography
+                  component="span"
+                  variant="body2"
+                  sx={{ color: "text.secondary", ml: 1 }}
+                >
+                  ({filteredItems.length} {t("items")})
+                </Typography>
+              </Typography>
+            )}
+
+            {allowMultiSelect && onMultiSelectModeChange && (
+              <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                <ToggleButtonGroup
+                  size="small"
+                  value={multiSelect ? "multi" : "single"}
+                  exclusive
+                  onChange={(_e, value) => {
+                    if (value === null) return;
+                    onMultiSelectModeChange(value === "multi");
+                  }}
+                >
+                  <ToggleButton value="single">
+                    <Tooltip title={t("Select one item")}>
+                      <LooksOneIcon fontSize="small" />
+                    </Tooltip>
+                  </ToggleButton>
+                  <ToggleButton value="multi">
+                    <Tooltip title={t("Select multiple items")}>
+                      <ChecklistIcon fontSize="small" />
+                    </Tooltip>
+                  </ToggleButton>
+                </ToggleButtonGroup>
+                <Tooltip title={t("Clear selection")}>
+                  <span>
+                    <IconButton
+                      size="small"
+                      disabled={!multiSelect || !(selectedIndices?.size > 0)}
+                      onClick={onClearSelection}
+                    >
+                      <CloseIcon fontSize="small" />
+                    </IconButton>
+                  </span>
+                </Tooltip>
+              </Box>
+            )}
           </Box>
-        )}
 
-        {/* Desktop section title */}
-        {isDesktop && (
-          <Typography variant="h6" sx={{ fontWeight: "bold", mb: 2 }}>
-            {t(ITEM_TYPES.find((x) => x.key === selectedType)?.label ?? "")}
-            <Typography
-              component="span"
-              variant="body2"
-              sx={{ color: "text.secondary", ml: 1 }}
-            >
-              ({filteredItems.length} {t("items")})
-            </Typography>
-          </Typography>
-        )}
-
-        {filteredItems.length === 0 ? (
-          renderEmptyState ? (
-            renderEmptyState()
-          ) : (
+          {multiSelect && selectedIndices?.size > 0 && (
             <Box
               sx={{
                 display: "flex",
-                flexDirection: "column",
                 alignItems: "center",
-                justifyContent: "center",
-                textAlign: "center",
-                py: 8,
-                px: 4,
-                gap: 2,
+                justifyContent: "flex-end",
+                gap: 1,
               }}
             >
-              <Typography variant="h5" sx={{ color: "text.secondary" }}>
-                {t("No items found.")}
+              <Typography variant="body2" sx={{ color: "text.secondary" }}>
+                {bulkImageProgress
+                  ? `${t("Capturing")} ${bulkImageProgress.done}/${bulkImageProgress.total}`
+                  : `${selectedIndices.size} ${t("selected")}`}
               </Typography>
-              {selectedCompendium === "official" &&
-                getItems(selectedType).length === 0 && (
+              {showShareUrl && (
+                <Tooltip title={t("Share Links (.txt)")}>
+                  <IconButton size="small" onClick={handleBulkShareLinks}>
+                    <ShareIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+              )}
+              <Tooltip title={t("Download Images (.zip)")}>
+                <span>
+                  <IconButton
+                    size="small"
+                    disabled={Boolean(bulkImageProgress)}
+                    onClick={handleBulkDownloadImages}
+                  >
+                    {bulkImageProgress ? (
+                      <CircularProgress size={16} />
+                    ) : (
+                      <DownloadIcon fontSize="small" />
+                    )}
+                  </IconButton>
+                </span>
+              </Tooltip>
+              {onBulkAddToCompendium && (
+                <>
+                  <Tooltip title={t("Add Selected to Compendium")}>
+                    <IconButton
+                      size="small"
+                      onClick={(e) => {
+                        if ((packs?.length ?? 0) > 0) {
+                          setBulkAddAnchor(e.currentTarget);
+                        } else {
+                          onBulkAddToCompendium(undefined);
+                        }
+                      }}
+                    >
+                      <LibraryAddIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                  <Menu
+                    anchorEl={bulkAddAnchor}
+                    open={Boolean(bulkAddAnchor)}
+                    onClose={() => setBulkAddAnchor(null)}
+                  >
+                    {(packs ?? []).map((pack) => (
+                      <MenuItem
+                        key={pack.id}
+                        disabled={!!pack.locked}
+                        onClick={() => {
+                          setBulkAddAnchor(null);
+                          onBulkAddToCompendium(pack.id);
+                        }}
+                      >
+                        <ListItemIcon>
+                          {pack.isPersonal ? (
+                            <StarIcon fontSize="small" color="warning" />
+                          ) : (
+                            <CollectionsBookmarkIcon fontSize="small" />
+                          )}
+                        </ListItemIcon>
+                        <ListItemText>{pack.name}</ListItemText>
+                      </MenuItem>
+                    ))}
+                  </Menu>
+                </>
+              )}
+              {onBulkExport && (
+                <>
+                  <Tooltip title={t("Export Selected")}>
+                    <IconButton
+                      size="small"
+                      onClick={(e) => setBulkExportAnchor(e.currentTarget)}
+                    >
+                      <CodeIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                  <Menu
+                    anchorEl={bulkExportAnchor}
+                    open={Boolean(bulkExportAnchor)}
+                    onClose={() => setBulkExportAnchor(null)}
+                  >
+                    <MenuItem
+                      onClick={() => {
+                        setBulkExportAnchor(null);
+                        onBulkExport("json");
+                      }}
+                    >
+                      {t("Export as JSON (.zip)")}
+                    </MenuItem>
+                    <MenuItem
+                      onClick={() => {
+                        setBulkExportAnchor(null);
+                        onBulkExport("markdown");
+                      }}
+                    >
+                      {t("Export as Markdown (.zip)")}
+                    </MenuItem>
+                    <MenuItem
+                      onClick={() => {
+                        setBulkExportAnchor(null);
+                        onBulkExport("plain");
+                      }}
+                    >
+                      {t("Export as Plaintext (.zip)")}
+                    </MenuItem>
+                  </Menu>
+                </>
+              )}
+            </Box>
+          )}
+        </Box>
+
+        <Box sx={{ p: { xs: 1.5, md: 2 }, pt: 1 }}>
+          {filteredItems.length === 0 ? (
+            renderEmptyState ? (
+              renderEmptyState()
+            ) : (
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  textAlign: "center",
+                  py: 8,
+                  px: 4,
+                  gap: 2,
+                }}
+              >
+                <Typography variant="h5" sx={{ color: "text.secondary" }}>
+                  {t("No items found.")}
+                </Typography>
+                {selectedCompendium === "official" &&
+                  getItems(selectedType).length === 0 && (
+                    <Box
+                      sx={{
+                        width: "100%",
+                        maxWidth: 640,
+                        p: 2.5,
+                        borderRadius: 2,
+                        border: "1px solid",
+                        borderColor: "divider",
+                        bgcolor: "background.paper",
+                        textAlign: "left",
+                      }}
+                    >
+                      <Typography
+                        variant="body1"
+                        sx={{
+                          color: "text.secondary",
+                          fontWeight: 500,
+                          lineHeight: 1.6,
+                        }}
+                      >
+                        {t(
+                          "This item type is not covered under the third party license and has no official data.",
+                        )}
+                      </Typography>
+                      <Typography
+                        variant="body1"
+                        sx={{ color: "text.secondary", mt: 1, lineHeight: 1.6 }}
+                      >
+                        {t(
+                          "You can create custom items by switching to your personal compendium.",
+                        )}
+                      </Typography>
+                      {packs?.length > 0 &&
+                        handlers?.handleCompendiumChange && (
+                          <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={() =>
+                              handlers.handleCompendiumChange(packs[0].id)
+                            }
+                            sx={{ mt: 2 }}
+                          >
+                            {t("Go to personal compendium")}
+                          </Button>
+                        )}
+                    </Box>
+                  )}
+                {selectedCompendium !== "official" && (
                   <Box
                     sx={{
                       width: "100%",
@@ -512,109 +923,116 @@ const CompendiumBrowser = React.memo(function CompendiumBrowser({
                         lineHeight: 1.6,
                       }}
                     >
-                      {t(
-                        "This item type is not covered under the third party license and has no official data.",
-                      )}
+                      {t("Create a new one.")}
                     </Typography>
-                    <Typography
-                      variant="body1"
-                      sx={{ color: "text.secondary", mt: 1, lineHeight: 1.6 }}
-                    >
-                      {t(
-                        "You can create custom items by switching to your personal compendium.",
-                      )}
-                    </Typography>
-                    {packs?.length > 0 && handlers?.handleCompendiumChange && (
+                    {onOpenQuickCreate && (
                       <Button
                         variant="contained"
                         color="primary"
-                        onClick={() =>
-                          handlers.handleCompendiumChange(packs[0].id)
-                        }
+                        onClick={onOpenQuickCreate}
                         sx={{ mt: 2 }}
                       >
-                        {t("Go to personal compendium")}
+                        {t("Create a new one.")}
                       </Button>
                     )}
                   </Box>
                 )}
-              {selectedCompendium !== "official" && (
-                <Box
-                  sx={{
-                    width: "100%",
-                    maxWidth: 640,
-                    p: 2.5,
-                    borderRadius: 2,
-                    border: "1px solid",
-                    borderColor: "divider",
-                    bgcolor: "background.paper",
-                    textAlign: "left",
-                  }}
-                >
-                  <Typography
-                    variant="body1"
-                    sx={{
-                      color: "text.secondary",
-                      fontWeight: 500,
-                      lineHeight: 1.6,
-                    }}
+              </Box>
+            )
+          ) : (
+            <Grid container spacing={2}>
+              {filteredItems.map((item, idx) => {
+                const isSelected = multiSelect
+                  ? Boolean(selectedIndices?.has(idx))
+                  : idx === selectedIdx;
+                return (
+                  <Grid
+                    key={itemIds[idx]}
+                    size={{ xs: 12, lg: selectedType === "classes" ? 12 : 6 }}
+                    sx={{ contain: "layout paint" }}
                   >
-                    {t("Create a new one.")}
-                  </Typography>
-                  {onOpenQuickCreate && (
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      onClick={onOpenQuickCreate}
-                      sx={{ mt: 2 }}
+                    <Box
+                      ref={!multiSelect && isSelected ? selectedCardRef : null}
+                      sx={{
+                        position: "relative",
+                        borderRadius: 2,
+                        border: isSelected
+                          ? `2px solid ${customTheme.primary}`
+                          : "2px solid transparent",
+                        transition: "border-color 0.15s ease",
+                        contain: "content",
+                        scrollMarginTop: { xs: 88, md: 96 },
+                      }}
                     >
-                      {t("Create a new one.")}
-                    </Button>
-                  )}
-                </Box>
-              )}
-            </Box>
-          )
-        ) : (
-          <Grid container spacing={2}>
-            {filteredItems.map((item, idx) => {
-              const isSelected = idx === selectedIdx;
-              return (
-                <Grid
-                  key={itemIds[idx]}
-                  size={{ xs: 12, lg: selectedType === "classes" ? 12 : 6 }}
-                  sx={{ contain: "layout paint" }}
-                >
-                  <Box
-                    ref={isSelected ? selectedCardRef : null}
-                    sx={{
-                      borderRadius: 2,
-                      border: isSelected
-                        ? `2px solid ${customTheme.primary}`
-                        : "2px solid transparent",
-                      transition: "border-color 0.15s ease",
-                      contain: "content",
-                    }}
-                  >
-                    <ItemCard
-                      type={selectedType}
-                      item={item}
-                      id={itemIds[idx]}
-                      onHeaderClick={itemClickHandlers[idx]}
-                      showImageToggle={isSelected}
-                      actionContent={
-                        isDesktop
-                          ? buildItemActionContent(item, idx)
-                          : buildMobileItemActionContent(item, idx)
-                      }
-                    />
-                  </Box>
-                </Grid>
-              );
-            })}
-          </Grid>
-        )}
+                      {multiSelect && (
+                        <IconButton
+                          size="small"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onToggleSelectedIndex?.(idx);
+                          }}
+                          sx={{
+                            position: "absolute",
+                            top: 6,
+                            right: 6,
+                            zIndex: 1,
+                            p: "3px",
+                            bgcolor: isSelected
+                              ? customTheme.primary
+                              : "rgba(0, 0, 0, 0.35)",
+                            "&:hover": {
+                              bgcolor: isSelected
+                                ? customTheme.primary
+                                : "rgba(0, 0, 0, 0.5)",
+                            },
+                          }}
+                        >
+                          {isSelected ? (
+                            <CheckCircleIcon
+                              fontSize="small"
+                              sx={{ color: "#fff" }}
+                            />
+                          ) : (
+                            <RadioButtonUncheckedIcon
+                              fontSize="small"
+                              sx={{ color: "rgba(255, 255, 255, 0.85)" }}
+                            />
+                          )}
+                        </IconButton>
+                      )}
+                      <ItemCard
+                        type={selectedType}
+                        item={item}
+                        id={itemIds[idx]}
+                        onHeaderClick={itemClickHandlers[idx]}
+                        showImageToggle={!multiSelect && isSelected}
+                        actionContent={
+                          multiSelect
+                            ? null
+                            : isDesktop
+                              ? buildItemActionContent(item, idx)
+                              : buildMobileItemActionContent(item, idx)
+                        }
+                      />
+                    </Box>
+                  </Grid>
+                );
+              })}
+            </Grid>
+          )}
+        </Box>
       </Box>
+
+      <Snackbar
+        open={bulkSnackbar.open}
+        autoHideDuration={3000}
+        onClose={() => setBulkSnackbar((s) => ({ ...s, open: false }))}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert severity={bulkSnackbar.severity} variant="filled">
+          {bulkSnackbar.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 });

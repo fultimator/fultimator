@@ -533,6 +533,7 @@ export default function EditAttacks({ npc, setNpc }) {
         onClose={() => setModalOpen(false)}
         context="npc"
         initialType="attacks"
+        allowMultiSelect
         onAddItem={(item) => {
           setNpc((prev) => ({
             ...prev,

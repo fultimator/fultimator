@@ -15,6 +15,8 @@ import {
   Tabs,
   Tab,
   Alert,
+  Snackbar,
+  Popover,
   useMediaQuery,
   InputAdornment,
   Autocomplete,
@@ -29,10 +31,12 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import AutorenewIcon from "@mui/icons-material/Autorenew";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import { useTranslate } from "../../translation/translate";
 import { useCustomTheme } from "../../hooks/useCustomTheme";
 import { useCompendiumPacks } from "../../hooks/useCompendiumPacks";
 import { useCompendiumFilters } from "./hooks/useCompendiumFilters";
+import { useCompendiumItems } from "./hooks/useCompendiumItems";
 import CompendiumBrowser from "./CompendiumBrowser";
 import {
   ITEM_TYPES,
@@ -41,6 +45,12 @@ import {
   toSlug,
 } from "../../libs/compendium";
 import Export from "../Export";
+import {
+  canonicalizeForExport,
+  canonicalizeForTransfer,
+} from "../../libs/exportTransforms";
+import { buildItemText } from "../../libs/buildItemText";
+import JSZip from "jszip";
 import CompendiumItemCreateDialog from "./CompendiumItemCreateDialog";
 import QuickCreateModal from "./QuickCreateModal";
 import { ManageModulesModal } from "../manage-modules";
@@ -74,6 +84,7 @@ const CompendiumViewerModal = ({
   initialModuleTypeFilter = "",
   initialQualityFilters = [],
   initialCompendium = "official",
+  allowMultiSelect = false,
 }) => {
   const { t } = useTranslate();
   const customTheme = useCustomTheme();
@@ -108,6 +119,7 @@ const CompendiumViewerModal = ({
     deletePack,
     toggleLock,
     removeItem,
+    addItem,
     ensurePersonalPack,
     exportAsModule,
     importFromFile,
@@ -144,6 +156,7 @@ const CompendiumViewerModal = ({
   const [importing, setImporting] = useState(false);
   const [importError, setImportError] = useState("");
   const [pendingNavPackId, setPendingNavPackId] = useState(null);
+  const [disclaimerAnchor, setDisclaimerAnchor] = useState(null);
 
   useEffect(() => {
     ensurePersonalPack();
@@ -277,6 +290,136 @@ const CompendiumViewerModal = ({
     setResolvedSelectedItem(item ?? null);
   }, []);
 
+  // Multi-select state. Resets to single-select, with an empty selection,
+  // whenever the modal (re)opens or the filtered list changes shape
+  // (type/search/pack change) so stale indices can't leak across lists.
+  const [multiSelectMode, setMultiSelectMode] = useState(false);
+  const [selectedIndices, setSelectedIndices] = useState(() => new Set());
+  const { filteredItems: multiSelectItems } = useCompendiumItems({
+    filters,
+    activePack,
+    selectedIdx: null,
+  });
+
+  useEffect(() => {
+    if (!open) return;
+    setMultiSelectMode(false);
+    setSelectedIndices(new Set());
+  }, [open]);
+
+  useEffect(() => {
+    setSelectedIndices(new Set());
+  }, [selectedType, selectedCompendium, searchQuery]);
+
+  const handleToggleSelectedIndex = useCallback((idx) => {
+    setSelectedIndices((prev) => {
+      const next = new Set(prev);
+      if (next.has(idx)) next.delete(idx);
+      else next.add(idx);
+      return next;
+    });
+  }, []);
+
+  const handleClearSelection = useCallback(() => {
+    setSelectedIndices(new Set());
+  }, []);
+
+  const selectedItems = useMemo(
+    () =>
+      Array.from(selectedIndices)
+        .map((idx) => multiSelectItems[idx])
+        .filter(Boolean),
+    [selectedIndices, multiSelectItems],
+  );
+
+  const [bulkSnackbar, setBulkSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
+
+  const uniqueFilename = useCallback((usedNames, baseName, ext) => {
+    let filename = `${baseName}.${ext}`;
+    let suffix = 2;
+    while (usedNames.has(filename)) {
+      filename = `${baseName}_${suffix}.${ext}`;
+      suffix += 1;
+    }
+    usedNames.add(filename);
+    return filename;
+  }, []);
+
+  const handleBulkExport = useCallback(
+    async (fmt) => {
+      if (selectedItems.length === 0) return;
+      const zip = new JSZip();
+      const usedNames = new Set();
+      const ext = fmt === "json" ? "json" : fmt === "markdown" ? "md" : "txt";
+
+      selectedItems.forEach((item, idx) => {
+        const baseName = String(item.name || `item_${idx}`)
+          .replace(/\s+/g, "_")
+          .toLowerCase();
+        const filename = uniqueFilename(usedNames, baseName, ext);
+
+        if (fmt === "json") {
+          const exportData = {
+            ...canonicalizeForExport(selectedType, item),
+            dataType: selectedType,
+          };
+          zip.file(filename, JSON.stringify(exportData, null, 2));
+        } else {
+          const canonicalData = canonicalizeForTransfer(selectedType, item);
+          const text = buildItemText(selectedType, canonicalData, fmt);
+          zip.file(filename, text);
+        }
+      });
+
+      const zipBlob = await zip.generateAsync({ type: "blob" });
+      const url = URL.createObjectURL(zipBlob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${selectedType}_${fmt}.zip`;
+      a.click();
+      URL.revokeObjectURL(url);
+    },
+    [selectedItems, selectedType, uniqueFilename],
+  );
+
+  const handleBulkAddToCompendium = useCallback(
+    async (packId) => {
+      const itemType = VIEWER_TO_PACK_TYPE[selectedType];
+      if (!itemType || selectedItems.length === 0) return;
+      const targetId = packId ?? (await ensurePersonalPack()).id ?? undefined;
+      if (!targetId) return;
+      let added = 0;
+      let failed = 0;
+      for (const item of selectedItems) {
+        try {
+          await addItem(targetId, itemType, item);
+          added += 1;
+        } catch {
+          failed += 1;
+        }
+      }
+      setBulkSnackbar({
+        open: true,
+        message:
+          failed > 0
+            ? `${t("Added")} ${added}, ${failed} ${t("failed (likely duplicates)")}`
+            : `${t("Added")} ${added} ${t("items to compendium")}`,
+        severity: failed > 0 ? "error" : "success",
+      });
+    },
+    [selectedItems, selectedType, addItem, ensurePersonalPack, t],
+  );
+
+  const handleMultiSelectModeChange = useCallback((nextMode) => {
+    setMultiSelectMode(nextMode);
+    setSelectedIndices(new Set());
+    setResolvedSelectedItem(null);
+  }, []);
+
   const renderItemActions = useCallback(
     (item, _idx, _selectedItem) => {
       return (
@@ -333,17 +476,38 @@ const CompendiumViewerModal = ({
   }, [selectedIdx]);
 
   const handleAddItem = useCallback(() => {
+    if (multiSelectMode) {
+      if (onAddItem && selectedIndices.size > 0) {
+        for (const idx of selectedIndices) {
+          const item = multiSelectItems[idx];
+          if (item) onAddItem(item, selectedType);
+        }
+      }
+      onClose();
+      return;
+    }
     if (resolvedSelectedItem && onAddItem) {
       onAddItem(resolvedSelectedItem, selectedType);
     }
     onClose();
-  }, [resolvedSelectedItem, onAddItem, selectedType, onClose]);
+  }, [
+    multiSelectMode,
+    selectedIndices,
+    multiSelectItems,
+    resolvedSelectedItem,
+    onAddItem,
+    selectedType,
+    onClose,
+  ]);
 
   const handleKeyDown = (e) => {
-    if (e.key === "Enter" && resolvedSelectedItem && !contextMismatch) {
-      e.preventDefault();
-      handleAddItem();
-    }
+    if (e.key !== "Enter" || contextMismatch) return;
+    const hasSelection = multiSelectMode
+      ? selectedIndices.size > 0
+      : Boolean(resolvedSelectedItem);
+    if (!hasSelection) return;
+    e.preventDefault();
+    handleAddItem();
   };
 
   // Wrap handlers to pass through manage modules callback
@@ -399,6 +563,14 @@ const CompendiumViewerModal = ({
           setSelectedIdx={setSelectedIdx}
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
+          allowMultiSelect={allowMultiSelect}
+          multiSelect={multiSelectMode}
+          onMultiSelectModeChange={handleMultiSelectModeChange}
+          selectedIndices={selectedIndices}
+          onToggleSelectedIndex={handleToggleSelectedIndex}
+          onClearSelection={handleClearSelection}
+          onBulkExport={handleBulkExport}
+          onBulkAddToCompendium={handleBulkAddToCompendium}
           packs={packs}
           activePack={activePack}
           context={context}
@@ -547,17 +719,42 @@ const CompendiumViewerModal = ({
               justifyContent: "space-between",
               px: 2,
               py: 1,
-              flexDirection: { xs: "column", sm: "row" },
-              alignItems: { xs: "stretch", sm: "center" },
-              gap: { xs: 1, sm: 0 },
             }}
           >
-            <Typography variant="body2" sx={{ color: "text.secondary" }}>
-              <strong>{t("Disclaimer")}:</strong>{" "}
-              {t(
-                "For personal use only; do not share exported data on official channels.",
-              )}
-            </Typography>
+            {isDesktop ? (
+              <Typography variant="body2" sx={{ color: "text.secondary" }}>
+                <strong>{t("Disclaimer")}:</strong>{" "}
+                {t(
+                  "For personal use only; do not share exported data on official channels.",
+                )}
+              </Typography>
+            ) : (
+              <>
+                <IconButton
+                  size="small"
+                  onClick={(e) => setDisclaimerAnchor(e.currentTarget)}
+                >
+                  <InfoOutlinedIcon fontSize="small" />
+                </IconButton>
+                <Popover
+                  open={Boolean(disclaimerAnchor)}
+                  anchorEl={disclaimerAnchor}
+                  onClose={() => setDisclaimerAnchor(null)}
+                  anchorOrigin={{ vertical: "top", horizontal: "left" }}
+                  transformOrigin={{ vertical: "bottom", horizontal: "left" }}
+                  slotProps={{
+                    paper: { sx: { p: 1.5, maxWidth: 280 } },
+                  }}
+                >
+                  <Typography variant="body2" sx={{ color: "text.secondary" }}>
+                    <strong>{t("Disclaimer")}:</strong>{" "}
+                    {t(
+                      "For personal use only; do not share exported data on official channels.",
+                    )}
+                  </Typography>
+                </Popover>
+              </>
+            )}
             <Tooltip
               title={
                 contextMismatch
@@ -574,11 +771,17 @@ const CompendiumViewerModal = ({
                 <Button
                   variant="contained"
                   color="primary"
-                  disabled={resolvedSelectedItem === null || !!contextMismatch}
+                  disabled={
+                    multiSelectMode
+                      ? selectedIndices.size === 0 || !!contextMismatch
+                      : resolvedSelectedItem === null || !!contextMismatch
+                  }
                   onClick={handleAddItem}
                   sx={{ flexShrink: 0 }}
                 >
-                  {t("Add Item")}
+                  {multiSelectMode
+                    ? `${t("Add Items")} (${selectedIndices.size})`
+                    : t("Add Item")}
                 </Button>
               </span>
             </Tooltip>
@@ -1222,6 +1425,17 @@ const CompendiumViewerModal = ({
           )}
         </DialogActions>
       </Dialog>
+
+      <Snackbar
+        open={bulkSnackbar.open}
+        autoHideDuration={3000}
+        onClose={() => setBulkSnackbar((s) => ({ ...s, open: false }))}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert severity={bulkSnackbar.severity} variant="filled">
+          {bulkSnackbar.message}
+        </Alert>
+      </Snackbar>
     </Dialog>
   );
 };

@@ -2911,6 +2911,7 @@ export default function PcEquipment({
             initialType={compendiumType}
             restrictToTypes={[compendiumType]}
             context="player"
+            allowMultiSelect
           />
         )}
         <ItemEditModal
@@ -3251,6 +3252,7 @@ export default function PcEquipment({
           initialType={compendiumType}
           restrictToTypes={[compendiumType]}
           context="player"
+          allowMultiSelect
         />
       )}
       <ItemEditModal

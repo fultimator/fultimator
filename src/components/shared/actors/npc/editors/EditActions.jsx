@@ -397,6 +397,7 @@ export default function EditActions({ npc, setNpc }) {
         context="npc"
         initialType="actions"
         initialCompendium="personal"
+        allowMultiSelect
         onAddItem={(item) => {
           setNpc((prev) => ({
             ...prev,
