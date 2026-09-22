@@ -42694,5 +42694,6 @@
     "pt-BR": "Roxo",
     "zh": "Purple",
     "ru": "Purple"
-  }
+  },
+  { "key": "npc_note_clock_sections", "en": "{0}-section Clock" }
 ]

@@ -79,9 +79,17 @@ export default function NoteCard({
 
   const handleSendToChat = (e) => {
     e.stopPropagation();
+    const firstClock = note.clocks?.[0];
     sendDisplayMessage("note", note.name, {
       description: note.description ?? "",
       speaker,
+      clock: firstClock
+        ? {
+            sections: firstClock.sections,
+            state: firstClock.state,
+            name: firstClock.name,
+          }
+        : undefined,
     });
   };
   const normalizedQuery = searchQuery.trim().toLowerCase();
@@ -96,7 +104,7 @@ export default function NoteCard({
 
   const clockGridCols = compact
     ? "1fr"
-    : "repeat(auto-fill, minmax(160px, 1fr))";
+    : "repeat(auto-fill, minmax(220px, 1fr))";
 
   const hasDescription = !!note.description;
   const hasClocks = visibleClocks.length > 0;

@@ -67,6 +67,7 @@ export default [
         TextEncoder: "readonly",
         DOMException: "readonly",
         Event: "readonly",
+        CustomEvent: "readonly",
         KeyboardEvent: "readonly",
         Window: "readonly",
         // Node globals

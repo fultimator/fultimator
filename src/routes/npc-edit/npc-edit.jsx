@@ -65,6 +65,7 @@ import ExportDialog from "../../components/shared/actors/pc/export/ExportDialog"
 import { useTranslate } from "../../translation/translate";
 import SectionCard from "../../components/shared/actors/common/SectionCard";
 import TagList from "../../components/TagList";
+import NpcClockList from "../../components/NpcClockList";
 import { moderators } from "../../libs/userGroups";
 import blacklist from "../../translation/blacklist.json";
 import deepEqual from "deep-equal";
@@ -520,6 +521,7 @@ export default function NpcEdit() {
                   />
                 )}
                 {isOwner && <TagList npc={npcTemp} setNpc={setNpcTemp} />}
+                {isOwner && <NpcClockList npc={npcTemp} setNpc={setNpcTemp} />}
               </Grid>
             </Grid>
           </>

@@ -1,4 +1,5 @@
-import { Box, IconButton, Tooltip } from "@mui/material";
+import { useState } from "react";
+import { Box, IconButton, InputBase, Tooltip } from "@mui/material";
 import { Add, Remove, RestartAlt } from "@mui/icons-material";
 import { useTranslate } from "/src/translation/translate";
 import Clock from "/src/components/shared/actors/pc/playerSheet/Clock";
@@ -9,6 +10,7 @@ export default function ClockControls({
   state,
   setState,
   label,
+  secondaryLabel,
   theme,
   clockSize = 36,
   compact = false,
@@ -16,29 +18,49 @@ export default function ClockControls({
   const { t } = useTranslate();
   const {
     filledCount: filled,
+    set,
     increment,
     decrement,
     reset,
   } = useClock(sections, state, setState);
+
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState("");
+
+  const startEditing = () => {
+    setDraft(String(filled));
+    setEditing(true);
+  };
+
+  const commitEditing = () => {
+    const parsed = parseInt(draft, 10);
+    if (!isNaN(parsed)) {
+      const clamped = Math.min(Math.max(parsed, 0), sections);
+      const next = new Array(sections).fill(false);
+      for (let i = 0; i < clamped; i++) next[i] = true;
+      set(next);
+    }
+    setEditing(false);
+  };
 
   const controls = (
     <>
       <Tooltip title={t("Decrement")} arrow>
         <span>
           <IconButton
-            size="small"
             disabled={filled === 0}
             onClick={decrement}
-            sx={{ p: 0, width: 28, height: 28 }}
+            sx={{ p: 0, width: 40, height: 40 }}
           >
-            <Remove sx={{ fontSize: "1rem" }} />
+            <Remove sx={{ fontSize: "1.4rem" }} />
           </IconButton>
         </span>
       </Tooltip>
       <Box
+        onClick={editing ? undefined : startEditing}
         sx={{
-          width: 28,
-          height: 28,
+          width: 40,
+          height: 40,
           borderRadius: "4px",
           bgcolor: "action.selected",
           display: "flex",
@@ -46,40 +68,66 @@ export default function ClockControls({
           justifyContent: "center",
           flexShrink: 0,
           fontFamily: "Antonio",
-          fontSize: "0.75rem",
+          fontSize: "1rem",
           fontWeight: "bold",
           lineHeight: 1,
           color: "text.primary",
+          cursor: editing ? "default" : "pointer",
         }}
       >
-        {filled}/{sections}
+        {editing ? (
+          <InputBase
+            autoFocus
+            value={draft}
+            onChange={(e) => setDraft(e.target.value.replace(/[^0-9]/g, ""))}
+            onBlur={commitEditing}
+            onFocus={(e) => e.target.select()}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                commitEditing();
+              } else if (e.key === "Escape") {
+                setEditing(false);
+              }
+            }}
+            inputProps={{
+              inputMode: "numeric",
+              style: {
+                width: "100%",
+                padding: 0,
+                textAlign: "center",
+                fontFamily: "Antonio",
+                fontSize: "1rem",
+                fontWeight: "bold",
+                lineHeight: 1,
+              },
+            }}
+          />
+        ) : (
+          `${filled}/${sections}`
+        )}
       </Box>
       <Tooltip title={t("Increment")} arrow>
         <span>
           <IconButton
-            size="small"
             disabled={filled >= sections}
             onClick={increment}
-            sx={{ p: 0, width: 28, height: 28 }}
+            sx={{ p: 0, width: 40, height: 40 }}
           >
-            <Add sx={{ fontSize: "1rem" }} />
+            <Add sx={{ fontSize: "1.4rem" }} />
           </IconButton>
         </span>
       </Tooltip>
       <Tooltip title={t("Reset")} arrow>
-        <IconButton
-          size="small"
-          onClick={reset}
-          sx={{ p: 0, width: 28, height: 28 }}
-        >
-          <RestartAlt sx={{ fontSize: "1rem" }} />
+        <IconButton onClick={reset} sx={{ p: 0, width: 40, height: 40 }}>
+          <RestartAlt sx={{ fontSize: "1.4rem" }} />
         </IconButton>
       </Tooltip>
     </>
   );
 
   if (compact) {
-    // Compact: always inline - clock left, name center, controls right
+    // Compact: clock left, name + secondary name stacked center, controls right
     return (
       <Box
         sx={{
@@ -96,7 +144,14 @@ export default function ClockControls({
           "&:hover": { borderColor: theme.primary },
         }}
       >
-        <Box sx={{ alignSelf: "center", flexShrink: 0 }}>
+        <Box
+          sx={{
+            alignSelf: "center",
+            flexShrink: 0,
+            display: "flex",
+            lineHeight: 0,
+          }}
+        >
           <Clock
             numSections={sections}
             size={clockSize}
@@ -108,14 +163,35 @@ export default function ClockControls({
         <Box
           sx={{
             flex: 1,
-            fontWeight: "bold",
-            fontSize: "0.85rem",
-            lineHeight: 1.3,
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            minWidth: 0,
             overflow: "hidden",
-            alignSelf: "center",
           }}
         >
-          {label}
+          <Box
+            sx={{
+              fontWeight: "bold",
+              fontSize: "0.95rem",
+              lineHeight: 1.3,
+              overflow: "hidden",
+            }}
+          >
+            {label}
+          </Box>
+          {secondaryLabel && (
+            <Box
+              sx={{
+                fontSize: "0.85rem",
+                lineHeight: 1.3,
+                overflow: "hidden",
+                color: "text.secondary",
+              }}
+            >
+              {secondaryLabel}
+            </Box>
+          )}
         </Box>
         <Box
           sx={{
@@ -133,7 +209,7 @@ export default function ClockControls({
   }
 
   // Full variant: container-query-driven layout
-  // Narrow container (<= ~180px) → vertical stack: clock → name → controls
+  // Narrow container (<= ~260px) → vertical stack: clock → name → controls
   // Wide container → horizontal: clock left, name+controls stacked right
   return (
     <Box
@@ -150,7 +226,7 @@ export default function ClockControls({
         gap: "6px",
         px: "6px",
         py: "4px",
-        "@container (max-width: 180px)": {
+        "@container (max-width: 260px)": {
           flexDirection: "column",
           alignItems: "center",
           gap: "4px",
@@ -162,7 +238,7 @@ export default function ClockControls({
         sx={{
           alignSelf: "center",
           flexShrink: 0,
-          "@container (max-width: 180px)": { alignSelf: "auto" },
+          "@container (max-width: 260px)": { alignSelf: "auto" },
         }}
       >
         <Clock
@@ -181,7 +257,7 @@ export default function ClockControls({
           justifyContent: "center",
           minWidth: 0,
           overflow: "hidden",
-          "@container (max-width: 180px)": {
+          "@container (max-width: 260px)": {
             alignItems: "center",
             width: "100%",
           },
@@ -190,10 +266,10 @@ export default function ClockControls({
         <Box
           sx={{
             fontWeight: "bold",
-            fontSize: "0.85rem",
+            fontSize: "0.95rem",
             lineHeight: 1.3,
             overflow: "hidden",
-            "@container (max-width: 180px)": {
+            "@container (max-width: 260px)": {
               textAlign: "center",
               width: "100%",
             },
@@ -207,7 +283,7 @@ export default function ClockControls({
             alignItems: "center",
             gap: 0,
             mt: "2px",
-            "@container (max-width: 180px)": { mt: 0 },
+            "@container (max-width: 260px)": { mt: 0 },
           }}
         >
           {controls}

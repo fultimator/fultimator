@@ -77,6 +77,7 @@ export const ITEM_TYPES = [
   { key: "attacks", label: staticT("NPC Attacks", true), context: "npc" },
   { key: "special", label: staticT("Special Rules", true), context: "npc" },
   { key: "actions", label: staticT("Other Actions", true), context: "npc" },
+  { key: "notes", label: staticT("Notes", true), context: "npc" },
   { key: "classes", label: staticT("Classes", true), context: "player" },
   { key: "player-spells", label: staticT("Spells", true), context: "both" },
   { key: "qualities", label: staticT("Qualities", true), context: "player" },
@@ -118,6 +119,7 @@ export const PACK_ITEM_TYPES = [
   { key: "attacks", label: staticT("NPC Attacks", true), context: "npc" },
   { key: "special", label: staticT("Special Rules", true), context: "npc" },
   { key: "actions", label: staticT("Other Actions", true), context: "npc" },
+  { key: "notes", label: staticT("Notes", true), context: "npc" },
   { key: "player-spells", label: staticT("Spells", true), context: "both" },
   { key: "qualities", label: staticT("Qualities", true), context: "player" },
   { key: "classes", label: staticT("Classes", true), context: "player" },
@@ -147,6 +149,7 @@ export const VIEWER_TO_PACK_TYPE = {
   attacks: "npc-attack",
   special: "npc-special",
   actions: "npc-action",
+  notes: "note",
   "player-spells": "player-spell",
   qualities: "quality",
   classes: "class",
@@ -185,6 +188,7 @@ export function getItems(type) {
       return officialEffects;
     case "special":
     case "actions":
+    case "notes":
     case "custom-weapons":
     case "accessories":
     case "optionals":
