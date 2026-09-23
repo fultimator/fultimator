@@ -391,6 +391,21 @@ export default function EditNotes({ npc, setNpc }) {
           <ItemRowCard
             key={i}
             label={note.name || t("(unnamed)")}
+            subtitle={
+              note.clocks && note.clocks.length > 0 ? (
+                <Typography
+                  noWrap
+                  sx={{ fontSize: "0.8rem", color: "text.secondary" }}
+                >
+                  {note.clocks
+                    .map(
+                      (clock) =>
+                        `${clock.name}: ${clock.state.filter(Boolean).length}/${clock.sections}`,
+                    )
+                    .join(", ")}
+                </Typography>
+              ) : null
+            }
             actions={
               <>
                 <IconButton
