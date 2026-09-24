@@ -13,8 +13,6 @@ import { SpanMarkdown, ClickableName } from "./NpcMarkdown";
 function NoteRow({ note, npc, showRoll, t }) {
   const addMessage = useAddChatMessage();
 
-  const firstClock = note.clocks?.[0];
-
   const handleSend = (e) => {
     e.stopPropagation();
     addMessage({
@@ -26,13 +24,11 @@ function NoteRow({ note, npc, showRoll, t }) {
       name: note.name,
       tags: [],
       description: note.effect,
-      clock: firstClock
-        ? {
-            sections: firstClock.sections,
-            state: firstClock.state,
-            name: firstClock.name,
-          }
-        : undefined,
+      clocks: note.clocks?.map((clock) => ({
+        sections: clock.sections,
+        state: clock.state,
+        name: clock.name,
+      })),
     });
   };
 

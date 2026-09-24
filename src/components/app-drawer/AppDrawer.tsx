@@ -23,6 +23,7 @@ import {
   FilterList as FilterListIcon,
   CheckBox as CheckBoxIcon,
   CheckBoxOutlineBlank as CheckBoxOutlineBlankIcon,
+  AccessTime as AccessTimeIcon,
 } from "@mui/icons-material";
 import { APP_DRAWER_WIDTH, TAB_RAIL_WIDTH } from "./constants";
 import { ChatPanel } from "./panels/chat";
@@ -30,7 +31,9 @@ import { CustomizerPanel } from "./panels/CustomizerPanel";
 import { SavedThemesPanel } from "./panels/SavedThemesPanel";
 import { useAppDrawerStore, type DrawerTab } from "../../store/appDrawerStore";
 import { useCombatActorSelectStore } from "../../store/combatActorSelectStore";
+import { useCombatProgressClocksStore } from "../../store/combatProgressClocksStore";
 import { ActorSelectPanel } from "./panels/ActorSelectPanel";
+import { ProgressClocksPanel } from "./panels/ProgressClocksPanel";
 import {
   useChatChannelStore,
   type ChatVisibleKind,
@@ -194,6 +197,11 @@ const BASE_TABS: { id: DrawerTab; label: string; icon: React.ReactNode }[] = [
     icon: <GroupAddIcon fontSize="small" />,
   },
   {
+    id: "progressClocks",
+    label: "Progress Clocks",
+    icon: <AccessTimeIcon fontSize="small" />,
+  },
+  {
     id: "customizer",
     label: "Customizer",
     icon: <PaletteIcon fontSize="small" />,
@@ -221,15 +229,21 @@ export const AppDrawer: React.FC<AppDrawerProps> = ({
   const setActiveTab = useAppDrawerStore((s) => s.setActiveTab);
   const drawerBottomActions = useAppDrawerStore((s) => s.drawerBottomActions);
   const actorSelectEnabled = useCombatActorSelectStore((s) => s.enabled);
-  const tabs = BASE_TABS.filter(
-    (tab) => tab.id !== "actorSelect" || actorSelectEnabled,
-  );
+  const progressClocksEnabled = useCombatProgressClocksStore((s) => s.enabled);
+  const tabs = BASE_TABS.filter((tab) => {
+    if (tab.id === "actorSelect") return actorSelectEnabled;
+    if (tab.id === "progressClocks") return progressClocksEnabled;
+    return true;
+  });
 
   React.useEffect(() => {
     if (activeTab === "actorSelect" && !actorSelectEnabled) {
       setActiveTab("chat");
     }
-  }, [activeTab, actorSelectEnabled, setActiveTab]);
+    if (activeTab === "progressClocks" && !progressClocksEnabled) {
+      setActiveTab("chat");
+    }
+  }, [activeTab, actorSelectEnabled, progressClocksEnabled, setActiveTab]);
 
   return (
     <Drawer
@@ -420,6 +434,9 @@ export const AppDrawer: React.FC<AppDrawerProps> = ({
             >
               <ChatPanel />
             </Box>
+            {activeTab === "progressClocks" && progressClocksEnabled && (
+              <ProgressClocksPanel />
+            )}
             {activeTab === "actorSelect" && actorSelectEnabled && (
               <ActorSelectPanel />
             )}

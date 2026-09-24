@@ -149,11 +149,11 @@ export type DisplayMessage = {
     amount: number;
     perTarget?: boolean;
   };
-  clock?: {
+  clocks?: {
     sections: number;
     state?: boolean[];
     name?: string;
-  };
+  }[];
 };
 
 export type Attribute = "dex" | "ins" | "mig" | "wlp";

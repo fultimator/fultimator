@@ -31,7 +31,15 @@ import { useTheme } from "@mui/material/styles";
 import { useCombatSimSettingsStore } from "../../stores/combatSimSettingsStore";
 import { useClock } from "../../hooks/useClock";
 
-function CombatClock({ clock, index, onUpdate, onRemove, onReset, emitLog }) {
+export function CombatClock({
+  clock,
+  index,
+  onUpdate,
+  onRemove,
+  onReset,
+  emitLog,
+  secondaryLabel,
+}) {
   const { logClockCurrentState } =
     useCombatSimSettingsStore.getState().settings;
   const theme = useTheme();
@@ -79,29 +87,33 @@ function CombatClock({ clock, index, onUpdate, onRemove, onReset, emitLog }) {
             <RemoveCircleOutlined fontSize="small" />
           </IconButton>
         </Tooltip>
-        <Tooltip title={t("clocks_reset_tooltip")}>
-          <IconButton
-            size="small"
-            onClick={() => onReset(index)}
-            sx={{ mr: 0.5 }}
-          >
-            <RestartAlt fontSize="small" />
-          </IconButton>
-        </Tooltip>
+        {onReset && (
+          <Tooltip title={t("clocks_reset_tooltip")}>
+            <IconButton
+              size="small"
+              onClick={() => onReset(index)}
+              sx={{ mr: 0.5 }}
+            >
+              <RestartAlt fontSize="small" />
+            </IconButton>
+          </Tooltip>
+        )}
         <Tooltip title={t("Increment")}>
           <IconButton size="small" onClick={increment}>
             <Add fontSize="small" />
           </IconButton>
         </Tooltip>
-        <Tooltip title={t("clocks_remove_tooltip")}>
-          <IconButton
-            size="small"
-            onClick={() => onRemove(index)}
-            color="error"
-          >
-            <RemoveCircleOutlined fontSize="small" />
-          </IconButton>
-        </Tooltip>
+        {onRemove && (
+          <Tooltip title={t("clocks_remove_tooltip")}>
+            <IconButton
+              size="small"
+              onClick={() => onRemove(index)}
+              color="error"
+            >
+              <RemoveCircleOutlined fontSize="small" />
+            </IconButton>
+          </Tooltip>
+        )}
       </Box>
       <Box sx={{ position: "absolute", left: 8, bottom: 8 }}>
         <Tooltip title={t("combat_sim_clock_log_button")}>
@@ -125,6 +137,14 @@ function CombatClock({ clock, index, onUpdate, onRemove, onReset, emitLog }) {
       >
         {clock.name}
       </Typography>
+      {secondaryLabel && (
+        <Typography
+          variant="caption"
+          sx={{ color: "text.secondary", textAlign: "center", mt: -1.5, mb: 1 }}
+        >
+          {secondaryLabel}
+        </Typography>
+      )}
       <Clock
         numSections={clock.sections}
         size={140}

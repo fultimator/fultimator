@@ -35,6 +35,7 @@ import { globalConfirm } from "../../utility/globalConfirm";
 import { useCombatSimSettingsStore } from "../../stores/combatSimSettingsStore";
 import { useCombatEncounterStore } from "../../stores/combatEncounterStore";
 import { useCombatActorSelectStore } from "../../store/combatActorSelectStore";
+import { useCombatProgressClocksStore } from "../../store/combatProgressClocksStore";
 import GeneralNotesDialog from "../../components/combatSim/GeneralNotesDialog";
 import InitiativeDialog from "../../components/combatSim/InitiativeDialog";
 import NpcEditModal from "../../components/combatSim/NpcEditModal";
@@ -283,6 +284,12 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
     (s) => s.setPanelData,
   );
   const clearActorSelectPanelData = useCombatActorSelectStore(
+    (s) => s.clearPanelData,
+  );
+  const setProgressClocksPanelData = useCombatProgressClocksStore(
+    (s) => s.setPanelData,
+  );
+  const clearProgressClocksPanelData = useCombatProgressClocksStore(
     (s) => s.clearPanelData,
   );
   useEffect(() => {
@@ -938,6 +945,54 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
   useEffect(
     () => () => clearActorSelectPanelData(),
     [clearActorSelectPanelData],
+  );
+
+  const actorClockEntries = useMemo(
+    () =>
+      [
+        ...selectedNPCs.map((npc) => ({ actor: npc, actorKind: "npc" })),
+        ...selectedPCs.map((pc) => ({ actor: pc, actorKind: "pc" })),
+      ].flatMap(({ actor, actorKind }) =>
+        (actor.notes || []).flatMap((note, noteIndex) =>
+          (note.clocks || []).map((clock, clockIndex) => ({
+            actorKind,
+            actorCombatId: actor.combatId,
+            actorName: actor.name,
+            noteIndex,
+            noteName: note.name,
+            clockIndex,
+            clock,
+          })),
+        ),
+      ),
+    [selectedNPCs, selectedPCs],
+  );
+
+  useEffect(() => {
+    if (isDifferentUser) {
+      clearProgressClocksPanelData();
+      return;
+    }
+    setProgressClocksPanelData({
+      encounterClocks,
+      actorClockEntries,
+      onUpdateEncounterClock: handleUpdateClock,
+      onUpdateActorClock: handleUpdateActorClock,
+      emitLog,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    isDifferentUser,
+    actorClockEntries,
+    encounterClocks,
+    emitLog,
+    clearProgressClocksPanelData,
+    setProgressClocksPanelData,
+  ]);
+
+  useEffect(
+    () => () => clearProgressClocksPanelData(),
+    [clearProgressClocksPanelData],
   );
 
   // Handle Remove PC from the selected PCs list
@@ -1737,6 +1792,34 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
     };
     setEncounterClocks(updatedClocks);
     emitLog({ type: "clock-reset", clockName: updatedClocks[index].name });
+  };
+
+  const handleUpdateActorClock = ({
+    actorKind,
+    actorCombatId,
+    noteIndex,
+    clockIndex,
+    newState,
+  }) => {
+    const setActors = actorKind === "npc" ? setSelectedNPCs : setSelectedPCs;
+    setActors((prev) =>
+      prev.map((actor) => {
+        if (actor.combatId !== actorCombatId) return actor;
+        return {
+          ...actor,
+          notes: actor.notes.map((note, ni) =>
+            ni !== noteIndex
+              ? note
+              : {
+                  ...note,
+                  clocks: note.clocks.map((c, ci) =>
+                    ci !== clockIndex ? c : { ...c, state: newState },
+                  ),
+                },
+          ),
+        };
+      }),
+    );
   };
 
   const handleNotesSave = (newNotes) => {

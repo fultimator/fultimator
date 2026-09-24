@@ -72,7 +72,6 @@ function NoteContextMenu({
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={close}>
         <MenuItem
           onClick={() => {
-            const firstClock = note.clocks?.[0];
             addMessage({
               id: crypto.randomUUID(),
               createdAt: Date.now(),
@@ -82,13 +81,11 @@ function NoteContextMenu({
               name: note.name,
               tags: [],
               description: note.effect || note.description,
-              clock: firstClock
-                ? {
-                    sections: firstClock.sections,
-                    state: firstClock.state,
-                    name: firstClock.name,
-                  }
-                : undefined,
+              clocks: note.clocks?.map((clock) => ({
+                sections: clock.sections,
+                state: clock.state,
+                name: clock.name,
+              })),
             });
             close();
           }}
@@ -411,7 +408,6 @@ export default function EditNotes({ npc, setNpc }) {
                 <IconButton
                   component="span"
                   onClick={() => {
-                    const firstClock = note.clocks?.[0];
                     addMessage({
                       id: crypto.randomUUID(),
                       createdAt: Date.now(),
@@ -421,13 +417,11 @@ export default function EditNotes({ npc, setNpc }) {
                       name: note.name,
                       tags: [],
                       description: note.effect || note.description,
-                      clock: firstClock
-                        ? {
-                            sections: firstClock.sections,
-                            state: firstClock.state,
-                            name: firstClock.name,
-                          }
-                        : undefined,
+                      clocks: note.clocks?.map((clock) => ({
+                        sections: clock.sections,
+                        state: clock.state,
+                        name: clock.name,
+                      })),
                     });
                   }}
                 >

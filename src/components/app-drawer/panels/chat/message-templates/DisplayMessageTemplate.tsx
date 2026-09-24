@@ -38,18 +38,20 @@ export const DisplayMessageTemplate: React.FC<DisplayMessageTemplateProps> = ({
         message.itemType || "",
       ).toLowerCase() as keyof typeof ACTION_ICON_SRC_BY_KEY
     ];
-  const clockSections = Number(message.clock?.sections) || 0;
-  const clockState =
-    clockSections > 0
-      ? Array.isArray(message.clock?.state) &&
-        message.clock.state.length === clockSections
-        ? message.clock.state
-        : new Array(clockSections).fill(false)
-      : [];
-  const filledClockSections = clockState.filter(Boolean).length;
+  const clocks = (message.clocks ?? [])
+    .map((clock) => {
+      const sections = Number(clock?.sections) || 0;
+      if (sections <= 0) return null;
+      const state =
+        Array.isArray(clock?.state) && clock.state.length === sections
+          ? clock.state
+          : new Array(sections).fill(false);
+      return { name: clock?.name, sections, state };
+    })
+    .filter((clock): clock is NonNullable<typeof clock> => clock !== null);
   const hasDescription = Boolean(message.description);
   const hasEffect = Boolean(message.effect);
-  const hasClock = clockSections > 0;
+  const hasClock = clocks.length > 0;
 
   return (
     <Box
@@ -175,45 +177,54 @@ export const DisplayMessageTemplate: React.FC<DisplayMessageTemplateProps> = ({
           )}
 
           {hasClock ? (
-            <Box
-              sx={{
-                px: 1.2,
-                py: 1,
-                border: "1px solid",
-                borderColor: "divider",
-                borderRadius: 1,
-                backgroundColor: "action.hover",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "flex-start",
-                gap: 1.25,
-                minHeight: 72,
-              }}
-            >
-              <Clock
-                numSections={clockSections}
-                size={56}
-                state={clockState}
-                setState={() => {}}
-                isCharacterSheet
-              />
-              <Box>
-                <Typography
-                  variant="caption"
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+              {clocks.map((clock, index) => (
+                <Box
+                  key={index}
                   sx={{
-                    display: "block",
-                    color: "text.secondary",
-                    fontWeight: 700,
+                    px: 1.2,
+                    py: 1,
+                    border: "1px solid",
+                    borderColor: "divider",
+                    borderRadius: 1,
+                    backgroundColor: "action.hover",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "flex-start",
+                    gap: 1.25,
+                    minHeight: 72,
                   }}
                 >
-                  {message.clock?.name || "Clock"}
-                </Typography>
-                <Typography
-                  sx={{ fontSize: "1.25rem", lineHeight: 1.1, fontWeight: 800 }}
-                >
-                  {filledClockSections}/{clockSections}
-                </Typography>
-              </Box>
+                  <Clock
+                    numSections={clock.sections}
+                    size={56}
+                    state={clock.state}
+                    setState={() => {}}
+                    isCharacterSheet
+                  />
+                  <Box>
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        display: "block",
+                        color: "text.secondary",
+                        fontWeight: 700,
+                      }}
+                    >
+                      {clock.name || "Clock"}
+                    </Typography>
+                    <Typography
+                      sx={{
+                        fontSize: "1.25rem",
+                        lineHeight: 1.1,
+                        fontWeight: 800,
+                      }}
+                    >
+                      {clock.state.filter(Boolean).length}/{clock.sections}
+                    </Typography>
+                  </Box>
+                </Box>
+              ))}
             </Box>
           ) : null}
         </Box>

@@ -79,17 +79,14 @@ export default function NoteCard({
 
   const handleSendToChat = (e) => {
     e.stopPropagation();
-    const firstClock = note.clocks?.[0];
     sendDisplayMessage("note", note.name, {
       description: note.description ?? "",
       speaker,
-      clock: firstClock
-        ? {
-            sections: firstClock.sections,
-            state: firstClock.state,
-            name: firstClock.name,
-          }
-        : undefined,
+      clocks: note.clocks?.map((clock) => ({
+        sections: clock.sections,
+        state: clock.state,
+        name: clock.name,
+      })),
     });
   };
   const normalizedQuery = searchQuery.trim().toLowerCase();
