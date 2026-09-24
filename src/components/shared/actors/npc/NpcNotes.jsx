@@ -32,7 +32,7 @@ function NoteRow({ note, npc, showRoll, t }) {
     });
   };
 
-  const clockSections = note.clocks?.map((clock) => clock.sections) ?? [];
+  const clockSummaries = note.clocks ?? [];
 
   return (
     <Fragment>
@@ -48,10 +48,13 @@ function NoteRow({ note, npc, showRoll, t }) {
           ) : (
             <strong>{note.name}</strong>
           )}{" "}
-          {clockSections.map((sections, i) => (
+          {clockSummaries.map((clock, i) => (
             <Fragment key={i}>
               <Diamond />{" "}
-              <strong>{t("npc_note_clock_sections", [sections])}</strong>{" "}
+              <strong>
+                {t("npc_note_clock_sections", [clock.sections])}
+                {clock.name ? ` (${clock.name})` : ""}
+              </strong>{" "}
             </Fragment>
           ))}
           <Diamond /> <SpanMarkdown>{note.effect}</SpanMarkdown>

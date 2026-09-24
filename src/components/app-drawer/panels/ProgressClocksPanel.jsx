@@ -24,6 +24,22 @@ export const ProgressClocksPanel = () => {
   const hasEncounterClocks = encounterClocks.length > 0;
   const hasActorClocks = actorClockEntries.length > 0;
 
+  const actorGroups = [];
+  const actorGroupIndexByCombatId = new Map();
+  for (const entry of actorClockEntries) {
+    let groupIndex = actorGroupIndexByCombatId.get(entry.actorCombatId);
+    if (groupIndex === undefined) {
+      groupIndex = actorGroups.length;
+      actorGroupIndexByCombatId.set(entry.actorCombatId, groupIndex);
+      actorGroups.push({
+        actorCombatId: entry.actorCombatId,
+        actorName: entry.actorName,
+        entries: [],
+      });
+    }
+    actorGroups[groupIndex].entries.push(entry);
+  }
+
   if (!hasEncounterClocks && !hasActorClocks) {
     return (
       <Box
@@ -89,27 +105,44 @@ export const ProgressClocksPanel = () => {
       {hasActorClocks && (
         <Box>
           <Typography sx={sectionTitleSx}>{t("Clocks")}</Typography>
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
-            {actorClockEntries.map((entry) => (
-              <ClockControls
-                key={`${entry.actorCombatId}-${entry.noteIndex}-${entry.clockIndex}`}
-                sections={entry.clock.sections}
-                state={entry.clock.state}
-                setState={(newState) =>
-                  onUpdateActorClock({
-                    actorKind: entry.actorKind,
-                    actorCombatId: entry.actorCombatId,
-                    noteIndex: entry.noteIndex,
-                    clockIndex: entry.clockIndex,
-                    newState,
-                  })
-                }
-                label={entry.clock.name}
-                secondaryLabel={entry.actorName}
-                theme={{ primary: theme.palette.primary.main }}
-                clockSize={36}
-                compact
-              />
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+            {actorGroups.map((group) => (
+              <Box key={group.actorCombatId}>
+                <Typography
+                  sx={{
+                    mb: 0.5,
+                    fontWeight: "bold",
+                    fontSize: "0.8rem",
+                    color: "text.primary",
+                  }}
+                >
+                  {group.actorName}
+                </Typography>
+                <Box
+                  sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}
+                >
+                  {group.entries.map((entry) => (
+                    <ClockControls
+                      key={`${entry.actorCombatId}-${entry.noteIndex}-${entry.clockIndex}`}
+                      sections={entry.clock.sections}
+                      state={entry.clock.state}
+                      setState={(newState) =>
+                        onUpdateActorClock({
+                          actorKind: entry.actorKind,
+                          actorCombatId: entry.actorCombatId,
+                          noteIndex: entry.noteIndex,
+                          clockIndex: entry.clockIndex,
+                          newState,
+                        })
+                      }
+                      label={entry.clock.name}
+                      theme={{ primary: theme.palette.primary.main }}
+                      clockSize={36}
+                      compact
+                    />
+                  ))}
+                </Box>
+              </Box>
             ))}
           </Box>
         </Box>
