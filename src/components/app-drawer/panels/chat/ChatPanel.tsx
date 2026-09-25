@@ -887,12 +887,28 @@ export const ChatPanel: React.FC = () => {
         return;
       }
 
-      const updated = applyResourceDelta(
-        activeActorDoc as Record<string, unknown>,
-        event.resource,
-        getResourceDelta(event.amount, nextDirection),
-      );
-      setActiveActorDoc(updated);
+      const delta = getResourceDelta(event.amount, nextDirection);
+      const combatId = activeActorDoc.combatId as string | undefined;
+      if (isCombatSim && event.resource === "ip" && combatId) {
+        updateRuntimeActor(combatId, (actor) => {
+          const stats = activeActorDoc.stats as
+            | Record<string, { max?: number }>
+            | undefined;
+          const maxIp = stats?.ip?.max ?? Number.POSITIVE_INFINITY;
+          return {
+            ...actor,
+            currentIp: Math.max(0, Math.min(actor.currentIp + delta, maxIp)),
+          };
+        });
+      } else {
+        setActiveActorDoc((prev) =>
+          applyResourceDelta(
+            prev as unknown as Record<string, unknown>,
+            event.resource,
+            delta,
+          ),
+        );
+      }
       setUndoneResourceLogIds((prev) => {
         const next = new Set(prev);
         if (isUndone) next.delete(logMsg.id);
@@ -900,7 +916,14 @@ export const ChatPanel: React.FC = () => {
         return next;
       });
     },
-    [activeActorDoc, addMessage, setActiveActorDoc, undoneResourceLogIds],
+    [
+      activeActorDoc,
+      addMessage,
+      isCombatSim,
+      updateRuntimeActor,
+      setActiveActorDoc,
+      undoneResourceLogIds,
+    ],
   );
 
   useEffect(() => {
