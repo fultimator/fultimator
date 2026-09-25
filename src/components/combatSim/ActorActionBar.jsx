@@ -181,6 +181,29 @@ export default function ActorActionBar({
         });
     }
 
+    if (actionKey === "inventory") {
+      const consumables = Array.isArray(actorDoc.consumables)
+        ? actorDoc.consumables
+        : [];
+      if (consumables.length === 0) {
+        return [{ label: "No Consumables", disabled: true }];
+      }
+      return consumables.map((item, idx) => {
+        const name = item?.name ? t(item.name) : `Consumable ${idx + 1}`;
+        return {
+          key: `consumable-${idx}`,
+          label: item?.ipCost ? `${name} (${item.ipCost} IP)` : name,
+          displayMessage: {
+            name,
+            description: item?.description ? t(item.description) : undefined,
+            tags: [],
+            itemType: "consumable",
+            cost: { resource: "ip", amount: item?.ipCost ?? 0 },
+          },
+        };
+      });
+    }
+
     if (actionKey === "skill") {
       if (isNpc) {
         const otherActions = Array.isArray(actorDoc.actions)
@@ -434,7 +457,7 @@ export default function ActorActionBar({
               openMenu(action, e.currentTarget);
             }}
             onClick={(e) => {
-              const directFire = ["guard", "inventory", "objective", "other"];
+              const directFire = ["guard", "objective", "other"];
               if (action === "study") {
                 cancelOpen();
                 closeMenu();

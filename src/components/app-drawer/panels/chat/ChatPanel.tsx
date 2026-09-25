@@ -510,6 +510,11 @@ export const ChatPanel: React.FC = () => {
           itemType?: string;
           tags?: string[];
           speaker?: string;
+          cost?: {
+            resource: "hp" | "mp" | "ip" | "fp" | "up";
+            amount: number;
+            perTarget?: boolean;
+          };
         }>
       ).detail;
       if (!detail?.name) return;
@@ -522,6 +527,7 @@ export const ChatPanel: React.FC = () => {
         name: detail.name,
         tags: detail.tags ?? [],
         description: detail.description,
+        cost: detail.cost,
       });
     };
     window.addEventListener("chat:add-message", handler);
