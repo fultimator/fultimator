@@ -29,6 +29,7 @@ export const DisplayMessageTemplate: React.FC<DisplayMessageTemplateProps> = ({
     null,
   );
   const [costEditValue, setCostEditValue] = useState("");
+  const [insufficientWarning, setInsufficientWarning] = useState(false);
   const tags = message.tags.map((t) =>
     t === "default" ? formatSpellType(t) : t,
   );
@@ -230,69 +231,91 @@ export const DisplayMessageTemplate: React.FC<DisplayMessageTemplateProps> = ({
         </Box>
       )}
       {message.cost != null && (
-        <Box sx={{ mt: 1, display: "flex", gap: 0.5 }}>
-          <Button
-            variant="outlined"
-            size="small"
-            fullWidth
-            onClick={() => {
-              if (onLossResource) {
-                onLossResource(
-                  message,
-                  message.cost!.resource,
-                  message.cost!.amount,
-                );
-                return;
-              }
-            }}
-            sx={{ textTransform: "none", fontWeight: 600 }}
-          >
-            Spend {message.cost.amount} {message.cost.resource.toUpperCase()}
-          </Button>
-          {onUpdateCost && (
-            <IconButton
-              size="small"
-              onClick={(e) => {
-                setCostEditValue(String(message.cost!.amount));
-                setCostEditAnchor(e.currentTarget);
-              }}
-            >
-              <SettingsIcon fontSize="small" />
-            </IconButton>
-          )}
-          <Popover
-            open={Boolean(costEditAnchor)}
-            anchorEl={costEditAnchor}
-            onClose={() => setCostEditAnchor(null)}
-            anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-            transformOrigin={{ vertical: "top", horizontal: "right" }}
-            slotProps={{
-              paper: { sx: { p: 1.5, display: "flex", gap: 1 } },
-            }}
-          >
-            <TextField
-              autoFocus
-              type="number"
-              size="small"
-              label={`Spend ${message.cost?.resource.toUpperCase()}`}
-              value={costEditValue}
-              onChange={(e) => setCostEditValue(e.target.value)}
-              slotProps={{ htmlInput: { min: 0 } }}
-              sx={{ width: 120 }}
-            />
+        <Box sx={{ mt: 1 }}>
+          <Box sx={{ display: "flex", gap: 0.5 }}>
             <Button
-              variant="contained"
+              variant="outlined"
               size="small"
+              fullWidth
               onClick={() => {
-                const amount = Math.max(0, parseInt(costEditValue, 10) || 0);
-                onUpdateCost?.(message, amount);
-                onLossResource?.(message, message.cost!.resource, amount);
-                setCostEditAnchor(null);
+                if (onLossResource) {
+                  const applied = onLossResource(
+                    message,
+                    message.cost!.resource,
+                    message.cost!.amount,
+                  );
+                  if (!applied) {
+                    setInsufficientWarning(true);
+                    setTimeout(() => setInsufficientWarning(false), 2500);
+                  }
+                  return;
+                }
+              }}
+              sx={{ textTransform: "none", fontWeight: 600 }}
+            >
+              Spend {message.cost.amount} {message.cost.resource.toUpperCase()}
+            </Button>
+            {onUpdateCost && (
+              <IconButton
+                size="small"
+                onClick={(e) => {
+                  setCostEditValue(String(message.cost!.amount));
+                  setCostEditAnchor(e.currentTarget);
+                }}
+              >
+                <SettingsIcon fontSize="small" />
+              </IconButton>
+            )}
+            <Popover
+              open={Boolean(costEditAnchor)}
+              anchorEl={costEditAnchor}
+              onClose={() => setCostEditAnchor(null)}
+              anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+              transformOrigin={{ vertical: "top", horizontal: "right" }}
+              slotProps={{
+                paper: { sx: { p: 1.5, display: "flex", gap: 1 } },
               }}
             >
-              Spend
-            </Button>
-          </Popover>
+              <TextField
+                autoFocus
+                type="number"
+                size="small"
+                label={`Spend ${message.cost?.resource.toUpperCase()}`}
+                value={costEditValue}
+                onChange={(e) => setCostEditValue(e.target.value)}
+                slotProps={{ htmlInput: { min: 0 } }}
+                sx={{ width: 120 }}
+              />
+              <Button
+                variant="contained"
+                size="small"
+                onClick={() => {
+                  const amount = Math.max(0, parseInt(costEditValue, 10) || 0);
+                  onUpdateCost?.(message, amount);
+                  const applied = onLossResource?.(
+                    message,
+                    message.cost!.resource,
+                    amount,
+                  );
+                  if (applied === false) {
+                    setInsufficientWarning(true);
+                    setTimeout(() => setInsufficientWarning(false), 2500);
+                  }
+                  setCostEditAnchor(null);
+                }}
+              >
+                Spend
+              </Button>
+            </Popover>
+          </Box>
+          {insufficientWarning && (
+            <Typography
+              variant="caption"
+              sx={{ display: "block", mt: 0.4, color: "error.main" }}
+            >
+              Insufficient {message.cost.resource.toUpperCase()}
+            </Typography>
+          )}
         </Box>
       )}
     </Box>

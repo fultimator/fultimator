@@ -305,6 +305,7 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
         const stats = doc.combatStats ?? {};
         const rtHp = runtime.currentHp;
         const rtMp = runtime.currentMp;
+        const rtIp = runtime.currentIp;
         const hpDiffers =
           Number.isFinite(rtHp) &&
           stats.currentHp !== undefined &&
@@ -313,7 +314,11 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
           Number.isFinite(rtMp) &&
           stats.currentMp !== undefined &&
           rtMp !== stats.currentMp;
-        if (!hpDiffers && !mpDiffers) return doc;
+        const ipDiffers =
+          Number.isFinite(rtIp) &&
+          stats.currentIp !== undefined &&
+          rtIp !== stats.currentIp;
+        if (!hpDiffers && !mpDiffers && !ipDiffers) return doc;
         changed = true;
         return {
           ...doc,
@@ -321,6 +326,7 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
             ...stats,
             currentHp: hpDiffers ? rtHp : stats.currentHp,
             currentMp: mpDiffers ? rtMp : stats.currentMp,
+            currentIp: ipDiffers ? rtIp : stats.currentIp,
           },
         };
       });
@@ -335,8 +341,13 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
   }, [mirrorRuntimeResources]);
 
   const syncRuntimeResource = (combatId, statType, delta, maxForStat) => {
-    if (statType !== "HP" && statType !== "MP") return;
-    const key = statType === "HP" ? "currentHp" : "currentMp";
+    if (statType !== "HP" && statType !== "MP" && statType !== "IP") return;
+    const key =
+      statType === "HP"
+        ? "currentHp"
+        : statType === "MP"
+          ? "currentMp"
+          : "currentIp";
     updateRuntimeActor(combatId, (actor) => ({
       ...actor,
       [key]: clamp(actor[key] + delta, 0, maxForStat),
@@ -1323,7 +1334,7 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
         npcClicked.combatId,
         statType,
         adjustedValue,
-        statType === "HP" ? maxHP : maxMP,
+        statType === "HP" ? maxHP : statType === "MP" ? maxMP : maxIP,
       );
 
       if (selectedPC && selectedPC.combatId === npcClicked.combatId) {
@@ -1491,7 +1502,11 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
       npcClicked.combatId,
       statType,
       adjustedValue,
-      statType === "HP" ? calcHP(npcClicked) : calcMP(npcClicked),
+      statType === "HP"
+        ? calcHP(npcClicked)
+        : statType === "MP"
+          ? calcMP(npcClicked)
+          : (npcClicked.stats?.ip?.max ?? 0),
     );
 
     if (selectedNPC && selectedNPC.combatId === npcClicked.combatId) {

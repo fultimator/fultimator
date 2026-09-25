@@ -79,6 +79,7 @@ function buildRuntimeActors(
       "npc" as RuntimeActorSource,
       (combatStats?.currentHp as number) ?? 0,
       (combatStats?.currentMp as number) ?? 0,
+      (combatStats?.currentIp as number) ?? 0,
     );
   }
 
@@ -90,6 +91,7 @@ function buildRuntimeActors(
       "pc" as RuntimeActorSource,
       (combatStats?.currentHp as number) ?? 0,
       (combatStats?.currentMp as number) ?? 0,
+      (combatStats?.currentIp as number) ?? 0,
     );
   }
 

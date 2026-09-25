@@ -192,6 +192,30 @@ function getOppositeResourceDirection(
   return direction === "loss" ? "gain" : "loss";
 }
 
+function getResourceCurrent(
+  actorDoc: Record<string, unknown>,
+  resource: ResourceKind,
+  runtimeIp?: number,
+): number {
+  if (resource === "fp") {
+    const doc = actorDoc as { info?: { fabulapoints?: number } };
+    return doc.info?.fabulapoints ?? 0;
+  }
+  if (resource === "up") {
+    const doc = actorDoc as { combatStats?: { ultima?: number } };
+    return doc.combatStats?.ultima ?? 0;
+  }
+  if (resource === "ip" && runtimeIp !== undefined) {
+    return runtimeIp;
+  }
+  const stats = (
+    actorDoc as {
+      stats?: Record<string, { current?: number }>;
+    }
+  ).stats;
+  return stats?.[resource]?.current ?? 0;
+}
+
 function applyResourceDelta(
   actorDoc: Record<string, unknown>,
   resource: ResourceKind,
@@ -304,6 +328,10 @@ export const ChatPanel: React.FC = () => {
   const contextActorName = useActorName(playerDoc, npcDoc);
   const combatSimActors = useCombatSimActors();
   const activeActorName = useCombatEncounterStore((s) => s.activeActorName);
+  const updateRuntimeActor = useCombatEncounterStore(
+    (s) => s.updateRuntimeActor,
+  );
+  const getRuntimeActor = useCombatEncounterStore((s) => s.getRuntimeActor);
   const localDb = useDatabase("local");
   const cloudDb = useDatabase("cloud");
 
@@ -708,14 +736,46 @@ export const ChatPanel: React.FC = () => {
             resource,
           }),
         );
-        return;
+        return false;
       }
-      const updated = applyResourceDelta(
-        activeActorDoc as Record<string, unknown>,
-        resource,
-        getResourceDelta(amount, direction),
-      );
-      setActiveActorDoc(updated);
+      const combatId = activeActorDoc.combatId as string | undefined;
+      const useRuntimeIp = isCombatSim && resource === "ip" && !!combatId;
+      const runtimeIp = useRuntimeIp
+        ? getRuntimeActor(combatId!)?.currentIp
+        : undefined;
+
+      if (direction === "loss") {
+        const current = getResourceCurrent(
+          activeActorDoc as unknown as Record<string, unknown>,
+          resource,
+          runtimeIp,
+        );
+        if (current < amount) {
+          return false;
+        }
+      }
+
+      const delta = getResourceDelta(amount, direction);
+      if (useRuntimeIp) {
+        updateRuntimeActor(combatId!, (actor) => {
+          const stats = activeActorDoc.stats as
+            | Record<string, { max?: number }>
+            | undefined;
+          const maxIp = stats?.ip?.max ?? Number.POSITIVE_INFINITY;
+          return {
+            ...actor,
+            currentIp: Math.max(0, Math.min(actor.currentIp + delta, maxIp)),
+          };
+        });
+      } else {
+        setActiveActorDoc((prev) =>
+          applyResourceDelta(
+            prev as unknown as Record<string, unknown>,
+            resource,
+            delta,
+          ),
+        );
+      }
       addMessage(
         buildResourceApplicationLog({
           actorName,
@@ -725,11 +785,15 @@ export const ChatPanel: React.FC = () => {
           resource,
         }),
       );
+      return true;
     },
     [
       activeActorDoc,
       addMessage,
       contextActorName,
+      getRuntimeActor,
+      isCombatSim,
+      updateRuntimeActor,
       selectedSpeaker,
       setActiveActorDoc,
     ],

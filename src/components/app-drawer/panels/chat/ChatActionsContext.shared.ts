@@ -18,7 +18,7 @@ export interface ChatActionsContextValue {
         message: DisplayMessage,
         resource: ResourceKind,
         amount: number,
-      ) => void)
+      ) => boolean)
     | null;
   onGainResource:
     | ((
