@@ -8773,7 +8773,7 @@
   },
   {
     "key": "Gain the ability to equip martial melee weapons.",
-    "en": "Gain the ability to equip martial melee weapons.",
+    "en": "Gain the ability to equip **martial melee weapons**.",
     "it": "Puoi equipaggiare le armi da mischia marziali.",
     "de": "Erhalte die Fähigkeit, kriegerische Nahkampfwaffen auszurüsten.",
     "pl": "Możesz wyposażyć się w żołnierską broń białą.",
@@ -8785,7 +8785,7 @@
   },
   {
     "key": "Gain the ability to equip martial ranged weapons.",
-    "en": "Gain the ability to equip martial ranged weapons.",
+    "en": "Gain the ability to equip **martial ranged weapons**.",
     "it": "Puoi equipaggiare le armi a distanza marziali.",
     "de": "Erhalte die Fähigkeit, kriegerische Fernkampfwaffen auszurüsten.",
     "pl": "Możesz wyposażyć się w żołnierską broń dystansową.",
@@ -8797,7 +8797,7 @@
   },
   {
     "key": "Gain the ability to equip martial shields.",
-    "en": "Gain the ability to equip martial shields.",
+    "en": "Gain the ability to equip **martial shields**.",
     "it": "Puoi equipaggiare gli scudi marziali.",
     "de": "Erhalte die Fähigkeit, kriegerische Schilde auszurüsten.",
     "pl": "Możesz wyposażyć się w żołnierskie tarcze.",
@@ -8809,7 +8809,7 @@
   },
   {
     "key": "Gain the ability to equip martial armor.",
-    "en": "Gain the ability to equip martial armor.",
+    "en": "Gain the ability to equip **martial armor**.",
     "it": "Puoi equipaggiare le armature marziali.",
     "de": "Erhalte die Fähigkeit, kriegerische Rüstung auszurüsten.",
     "pl": "Możesz wyposażyć się w żołnierskie zbroje.",
@@ -15850,6 +15850,18 @@
     "pt-BR": "Allows the entire group to rest (page 90) while in the wilderness. Cannot be used in settlements.",
     "zh": "",
     "ru": "Allows the entire group to rest (page 90) while in the wilderness. Cannot be used in settlements."
+  },
+  {
+    "key": "npc_note_clock_sections",
+    "en": "{0}-section Clock",
+    "it": "{0}-section Clock",
+    "de": "{0}-section Clock",
+    "pl": "{0}-section Clock",
+    "fr": "{0}-section Clock",
+    "es": "{0}-section Clock",
+    "pt-BR": "{0}-section Clock",
+    "zh": "",
+    "ru": "{0}-section Clock"
   },
   {
     "key": "shared.fuid",
@@ -23329,15 +23341,15 @@
   },
   {
     "key": "Spellblade_desc",
-    "en": "When you cast an offensive spell (⚡) targeting a **single creature**, if the spell has a **total Mind Point cost of (SL × 20) or lower**, you may choose one **non-arcane** weapon you have equipped. If you do, your Magic Check for the spell uses the chosen weapon’s Accuracy Check formula; if that formula includes **Dexterity**, the Magic Check also gains a bonus equal to (**SL**). For instance, casting an Elementalist spell through a **bronze sword** (page **131**) when you have Skill Level 2 in **Spellblade** will cause the Magic Check to be 【**DEX + MIG**】 **+3** instead of 【**INS + WLP**】.",
+    "en": "When you cast an offensive spell (⚡) targeting a **single creature**, if the spell has a **total Mind Point cost of 【SL × 20】 or lower**, you may choose one **non-arcane** weapon you have equipped. If you do, your Magic Check for the spell uses the chosen weapon’s Accuracy Check formula; if that formula includes **Dexterity**, the Magic Check also gains a bonus equal to 【**SL**】. For instance, casting an **Elementalist** spell through a **bronze sword** (page **131**) when you have **Skill Level 2** in **Spellblade** will cause the Magic Check to be 【**DEX + MIG**】 **+3** instead of 【**INS + WLP**】.",
     "it": "Quando lanci un incantesimo offensivo (⚡) e bersagli **una sola creatura**, se l’incantesimo ha un **costo totale in Punti Mente pari o inferiore a** 【**LA × 10**】 e hai una o più armi equipaggiate della Categoria **arco, flagello, lancia, pugnale, da rissa** o **spada**, puoi scegliere una di queste armi. Se lo fai, il tuo Test di Magia per l’incantesimo utilizza la formula del Test di Precisione dell’arma; per esempio, il Test di Magia per un incantesimo da Elementalista lanciato attraverso una **spada di bronzo** è 【**DES + VIG**】 +1 invece di 【**INT + VOL**】.",
-    "de": "When you cast an offensive spell (⚡) targeting a **single creature**, if the spell has a **total Mind Point cost of (SL × 20) or lower**, you may choose one **non-arcane** weapon you have equipped. If you do, your Magic Check for the spell uses the chosen weapon’s Accuracy Check formula; if that formula includes **Dexterity**, the Magic Check also gains a bonus equal to (**SL**). For instance, casting an Elementalist spell through a **bronze sword** (page **131**) when you have Skill Level 2 in **Spellblade** will cause the Magic Check to be 【**DEX + MIG**】 **+3** instead of 【**INS + WLP**】.",
-    "pl": "When you cast an offensive spell (⚡) targeting a **single creature**, if the spell has a **total Mind Point cost of (SL × 20) or lower**, you may choose one **non-arcane** weapon you have equipped. If you do, your Magic Check for the spell uses the chosen weapon’s Accuracy Check formula; if that formula includes **Dexterity**, the Magic Check also gains a bonus equal to (**SL**). For instance, casting an Elementalist spell through a **bronze sword** (page **131**) when you have Skill Level 2 in **Spellblade** will cause the Magic Check to be 【**DEX + MIG**】 **+3** instead of 【**INS + WLP**】.",
+    "de": "When you cast an offensive spell (⚡) targeting a **single creature**, if the spell has a **total Mind Point cost of 【SL × 20】 or lower**, you may choose one **non-arcane** weapon you have equipped. If you do, your Magic Check for the spell uses the chosen weapon’s Accuracy Check formula; if that formula includes **Dexterity**, the Magic Check also gains a bonus equal to 【**SL**】. For instance, casting an **Elementalist** spell through a **bronze sword** (page **131**) when you have **Skill Level 2** in **Spellblade** will cause the Magic Check to be 【**DEX + MIG**】 **+3** instead of 【**INS + WLP**】.",
+    "pl": "When you cast an offensive spell (⚡) targeting a **single creature**, if the spell has a **total Mind Point cost of 【SL × 20】 or lower**, you may choose one **non-arcane** weapon you have equipped. If you do, your Magic Check for the spell uses the chosen weapon’s Accuracy Check formula; if that formula includes **Dexterity**, the Magic Check also gains a bonus equal to 【**SL**】. For instance, casting an **Elementalist** spell through a **bronze sword** (page **131**) when you have **Skill Level 2** in **Spellblade** will cause the Magic Check to be 【**DEX + MIG**】 **+3** instead of 【**INS + WLP**】.",
     "fr": "Quand vous lancez un sort offensif (⚡) visant **une seule créature** en étant équipé d’une ou plusieurs armes de catégorie **arme**, **lutte**, **dague**, **articulé**, **lance** ou **épée**, si le **coût total en Points de Magie du sort est inférieur ou égal à 【NC × 10】**, vous pouvez choisir une de ces armes : le test de magie du sort est effectué à l’aide de la formule de précision de l’arme en question. Par exemple, le test de magie d’un sort d’Élémentaliste lancé au moyen d’une **épée de bronze** (page **131**) se fait avec **【DEX + PUI】+1** au lieu d’ **【INT + VOL】**.",
-    "es": "When you cast an offensive spell (⚡) targeting a **single creature**, if the spell has a **total Mind Point cost of (SL × 20) or lower**, you may choose one **non-arcane** weapon you have equipped. If you do, your Magic Check for the spell uses the chosen weapon’s Accuracy Check formula; if that formula includes **Dexterity**, the Magic Check also gains a bonus equal to (**SL**). For instance, casting an Elementalist spell through a **bronze sword** (page **131**) when you have Skill Level 2 in **Spellblade** will cause the Magic Check to be 【**DEX + MIG**】 **+3** instead of 【**INS + WLP**】.",
+    "es": "When you cast an offensive spell (⚡) targeting a **single creature**, if the spell has a **total Mind Point cost of 【SL × 20】 or lower**, you may choose one **non-arcane** weapon you have equipped. If you do, your Magic Check for the spell uses the chosen weapon’s Accuracy Check formula; if that formula includes **Dexterity**, the Magic Check also gains a bonus equal to 【**SL**】. For instance, casting an **Elementalist** spell through a **bronze sword** (page **131**) when you have **Skill Level 2** in **Spellblade** will cause the Magic Check to be 【**DEX + MIG**】 **+3** instead of 【**INS + WLP**】.",
     "pt-BR": "Quando você conjura um Feitiço ofensivo (⚡) tendo como alvo uma **única criatura**, se o Feitiço tiver um **custo total de Pontos de Mente igual ou inferior a (NP × 20)**, você pode escolher uma arma **não arcana** que tenha equipada. Se fizer isso, seu **Teste de Magia** para o Feitiço usa a fórmula de **Teste de Precisão** da arma escolhida; se essa fórmula incluir **Destreza**, o Teste de Magia também recebe um bônus igual a (**NP**). Por exemplo, conjurar um Feitiço de Elementalista através de uma **espada de bronze** (página **131**) quando você tem Nível de Poder 2 em **Feitilâmina** fará com que o Teste de Magia seja (**DES + VIG**) **+3** em vez de (**AST + VON**).",
-    "zh": "When you cast an offensive spell (⚡) targeting a **single creature**, if the spell has a **total Mind Point cost of (SL × 20) or lower**, you may choose one **non-arcane** weapon you have equipped. If you do, your Magic Check for the spell uses the chosen weapon’s Accuracy Check formula; if that formula includes **Dexterity**, the Magic Check also gains a bonus equal to (**SL**). For instance, casting an Elementalist spell through a **bronze sword** (page **131**) when you have Skill Level 2 in **Spellblade** will cause the Magic Check to be 【**DEX + MIG**】 **+3** instead of 【**INS + WLP**】.",
-    "ru": "When you cast an offensive spell (⚡) targeting a **single creature**, if the spell has a **total Mind Point cost of (SL × 20) or lower**, you may choose one **non-arcane** weapon you have equipped. If you do, your Magic Check for the spell uses the chosen weapon’s Accuracy Check formula; if that formula includes **Dexterity**, the Magic Check also gains a bonus equal to (**SL**). For instance, casting an Elementalist spell through a **bronze sword** (page **131**) when you have Skill Level 2 in **Spellblade** will cause the Magic Check to be 【**DEX + MIG**】 **+3** instead of 【**INS + WLP**】."
+    "zh": "When you cast an offensive spell (⚡) targeting a **single creature**, if the spell has a **total Mind Point cost of 【SL × 20】 or lower**, you may choose one **non-arcane** weapon you have equipped. If you do, your Magic Check for the spell uses the chosen weapon’s Accuracy Check formula; if that formula includes **Dexterity**, the Magic Check also gains a bonus equal to 【**SL**】. For instance, casting an **Elementalist** spell through a **bronze sword** (page **131**) when you have **Skill Level 2** in **Spellblade** will cause the Magic Check to be 【**DEX + MIG**】 **+3** instead of 【**INS + WLP**】.",
+    "ru": "When you cast an offensive spell (⚡) targeting a **single creature**, if the spell has a **total Mind Point cost of 【SL × 20】 or lower**, you may choose one **non-arcane** weapon you have equipped. If you do, your Magic Check for the spell uses the chosen weapon’s Accuracy Check formula; if that formula includes **Dexterity**, the Magic Check also gains a bonus equal to 【**SL**】. For instance, casting an **Elementalist** spell through a **bronze sword** (page **131**) when you have **Skill Level 2** in **Spellblade** will cause the Magic Check to be 【**DEX + MIG**】 **+3** instead of 【**INS + WLP**】."
   },
   {
     "key": "Absorb MP",
@@ -23569,7 +23581,7 @@
   },
   {
     "key": "Withstand_desc",
-    "en": "When you perform the **Guard** action, if you choose **not** to provide cover to another creature, you recover Hit Points equal to【5 + **(SL, multiplied by the highest strength among your Bonds)**】and choose **Might** or **Willpower**: you treat the chosen Attribute as being one die size higher (up to a maximum of **d12**) until the end of your next turn.",
+    "en": "When you perform the **Guard** action, if you choose **not** to provide cover to another creature, you recover Hit Points equal to【**5 + (SL, multiplied by the highest strength among your Bonds)**】and choose **Might** or **Willpower**: you treat the chosen Attribute as being one die size higher (up to a maximum of **d12**) until the end of your next turn.",
     "it": "Quando esegui l’azione di **Guardia**, se scegli di **non** coprire un’altra creatura, recuperi Punti Vita pari a 【**LA, moltiplicato per la forza più alta tra i tuoi Legami**】 e scegli **Vigore** o **Volontà**: fino al termine del tuo prossimo turno, consideri la Caratteristica scelta incrementata di una taglia di dado (massimo **d12**).",
     "de": "When you perform the **Guard** action, if you choose **not** to provide cover to another creature, you recover Hit Points equal to【5 + **(SL, multiplied by the highest strength among your Bonds)**】and choose **Might** or **Willpower**: you treat the chosen Attribute as being one die size higher (up to a maximum of **d12**) until the end of your next turn.",
     "pl": "When you perform the **Guard** action, if you choose **not** to provide cover to another creature, you recover Hit Points equal to【5 + **(SL, multiplied by the highest strength among your Bonds)**】and choose **Might** or **Willpower**: you treat the chosen Attribute as being one die size higher (up to a maximum of **d12**) until the end of your next turn.",
@@ -42694,6 +42706,5 @@
     "pt-BR": "Roxo",
     "zh": "Purple",
     "ru": "Purple"
-  },
-  { "key": "npc_note_clock_sections", "en": "{0}-section Clock" }
+  }
 ]

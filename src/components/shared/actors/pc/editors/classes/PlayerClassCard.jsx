@@ -519,37 +519,46 @@ export default function PlayerClassCard({
             <ul>
               {classItem.benefits.hpplus !== 0 && (
                 <li>
-                  <Typography>
-                    {t("Permanently increase your maximum Hit Points by")}{" "}
-                    {classItem.benefits.hpplus}.
-                  </Typography>
+                  <StyledMarkdown
+                    allowedElements={["strong", "em"]}
+                    unwrapDisallowed
+                  >
+                    {`${t("Permanently increase your maximum Hit Points by")} ${classItem.benefits.hpplus}.`}
+                  </StyledMarkdown>
                 </li>
               )}
               {classItem.benefits.mpplus !== 0 && (
                 <li>
-                  <Typography>
-                    {t("Permanently increase your maximum Mind Points by")}{" "}
-                    {classItem.benefits.mpplus}.
-                  </Typography>
+                  <StyledMarkdown
+                    allowedElements={["strong", "em"]}
+                    unwrapDisallowed
+                  >
+                    {`${t("Permanently increase your maximum Mind Points by")} ${classItem.benefits.mpplus}.`}
+                  </StyledMarkdown>
                 </li>
               )}
               {classItem.benefits.ipplus !== 0 && (
                 <li>
-                  <Typography>
-                    {t("Permanently increase your maximum Inventory Points by")}{" "}
-                    {classItem.benefits.ipplus}.
-                  </Typography>
+                  <StyledMarkdown
+                    allowedElements={["strong", "em"]}
+                    unwrapDisallowed
+                  >
+                    {`${t("Permanently increase your maximum Inventory Points by")} ${classItem.benefits.ipplus}.`}
+                  </StyledMarkdown>
                 </li>
               )}
               {classItem.benefits.rituals && (
                 <>
                   {classItem.benefits.rituals.ritualism && (
                     <li>
-                      <Typography>
+                      <StyledMarkdown
+                        allowedElements={["strong", "em"]}
+                        unwrapDisallowed
+                      >
                         {t(
                           "You may perform Rituals whose effects fall within the Ritualism discipline.",
                         )}
-                      </Typography>
+                      </StyledMarkdown>
                     </li>
                   )}
                 </>
@@ -558,36 +567,53 @@ export default function PlayerClassCard({
                 <>
                   {classItem.benefits.martials.melee && (
                     <li>
-                      <Typography>
+                      <StyledMarkdown
+                        allowedElements={["strong", "em"]}
+                        unwrapDisallowed
+                      >
                         {t("Gain the ability to equip martial melee weapons.")}
-                      </Typography>
+                      </StyledMarkdown>
                     </li>
                   )}
                   {classItem.benefits.martials.ranged && (
                     <li>
-                      <Typography>
+                      <StyledMarkdown
+                        allowedElements={["strong", "em"]}
+                        unwrapDisallowed
+                      >
                         {t("Gain the ability to equip martial ranged weapons.")}
-                      </Typography>
+                      </StyledMarkdown>
                     </li>
                   )}
                   {classItem.benefits.martials.shields && (
                     <li>
-                      <Typography>
+                      <StyledMarkdown
+                        allowedElements={["strong", "em"]}
+                        unwrapDisallowed
+                      >
                         {t("Gain the ability to equip martial shields.")}
-                      </Typography>
+                      </StyledMarkdown>
                     </li>
                   )}
                   {classItem.benefits.martials.armor && (
                     <li>
-                      <Typography>
+                      <StyledMarkdown
+                        allowedElements={["strong", "em"]}
+                        unwrapDisallowed
+                      >
                         {t("Gain the ability to equip martial armor.")}
-                      </Typography>
+                      </StyledMarkdown>
                     </li>
                   )}
                   {classItem.benefits.custom &&
                     classItem.benefits.custom.map((custombenefit, index) => (
                       <li key={index}>
-                        <Typography>{custombenefit}</Typography>
+                        <StyledMarkdown
+                          allowedElements={["strong", "em"]}
+                          unwrapDisallowed
+                        >
+                          {custombenefit}
+                        </StyledMarkdown>
                       </li>
                     ))}
                 </>

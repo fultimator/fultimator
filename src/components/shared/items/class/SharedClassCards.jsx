@@ -676,7 +676,13 @@ export const SharedClassCard = React.memo(function SharedClassCard({
             <Stack spacing={0.25}>
               {benefitLines.map((line, i) => (
                 <Typography key={i} variant="body2">
-                  • {line}
+                  •{" "}
+                  <StyledMarkdown
+                    allowedElements={["strong", "em"]}
+                    unwrapDisallowed
+                  >
+                    {line}
+                  </StyledMarkdown>
                 </Typography>
               ))}
             </Stack>
