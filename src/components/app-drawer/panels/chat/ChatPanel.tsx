@@ -13,15 +13,20 @@ import {
   DialogContent,
   DialogTitle,
   Divider,
+  IconButton,
   List,
   ListItem,
   ListItemButton,
   ListItemIcon,
   ListItemText,
+  Menu,
+  MenuItem,
   Typography,
   Button,
 } from "@mui/material";
 import { useLocation } from "react-router";
+import MenuIcon from "@mui/icons-material/Menu";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutlined";
 import PrecisionManufacturingIcon from "@mui/icons-material/PrecisionManufacturing";
 import DeleteConfirmationDialog from "../../../common/DeleteConfirmationDialog";
 import { AUTHOR_NAME, DEFAULT_SPEAKER, LOCAL_SPEAKER_KEY } from "./constants";
@@ -297,6 +302,39 @@ function buildResourceApplicationLog({
     },
   };
 }
+
+const LogMessageMenu: React.FC<{ onDelete: () => void }> = ({ onDelete }) => {
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  return (
+    <>
+      <IconButton
+        size="small"
+        aria-label="Message options"
+        onClick={(e) => setAnchorEl(e.currentTarget)}
+        sx={{ color: "text.secondary", flexShrink: 0 }}
+      >
+        <MenuIcon sx={{ fontSize: 16 }} />
+      </IconButton>
+      <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={() => setAnchorEl(null)}
+      >
+        <MenuItem
+          onClick={() => {
+            setAnchorEl(null);
+            onDelete();
+          }}
+        >
+          <ListItemIcon>
+            <DeleteOutlineIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>Delete Message</ListItemText>
+        </MenuItem>
+      </Menu>
+    </>
+  );
+};
 
 export const ChatPanel: React.FC = () => {
   const { t } = useTranslate();
@@ -1039,6 +1077,9 @@ export const ChatPanel: React.FC = () => {
                       >
                         {formatTimeAgo(logMsg.createdAt)}
                       </Typography>
+                      <LogMessageMenu
+                        onDelete={() => deleteActiveMessage(logMsg.id)}
+                      />
                     </Box>
                   );
                 }

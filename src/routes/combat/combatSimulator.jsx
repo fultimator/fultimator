@@ -2126,7 +2126,6 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
             isMobile={isMobile}
             selectedPCs={selectedPCs}
             setSelectedPCs={setSelectedPCs}
-            emitLog={emitLog}
             addMessage={addMessage}
             handleOpen={handleOpen}
             tabIndex={pcTabIndex}

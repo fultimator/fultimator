@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   Box,
   Button,
@@ -13,7 +13,7 @@ import {
   ToggleButtonGroup,
   Typography,
 } from "@mui/material";
-import { Close, Description, Edit, Send, Favorite } from "@mui/icons-material";
+import { Close, Description, Edit, Favorite } from "@mui/icons-material";
 import ActorActionBar from "./ActorActionBar";
 import { useTheme } from "@mui/material/styles";
 import { PlayerSheetCompact } from "/src/components/shared/actors/pc";
@@ -568,17 +568,7 @@ function PcNotesTab({
   selectedPCs,
   setSelectedPCs,
   setSelectedPC,
-  emitLog,
 }) {
-  const [customLog, setCustomLog] = useState("");
-
-  const handleSendLog = () => {
-    const trimmed = customLog.trim();
-    if (!trimmed) return;
-    emitLog?.({ type: "text", text: `${selectedPC.name}: ${trimmed}` });
-    setCustomLog("");
-  };
-
   const updatePc = (updater) => {
     setSelectedPCs?.((prev) =>
       prev.map((pc) =>
@@ -591,9 +581,28 @@ function PcNotesTab({
   const notes =
     selectedPCs?.find((p) => p.combatId === selectedPC.combatId)?.combatStats
       ?.notes ?? "";
+  const combatNotes =
+    selectedPCs?.find((p) => p.combatId === selectedPC.combatId)?.combatStats
+      ?.combatNotes ?? "";
 
   return (
     <>
+      <TextField
+        label={t("combat_sim_combat_notes")}
+        variant="outlined"
+        fullWidth
+        rows={1}
+        placeholder={t("combat_sim_combat_notes_detail")}
+        value={combatNotes}
+        onChange={(e) =>
+          updatePc((pc) => ({
+            ...pc,
+            combatStats: { ...pc.combatStats, combatNotes: e.target.value },
+          }))
+        }
+        sx={{ mt: 2 }}
+        slotProps={{ htmlInput: { maxLength: 50 } }}
+      />
       <TextField
         label={t("Notes")}
         variant="outlined"
@@ -609,29 +618,6 @@ function PcNotesTab({
         }
         sx={{ mt: 2 }}
         slotProps={{ htmlInput: { maxLength: 2000 } }}
-      />
-      <TextField
-        label={t("combat_sim_custom_log")}
-        variant="outlined"
-        fullWidth
-        value={customLog}
-        onChange={(e) => setCustomLog(e.target.value)}
-        sx={{ mt: 2 }}
-        slotProps={{
-          input: {
-            endAdornment: (
-              <Button
-                onClick={handleSendLog}
-                color="primary"
-                variant="contained"
-                startIcon={<Send />}
-                disabled={!customLog}
-              >
-                {t("combat_sim_send_log")}
-              </Button>
-            ),
-          },
-        }}
       />
     </>
   );
@@ -651,7 +637,6 @@ export default function PCDetail({
   isMobile = false,
   selectedPCs,
   setSelectedPCs,
-  emitLog,
   addMessage,
   handleOpen,
   tabIndex,
@@ -690,6 +675,16 @@ export default function PCDetail({
       currentMp: runtimeMp ?? selectedPC.combatStats?.currentMp,
       currentIp: runtimeIp ?? selectedPC.combatStats?.currentIp,
     },
+  };
+
+  const handleSheetClockUpdate = (updater) => {
+    const applyNotesOnly = (pc) => ({ ...pc, notes: updater(pc).notes });
+    setSelectedPCs?.((prev) =>
+      prev.map((pc) =>
+        pc.combatId === selectedPC.combatId ? applyNotesOnly(pc) : pc,
+      ),
+    );
+    setSelectedPC?.((prev) => (prev ? applyNotesOnly(prev) : prev));
   };
 
   const pcSpeaker = selectedPC?.name ?? "";
@@ -798,7 +793,7 @@ export default function PCDetail({
       {tabIndex === 0 && (
         <PlayerSheetCompact
           pc={previewPc}
-          onUpdate={() => {}}
+          onUpdate={handleSheetClockUpdate}
           onQuickCheck={handleQuickCheck}
           characterImage={previewPc?.info?.imgurl ?? null}
           id={previewPc?.id}
@@ -819,7 +814,6 @@ export default function PCDetail({
           selectedPCs={selectedPCs}
           setSelectedPCs={setSelectedPCs}
           setSelectedPC={setSelectedPC}
-          emitLog={emitLog}
         />
       )}
     </Box>
@@ -862,6 +856,8 @@ export default function PCDetail({
           }}
         >
           {selectedPC.name}
+          {selectedPC?.combatStats?.combatNotes &&
+            ` 【${selectedPC.combatStats.combatNotes}】`}
           <IconButton onClick={() => setSelectedPC(null)}>
             <Close />
           </IconButton>
@@ -910,6 +906,8 @@ export default function PCDetail({
           }}
         >
           {selectedPC.name}
+          {selectedPC?.combatStats?.combatNotes &&
+            ` 【${selectedPC.combatStats.combatNotes}】`}
         </Typography>
         <IconButton
           onClick={() => setSelectedPC(null)}

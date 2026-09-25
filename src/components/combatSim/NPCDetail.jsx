@@ -537,7 +537,6 @@ const NPCDetail = ({
             setSelectedNPC={setSelectedNPC}
             selectedNPCs={selectedNPCs}
             setSelectedNPCs={setSelectedNPCs}
-            emitLog={emitLog}
           />
         )}
       </Box>
