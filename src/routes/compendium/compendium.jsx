@@ -11,6 +11,8 @@ import {
   TextField,
   Select,
   MenuItem,
+  ListItemIcon,
+  ListItemText,
   FormControl,
   InputLabel,
   Typography,
@@ -1489,22 +1491,66 @@ function CompendiumViewer() {
 
   // Route-specific item actions (share, download, export, pack management)
   const renderItemActions = useCallback(
-    (item, _idx, _selectedItem) => (
-      <>
-        <Tooltip title={t("Share URL")}>
-          <IconButton size="small" onClick={handleShareUrl}>
-            <ShareIcon fontSize="small" />
-          </IconButton>
-        </Tooltip>
-        <Tooltip title={t("Download as Image")}>
-          {/* download is handled by CompendiumBrowser via showDownloadImage */}
-          <span style={{ display: "none" }} />
-        </Tooltip>
-        <Export name={item.name} dataType={selectedType} data={item} />
-        {selectedCompendium !== "official" &&
-          selectedType === "classes" &&
-          item._packItemId &&
-          !activePack?.locked && (
+    (item, _idx, _selectedItem, opts = {}) => {
+      const inMenu = opts.inMenu;
+      const canEditClass =
+        selectedCompendium !== "official" &&
+        selectedType === "classes" &&
+        item._packItemId &&
+        !activePack?.locked;
+      const canRemove =
+        selectedCompendium !== "official" &&
+        item._packItemId &&
+        !activePack?.locked;
+
+      if (inMenu) {
+        return (
+          <>
+            <MenuItem onClick={handleShareUrl}>
+              <ListItemIcon>
+                <ShareIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText>{t("Share URL")}</ListItemText>
+            </MenuItem>
+            <Export
+              name={item.name}
+              dataType={selectedType}
+              data={item}
+              menuItemLabel={t("Export")}
+            />
+            {canEditClass && (
+              <MenuItem
+                onClick={() =>
+                  setEditClassItem({ item, packItemId: item._packItemId })
+                }
+              >
+                <ListItemIcon>
+                  <EditIcon fontSize="small" />
+                </ListItemIcon>
+                <ListItemText>{t("Edit Class")}</ListItemText>
+              </MenuItem>
+            )}
+            {canRemove && (
+              <MenuItem onClick={() => handleRemoveFromPack(item)}>
+                <ListItemIcon>
+                  <DeleteIcon fontSize="small" color="error" />
+                </ListItemIcon>
+                <ListItemText>{t("Remove from pack")}</ListItemText>
+              </MenuItem>
+            )}
+          </>
+        );
+      }
+
+      return (
+        <>
+          <Tooltip title={t("Share URL")}>
+            <IconButton size="small" onClick={handleShareUrl}>
+              <ShareIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+          <Export name={item.name} dataType={selectedType} data={item} />
+          {canEditClass && (
             <Tooltip title={t("Edit Class")}>
               <IconButton
                 size="small"
@@ -1516,9 +1562,7 @@ function CompendiumViewer() {
               </IconButton>
             </Tooltip>
           )}
-        {selectedCompendium !== "official" &&
-          item._packItemId &&
-          !activePack?.locked && (
+          {canRemove && (
             <Tooltip title={t("Remove from pack")}>
               <IconButton
                 size="small"
@@ -1529,8 +1573,9 @@ function CompendiumViewer() {
               </IconButton>
             </Tooltip>
           )}
-      </>
-    ),
+        </>
+      );
+    },
     [
       t,
       handleShareUrl,

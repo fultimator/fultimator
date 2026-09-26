@@ -3576,6 +3576,30 @@
     "ru": "Exporting..."
   },
   {
+    "key": "Add to Compendium",
+    "en": "Add to Compendium",
+    "it": "Add to Compendium",
+    "de": "Add to Compendium",
+    "pl": "Add to Compendium",
+    "fr": "Add to Compendium",
+    "es": "Add to Compendium",
+    "pt-BR": "Add to Compendium",
+    "zh": "Add to Compendium",
+    "ru": "Add to Compendium"
+  },
+  {
+    "key": "Remove from pack",
+    "en": "Remove from pack",
+    "it": "Remove from pack",
+    "de": "Remove from pack",
+    "pl": "Remove from pack",
+    "fr": "Remove from pack",
+    "es": "Remove from pack",
+    "pt-BR": "Remove from pack",
+    "zh": "Remove from pack",
+    "ru": "Remove from pack"
+  },
+  {
     "key": "Extra Accuracy",
     "en": "Extra Accuracy",
     "it": "Precisione Plus",

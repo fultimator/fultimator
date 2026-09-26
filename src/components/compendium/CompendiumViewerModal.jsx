@@ -21,6 +21,9 @@ import {
   InputAdornment,
   Autocomplete,
   Chip,
+  MenuItem,
+  ListItemIcon,
+  ListItemText,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import CloseIcon from "@mui/icons-material/Close";
@@ -421,7 +424,13 @@ const CompendiumViewerModal = ({
   }, []);
 
   const renderItemActions = useCallback(
-    (item, _idx, _selectedItem) => {
+    (item, _idx, _selectedItem, opts = {}) => {
+      const inMenu = opts.inMenu;
+      const canEditPack =
+        selectedCompendium !== "official" &&
+        item._packItemId &&
+        !activePack?.locked;
+
       return (
         <>
           <Export
@@ -429,11 +438,26 @@ const CompendiumViewerModal = ({
             dataType={selectedType}
             data={item}
             size="small"
+            menuItemLabel={inMenu ? t("Export") : undefined}
           />
-          {selectedCompendium !== "official" &&
-            item._packItemId &&
-            !activePack?.locked &&
-            VIEWER_TO_PACK_TYPE[selectedType] && (
+          {canEditPack &&
+            VIEWER_TO_PACK_TYPE[selectedType] &&
+            (inMenu ? (
+              <MenuItem
+                onClick={() =>
+                  setEditPackItem({
+                    item,
+                    packItemId: item._packItemId,
+                    itemType: VIEWER_TO_PACK_TYPE[selectedType],
+                  })
+                }
+              >
+                <ListItemIcon>
+                  <EditIcon fontSize="small" />
+                </ListItemIcon>
+                <ListItemText>{t("Edit")}</ListItemText>
+              </MenuItem>
+            ) : (
               <Tooltip title={t("Edit")}>
                 <IconButton
                   size="small"
@@ -448,10 +472,20 @@ const CompendiumViewerModal = ({
                   <EditIcon fontSize="small" />
                 </IconButton>
               </Tooltip>
-            )}
-          {selectedCompendium !== "official" &&
-            item._packItemId &&
-            !activePack?.locked && (
+            ))}
+          {canEditPack &&
+            (inMenu ? (
+              <MenuItem
+                onClick={() =>
+                  setDeletePackItem({ item, packItemId: item._packItemId })
+                }
+              >
+                <ListItemIcon>
+                  <DeleteIcon fontSize="small" color="error" />
+                </ListItemIcon>
+                <ListItemText>{t("Remove from pack")}</ListItemText>
+              </MenuItem>
+            ) : (
               <Tooltip title={t("Remove from pack")}>
                 <IconButton
                   size="small"
@@ -463,7 +497,7 @@ const CompendiumViewerModal = ({
                   <DeleteIcon fontSize="small" />
                 </IconButton>
               </Tooltip>
-            )}
+            ))}
         </>
       );
     },

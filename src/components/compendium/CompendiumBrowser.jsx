@@ -442,7 +442,7 @@ const CompendiumBrowser = React.memo(function CompendiumBrowser({
 
     // Caller-provided extras (e.g. "Add Item" button in modal, edit/delete in pack mode)
     const callerActions = renderItemActions
-      ? renderItemActions(item, idx, selectedItem)
+      ? renderItemActions(item, idx, selectedItem, { inMenu: false })
       : null;
 
     // Standard toolbar (share, download, export, add-to-pack)
@@ -558,24 +558,27 @@ const CompendiumBrowser = React.memo(function CompendiumBrowser({
             </MenuItem>
           )}
           {VIEWER_TO_PACK_TYPE[selectedType] && (
-            <Box sx={{ px: 1 }}>
-              <AddToCompendiumButton
-                itemType={VIEWER_TO_PACK_TYPE[selectedType]}
-                data={item}
-                excludePackId={
-                  selectedCompendium !== "official"
-                    ? selectedCompendium
-                    : undefined
-                }
-              />
-            </Box>
+            <AddToCompendiumButton
+              itemType={VIEWER_TO_PACK_TYPE[selectedType]}
+              data={item}
+              excludePackId={
+                selectedCompendium !== "official"
+                  ? selectedCompendium
+                  : undefined
+              }
+              menuItemLabel={t("Add to Compendium")}
+            />
           )}
           {showExport && (
-            <Box sx={{ px: 1 }}>
-              <Export name={item.name} dataType={selectedType} data={item} />
-            </Box>
+            <Export
+              name={item.name}
+              dataType={selectedType}
+              data={item}
+              menuItemLabel={t("Export")}
+            />
           )}
-          {renderItemActions && renderItemActions(item, idx, selectedItem)}
+          {renderItemActions &&
+            renderItemActions(item, idx, selectedItem, { inMenu: true })}
         </Menu>
       </>
     );
