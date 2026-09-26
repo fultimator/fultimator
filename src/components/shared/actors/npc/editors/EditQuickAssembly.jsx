@@ -101,6 +101,7 @@ export default function EditQuickAssembly({ npc, setNpc }) {
   const { personalPack } = useCompendiumPacks();
   const [compendiumOpen, setCompendiumOpen] = React.useState(false);
   const [compendiumType, setCompendiumType] = React.useState("special");
+  const [compendiumSubtype, setCompendiumSubtype] = React.useState(null);
   const [activeSlot, setActiveSlot] = React.useState(null);
   const [activeStep, setActiveStep] = React.useState(0);
   const [showAll, setShowAll] = React.useState(false);
@@ -136,9 +137,10 @@ export default function EditQuickAssembly({ npc, setNpc }) {
   ).length;
   const grantsDone = grantsTotal === 0 || grantsApplied >= grantsTotal;
 
-  const openCompendium = (type = "special", slot = null) => {
+  const openCompendium = (type = "special", slot = null, subtype = null) => {
     setCompendiumType(type);
     setActiveSlot(slot);
+    setCompendiumSubtype(subtype);
     setCompendiumOpen(true);
   };
 
@@ -688,6 +690,7 @@ export default function EditQuickAssembly({ npc, setNpc }) {
                                   onOpenCompendium={openCompendium}
                                   onRemoveReference={requestRemoveReference}
                                   onScrollTo={scrollToSection}
+                                  subtypeOverride="negativeSkill"
                                 />
                               </Box>
                             </TableCell>
@@ -936,6 +939,7 @@ export default function EditQuickAssembly({ npc, setNpc }) {
         onClose={() => setCompendiumOpen(false)}
         context="npc"
         initialType={compendiumType}
+        initialSpecialSubtypes={compendiumSubtype ? [compendiumSubtype] : []}
         initialCompendium="personal"
         allowMultiSelect
         onAddItem={(item) => {
@@ -956,6 +960,7 @@ export default function EditQuickAssembly({ npc, setNpc }) {
                 effect: item.effect || "",
                 spCost: item.spCost ?? 1,
                 fuid: item.fuid,
+                subtype: item.subtype,
                 _qaAdded: true,
                 _qaSlot: activeSlot,
               },
@@ -1124,6 +1129,7 @@ function GrantFiller({
   qaSpecials,
   onRemoveReference,
   onScrollTo,
+  subtypeOverride,
 }) {
   switch (grant.kind) {
     case "roleSkill":
@@ -1155,7 +1161,9 @@ function GrantFiller({
                 ? t("role_grant_add_boss_skill")
                 : undefined
             }
-            onPick={(type) => onOpenCompendium(type, slotId)}
+            onPick={(type) =>
+              onOpenCompendium(type, slotId, subtypeOverride ?? grant.kind)
+            }
           />
         </Stack>
       );
@@ -1615,7 +1623,7 @@ function SpeciesGrantFiller({
           ))}
           <AddSkillButton
             t={t}
-            onPick={(type) => onOpenCompendium(type, slotId)}
+            onPick={(type) => onOpenCompendium(type, slotId, "speciesSkill")}
           />
         </Stack>
       );

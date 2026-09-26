@@ -408,6 +408,7 @@ export default function EditActions({ npc, setNpc }) {
                 effect: item.effect || "",
                 spCost: item.spCost ?? 1,
                 fuid: item.fuid,
+                subtype: item.subtype,
               },
             ],
           }));

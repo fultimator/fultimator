@@ -88,6 +88,7 @@ export function useCompendiumItems({ filters, activePack, selectedIdx }) {
     selectedQualityCategories,
     selectedHeroicClasses,
     selectedOptionalSubtypes,
+    selectedSpecialSubtypes,
     selectedEffectTransfer,
     selectedEffectApplicableTypes,
     searchQuery,
@@ -143,6 +144,14 @@ export function useCompendiumItems({ filters, activePack, selectedIdx }) {
       if (selectedType === "optionals" && selectedOptionalSubtypes.length > 0) {
         items = items.filter((item) =>
           selectedOptionalSubtypes.includes(item.subtype),
+        );
+      }
+      if (
+        (selectedType === "special" || selectedType === "actions") &&
+        selectedSpecialSubtypes.length > 0
+      ) {
+        items = items.filter((item) =>
+          selectedSpecialSubtypes.includes(item.subtype),
         );
       }
       if (selectedType === "effects" && selectedEffectTransfer !== "") {
@@ -258,6 +267,14 @@ export function useCompendiumItems({ filters, activePack, selectedIdx }) {
           selectedOptionalSubtypes.includes(item.subtype),
         );
       }
+      if (
+        (selectedType === "special" || selectedType === "actions") &&
+        selectedSpecialSubtypes.length > 0
+      ) {
+        items = items.filter((item) =>
+          selectedSpecialSubtypes.includes(item.subtype),
+        );
+      }
       if (selectedType === "effects" && selectedEffectTransfer !== "") {
         const wantTransfer = selectedEffectTransfer === "true";
         items = items.filter((item) => Boolean(item.transfer) === wantTransfer);
@@ -347,6 +364,7 @@ export function useCompendiumItems({ filters, activePack, selectedIdx }) {
     selectedBook,
     selectedHeroicClasses,
     selectedOptionalSubtypes,
+    selectedSpecialSubtypes,
     selectedEffectTransfer,
     selectedEffectApplicableTypes,
     isPilotClassSelected,

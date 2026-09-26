@@ -82,6 +82,7 @@ const CompendiumViewerModal = ({
   restrictToTypes,
   viewOnly = false,
   initialOptionalSubtypes = [],
+  initialSpecialSubtypes = [],
   initialSpellClass = "",
   initialSearchQuery = "",
   initialModuleTypeFilter = "",
@@ -109,6 +110,7 @@ const CompendiumViewerModal = ({
     initialModuleType: initialModuleTypeFilter,
     initialQualityFilters,
     initialOptionalSubtypes,
+    initialSpecialSubtypes,
     initialCompendium,
     open,
   });

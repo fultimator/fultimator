@@ -38,7 +38,7 @@ export default function ExplainAffinities({ npc }) {
           <Typography>
             <ReactMarkdown allowedElements={["strong"]} unwrapDisallowed={true}>
               {t(
-                "**Constructs** are Immune to **poison** damage and Resistant to **earth** damage, and immune to poisoned.",
+                "**Constructs** are Immune to **poison** damage and Resistant to **earth** damage, and immune to **poisoned**.",
                 true,
               )}
             </ReactMarkdown>

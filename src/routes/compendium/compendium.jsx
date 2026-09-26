@@ -257,6 +257,8 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
   onHeroicClassesChange,
   selectedOptionalSubtypes,
   onOptionalSubtypesChange,
+  selectedSpecialSubtypes,
+  onSpecialSubtypesChange,
   selectedEffectTransfer = "",
   onEffectTransferChange,
   selectedEffectApplicableTypes = [],
@@ -749,6 +751,57 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
           />
         )}
 
+        {(selectedType === "special" || selectedType === "actions") && (
+          <Autocomplete
+            {...(isMobile ? autocompleteOverlayProps : {})}
+            multiple
+            limitTags={1}
+            size="small"
+            fullWidth
+            sx={compactMultiAutocompleteSx}
+            options={[
+              "roleSkill",
+              "negativeSkill",
+              "bossSkill",
+              "speciesSkill",
+            ]}
+            getOptionLabel={(o) =>
+              t(
+                {
+                  roleSkill: "shared.qaSubtype.roleSkill",
+                  negativeSkill: "shared.qaSubtype.negativeSkill",
+                  bossSkill: "shared.qaSubtype.bossSkill",
+                  speciesSkill: "shared.qaSubtype.speciesSkill",
+                }[o] ?? o,
+              )
+            }
+            value={selectedSpecialSubtypes}
+            onChange={(e, newValue) => onSpecialSubtypesChange(newValue)}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label={t("shared.qaSubtype")}
+                placeholder={t("All subtypes")}
+              />
+            )}
+            renderValue={(value, getTagProps) =>
+              value.map((option, index) => {
+                const { key, ...tagProps } = getTagProps({ index });
+                const label =
+                  {
+                    roleSkill: "shared.qaSubtype.roleSkill",
+                    negativeSkill: "shared.qaSubtype.negativeSkill",
+                    bossSkill: "shared.qaSubtype.bossSkill",
+                    speciesSkill: "shared.qaSubtype.speciesSkill",
+                  }[option] ?? option;
+                return (
+                  <Chip key={key} label={t(label)} size="small" {...tagProps} />
+                );
+              })
+            }
+          />
+        )}
+
         {selectedType === "effects" && (
           <>
             <FormControl size="small" fullWidth>
@@ -1165,6 +1218,10 @@ function CompendiumViewer() {
     const subtypes = searchParams.get("optionalSubtypes");
     return subtypes ? subtypes.split(",") : [];
   }, [searchParams]);
+  const selectedSpecialSubtypes = useMemo(() => {
+    const subtypes = searchParams.get("specialSubtypes");
+    return subtypes ? subtypes.split(",") : [];
+  }, [searchParams]);
   const selectedEffectTransfer = searchParams.get("effectTransfer") ?? "";
   const selectedEffectApplicableTypes = useMemo(() => {
     const types = searchParams.get("effectApplicableTypes");
@@ -1220,6 +1277,7 @@ function CompendiumViewer() {
     selectedQualityCategories,
     selectedHeroicClasses,
     selectedOptionalSubtypes,
+    selectedSpecialSubtypes,
     selectedEffectTransfer,
     selectedEffectApplicableTypes,
     selectedCompendium,
@@ -1352,6 +1410,14 @@ function CompendiumViewer() {
         setSearchParams(newParams);
         if (scrollRef?.current) scrollRef.current.scrollTop = 0;
       },
+      handleSpecialSubtypesChange: (subtypes, { scrollRef } = {}) => {
+        setSearchQuery("");
+        setSelectedIdx(null);
+        const newParams = { ...urlBase(), type: selectedType };
+        if (subtypes.length > 0) newParams.specialSubtypes = subtypes.join(",");
+        setSearchParams(newParams);
+        if (scrollRef?.current) scrollRef.current.scrollTop = 0;
+      },
       handleEffectTransferChange: (value, { scrollRef } = {}) => {
         setSearchQuery("");
         setSelectedIdx(null);
@@ -1412,6 +1478,9 @@ function CompendiumViewer() {
           ...(selectedOptionalSubtypes.length > 0
             ? { optionalSubtypes: selectedOptionalSubtypes.join(",") }
             : {}),
+          ...(selectedSpecialSubtypes.length > 0
+            ? { specialSubtypes: selectedSpecialSubtypes.join(",") }
+            : {}),
           item: toSlug(item.name),
         });
       },
@@ -1430,6 +1499,7 @@ function CompendiumViewer() {
       selectedQualityCategories,
       selectedHeroicClasses,
       selectedOptionalSubtypes,
+      selectedSpecialSubtypes,
       selectedEffectTransfer,
       selectedEffectApplicableTypes,
     ],

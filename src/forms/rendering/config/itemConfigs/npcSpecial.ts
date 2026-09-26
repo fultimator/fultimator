@@ -59,6 +59,25 @@ export const npcSpecialFieldConfig: ItemFieldConfig<NpcSpecialFormState> = [
     validationHints: { min: 0 },
   },
   {
+    key: "subtype",
+    kind: "editable",
+    label: "shared.qaSubtype",
+    component: "select",
+    defaultValue: "",
+    group: G.core,
+    order: 1.5,
+    gridSize: 8,
+    componentProps: {
+      options: [
+        { value: "", label: "shared.qaSubtype.none" },
+        { value: "roleSkill", label: "shared.qaSubtype.roleSkill" },
+        { value: "negativeSkill", label: "shared.qaSubtype.negativeSkill" },
+        { value: "bossSkill", label: "shared.qaSubtype.bossSkill" },
+        { value: "speciesSkill", label: "shared.qaSubtype.speciesSkill" },
+      ],
+    },
+  },
+  {
     key: "effect",
     kind: "editable",
     label: prefixedLabel(NPC_SPECIAL_LABEL_PREFIX, SHARED_LABEL_KEYS.effect),

@@ -1813,15 +1813,15 @@
   },
   {
     "key": "Immune to **poison** damage and Resistant to **earth** damage, and immune to poisoned.",
-    "en": "Immune to **poison** damage and Resistant to **earth** damage, and immune to poisoned.",
-    "it": "Immuni ai danni da **veleno** e Resistenti ai danni da **terra**, e sono immuni all'essere avvelenati.",
-    "de": "Immun gegen **Gift**schaden und Resistent gegen **Erd**schaden, und immun gegen Vergiftung.",
-    "pl": "Nietykalne na  obrażenia **trujące** i odporne na **ziemne** obrażenia, oraz są odporne na zatrucie.",
-    "fr": "Immunisées aux dégâts de **poison** et résistantes aux dégâts de **terre**, et immunisées contre l'empoisonnement.",
-    "es": "Inmunes al daño de **veneno** y resistentes al daño de **tierra** y son inmunes al envenenamiento.",
-    "pt-BR": "Imunes a dano **veneno** e resistentes a dano **terra**, e imunes a serem envenenados.",
+    "en": "Immune to **poison** damage and Resistant to **earth** damage, and immune to **poisoned**.",
+    "it": "Immuni ai danni da **veleno** e Resistenti ai danni da **terra**, e sono immuni all'essere **avvelenati**.",
+    "de": "Immun gegen **Gift**schaden und Resistent gegen **Erd**schaden, und immun gegen **Vergiftung**.",
+    "pl": "Nietykalne na  obrażenia **trujące** i odporne na **ziemne** obrażenia, oraz są odporne na **zatrucie**.",
+    "fr": "Immunisées aux dégâts de **poison** et résistantes aux dégâts de **terre**, et immunisées contre **l'empoisonnement**.",
+    "es": "Inmunes al daño de **veneno** y resistentes al daño de **tierra** y son inmunes al **envenenamiento**.",
+    "pt-BR": "Imunes a dano **veneno** e resistentes a dano **terra**, e imunes a serem **envenenados**.",
     "zh": "免疫**毒系**伤害，对**土系**伤害具有抵抗相性，且免疫**中毒**。",
-    "ru": "Immune to **poison** damage and Resistant to **earth** damage, and immune to poisoned."
+    "ru": "Immune to **poison** damage and Resistant to **earth** damage, and immune to **poisoned**."
   },
   {
     "key": "1 handed",
@@ -16402,6 +16402,78 @@
     "pt-BR": "IP Cost",
     "zh": "IP Cost",
     "ru": "IP Cost"
+  },
+  {
+    "key": "shared.qaSubtype",
+    "en": "Subtype",
+    "it": "Subtype",
+    "de": "Subtype",
+    "pl": "Subtype",
+    "fr": "Subtype",
+    "es": "Subtype",
+    "pt-BR": "Subtype",
+    "zh": "Subtype",
+    "ru": "Subtype"
+  },
+  {
+    "key": "shared.qaSubtype.none",
+    "en": "None",
+    "it": "None",
+    "de": "None",
+    "pl": "None",
+    "fr": "None",
+    "es": "None",
+    "pt-BR": "None",
+    "zh": "None",
+    "ru": "None"
+  },
+  {
+    "key": "shared.qaSubtype.roleSkill",
+    "en": "Role Skill",
+    "it": "Role Skill",
+    "de": "Role Skill",
+    "pl": "Role Skill",
+    "fr": "Role Skill",
+    "es": "Role Skill",
+    "pt-BR": "Role Skill",
+    "zh": "Role Skill",
+    "ru": "Role Skill"
+  },
+  {
+    "key": "shared.qaSubtype.negativeSkill",
+    "en": "Negative Skill",
+    "it": "Negative Skill",
+    "de": "Negative Skill",
+    "pl": "Negative Skill",
+    "fr": "Negative Skill",
+    "es": "Negative Skill",
+    "pt-BR": "Negative Skill",
+    "zh": "Negative Skill",
+    "ru": "Negative Skill"
+  },
+  {
+    "key": "shared.qaSubtype.bossSkill",
+    "en": "Boss Skill",
+    "it": "Boss Skill",
+    "de": "Boss Skill",
+    "pl": "Boss Skill",
+    "fr": "Boss Skill",
+    "es": "Boss Skill",
+    "pt-BR": "Boss Skill",
+    "zh": "Boss Skill",
+    "ru": "Boss Skill"
+  },
+  {
+    "key": "shared.qaSubtype.speciesSkill",
+    "en": "Species Skill",
+    "it": "Species Skill",
+    "de": "Species Skill",
+    "pl": "Species Skill",
+    "fr": "Species Skill",
+    "es": "Species Skill",
+    "pt-BR": "Species Skill",
+    "zh": "Species Skill",
+    "ru": "Species Skill"
   },
   {
     "key": "meta.book",
