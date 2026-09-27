@@ -1812,7 +1812,7 @@
     "ru": "**Undead** are Immune to **dark** and **poison** damage, and Vulnerable to **light** damage."
   },
   {
-    "key": "Immune to **poison** damage and Resistant to **earth** damage, and immune to poisoned.",
+    "key": "Immune to **poison** damage and Resistant to **earth** damage, and immune to **poisoned**.",
     "en": "Immune to **poison** damage and Resistant to **earth** damage, and immune to **poisoned**.",
     "it": "Immuni ai danni da **veleno** e Resistenti ai danni da **terra**, e sono immuni all'essere **avvelenati**.",
     "de": "Immun gegen **Gift**schaden und Resistent gegen **Erd**schaden, und immun gegen **Vergiftung**.",
@@ -14604,6 +14604,30 @@
     "ru": "Re-applying the role will reset attributes to the role defaults for this level, discarding your manual changes. Re-apply?"
   },
   {
+    "key": "role_species_change_title",
+    "en": "Change Species",
+    "it": "Change Species",
+    "de": "Change Species",
+    "pl": "Change Species",
+    "fr": "Change Species",
+    "es": "Change Species",
+    "pt-BR": "Change Species",
+    "zh": "",
+    "ru": "Change Species"
+  },
+  {
+    "key": "role_species_change_confirm",
+    "en": "Changing species will clear the Species Options you've already chosen (skills, immunities, and selections). Continue?",
+    "it": "Changing species will clear the Species Options you've already chosen (skills, immunities, and selections). Continue?",
+    "de": "Changing species will clear the Species Options you've already chosen (skills, immunities, and selections). Continue?",
+    "pl": "Changing species will clear the Species Options you've already chosen (skills, immunities, and selections). Continue?",
+    "fr": "Changing species will clear the Species Options you've already chosen (skills, immunities, and selections). Continue?",
+    "es": "Changing species will clear the Species Options you've already chosen (skills, immunities, and selections). Continue?",
+    "pt-BR": "Changing species will clear the Species Options you've already chosen (skills, immunities, and selections). Continue?",
+    "zh": "",
+    "ru": "Changing species will clear the Species Options you've already chosen (skills, immunities, and selections). Continue?"
+  },
+  {
     "key": "effect",
     "en": "Effect",
     "it": "Effect",
@@ -14996,7 +15020,7 @@
     "fr": "up to {0}",
     "es": "up to {0}",
     "pt-BR": "up to {0}",
-    "zh": "up to {0}",
+    "zh": "",
     "ru": "up to {0}"
   },
   {
@@ -15046,6 +15070,18 @@
     "pt-BR": "Thorns (special rule)",
     "zh": "",
     "ru": "Thorns (special rule)"
+  },
+  {
+    "key": "role_species_note_thorns_desc",
+    "en": "See Bestiary Vol. 1, page 73.",
+    "it": "See Bestiary Vol. 1, page 73.",
+    "de": "See Bestiary Vol. 1, page 73.",
+    "pl": "See Bestiary Vol. 1, page 73.",
+    "fr": "See Bestiary Vol. 1, page 73.",
+    "es": "See Bestiary Vol. 1, page 73.",
+    "pt-BR": "See Bestiary Vol. 1, page 73.",
+    "zh": "",
+    "ru": "See Bestiary Vol. 1, page 73."
   },
   {
     "key": "role_species_note_flying",

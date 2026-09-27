@@ -128,6 +128,13 @@ const INVOKER_WELLSPRINGS = [
   "Physical",
 ];
 
+const SPECIAL_SUBTYPE_LABELS = {
+  roleSkill: "shared.qaSubtype.roleSkill",
+  negativeSkill: "shared.qaSubtype.negativeSkill",
+  bossSkill: "shared.qaSubtype.bossSkill",
+};
+const SPECIAL_SUBTYPE_OPTIONS = Object.keys(SPECIAL_SUBTYPE_LABELS);
+
 function SidebarSecondaryValue(type, item, t) {
   if (type === "weapons") return `${item.cost}z`;
   if (type === "custom-weapons") return `${item.cost || 300}z`;
@@ -759,16 +766,8 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
             size="small"
             fullWidth
             sx={compactMultiAutocompleteSx}
-            options={["roleSkill", "negativeSkill", "bossSkill"]}
-            getOptionLabel={(o) =>
-              t(
-                {
-                  roleSkill: "shared.qaSubtype.roleSkill",
-                  negativeSkill: "shared.qaSubtype.negativeSkill",
-                  bossSkill: "shared.qaSubtype.bossSkill",
-                }[o] ?? o,
-              )
-            }
+            options={SPECIAL_SUBTYPE_OPTIONS}
+            getOptionLabel={(o) => t(SPECIAL_SUBTYPE_LABELS[o] ?? o)}
             value={selectedSpecialSubtypes}
             onChange={(e, newValue) => onSpecialSubtypesChange(newValue)}
             renderInput={(params) => (
@@ -781,12 +780,7 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
             renderValue={(value, getTagProps) =>
               value.map((option, index) => {
                 const { key, ...tagProps } = getTagProps({ index });
-                const label =
-                  {
-                    roleSkill: "shared.qaSubtype.roleSkill",
-                    negativeSkill: "shared.qaSubtype.negativeSkill",
-                    bossSkill: "shared.qaSubtype.bossSkill",
-                  }[option] ?? option;
+                const label = SPECIAL_SUBTYPE_LABELS[option] ?? option;
                 return (
                   <Chip key={key} label={t(label)} size="small" {...tagProps} />
                 );

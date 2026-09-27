@@ -20,12 +20,19 @@ import ReactMarkdown from "react-markdown";
 import { useTranslate } from "/src/translation/translate";
 import SectionCard from "/src/components/shared/actors/common/SectionCard";
 import { useCustomTheme } from "/src/hooks/useCustomTheme";
+import { useConfirm } from "/src/components/common/useConfirm";
 import { SchemaFieldRenderer } from "/src/forms/rendering/SchemaFieldRenderer";
 import { npcFieldConfig } from "/src/forms/rendering/config/actorConfigs/npc";
+import { getSpeciesStep } from "/src/libs/quickAssembly/species";
+import {
+  hasSpeciesOptionPicks,
+  clearSpeciesOptionPicks,
+} from "/src/libs/quickAssembly/speciesGrants";
 
 export default function EditBasics({ npc, setNpc }) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
+  const confirm = useConfirm();
   const background =
     theme.mode === "dark"
       ? `linear-gradient(to right, ${theme.primary}, ${theme.quaternary})`
@@ -49,6 +56,20 @@ export default function EditBasics({ npc, setNpc }) {
       ),
     [],
   );
+
+  const handleDetailFieldsChange = async (next) => {
+    if (next.species === npc.species || !hasSpeciesOptionPicks(npc)) {
+      setNpc(next);
+      return;
+    }
+    const ok = await confirm({
+      title: t("role_species_change_title"),
+      message: t("role_species_change_confirm"),
+    });
+    if (ok) {
+      setNpc(clearSpeciesOptionPicks(next, getSpeciesStep(npc.species)));
+    }
+  };
 
   const checkImageSize = useCallback(async (imageUrl) => {
     try {
@@ -102,7 +123,7 @@ export default function EditBasics({ npc, setNpc }) {
           <SchemaFieldRenderer
             config={detailFields}
             state={npc}
-            onChange={setNpc}
+            onChange={handleDetailFieldsChange}
             surface="edit"
             group="basics"
             cols={2}

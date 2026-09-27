@@ -1,7 +1,5 @@
 import React from "react";
 import {
-  Alert,
-  AlertTitle,
   Box,
   Button,
   Card,
@@ -70,6 +68,7 @@ import {
   removeSpell,
   npcHasSpell,
   isSpeciesGrantApplied,
+  clearSpeciesOptionPicks,
 } from "/src/libs/quickAssembly/speciesGrants";
 import CompendiumViewerModal from "/src/components/compendium/CompendiumViewerModal";
 import DeleteConfirmationDialog from "/src/components/common/DeleteConfirmationDialog";
@@ -94,6 +93,17 @@ function findFlyingSpecial(personalPack) {
   return item?.data ?? null;
 }
 
+const THORNS_PATTERN = /\bthorns\b/i;
+function findThornsSpecial(personalPack) {
+  const item = (personalPack?.items ?? []).find(
+    (i) =>
+      i.type === "npc-special" &&
+      (THORNS_PATTERN.test(i.data?.name ?? "") ||
+        THORNS_PATTERN.test(i.data?.fuid ?? "")),
+  );
+  return item?.data ?? null;
+}
+
 export default function EditQuickAssembly({ npc, setNpc }) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
@@ -103,6 +113,8 @@ export default function EditQuickAssembly({ npc, setNpc }) {
   const [compendiumType, setCompendiumType] = React.useState("special");
   const [compendiumSubtype, setCompendiumSubtype] = React.useState(null);
   const [activeSlot, setActiveSlot] = React.useState(null);
+  const [activeSlotMaxAdd, setActiveSlotMaxAdd] = React.useState(Infinity);
+  const addedForSlotRef = React.useRef(0);
   const [activeStep, setActiveStep] = React.useState(0);
   const [showAll, setShowAll] = React.useState(false);
   const [pendingDelete, setPendingDelete] = React.useState(null);
@@ -122,11 +134,19 @@ export default function EditQuickAssembly({ npc, setNpc }) {
   // Construct/Elemental/Undead unlock their option list only once the user adds the
   // extra restricted Vulnerability.
   const optionalVulnTypes = speciesStep?.optionalVuln ?? null;
+  const optionalVulnCount = (optionalVulnTypes ?? []).filter(
+    (type) => npc.affinities?.[type] === "vu",
+  ).length;
   const optionalVulnSatisfied =
-    !speciesStep?.optionsRequireVuln ||
-    (optionalVulnTypes ?? []).some((type) => npc.affinities?.[type] === "vu");
+    !speciesStep?.optionsRequireVuln || optionalVulnCount > 0;
 
-  const speciesChooseTarget = speciesStep?.choose ?? 0;
+  const speciesChooseTarget = speciesStep?.optionsRequireVuln
+    ? Math.min(optionalVulnCount, optionalVulnTypes?.length ?? 0)
+    : (speciesStep?.choose ?? 0);
+
+  const fixedStatusImmunities = (speciesStep?.fixed ?? [])
+    .filter((g) => g.kind === "statusImmunity")
+    .flatMap((g) => g.options ?? []);
 
   const countableGrants = [...grants, ...rankGrants].filter((g) =>
     isGrantCountable(g),
@@ -137,9 +157,16 @@ export default function EditQuickAssembly({ npc, setNpc }) {
   ).length;
   const grantsDone = grantsTotal === 0 || grantsApplied >= grantsTotal;
 
-  const openCompendium = (type = "special", slot = null, subtype = null) => {
+  const openCompendium = (
+    type = "special",
+    slot = null,
+    subtype = null,
+    maxAdd = Infinity,
+  ) => {
     setCompendiumType(type);
     setActiveSlot(slot);
+    setActiveSlotMaxAdd(maxAdd);
+    addedForSlotRef.current = 0;
     setCompendiumSubtype(subtype);
     setCompendiumOpen(true);
   };
@@ -160,19 +187,19 @@ export default function EditQuickAssembly({ npc, setNpc }) {
       return { ...next, extra: { ...next.extra, mp: bonus } };
     });
 
-  // Adds a compendium Flying rule if the user has one, else a "Flying" stub.
-  const addFlying = (slot) => {
-    const match = findFlyingSpecial(personalPack);
+  // Adds a matching compendium special rule if the user has one, else a bare-name stub.
+  const addScaffoldSpecial = (find, name, descriptionKey) => (slot) => {
+    const match = find(personalPack);
     const item = match
       ? {
-          name: match.name || "Flying",
+          name: match.name || name,
           effect: match.effect || "",
           spCost: match.spCost ?? 1,
           fuid: match.fuid,
         }
       : {
-          name: "Flying",
-          effect: t("role_species_note_flying_desc"),
+          name,
+          effect: descriptionKey ? t(descriptionKey) : "",
           spCost: 1,
         };
     setNpc((prev) => ({
@@ -183,6 +210,16 @@ export default function EditQuickAssembly({ npc, setNpc }) {
       ],
     }));
   };
+  const addFlying = addScaffoldSpecial(
+    findFlyingSpecial,
+    "Flying",
+    "role_species_note_flying_desc",
+  );
+  const addThorns = addScaffoldSpecial(
+    findThornsSpecial,
+    "Thorns",
+    "role_species_note_thorns_desc",
+  );
 
   const toggleSelection = (slot) =>
     setNpc((prev) => ({
@@ -299,27 +336,39 @@ export default function EditQuickAssembly({ npc, setNpc }) {
     (grant.kind === "reminder" && grant.note === "flying");
 
   const isManualSelectOption = (grant) =>
-    grant.kind === "replaceAffinity" ||
-    (grant.kind === "reminder" && grant.note !== "flying");
+    grant.kind === "reminder" && grant.note !== "flying";
 
-  const isOptionApplied = (grant, index) => optionChoiceCount(grant, index) > 0;
-
-  const optionChoiceCount = (grant, index) => {
+  const speciesOptionRows = (speciesStep?.options ?? []).map((grant, index) => {
+    const slotId = grantSlotId(grant, "species", index);
+    const slotQaSpecials = qaSpecialsForSlot(slotId);
+    let choiceCount;
     if (isSlotBackedOption(grant)) {
-      const added = qaSpecialsForSlot(
-        grantSlotId(grant, "species", index),
-      ).length;
-      return Math.min(added, grant.maxPicks ?? 1);
+      choiceCount = Math.min(slotQaSpecials.length, grant.maxPicks ?? 1);
+    } else if (isManualSelectOption(grant)) {
+      choiceCount = npc.qaSelections?.[slotId] ? 1 : 0;
+    } else {
+      const opts =
+        grant.kind === "statusImmunity"
+          ? { excludeStatuses: fixedStatusImmunities }
+          : undefined;
+      choiceCount = isSpeciesGrantApplied(grant, npc, opts) ? 1 : 0;
     }
-    if (isManualSelectOption(grant)) {
-      return npc.qaSelections?.[grantSlotId(grant, "species", index)] ? 1 : 0;
-    }
-    return isSpeciesGrantApplied(grant, npc) ? 1 : 0;
-  };
+    return { grant, index, slotId, qaSpecials: slotQaSpecials, choiceCount };
+  });
 
-  const speciesChosen = (speciesStep?.options ?? []).reduce(
-    (sum, grant, index) => sum + optionChoiceCount(grant, index),
+  const speciesChosen = speciesOptionRows.reduce(
+    (sum, row) => sum + row.choiceCount,
     0,
+  );
+
+  const upgradedAffinityTypes = new Set(
+    (speciesStep?.options ?? [])
+      .filter((g) => g.kind === "replaceAffinity")
+      .flatMap((g) =>
+        (g.type ? [g.type] : DAMAGE_TYPES).filter(
+          (type) => npc.affinities?.[type] === g.to,
+        ),
+      ),
   );
 
   // resources.hp.bonus (post-v10) with an extra.hp fallback.
@@ -369,6 +418,35 @@ export default function EditQuickAssembly({ npc, setNpc }) {
         [type]: prev.affinities?.[type] === value ? "no" : value,
       },
     }));
+
+  const toggleReplaceAffinity = (type, grant) =>
+    setNpc((prev) => {
+      const affinities = { ...prev.affinities };
+      const alreadyOn = affinities[type] === grant.to;
+      for (const t of DAMAGE_TYPES) {
+        if (affinities[t] === grant.to) affinities[t] = grant.from;
+      }
+      if (!alreadyOn) affinities[type] = grant.to;
+      return { ...prev, affinities };
+    });
+
+  const toggleOptionalVuln = (type) =>
+    setNpc((prev) => {
+      const wasOn = prev.affinities?.[type] === "vu";
+      const next = {
+        ...prev,
+        affinities: {
+          ...prev.affinities,
+          [type]: wasOn ? "no" : "vu",
+        },
+      };
+      const newBudget = wasOn
+        ? speciesChooseTarget - 1
+        : speciesChooseTarget + 1;
+      return wasOn && speciesChosen > newBudget
+        ? clearSpeciesOptionPicks(next, speciesStep)
+        : next;
+    });
 
   const toggleStatusImmunity = (status) =>
     setNpc((prev) => ({
@@ -839,7 +917,7 @@ export default function EditQuickAssembly({ npc, setNpc }) {
                 >
                   {t("role_species_options_hint", [
                     t(npc.species, undefined, true),
-                    speciesStep.choose,
+                    speciesChooseTarget,
                   ])}
                 </Typography>
 
@@ -873,6 +951,7 @@ export default function EditQuickAssembly({ npc, setNpc }) {
                           onToggleSpell={toggleSpell}
                           onToggleHpBonus={toggleHpBonus}
                           onOpenCompendium={openCompendium}
+                          upgradedAffinityTypes={upgradedAffinityTypes}
                         />
                       ))}
                     </Stack>
@@ -880,34 +959,67 @@ export default function EditQuickAssembly({ npc, setNpc }) {
                 )}
 
                 {optionalVulnTypes && (
-                  <Alert
-                    severity={optionalVulnSatisfied ? "success" : "info"}
-                    icon={optionalVulnSatisfied ? <Check /> : undefined}
-                    sx={{ mb: 1.5, "& .MuiAlert-message": { width: "100%" } }}
+                  <Card
+                    variant="outlined"
+                    sx={{
+                      borderLeft: 3,
+                      borderLeftColor: optionalVulnSatisfied
+                        ? "success.main"
+                        : "transparent",
+                      bgcolor: optionalVulnSatisfied
+                        ? "action.hover"
+                        : "transparent",
+                      transition: "border-color 120ms, background-color 120ms",
+                      mb: 1.5,
+                    }}
                   >
-                    <AlertTitle sx={{ mb: 0.5 }}>
-                      {t("role_species_optional_vuln")}
-                    </AlertTitle>
-                    <Stack
-                      direction="row"
-                      spacing={0.5}
-                      sx={{ flexWrap: "wrap", gap: 0.5 }}
+                    <CardContent
+                      sx={{ py: 1, px: 1.5, "&:last-child": { pb: 1 } }}
                     >
-                      {optionalVulnTypes.map((type) => {
-                        const on = npc.affinities?.[type] === "vu";
-                        return (
-                          <Chip
-                            key={type}
-                            size="small"
-                            label={t(type)}
-                            color={on ? "warning" : "default"}
-                            variant={on ? "filled" : "outlined"}
-                            onClick={() => toggleAffinity(type, "vu")}
-                          />
-                        );
-                      })}
-                    </Stack>
-                  </Alert>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          flexWrap: "wrap",
+                          alignItems: "center",
+                          gap: 1,
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <Typography variant="body2" sx={{ flex: "1 1 200px" }}>
+                          {optionalVulnSatisfied && (
+                            <Check
+                              fontSize="inherit"
+                              sx={{
+                                verticalAlign: "text-bottom",
+                                mr: 0.5,
+                                color: "success.main",
+                              }}
+                            />
+                          )}
+                          {t("role_species_optional_vuln")}
+                        </Typography>
+                        <Stack
+                          direction="row"
+                          spacing={0.5}
+                          sx={{ flexWrap: "wrap", gap: 0.5 }}
+                        >
+                          {optionalVulnTypes.map((type) => {
+                            const on = npc.affinities?.[type] === "vu";
+                            return (
+                              <Chip
+                                key={type}
+                                size="small"
+                                label={t(type)}
+                                color={on ? "primary" : "default"}
+                                variant={on ? "filled" : "outlined"}
+                                onClick={() => toggleOptionalVuln(type)}
+                              />
+                            );
+                          })}
+                        </Stack>
+                      </Box>
+                    </CardContent>
+                  </Card>
                 )}
 
                 <Box
@@ -917,30 +1029,37 @@ export default function EditQuickAssembly({ npc, setNpc }) {
                   }}
                 >
                   <Stack spacing={1}>
-                    {speciesStep.options.map((grant, i) => {
-                      const slotId = grantSlotId(grant, "species", i);
-                      return (
+                    {speciesOptionRows.map(
+                      ({ grant, index, slotId, qaSpecials, choiceCount }) => (
                         <SpeciesOptionCard
-                          key={`species-opt-${i}`}
+                          key={`species-opt-${index}`}
                           grant={grant}
-                          applied={isOptionApplied(grant, i)}
+                          applied={choiceCount > 0}
                           npc={npc}
                           t={t}
                           onToggleAffinity={toggleAffinity}
+                          onToggleReplaceAffinity={toggleReplaceAffinity}
                           onToggleStatusImmunity={toggleStatusImmunity}
                           onToggleSpell={toggleSpell}
                           onToggleHpBonus={toggleHpBonus}
                           onOpenCompendium={openCompendium}
                           onAddFlying={addFlying}
+                          onAddThorns={addThorns}
                           onToggleSelection={toggleSelection}
                           selected={!!npc.qaSelections?.[slotId]}
                           slotId={slotId}
-                          qaSpecials={qaSpecialsForSlot(slotId)}
+                          qaSpecials={qaSpecials}
+                          statusImmunityOpts={{
+                            max: speciesStep.optionsRequireVuln
+                              ? optionalVulnCount * 2
+                              : undefined,
+                            exclude: fixedStatusImmunities,
+                          }}
                           onRemoveReference={requestRemoveReference}
                           onScrollTo={scrollToSection}
                         />
-                      );
-                    })}
+                      ),
+                    )}
                   </Stack>
                 </Box>
               </StepContent>
@@ -966,21 +1085,25 @@ export default function EditQuickAssembly({ npc, setNpc }) {
             return;
           }
           const list = compendiumType === "actions" ? "actions" : "special";
-          setNpc((prev) => ({
-            ...prev,
-            [list]: [
-              ...(prev[list] || []),
-              {
-                name: item.name,
-                effect: item.effect || "",
-                spCost: item.spCost ?? 1,
-                fuid: item.fuid,
-                subtype: item.subtype,
-                _qaAdded: true,
-                _qaSlot: activeSlot,
-              },
-            ],
-          }));
+          setNpc((prev) => {
+            if (addedForSlotRef.current >= activeSlotMaxAdd) return prev;
+            addedForSlotRef.current += 1;
+            return {
+              ...prev,
+              [list]: [
+                ...(prev[list] || []),
+                {
+                  name: item.name,
+                  effect: item.effect || "",
+                  spCost: item.spCost ?? 1,
+                  fuid: item.fuid,
+                  subtype: item.subtype,
+                  _qaAdded: true,
+                  _qaSlot: activeSlot,
+                },
+              ],
+            };
+          });
         }}
       />
 
@@ -1169,17 +1292,24 @@ function GrantFiller({
               onDelete={() => onRemoveReference(ref)}
             />
           ))}
-          <AddSkillButton
-            t={t}
-            label={
-              grant.kind === "bossSkill"
-                ? t("role_grant_add_boss_skill")
-                : undefined
-            }
-            onPick={(type) =>
-              onOpenCompendium(type, slotId, subtypeOverride ?? grant.kind)
-            }
-          />
+          {(qaSpecials ?? []).length < (grant.count ?? 1) && (
+            <AddSkillButton
+              t={t}
+              label={
+                grant.kind === "bossSkill"
+                  ? t("role_grant_add_boss_skill")
+                  : undefined
+              }
+              onPick={(type) =>
+                onOpenCompendium(
+                  type,
+                  slotId,
+                  subtypeOverride ?? grant.kind,
+                  (grant.count ?? 1) - (qaSpecials ?? []).length,
+                )
+              }
+            />
+          )}
         </Stack>
       );
 
@@ -1400,9 +1530,10 @@ function QaReferenceChip({ reference, t, onClick, onDelete }) {
   );
 }
 
-function speciesGrantLabel(grant, t) {
+function speciesGrantLabel(grant, t, countOverride) {
   const base = t(`role_species_${grant.kind}`);
-  const count = grant.count > 1 ? ` (${grant.count})` : "";
+  const effectiveCount = countOverride ?? grant.count;
+  const count = effectiveCount > 1 ? ` (${effectiveCount})` : "";
   const mpBonus = grant.mpBonus ? ` (+${grant.mpBonus} ${t("MP")})` : "";
   const maxPicks =
     grant.maxPicks > 1 ? ` (${t("role_species_up_to", [grant.maxPicks])})` : "";
@@ -1446,19 +1577,25 @@ function SpeciesGrantRow({
   npc,
   t,
   onToggleAffinity,
+  onToggleReplaceAffinity,
   onToggleStatusImmunity,
   onToggleSpell,
   onToggleHpBonus,
   onOpenCompendium,
   onAddFlying,
+  onAddThorns,
   onToggleSelection,
   selected,
   slotId,
   qaSpecials,
   onRemoveReference,
   onScrollTo,
+  statusImmunityOpts,
+  upgradedAffinityTypes,
 }) {
-  const { base, noteKey } = speciesGrantLabel(grant, t);
+  const countOverride =
+    grant.kind === "statusImmunity" ? statusImmunityOpts?.max : undefined;
+  const { base, noteKey } = speciesGrantLabel(grant, t, countOverride);
 
   return (
     <Box
@@ -1492,17 +1629,21 @@ function SpeciesGrantRow({
           npc={npc}
           t={t}
           onToggleAffinity={onToggleAffinity}
+          onToggleReplaceAffinity={onToggleReplaceAffinity}
           onToggleStatusImmunity={onToggleStatusImmunity}
           onToggleSpell={onToggleSpell}
           onToggleHpBonus={onToggleHpBonus}
           onOpenCompendium={onOpenCompendium}
           onAddFlying={onAddFlying}
+          onAddThorns={onAddThorns}
           onToggleSelection={onToggleSelection}
           selected={selected}
           slotId={slotId}
           qaSpecials={qaSpecials}
+          statusImmunityOpts={statusImmunityOpts}
           onRemoveReference={onRemoveReference}
           onScrollTo={onScrollTo}
+          upgradedAffinityTypes={upgradedAffinityTypes}
         />
       </Box>
     </Box>
@@ -1518,13 +1659,17 @@ function SpeciesGrantFiller({
   onRemoveReference,
   onScrollTo,
   onToggleAffinity,
+  onToggleReplaceAffinity,
   onToggleStatusImmunity,
   onToggleSpell,
   onToggleHpBonus,
   onOpenCompendium,
   onAddFlying,
+  onAddThorns,
   onToggleSelection,
   selected,
+  statusImmunityOpts,
+  upgradedAffinityTypes,
 }) {
   switch (grant.kind) {
     case "affinity": {
@@ -1541,14 +1686,16 @@ function SpeciesGrantFiller({
           sx={{ flexWrap: "wrap", gap: 0.5, justifyContent: "flex-end" }}
         >
           {types.map((type) => {
-            const on = npc.affinities?.[type] === grant.value;
+            const upgraded = upgradedAffinityTypes?.has(type);
+            const on = npc.affinities?.[type] === grant.value || upgraded;
             return (
               <Chip
                 key={type}
                 size="small"
-                label={t(type)}
+                label={upgraded ? `${t(type)} (${t("Absorption")})` : t(type)}
                 color={on ? "primary" : "default"}
                 variant={on ? "filled" : "outlined"}
+                disabled={upgraded}
                 onClick={() => onToggleAffinity(type, grant.value)}
               />
             );
@@ -1558,23 +1705,34 @@ function SpeciesGrantFiller({
     }
 
     case "statusImmunity": {
-      const options = grant.options ?? STATUS_EFFECTS;
+      const exclude = statusImmunityOpts?.exclude ?? [];
+      const options = (grant.options ?? STATUS_EFFECTS).filter(
+        (status) => !exclude.includes(status),
+      );
+      const max = statusImmunityOpts?.max ?? grant.count ?? 1;
+      const pickedCount = options.filter(
+        (status) => npc.immunities?.[status],
+      ).length;
       return (
         <Stack
           direction="row"
           spacing={0.5}
           sx={{ flexWrap: "wrap", gap: 0.5 }}
         >
-          {options.map((status) => (
-            <Chip
-              key={status}
-              size="small"
-              label={t(status)}
-              color={npc.immunities?.[status] ? "primary" : "default"}
-              variant={npc.immunities?.[status] ? "filled" : "outlined"}
-              onClick={() => onToggleStatusImmunity(status)}
-            />
-          ))}
+          {options.map((status) => {
+            const on = !!npc.immunities?.[status];
+            return (
+              <Chip
+                key={status}
+                size="small"
+                label={t(status)}
+                color={on ? "primary" : "default"}
+                variant={on ? "filled" : "outlined"}
+                disabled={!on && pickedCount >= max}
+                onClick={() => onToggleStatusImmunity(status)}
+              />
+            );
+          })}
         </Stack>
       );
     }
@@ -1619,6 +1777,39 @@ function SpeciesGrantFiller({
     }
 
     case "roleSkill":
+      if (grant.note === "thorns") {
+        return (
+          <Stack
+            direction="row"
+            spacing={0.5}
+            sx={{
+              flexWrap: "wrap",
+              alignItems: "center",
+              gap: 0.5,
+              justifyContent: "flex-end",
+            }}
+          >
+            {(qaSpecials ?? []).map((ref) => (
+              <QaReferenceChip
+                key={ref.id ?? ref.index}
+                reference={ref}
+                t={t}
+                onClick={() => onScrollTo(ref.list)}
+                onDelete={() => onRemoveReference(ref)}
+              />
+            ))}
+            {(qaSpecials ?? []).length < (grant.count ?? 1) && (
+              <Button
+                size="small"
+                variant="outlined"
+                onClick={() => onAddThorns(slotId)}
+              >
+                {t("role_grant_add_skill")}
+              </Button>
+            )}
+          </Stack>
+        );
+      }
       return (
         <Stack
           direction="row"
@@ -1642,7 +1833,14 @@ function SpeciesGrantFiller({
           {(qaSpecials ?? []).length < (grant.maxPicks ?? 1) && (
             <AddSkillButton
               t={t}
-              onPick={(type) => onOpenCompendium(type, slotId, "roleSkill")}
+              onPick={(type) =>
+                onOpenCompendium(
+                  type,
+                  slotId,
+                  "roleSkill",
+                  (grant.maxPicks ?? 1) - (qaSpecials ?? []).length,
+                )
+              }
             />
           )}
         </Stack>
@@ -1689,14 +1887,34 @@ function SpeciesGrantFiller({
         />
       );
 
-    case "replaceAffinity":
+    case "replaceAffinity": {
+      const types = grant.type
+        ? [grant.type]
+        : DAMAGE_TYPES.filter((type) =>
+            [grant.from, grant.to].includes(npc.affinities?.[type]),
+          );
       return (
-        <SelectButton
-          selected={selected}
-          t={t}
-          onClick={() => onToggleSelection(slotId)}
-        />
+        <Stack
+          direction="row"
+          spacing={0.5}
+          sx={{ flexWrap: "wrap", gap: 0.5, justifyContent: "flex-end" }}
+        >
+          {types.map((type) => {
+            const on = npc.affinities?.[type] === grant.to;
+            return (
+              <Chip
+                key={type}
+                size="small"
+                label={t(type)}
+                color={on ? "primary" : "default"}
+                variant={on ? "filled" : "outlined"}
+                onClick={() => onToggleReplaceAffinity(type, grant)}
+              />
+            );
+          })}
+        </Stack>
       );
+    }
 
     default:
       return null;

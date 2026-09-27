@@ -1,10 +1,31 @@
 import type { ItemFieldConfig } from "../fieldConfig";
-import type { TypeNpc } from "../../../../types/Npcs";
+import type { TypeNpc, NpcAction, NpcSpecial } from "../../../../types/Npcs";
 import armorList from "../../../../libs/armor";
 import shieldList from "../../../../libs/shields";
 import { applySpeciesEffects } from "./npcSpeciesEffects";
+import { getRankGrants } from "../../../../libs/quickAssembly/levelGrants";
 
 type NpcFormState = TypeNpc & Record<string, unknown>;
+
+function stripExcessRankSkills<T extends NpcAction | NpcSpecial>(
+  list: T[] | undefined,
+  rank: unknown,
+): T[] | undefined {
+  if (!list?.some((s) => s._qaAdded && s._qaSlot?.startsWith("rank-"))) {
+    return list;
+  }
+  const caps: Record<string, number> = {};
+  for (const grant of getRankGrants(rank as string)) {
+    caps[`rank-${grant.kind}`] = grant.count ?? 1;
+  }
+  const seen: Record<string, number> = {};
+  return list.filter((s) => {
+    if (!s._qaAdded || !s._qaSlot?.startsWith("rank-")) return true;
+    const cap = caps[s._qaSlot] ?? 0;
+    seen[s._qaSlot] = (seen[s._qaSlot] ?? 0) + 1;
+    return seen[s._qaSlot] <= cap;
+  });
+}
 
 const SPECIES_OPTIONS = [
   { value: "Beast", label: "Beast" },
@@ -103,6 +124,10 @@ export const npcFieldConfig: ItemFieldConfig<NpcFormState> = [
     order: 4,
     gridSize: { xs: 6, sm: 3 } as unknown as number,
     componentProps: { options: RANK_OPTIONS },
+    onChangeEffects: {
+      special: (s) => stripExcessRankSkills(s.special, s.rank),
+      actions: (s) => stripExcessRankSkills(s.actions, s.rank),
+    },
   },
   {
     key: "phases",
