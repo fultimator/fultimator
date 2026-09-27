@@ -144,12 +144,21 @@ export default function EditQuickAssembly({ npc, setNpc }) {
     setCompendiumOpen(true);
   };
 
-  const toggleSpell = (fuid) =>
-    setNpc((prev) =>
-      npcHasSpell(prev, fuid)
-        ? removeSpell(prev, fuid)
-        : addOfficialSpell(prev, fuid),
-    );
+  const toggleSpell = (fuid, mpBonus = 0) =>
+    setNpc((prev) => {
+      const had = npcHasSpell(prev, fuid);
+      const next = had ? removeSpell(prev, fuid) : addOfficialSpell(prev, fuid);
+      if (!mpBonus) return next;
+      const current = next.resources?.mp?.bonus ?? next.extra?.mp ?? 0;
+      const bonus = had ? Math.max(0, current - mpBonus) : current + mpBonus;
+      if (next.resources?.mp) {
+        return {
+          ...next,
+          resources: { ...next.resources, mp: { ...next.resources.mp, bonus } },
+        };
+      }
+      return { ...next, extra: { ...next.extra, mp: bonus } };
+    });
 
   // Adds a compendium Flying rule if the user has one, else a "Flying" stub.
   const addFlying = (slot) => {
@@ -293,19 +302,25 @@ export default function EditQuickAssembly({ npc, setNpc }) {
     grant.kind === "replaceAffinity" ||
     (grant.kind === "reminder" && grant.note !== "flying");
 
-  const isOptionApplied = (grant, index) => {
+  const isOptionApplied = (grant, index) => optionChoiceCount(grant, index) > 0;
+
+  const optionChoiceCount = (grant, index) => {
     if (isSlotBackedOption(grant)) {
-      return qaSpecialsForSlot(grantSlotId(grant, "species", index)).length > 0;
+      const added = qaSpecialsForSlot(
+        grantSlotId(grant, "species", index),
+      ).length;
+      return Math.min(added, grant.maxPicks ?? 1);
     }
     if (isManualSelectOption(grant)) {
-      return !!npc.qaSelections?.[grantSlotId(grant, "species", index)];
+      return npc.qaSelections?.[grantSlotId(grant, "species", index)] ? 1 : 0;
     }
-    return isSpeciesGrantApplied(grant, npc);
+    return isSpeciesGrantApplied(grant, npc) ? 1 : 0;
   };
 
-  const speciesChosen = (speciesStep?.options ?? []).filter(
-    isOptionApplied,
-  ).length;
+  const speciesChosen = (speciesStep?.options ?? []).reduce(
+    (sum, grant, index) => sum + optionChoiceCount(grant, index),
+    0,
+  );
 
   // resources.hp.bonus (post-v10) with an extra.hp fallback.
   const toggleHpBonus = (amount, done) =>
@@ -1388,8 +1403,11 @@ function QaReferenceChip({ reference, t, onClick, onDelete }) {
 function speciesGrantLabel(grant, t) {
   const base = t(`role_species_${grant.kind}`);
   const count = grant.count > 1 ? ` (${grant.count})` : "";
+  const mpBonus = grant.mpBonus ? ` (+${grant.mpBonus} ${t("MP")})` : "";
+  const maxPicks =
+    grant.maxPicks > 1 ? ` (${t("role_species_up_to", [grant.maxPicks])})` : "";
   const noteKey = grant.note ? SPECIES_NOTE_KEYS[grant.note] : null;
-  return { base: `${base}${count}`, noteKey };
+  return { base: `${base}${count}${mpBonus}${maxPicks}`, noteKey };
 }
 
 const SPECIES_NOTE_KEYS = {
@@ -1592,7 +1610,7 @@ function SpeciesGrantFiller({
                 label={opt.name}
                 color={on ? "primary" : "default"}
                 variant={on ? "filled" : "outlined"}
-                onClick={() => onToggleSpell(opt.fuid)}
+                onClick={() => onToggleSpell(opt.fuid, grant.mpBonus)}
               />
             );
           })}
@@ -1621,10 +1639,12 @@ function SpeciesGrantFiller({
               onDelete={() => onRemoveReference(ref)}
             />
           ))}
-          <AddSkillButton
-            t={t}
-            onPick={(type) => onOpenCompendium(type, slotId, "speciesSkill")}
-          />
+          {(qaSpecials ?? []).length < (grant.maxPicks ?? 1) && (
+            <AddSkillButton
+              t={t}
+              onPick={(type) => onOpenCompendium(type, slotId, "speciesSkill")}
+            />
+          )}
         </Stack>
       );
 

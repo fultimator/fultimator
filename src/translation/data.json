@@ -14988,6 +14988,18 @@
     "ru": "Role Skill"
   },
   {
+    "key": "role_species_up_to",
+    "en": "up to {0}",
+    "it": "up to {0}",
+    "de": "up to {0}",
+    "pl": "up to {0}",
+    "fr": "up to {0}",
+    "es": "up to {0}",
+    "pt-BR": "up to {0}",
+    "zh": "up to {0}",
+    "ru": "up to {0}"
+  },
+  {
     "key": "role_species_replaceAffinity",
     "en": "Replace Affinity",
     "it": "Replace Affinity",
