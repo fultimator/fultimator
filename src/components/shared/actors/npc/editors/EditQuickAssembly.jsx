@@ -1642,7 +1642,7 @@ function SpeciesGrantFiller({
           {(qaSpecials ?? []).length < (grant.maxPicks ?? 1) && (
             <AddSkillButton
               t={t}
-              onPick={(type) => onOpenCompendium(type, slotId, "speciesSkill")}
+              onPick={(type) => onOpenCompendium(type, slotId, "roleSkill")}
             />
           )}
         </Stack>

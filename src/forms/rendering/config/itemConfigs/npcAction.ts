@@ -73,7 +73,6 @@ export const npcActionFieldConfig: ItemFieldConfig<NpcActionFormState> = [
         { value: "roleSkill", label: "shared.qaSubtype.roleSkill" },
         { value: "negativeSkill", label: "shared.qaSubtype.negativeSkill" },
         { value: "bossSkill", label: "shared.qaSubtype.bossSkill" },
-        { value: "speciesSkill", label: "shared.qaSubtype.speciesSkill" },
       ],
     },
   },

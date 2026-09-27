@@ -6,7 +6,6 @@ export const NPC_ACTION_SUBTYPES = [
   "roleSkill",
   "negativeSkill",
   "bossSkill",
-  "speciesSkill",
 ] as const;
 
 export const NpcActionSchema = z.object({

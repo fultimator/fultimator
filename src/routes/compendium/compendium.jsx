@@ -759,19 +759,13 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
             size="small"
             fullWidth
             sx={compactMultiAutocompleteSx}
-            options={[
-              "roleSkill",
-              "negativeSkill",
-              "bossSkill",
-              "speciesSkill",
-            ]}
+            options={["roleSkill", "negativeSkill", "bossSkill"]}
             getOptionLabel={(o) =>
               t(
                 {
                   roleSkill: "shared.qaSubtype.roleSkill",
                   negativeSkill: "shared.qaSubtype.negativeSkill",
                   bossSkill: "shared.qaSubtype.bossSkill",
-                  speciesSkill: "shared.qaSubtype.speciesSkill",
                 }[o] ?? o,
               )
             }
@@ -792,7 +786,6 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
                     roleSkill: "shared.qaSubtype.roleSkill",
                     negativeSkill: "shared.qaSubtype.negativeSkill",
                     bossSkill: "shared.qaSubtype.bossSkill",
-                    speciesSkill: "shared.qaSubtype.speciesSkill",
                   }[option] ?? option;
                 return (
                   <Chip key={key} label={t(label)} size="small" {...tagProps} />

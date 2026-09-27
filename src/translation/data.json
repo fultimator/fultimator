@@ -16476,18 +16476,6 @@
     "ru": "Boss Skill"
   },
   {
-    "key": "shared.qaSubtype.speciesSkill",
-    "en": "Species Skill",
-    "it": "Species Skill",
-    "de": "Species Skill",
-    "pl": "Species Skill",
-    "fr": "Species Skill",
-    "es": "Species Skill",
-    "pt-BR": "Species Skill",
-    "zh": "Species Skill",
-    "ru": "Species Skill"
-  },
-  {
     "key": "meta.book",
     "en": "Book",
     "it": "Book",
