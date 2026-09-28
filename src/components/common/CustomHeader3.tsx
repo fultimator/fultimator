@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Typography, IconButton, Tooltip } from "@mui/material";
 import { Add, Edit, Remove, Search } from "@mui/icons-material";
 import { useTranslate } from "../../translation/translate";
 import { useTheme } from "@mui/system";
+import SkillLevelModal from "./SkillLevelModal";
 
 interface CustomHeader3Props {
   headerText: string;
@@ -33,63 +34,11 @@ const CustomHeader3: React.FC<CustomHeader3Props> = ({
   increaseDisabled = false,
   increaseTooltip,
 }) => {
-  const [isMobileView, setIsMobileView] = useState<boolean>(false);
+  const [levelModalOpen, setLevelModalOpen] = useState<boolean>(false);
 
   const { t } = useTranslate();
   const theme = useTheme();
   const primary = theme.palette.primary.main;
-
-  // Include your SVGs here as React components
-  const EmptyStarSVG = (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 95.74 95.98"
-      width="24"
-      height="24"
-    >
-      <path
-        fill="white"
-        opacity=".96"
-        stroke={theme.palette.secondary.main} // Use primary color from theme
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="6px"
-        d="M33.55,33.94l-28.7,11.66c-2.5,1.01-2.46,4.56.06,5.52l29,11.08,11.7,28.97c.98,2.43,4.44,2.41,5.39-.04l11.28-29.09,28.57-11.79c2.54-1.05,2.51-4.66-.05-5.66l-28.84-11.27-11.73-28.5c-1.02-2.47-4.54-2.43-5.5.06l-11.18,29.04Z"
-      />
-    </svg>
-  );
-
-  const FilledStarSVG = (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 95.74 95.98"
-      width="24"
-      height="24"
-    >
-      <path
-        fill="gold" // Adjust the fill color to match the gold star
-        opacity=".96"
-        stroke={theme.palette.secondary.main} // Use primary color from theme
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="6px"
-        d="M33.55,33.94l-28.7,11.66c-2.5,1.01-2.46,4.56.06,5.52l29,11.08,11.7,28.97c.98,2.43,4.44,2.41,5.39-.04l11.28-29.09,28.57-11.79c2.54-1.05,2.51-4.66-.05-5.66l-28.84-11.27-11.73-28.5c-1.02-2.47-4.54-2.43-5.5.06l-11.18,29.04Z"
-      />
-    </svg>
-  );
-
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobileView(window.innerWidth <= 768); // Adjust the threshold as per your design
-    };
-
-    handleResize(); // Initial check
-    window.addEventListener("resize", handleResize);
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
 
   return (
     <div
@@ -113,22 +62,21 @@ const CustomHeader3: React.FC<CustomHeader3Props> = ({
         {headerText}
       </Typography>
       <div style={{ display: "flex", alignItems: "center" }}>
-        {isMobileView && !isHeroicSkill ? (
-          <Typography
-            variant="body1"
-            color={"gold"}
-            sx={{ fontFamily: "Antonio" }}
-          >{`${currentLvl}/${maxLvl}`}</Typography>
-        ) : (
-          <>
-            {[...Array(Number(maxLvl))].map((_, index) =>
-              index < Number(currentLvl) ? (
-                <span key={index}>{FilledStarSVG}</span>
-              ) : (
-                <span key={index}>{EmptyStarSVG}</span>
-              ),
-            )}
-          </>
+        {!isHeroicSkill && (
+          <Tooltip title={t("View Skill Level")}>
+            <Typography
+              component="span"
+              onClick={() => setLevelModalOpen(true)}
+              variant="body1"
+              color={"gold"}
+              sx={{
+                fontFamily: "Antonio",
+                cursor: "pointer",
+                px: "6px",
+                "&:hover": { textDecoration: "underline" },
+              }}
+            >{`SL ${currentLvl}/${maxLvl}`}</Typography>
+          </Tooltip>
         )}
         {isEditMode && !isHeroicSkill && (
           <>
@@ -211,6 +159,20 @@ const CustomHeader3: React.FC<CustomHeader3Props> = ({
           </>
         )}
       </div>
+      {!isHeroicSkill && (
+        <SkillLevelModal
+          open={levelModalOpen}
+          onClose={() => setLevelModalOpen(false)}
+          headerText={headerText}
+          currentLvl={currentLvl}
+          maxLvl={maxLvl}
+          onIncrease={onIncrease}
+          onDecrease={onDecrease}
+          isEditMode={isEditMode}
+          increaseDisabled={increaseDisabled}
+          increaseTooltip={increaseTooltip}
+        />
+      )}
     </div>
   );
 };

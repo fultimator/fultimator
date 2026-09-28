@@ -18,6 +18,7 @@ import {
   DialogActions,
   Button,
   TextField,
+  useMediaQuery,
 } from "@mui/material";
 import {
   Star,
@@ -85,6 +86,7 @@ import {
 import { SharedPlayerSpellCard } from "/src/components/shared/items/spells/SharedSpellCards";
 import SkillResourceTracker from "/src/components/shared/actors/pc/editors/classes/SkillResourceTracker";
 import ItemEditModal from "/src/forms/ui/ItemEditModal";
+import SkillLevelModal from "/src/components/common/SkillLevelModal";
 // Utilities
 
 function SectionSubHeader({ children, theme }) {
@@ -451,11 +453,24 @@ function DescriptionArea({ children }) {
 }
 // SkillStars
 
-function SkillStars({ current, max, secondaryColor }) {
+function SkillStars({ current, max, secondaryColor, onClick, sx }) {
   const size = 26;
   return (
     <Box
-      sx={{ display: "flex", alignItems: "center", flexShrink: 0, gap: "1px" }}
+      onClick={onClick}
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        flexShrink: 0,
+        gap: "2px",
+        ...(onClick && {
+          cursor: "pointer",
+          borderRadius: "4px",
+          transition: "filter 0.15s ease",
+          "&:hover": { filter: "brightness(1.2)" },
+        }),
+        ...sx,
+      }}
     >
       {[...Array(Number(max))].map((_, i) =>
         i < Number(current) ? (
@@ -517,6 +532,8 @@ function SkillCard({
   onPreview,
 }) {
   const [descOpen, setDescOpen] = useState(!compact);
+  const [levelModalOpen, setLevelModalOpen] = useState(false);
+  const isMobile = useMediaQuery((th) => th.breakpoints.down("sm"));
   const cls = pc?.classes?.[classIdx];
   const totalSkillLevels = (cls?.skills ?? []).reduce(
     (sum, s) => sum + (Number(s.currentLvl) || 0),
@@ -606,196 +623,269 @@ function SkillCard({
     const expandable = hasDesc || hasResourceTracker;
     const expanded = expandable ? descOpen || forceOpen : false;
     return (
-      <Accordion
-        disableGutters
-        elevation={0}
-        square
-        expanded={expanded}
-        onChange={() => expandable && setDescOpen((v) => !v)}
-        sx={{
-          borderTop: `1px solid ${theme.secondary}`,
-          overflow: "hidden",
-          background: "transparent",
-          "&:before": { display: "none" },
-        }}
-      >
-        <AccordionSummary
-          component="div"
+      <>
+        <Accordion
+          disableGutters
+          elevation={0}
+          square
+          expanded={expanded}
+          onChange={() => expandable && setDescOpen((v) => !v)}
           sx={{
-            minHeight: 0,
-            p: 0,
-            background: theme.primary,
-            "& .MuiAccordionSummary-content": { m: 0 },
-            "& .MuiAccordionSummary-expandIconWrapper": { display: "none" },
-            cursor: expandable ? "pointer" : "default",
+            borderTop: `1px solid ${theme.secondary}`,
+            overflow: "hidden",
+            background: "transparent",
+            "&:before": { display: "none" },
           }}
         >
-          <Box
+          <AccordionSummary
+            component="div"
             sx={{
-              display: "flex",
-              alignItems: "center",
-              px: 2,
-              py: 0.5,
-              gap: 1,
-              minHeight: 40,
-              width: "100%",
+              minHeight: 0,
+              p: 0,
+              background: theme.primary,
+              "& .MuiAccordionSummary-content": { m: 0 },
+              "& .MuiAccordionSummary-expandIconWrapper": { display: "none" },
+              cursor: expandable ? "pointer" : "default",
             }}
           >
-            <Typography
+            <Box
               sx={{
-                fontFamily: "Antonio",
-                fontWeight: "bold",
-                fontSize: { xs: "1rem", sm: "1.1rem" },
-                textTransform: "uppercase",
-                color: "#fff",
-                flex: 1,
-                lineHeight: 1.3,
+                display: "flex",
+                alignItems: "center",
+                px: 2,
+                py: 0.5,
+                gap: 1,
+                minHeight: 40,
+                width: "100%",
               }}
             >
-              {highlightMatch(t(skill.skillName), searchQuery)}
-            </Typography>
-            {isInteractive && onUpdate ? (
-              <Box
+              <Typography
                 sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "4px",
-                  flexShrink: 0,
+                  fontFamily: "Antonio",
+                  fontWeight: "bold",
+                  fontSize: { xs: "1rem", sm: "1.1rem" },
+                  textTransform: "uppercase",
+                  color: "#fff",
+                  flex: 1,
+                  lineHeight: 1.3,
                 }}
-                onClick={(e) => e.stopPropagation()}
               >
-                <SkillStars
-                  current={skill.currentLvl}
-                  max={skill.maxLvl}
-                  secondaryColor={theme.secondary}
-                />
-                <Tooltip title={t("Decrease Level")}>
-                  <span>
-                    <IconButton
-                      size="small"
-                      sx={{
-                        p: "3px",
-                        color: "#fff",
-                        border: "1px solid rgba(255,255,255,0.4)",
-                        borderRadius: "4px",
-                      }}
-                      onClick={handleDecrement}
-                      disabled={skill.currentLvl <= 0}
-                    >
-                      <Remove sx={{ fontSize: "1rem" }} />
-                    </IconButton>
-                  </span>
-                </Tooltip>
-                <Typography
+                {highlightMatch(t(skill.skillName), searchQuery)}
+              </Typography>
+              {isInteractive && onUpdate ? (
+                <Box
                   sx={{
-                    fontFamily: "Antonio",
-                    fontSize: "0.85rem",
-                    fontWeight: "bold",
-                    color: "#fff",
-                    lineHeight: 1,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "4px",
+                    flexShrink: 0,
+                  }}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <Tooltip title={t("Decrease Level")}>
+                    <span>
+                      <IconButton
+                        size="small"
+                        sx={{
+                          p: "3px",
+                          color: "#fff",
+                          border: "1px solid rgba(255,255,255,0.4)",
+                          borderRadius: "4px",
+                        }}
+                        onClick={handleDecrement}
+                        disabled={skill.currentLvl <= 0}
+                      >
+                        <Remove sx={{ fontSize: "1rem" }} />
+                      </IconButton>
+                    </span>
+                  </Tooltip>
+                  {isMobile ? (
+                    <Tooltip title={t("View Skill Level")}>
+                      <Typography
+                        onClick={() => setLevelModalOpen(true)}
+                        sx={{
+                          fontFamily: "Antonio",
+                          fontSize: "0.85rem",
+                          fontWeight: "bold",
+                          color: "#fff",
+                          lineHeight: 1,
+                          cursor: "pointer",
+                          "&:hover": { textDecoration: "underline" },
+                        }}
+                      >
+                        SL{skill.currentLvl}/{skill.maxLvl}
+                      </Typography>
+                    </Tooltip>
+                  ) : (
+                    <>
+                      <Tooltip title={t("View Skill Level")}>
+                        <span>
+                          <SkillStars
+                            current={skill.currentLvl}
+                            max={skill.maxLvl}
+                            secondaryColor={theme.secondary}
+                            onClick={() => setLevelModalOpen(true)}
+                            sx={{ mx: "8px" }}
+                          />
+                        </span>
+                      </Tooltip>
+                      <Typography
+                        sx={{
+                          fontFamily: "Antonio",
+                          fontSize: "0.85rem",
+                          fontWeight: "bold",
+                          color: "#fff",
+                          lineHeight: 1,
+                          mr: "4px",
+                        }}
+                      >
+                        SL{skill.currentLvl}
+                      </Typography>
+                    </>
+                  )}
+                  <Tooltip title={t("Increase Level")}>
+                    <span>
+                      <IconButton
+                        size="small"
+                        sx={{
+                          p: "3px",
+                          color: "#fff",
+                          border: "1px solid rgba(255,255,255,0.4)",
+                          borderRadius: "4px",
+                        }}
+                        onClick={handleIncrement}
+                        disabled={
+                          skill.currentLvl >= skill.maxLvl || atClassLevelCap
+                        }
+                      >
+                        <Add sx={{ fontSize: "1rem" }} />
+                      </IconButton>
+                    </span>
+                  </Tooltip>
+                </Box>
+              ) : (
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 1,
+                    flexShrink: 0,
+                  }}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {isMobile ? (
+                    <Tooltip title={t("View Skill Level")}>
+                      <Typography
+                        onClick={() => setLevelModalOpen(true)}
+                        sx={{
+                          fontFamily: "Antonio",
+                          fontSize: "0.85rem",
+                          fontWeight: "bold",
+                          color: "rgba(255,255,255,0.9)",
+                          lineHeight: 1,
+                          cursor: "pointer",
+                          "&:hover": { textDecoration: "underline" },
+                        }}
+                      >
+                        SL{skill.currentLvl}/{skill.maxLvl}
+                      </Typography>
+                    </Tooltip>
+                  ) : (
+                    <>
+                      <Tooltip title={t("View Skill Level")}>
+                        <span>
+                          <SkillStars
+                            current={skill.currentLvl}
+                            max={skill.maxLvl}
+                            secondaryColor={theme.secondary}
+                            onClick={() => setLevelModalOpen(true)}
+                            sx={{ mr: "8px" }}
+                          />
+                        </span>
+                      </Tooltip>
+                      <Typography
+                        sx={{
+                          fontFamily: "Antonio",
+                          fontSize: "0.85rem",
+                          fontWeight: "bold",
+                          color: "rgba(255,255,255,0.9)",
+                          lineHeight: 1,
+                        }}
+                      >
+                        SL{skill.currentLvl}
+                      </Typography>
+                    </>
+                  )}
+                </Box>
+              )}
+              <Tooltip title={t("Send to Chat")}>
+                <IconButton
+                  size="small"
+                  sx={{
+                    p: "3px",
+                    color: "rgba(255,255,255,0.85)",
+                    border: "1px solid rgba(255,255,255,0.4)",
+                    borderRadius: "4px",
+                    flexShrink: 0,
+                  }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    sendDisplayMessage("skill", t(skill.skillName), {
+                      speaker: pc?.info?.name || pc?.name || "",
+                      description: translatedDescription || undefined,
+                    });
                   }}
                 >
-                  SL{skill.currentLvl}
-                </Typography>
-                <Tooltip title={t("Increase Level")}>
-                  <span>
-                    <IconButton
-                      size="small"
-                      sx={{
-                        p: "3px",
-                        color: "#fff",
-                        border: "1px solid rgba(255,255,255,0.4)",
-                        borderRadius: "4px",
-                      }}
-                      onClick={handleIncrement}
-                      disabled={
-                        skill.currentLvl >= skill.maxLvl || atClassLevelCap
-                      }
-                    >
-                      <Add sx={{ fontSize: "1rem" }} />
-                    </IconButton>
-                  </span>
-                </Tooltip>
-              </Box>
-            ) : (
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 1,
-                  flexShrink: 0,
-                }}
-              >
-                <SkillStars
-                  current={skill.currentLvl}
-                  max={skill.maxLvl}
-                  secondaryColor={theme.secondary}
-                />
-                <Typography
+                  <MessageOutlined sx={{ fontSize: "1.2rem" }} />
+                </IconButton>
+              </Tooltip>
+              {expandable && (
+                <IconButton
+                  size="small"
                   sx={{
-                    fontFamily: "Antonio",
-                    fontSize: "0.85rem",
-                    fontWeight: "bold",
-                    color: "rgba(255,255,255,0.9)",
-                    lineHeight: 1,
+                    p: "3px",
+                    color: "rgba(255,255,255,0.7)",
+                    flexShrink: 0,
+                  }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setDescOpen((v) => !v);
                   }}
                 >
-                  SL{skill.currentLvl}
-                </Typography>
-              </Box>
-            )}
-            <Tooltip title={t("Send to Chat")}>
-              <IconButton
-                size="small"
-                sx={{
-                  p: "3px",
-                  color: "rgba(255,255,255,0.85)",
-                  border: "1px solid rgba(255,255,255,0.4)",
-                  borderRadius: "4px",
-                  flexShrink: 0,
-                }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  sendDisplayMessage("skill", t(skill.skillName), {
-                    speaker: pc?.info?.name || pc?.name || "",
-                    description: translatedDescription || undefined,
-                  });
-                }}
-              >
-                <MessageOutlined sx={{ fontSize: "1.2rem" }} />
-              </IconButton>
-            </Tooltip>
-            {expandable && (
-              <IconButton
-                size="small"
-                sx={{ p: "3px", color: "rgba(255,255,255,0.7)", flexShrink: 0 }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setDescOpen((v) => !v);
-                }}
-              >
-                {descOpen ? (
-                  <KeyboardArrowUp sx={{ fontSize: "1.2rem" }} />
-                ) : (
-                  <KeyboardArrowDown sx={{ fontSize: "1.2rem" }} />
-                )}
-              </IconButton>
-            )}
-          </Box>
-        </AccordionSummary>
-        {expandable && (
-          <AccordionDetails sx={{ p: 0 }}>
-            {hasDesc && (
-              <DescriptionArea>
-                <NotesMarkdown uniform fontSize="1rem">
-                  {highlightMarkdownText(translatedDescription, searchQuery)}
-                </NotesMarkdown>
-              </DescriptionArea>
-            )}
-            {isInteractive && resourceTracker}
-          </AccordionDetails>
-        )}
-      </Accordion>
+                  {descOpen ? (
+                    <KeyboardArrowUp sx={{ fontSize: "1.2rem" }} />
+                  ) : (
+                    <KeyboardArrowDown sx={{ fontSize: "1.2rem" }} />
+                  )}
+                </IconButton>
+              )}
+            </Box>
+          </AccordionSummary>
+          {expandable && (
+            <AccordionDetails sx={{ p: 0 }}>
+              {hasDesc && (
+                <DescriptionArea>
+                  <NotesMarkdown uniform fontSize="1rem">
+                    {highlightMarkdownText(translatedDescription, searchQuery)}
+                  </NotesMarkdown>
+                </DescriptionArea>
+              )}
+              {isInteractive && resourceTracker}
+            </AccordionDetails>
+          )}
+        </Accordion>
+        <SkillLevelModal
+          open={levelModalOpen}
+          onClose={() => setLevelModalOpen(false)}
+          headerText={t(skill.skillName)}
+          currentLvl={skill.currentLvl}
+          maxLvl={skill.maxLvl}
+          onIncrease={handleIncrement}
+          onDecrease={handleDecrement}
+          isEditMode={isInteractive && !!onUpdate}
+          increaseDisabled={atClassLevelCap}
+        />
+      </>
     );
   }
 

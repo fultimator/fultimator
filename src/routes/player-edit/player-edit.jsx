@@ -994,7 +994,7 @@ export default function PlayerEdit() {
         {/* Compact View Toggle: only show when on Player Sheet tab */}
         {openTab === 0 && (
           <Grid container spacing={1} sx={{ mb: 2, paddingX: 1 }}>
-            <Grid size={isSmallScreen ? 10 : 6}>
+            <Grid size={isSmallScreen ? (compactView ? 8 : 10) : 6}>
               <Button
                 variant="contained"
                 color="primary"
@@ -1031,6 +1031,25 @@ export default function PlayerEdit() {
                 </IconButton>
               )}
             </Grid>
+            {isSmallScreen && compactView && (
+              <Grid size={2}>
+                <Tooltip
+                  title={
+                    compactViewExpanded
+                      ? t("Collapse Details")
+                      : t("Expand Details")
+                  }
+                >
+                  <IconButton
+                    onClick={() => setCompactViewExpanded((prev) => !prev)}
+                    color="primary"
+                    sx={{ display: "flex", mx: "auto" }}
+                  >
+                    {compactViewExpanded ? <ExpandLess /> : <ExpandMore />}
+                  </IconButton>
+                </Tooltip>
+              </Grid>
+            )}
           </Grid>
         )}
         <TabPanel value={0} currentValue={openTab}>
@@ -1042,30 +1061,6 @@ export default function PlayerEdit() {
                 padding: 1,
               }}
             >
-              <Grid container size={12}>
-                <Box
-                  sx={{
-                    width: "100%",
-                    display: "flex",
-                    justifyContent: "flex-end",
-                    mb: 1,
-                  }}
-                >
-                  <Tooltip
-                    title={
-                      compactViewExpanded
-                        ? t("Collapse Details")
-                        : t("Expand Details")
-                    }
-                  >
-                    <IconButton
-                      onClick={() => setCompactViewExpanded((prev) => !prev)}
-                    >
-                      {compactViewExpanded ? <ExpandLess /> : <ExpandMore />}
-                    </IconButton>
-                  </Tooltip>
-                </Box>
-              </Grid>
               <Grid container size={12}>
                 <PlayerSheetCompact
                   pc={playerTemp}
@@ -1469,56 +1464,93 @@ export default function PlayerEdit() {
             zIndex: 1300,
             borderTop: "1px solid",
             borderColor: "divider",
-            overflowX: "auto",
-            overflowY: "hidden",
-            WebkitOverflowScrolling: "touch",
+            display: "flex",
+            alignItems: "stretch",
           }}
         >
-          <BottomNavigation
-            showLabels
-            value={openTab}
-            onChange={(e, newValue) => handleTabChange(e, newValue)}
+          <Box
             sx={{
-              width: "max-content",
-              minWidth: "100%",
-              "& .MuiBottomNavigationAction-root": {
-                flex: "0 0 auto",
-                minWidth: 80,
-                px: 1,
-              },
+              flex: 1,
+              overflowX: "auto",
+              overflowY: "hidden",
+              WebkitOverflowScrolling: "touch",
             }}
           >
-            <BottomNavigationAction
-              label={t("Player Sheet")}
-              icon={<CharacterSheetIcon color="currentColor" size="1.4em" />}
-            />
-            <BottomNavigationAction label={t("Informations")} icon={<Info />} />
-            <BottomNavigationAction
-              label={t("Stats")}
-              icon={<StatsIcon color="currentColor" size="1.4em" />}
-            />
-            <BottomNavigationAction
-              label={t("Classes")}
-              icon={<ClassesIcon color="currentColor" size="1.4em" />}
-            />
-            <BottomNavigationAction
-              label={t("Spells")}
-              icon={<SpellsIcon color="currentColor" size="1.4em" />}
-            />
-            <BottomNavigationAction
-              label={t("Backpack")}
-              icon={<EquipmentIcon color="currentColor" size="1.4em" />}
-            />
-            <BottomNavigationAction
-              label={t("Notes")}
-              icon={<NotesIcon color="currentColor" size="1.4em" />}
-            />
-            <BottomNavigationAction
-              label={t("Effects")}
-              icon={<AutoAwesome />}
-            />
-            <BottomNavigationAction label={t("Settings")} icon={<Settings />} />
-          </BottomNavigation>
+            <BottomNavigation
+              showLabels
+              value={openTab}
+              onChange={(e, newValue) => handleTabChange(e, newValue)}
+              sx={{
+                width: "max-content",
+                minWidth: "100%",
+                "& .MuiBottomNavigationAction-root": {
+                  flex: "0 0 auto",
+                  minWidth: 80,
+                  px: 1,
+                },
+              }}
+            >
+              <BottomNavigationAction
+                label={t("Player Sheet")}
+                icon={<CharacterSheetIcon color="currentColor" size="1.4em" />}
+              />
+              <BottomNavigationAction
+                label={t("Informations")}
+                icon={<Info />}
+              />
+              <BottomNavigationAction
+                label={t("Stats")}
+                icon={<StatsIcon color="currentColor" size="1.4em" />}
+              />
+              <BottomNavigationAction
+                label={t("Classes")}
+                icon={<ClassesIcon color="currentColor" size="1.4em" />}
+              />
+              <BottomNavigationAction
+                label={t("Spells")}
+                icon={<SpellsIcon color="currentColor" size="1.4em" />}
+              />
+              <BottomNavigationAction
+                label={t("Backpack")}
+                icon={<EquipmentIcon color="currentColor" size="1.4em" />}
+              />
+              <BottomNavigationAction
+                label={t("Notes")}
+                icon={<NotesIcon color="currentColor" size="1.4em" />}
+              />
+              <BottomNavigationAction
+                label={t("Effects")}
+                icon={<AutoAwesome />}
+              />
+              <BottomNavigationAction
+                label={t("Settings")}
+                icon={<Settings />}
+              />
+            </BottomNavigation>
+          </Box>
+          <Box
+            sx={{
+              flexShrink: 0,
+              borderLeft: "1px solid",
+              borderColor: "divider",
+              display: "flex",
+              alignItems: "center",
+              px: 1,
+            }}
+          >
+            <Tooltip title={t("Save")} placement="top">
+              <span>
+                <IconButton
+                  color={isUpdated && isOwner ? "primary" : "default"}
+                  onClick={handleSave}
+                  disabled={!isOwner || !isUpdated}
+                  aria-label="save"
+                >
+                  <Save />
+                </IconButton>
+              </span>
+            </Tooltip>
+          </Box>
         </Paper>
       )}
       <Box
@@ -1538,7 +1570,7 @@ export default function PlayerEdit() {
           gap: 1,
         }}
       >
-        {isUpdated && isOwner && (
+        {!isSmallScreen && isUpdated && isOwner && (
           <Tooltip title={t("Save")} placement="left">
             <Fab
               color="primary"
