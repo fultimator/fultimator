@@ -29,6 +29,7 @@ import NotesTab from "./npcDetail/NotesTab";
 import AttributeSection, { DefStatsRow } from "./npcDetail/AttributeSection";
 import StandardRollsSection from "./npcDetail/StandardRollsSection";
 import DefenseModifierDialog from "./npcDetail/DefenseModifierDialog";
+import ActorEditModal from "/src/forms/ui/ActorEditModal";
 import {
   calcPrecision,
   calcDamage,
@@ -623,28 +624,40 @@ const NPCDetail = ({
       )}
 
       {/* Target Selection Dialog */}
-      <Dialog
+      <ActorEditModal
         open={open}
         onClose={() => setOpen(false)}
-        sx={{ "& .MuiDialog-paper": { borderRadius: 3, padding: 2 } }}
+        title={t("combat_sim_select_n_targets")}
+        maxWidth="xs"
+        actions={
+          <Box sx={{ display: "flex", justifyContent: "center", gap: 1 }}>
+            <Button
+              onClick={() => {
+                setOpen(false);
+                setError("");
+              }}
+              variant="outlined"
+              color="primary"
+              sx={{ borderRadius: 2, textTransform: "none", px: 3 }}
+            >
+              {t("Cancel")}
+            </Button>
+            <Button
+              onClick={() => handleConfirmSpell(clickedData)}
+              variant="contained"
+              color="primary"
+              sx={{ borderRadius: 2, textTransform: "uppercase", px: 3 }}
+            >
+              {t("Roll")}
+            </Button>
+          </Box>
+        }
       >
-        <DialogTitle
-          variant="h4"
-          sx={{
-            fontWeight: "bold",
-            textAlign: "center",
-            borderBottom: `1px solid ${theme.palette.divider}`,
-            pb: 1,
-          }}
-        >
-          {t("combat_sim_select_n_targets")}
-        </DialogTitle>
-        <DialogContent
+        <Box
           sx={{
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            mt: 1,
           }}
         >
           <Select
@@ -675,29 +688,8 @@ const NPCDetail = ({
             })}
           </Select>
           {error && <FormHelperText error>{error}</FormHelperText>}
-        </DialogContent>
-        <DialogActions sx={{ width: "100%", justifyContent: "center" }}>
-          <Button
-            onClick={() => {
-              setOpen(false);
-              setError("");
-            }}
-            variant="outlined"
-            color="primary"
-            sx={{ borderRadius: 2, textTransform: "none", px: 3 }}
-          >
-            {t("Cancel")}
-          </Button>
-          <Button
-            onClick={() => handleConfirmSpell(clickedData)}
-            variant="contained"
-            color="primary"
-            sx={{ borderRadius: 2, textTransform: "uppercase", px: 3 }}
-          >
-            {t("Roll")}
-          </Button>
-        </DialogActions>
-      </Dialog>
+        </Box>
+      </ActorEditModal>
       <DefenseModifierDialog
         open={!!defenseDialogType}
         onClose={() => setDefenseDialogType(null)}

@@ -682,40 +682,42 @@ function SkillCard({
                   }}
                   onClick={(e) => e.stopPropagation()}
                 >
-                  <Tooltip title={t("Decrease Level")}>
-                    <span>
-                      <IconButton
-                        size="small"
-                        sx={{
-                          p: "3px",
-                          color: "#fff",
-                          border: "1px solid rgba(255,255,255,0.4)",
-                          borderRadius: "4px",
-                        }}
-                        onClick={handleDecrement}
-                        disabled={skill.currentLvl <= 0}
-                      >
-                        <Remove sx={{ fontSize: "1rem" }} />
-                      </IconButton>
-                    </span>
-                  </Tooltip>
                   {isMobile ? (
-                    <Tooltip title={t("View Skill Level")}>
-                      <Typography
-                        onClick={() => setLevelModalOpen(true)}
-                        sx={{
-                          fontFamily: "Antonio",
-                          fontSize: "0.85rem",
-                          fontWeight: "bold",
-                          color: "#fff",
-                          lineHeight: 1,
-                          cursor: "pointer",
-                          "&:hover": { textDecoration: "underline" },
-                        }}
-                      >
-                        SL{skill.currentLvl}/{skill.maxLvl}
-                      </Typography>
-                    </Tooltip>
+                    <>
+                      <Tooltip title={t("Decrease Level")}>
+                        <span>
+                          <IconButton
+                            size="small"
+                            sx={{
+                              p: "3px",
+                              color: "#fff",
+                              border: "1px solid rgba(255,255,255,0.4)",
+                              borderRadius: "4px",
+                            }}
+                            onClick={handleDecrement}
+                            disabled={skill.currentLvl <= 0}
+                          >
+                            <Remove sx={{ fontSize: "1rem" }} />
+                          </IconButton>
+                        </span>
+                      </Tooltip>
+                      <Tooltip title={t("View Skill Level")}>
+                        <Typography
+                          onClick={() => setLevelModalOpen(true)}
+                          sx={{
+                            fontFamily: "Antonio",
+                            fontSize: "0.85rem",
+                            fontWeight: "bold",
+                            color: "#fff",
+                            lineHeight: 1,
+                            cursor: "pointer",
+                            "&:hover": { textDecoration: "underline" },
+                          }}
+                        >
+                          SL{skill.currentLvl}/{skill.maxLvl}
+                        </Typography>
+                      </Tooltip>
+                    </>
                   ) : (
                     <>
                       <Tooltip title={t("View Skill Level")}>
@@ -727,6 +729,23 @@ function SkillCard({
                             onClick={() => setLevelModalOpen(true)}
                             sx={{ mx: "8px" }}
                           />
+                        </span>
+                      </Tooltip>
+                      <Tooltip title={t("Decrease Level")}>
+                        <span>
+                          <IconButton
+                            size="small"
+                            sx={{
+                              p: "3px",
+                              color: "#fff",
+                              border: "1px solid rgba(255,255,255,0.4)",
+                              borderRadius: "4px",
+                            }}
+                            onClick={handleDecrement}
+                            disabled={skill.currentLvl <= 0}
+                          >
+                            <Remove sx={{ fontSize: "1rem" }} />
+                          </IconButton>
                         </span>
                       </Tooltip>
                       <Typography
@@ -884,6 +903,7 @@ function SkillCard({
           onDecrease={handleDecrement}
           isEditMode={isInteractive && !!onUpdate}
           increaseDisabled={atClassLevelCap}
+          investedLevels={totalSkillLevels}
         />
       </>
     );
@@ -2739,32 +2759,35 @@ export default function PcClasses({
           </Box>
         )}
 
-        {filteredClasses.map((cls, classIdx) => (
-          <ClassSection
-            key={`class-${classIdx}`}
-            cls={cls}
-            classIdx={classIdx}
-            isInteractive={isInteractive}
-            onUpdate={isInteractive ? applyUpdate : undefined}
-            updateMaxStats={updateMaxStats}
-            onLevelChange={
-              isInteractive && !automaticClassLevel
-                ? handleLevelChange
-                : undefined
-            }
-            onRemoveClass={isInteractive ? handleRemoveClass : undefined}
-            onEditClass={isInteractive ? openEditClass : undefined}
-            pc={pc}
-            searchQuery={searchQuery}
-            setHeroicPickerClassIdx={setHeroicPickerClassIdx}
-            setHeroicEditClassIdx={setHeroicEditClassIdx}
-            compact={isCompact}
-            defaultExpanded={defaultExpanded}
-            forceExpanded={expandSignal}
-            theme={theme}
-            t={t}
-          />
-        ))}
+        {filteredClasses.map((cls) => {
+          const classIdx = (pc?.classes ?? []).indexOf(cls);
+          return (
+            <ClassSection
+              key={`class-${classIdx}`}
+              cls={cls}
+              classIdx={classIdx}
+              isInteractive={isInteractive}
+              onUpdate={isInteractive ? applyUpdate : undefined}
+              updateMaxStats={updateMaxStats}
+              onLevelChange={
+                isInteractive && !automaticClassLevel
+                  ? handleLevelChange
+                  : undefined
+              }
+              onRemoveClass={isInteractive ? handleRemoveClass : undefined}
+              onEditClass={isInteractive ? openEditClass : undefined}
+              pc={pc}
+              searchQuery={searchQuery}
+              setHeroicPickerClassIdx={setHeroicPickerClassIdx}
+              setHeroicEditClassIdx={setHeroicEditClassIdx}
+              compact={isCompact}
+              defaultExpanded={defaultExpanded}
+              forceExpanded={expandSignal}
+              theme={theme}
+              t={t}
+            />
+          );
+        })}
         {filteredClasses.length === 0 && (
           <Typography
             sx={{

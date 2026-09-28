@@ -1,16 +1,8 @@
 import React from "react";
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  Typography,
-  Tooltip,
-  Box,
-} from "@mui/material";
+import { Button, Typography, Tooltip, Box } from "@mui/material";
 import { useTheme } from "@mui/system";
 import { useTranslate } from "../../translation/translate";
+import ActorEditModal from "../../forms/ui/ActorEditModal";
 
 interface SkillLevelModalProps {
   open: boolean;
@@ -23,6 +15,7 @@ interface SkillLevelModalProps {
   isEditMode: boolean;
   increaseDisabled?: boolean;
   increaseTooltip?: string;
+  investedLevels?: number;
 }
 
 const SkillLevelModal: React.FC<SkillLevelModalProps> = ({
@@ -36,6 +29,7 @@ const SkillLevelModal: React.FC<SkillLevelModalProps> = ({
   isEditMode,
   increaseDisabled = false,
   increaseTooltip,
+  investedLevels,
 }) => {
   const { t } = useTranslate();
   const theme = useTheme();
@@ -91,25 +85,88 @@ const SkillLevelModal: React.FC<SkillLevelModalProps> = ({
     </svg>
   );
 
+  const actions = (
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 1,
+      }}
+    >
+      {isEditMode && (
+        <Tooltip title={currentLvl <= 0 ? "" : t("Decrease Level")}>
+          <span>
+            <Button
+              variant="outlined"
+              color="error"
+              onClick={onDecrease}
+              disabled={currentLvl <= 0}
+              sx={{
+                minWidth: 48,
+                minHeight: 36,
+                fontSize: "1.25rem",
+                lineHeight: 1,
+              }}
+            >
+              −
+            </Button>
+          </span>
+        </Tooltip>
+      )}
+      <Button onClick={onClose} color="secondary" variant="contained">
+        {t("Close")}
+      </Button>
+      {isEditMode && (
+        <Tooltip
+          title={
+            currentLvl >= maxLvl || increaseDisabled
+              ? (increaseTooltip ?? "")
+              : t("Increase Level")
+          }
+        >
+          <span>
+            <Button
+              variant="outlined"
+              color="success"
+              onClick={onIncrease}
+              disabled={currentLvl >= maxLvl || increaseDisabled}
+              sx={{
+                minWidth: 48,
+                minHeight: 36,
+                fontSize: "1.25rem",
+                lineHeight: 1,
+              }}
+            >
+              +
+            </Button>
+          </span>
+        </Tooltip>
+      )}
+    </Box>
+  );
+
   return (
-    <Dialog
+    <ActorEditModal
       open={open}
       onClose={onClose}
-      sx={{ "& .MuiDialog-paper": { width: "min(360px, calc(100vw - 32px))" } }}
+      title={headerText}
+      maxWidth="xs"
+      actions={actions}
     >
-      <DialogTitle sx={{ textAlign: "center", pb: 0 }}>
-        {headerText}
-      </DialogTitle>
-      <DialogContent
+      <Box
         sx={{
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
           gap: "12px",
-          pt: "12px !important",
-          pb: 2,
         }}
       >
+        {Number.isFinite(investedLevels) && (
+          <Typography sx={{ textAlign: "center", opacity: 0.7 }}>
+            {t("Invested Class Levels")}: {investedLevels}
+          </Typography>
+        )}
         <Box
           sx={{
             display: "flex",
@@ -136,64 +193,8 @@ const SkillLevelModal: React.FC<SkillLevelModalProps> = ({
         <Typography sx={{ textAlign: "center", opacity: 0.85 }}>
           {t("Skill Level")}: {currentLvl}/{maxLvl}
         </Typography>
-      </DialogContent>
-      <DialogActions sx={{ justifyContent: "center" }}>
-        {isEditMode && (
-          <Tooltip title={currentLvl <= 0 ? "" : t("Decrease Level")}>
-            <span>
-              <Button
-                variant="outlined"
-                color="error"
-                onClick={onDecrease}
-                disabled={currentLvl <= 0}
-                sx={{
-                  minWidth: 48,
-                  minHeight: 36,
-                  fontSize: "1.25rem",
-                  lineHeight: 1,
-                }}
-              >
-                −
-              </Button>
-            </span>
-          </Tooltip>
-        )}
-        <Button
-          onClick={onClose}
-          color="secondary"
-          variant="contained"
-          sx={{ minHeight: 36 }}
-        >
-          {t("Close")}
-        </Button>
-        {isEditMode && (
-          <Tooltip
-            title={
-              currentLvl >= maxLvl || increaseDisabled
-                ? (increaseTooltip ?? "")
-                : t("Increase Level")
-            }
-          >
-            <span>
-              <Button
-                variant="outlined"
-                color="success"
-                onClick={onIncrease}
-                disabled={currentLvl >= maxLvl || increaseDisabled}
-                sx={{
-                  minWidth: 48,
-                  minHeight: 36,
-                  fontSize: "1.25rem",
-                  lineHeight: 1,
-                }}
-              >
-                +
-              </Button>
-            </span>
-          </Tooltip>
-        )}
-      </DialogActions>
-    </Dialog>
+      </Box>
+    </ActorEditModal>
   );
 };
 
