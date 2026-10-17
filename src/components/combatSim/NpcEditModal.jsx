@@ -43,6 +43,7 @@ import {
 } from "/src/components/shared/actors/npc/editors";
 import CustomHeader from "../../components/common/CustomHeader";
 import NpcActorCard from "../../components/shared/actors/npc/NpcActorCard";
+import NpcClockList from "../../components/NpcClockList";
 import { useTranslate } from "../../translation/translate";
 import { globalConfirm } from "../../utility/globalConfirm";
 import { calcAvailableSkills, calcUsedSkills } from "../../libs/npcs";
@@ -262,7 +263,7 @@ export default function NpcEditModal({ npcId, open, onClose, onSaved }) {
                 </Box>
                 <Divider orientation="vertical" flexItem />
                 <Box sx={{ width: 360, flexShrink: 0 }}>
-                  <PreviewPanel npcTemp={npcTemp} />
+                  <PreviewPanel npcTemp={npcTemp} setNpcTemp={setNpcTemp} />
                 </Box>
               </Box>
             ) : (
@@ -277,7 +278,7 @@ export default function NpcEditModal({ npcId, open, onClose, onSaved }) {
                   />
                 </Box>
                 <Box hidden={tab !== 1} sx={{ px: 3 }}>
-                  <PreviewPanel npcTemp={npcTemp} />
+                  <PreviewPanel npcTemp={npcTemp} setNpcTemp={setNpcTemp} />
                 </Box>
               </>
             )}
@@ -413,7 +414,7 @@ function EditorPanels({ npcTemp, setNpcTemp, secondary, isSmallScreen, t }) {
   );
 }
 
-function PreviewPanel({ npcTemp }) {
+function PreviewPanel({ npcTemp, setNpcTemp }) {
   return (
     <>
       <NpcActorCard
@@ -422,6 +423,9 @@ function PreviewPanel({ npcTemp }) {
         collapse={true}
         variant="interactive"
       />
+      <Box sx={{ mt: 2 }}>
+        <NpcClockList npc={npcTemp} setNpc={setNpcTemp} />
+      </Box>
       <Box sx={{ mt: 2 }}>
         <ExplainSkills npc={npcTemp} />
       </Box>

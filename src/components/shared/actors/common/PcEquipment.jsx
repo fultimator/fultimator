@@ -46,14 +46,12 @@ import {
   SharedShieldCard,
   SharedCustomWeaponCard,
   SharedAccessoryCard,
+  SharedConsumableCard,
 } from "/src/components/shared/items";
 import { useTranslate } from "/src/translation/translate";
 import { useCustomTheme } from "/src/hooks/useCustomTheme";
 import { calculateAttribute } from "/src/libs/playerCalculations";
-import {
-  deriveVehicleSlots,
-  isTwoHandedEquipped,
-} from "/src/libs/player/slots/equipmentSlots";
+import { isTwoHandedEquipped } from "/src/libs/player/slots/equipmentSlots";
 import {
   clearSlotAction,
   equipItemToSlot,
@@ -92,6 +90,10 @@ import {
   buildCustomWeaponFormState,
   buildCustomWeaponSavePayload,
 } from "/src/forms/schema/itemSchemas/customWeapon";
+import {
+  buildConsumableFormState,
+  buildConsumableSavePayload,
+} from "/src/forms/schema/itemSchemas/consumable";
 
 // --- Helpers ---
 
@@ -291,6 +293,8 @@ function CompactItemRow({
   handleEquipment,
   handleDiceRoll,
   handleEdit,
+  handleDelete,
+  handleAddToCompendium,
   checkIfEquippable,
   equipToSlot,
   _unequipItem,
@@ -299,6 +303,21 @@ function CompactItemRow({
   t,
   _onPreviewItem,
 }) {
+  const itemSource =
+    item.equipType === "weapon"
+      ? "weapons"
+      : item.equipType === "custom-weapon"
+        ? "customWeapons"
+        : item.equipType === "shield"
+          ? "shields"
+          : item.equipType === "armor"
+            ? "armor"
+            : "accessories";
+  const itemRawIndex = item.originalIndex;
+  const itemRawData =
+    item.originalData ??
+    player.equipment?.[0]?.[itemSource]?.[itemRawIndex] ??
+    item;
   const slotMatches = (ref, source, name, index, sourceArr) => {
     if (!ref || ref.source !== source) return false;
     if (ref.index !== undefined) return ref.index === index;
@@ -324,6 +343,7 @@ function CompactItemRow({
         defaultRef && defaultRef.source === source && defaultRef.name === name;
       const autoEquipEnabled = settings.autoEquipUnarmed ?? !!defaultRef;
       if (isDefaultUnarmed && autoEquipEnabled) {
+        if (isTwoHandedEquipped(player)) return null;
         const mE = !slots.mainHand,
           oE = !slots.offHand;
         if (mE && oE) return "M+O";
@@ -543,7 +563,7 @@ function CompactItemRow({
                 key="main"
                 disabled={!canEquip}
                 onClick={() => {
-                  equipToSlot(source, item.name, idx, "mainHand", false);
+                  equipToSlot(source, item.name, idx, "mainHand");
                   setMenuAnchor(null);
                 }}
               >
@@ -554,7 +574,7 @@ function CompactItemRow({
                 key="off"
                 disabled={!canEquip}
                 onClick={() => {
-                  equipToSlot(source, item.name, idx, "offHand", false);
+                  equipToSlot(source, item.name, idx, "offHand");
                   setMenuAnchor(null);
                 }}
               >
@@ -576,7 +596,7 @@ function CompactItemRow({
                 key="main"
                 disabled={!canEquip}
                 onClick={() => {
-                  equipToSlot(source, item.name, idx, "mainHand", false);
+                  equipToSlot(source, item.name, idx, "mainHand");
                   setMenuAnchor(null);
                 }}
               >
@@ -587,7 +607,7 @@ function CompactItemRow({
                 key="off"
                 disabled={!canEquip}
                 onClick={() => {
-                  equipToSlot(source, item.name, idx, "offHand", false);
+                  equipToSlot(source, item.name, idx, "offHand");
                   setMenuAnchor(null);
                 }}
               >
@@ -621,6 +641,28 @@ function CompactItemRow({
           <Edit fontSize="small" sx={{ mr: 1.5, flexShrink: 0 }} />
           <ListItemText>{t("Edit")}</ListItemText>
         </MenuItem>
+        <MenuItem
+          disabled={!isEditMode}
+          onClick={() => {
+            handleDelete?.(itemSource, itemRawIndex, itemRawData);
+            setMenuAnchor(null);
+          }}
+          sx={{ "&:not(.Mui-disabled)": { color: "error.main" } }}
+        >
+          <Delete fontSize="small" sx={{ mr: 1.5, flexShrink: 0 }} />
+          <ListItemText>{t("Delete")}</ListItemText>
+        </MenuItem>
+        {handleAddToCompendium && (
+          <MenuItem
+            onClick={async () => {
+              await handleAddToCompendium(itemSource, itemRawData);
+              setMenuAnchor(null);
+            }}
+          >
+            <AddToPhotosIcon fontSize="small" sx={{ mr: 1.5, flexShrink: 0 }} />
+            <ListItemText>{t("Add to Compendium")}</ListItemText>
+          </MenuItem>
+        )}
       </Menu>
     </>
   );
@@ -637,6 +679,8 @@ function TransformingFormCard({
   onEquip,
   onRoll,
   onEdit,
+  onDelete,
+  onAddToCompendium,
   checkIfEquippable,
   searchQuery,
   theme,
@@ -758,6 +802,28 @@ function TransformingFormCard({
           <Edit fontSize="small" sx={{ mr: 1.5, flexShrink: 0 }} />
           <ListItemText>{t("Edit")}</ListItemText>
         </MenuItem>
+        <MenuItem
+          disabled={!isEditMode}
+          onClick={() => {
+            onDelete?.();
+            setMenuAnchor(null);
+          }}
+          sx={{ "&:not(.Mui-disabled)": { color: "error.main" } }}
+        >
+          <Delete fontSize="small" sx={{ mr: 1.5, flexShrink: 0 }} />
+          <ListItemText>{t("Delete")}</ListItemText>
+        </MenuItem>
+        {onAddToCompendium && (
+          <MenuItem
+            onClick={async () => {
+              await onAddToCompendium();
+              setMenuAnchor(null);
+            }}
+          >
+            <AddToPhotosIcon fontSize="small" sx={{ mr: 1.5, flexShrink: 0 }} />
+            <ListItemText>{t("Add to Compendium")}</ListItemText>
+          </MenuItem>
+        )}
       </Menu>
     </>
   );
@@ -772,6 +838,8 @@ function CompactTransformingPair({
   handleDiceRoll,
   handleSwapForm,
   handleEdit,
+  handleDelete,
+  handleAddToCompendium,
   checkIfEquippable,
   theme,
   t,
@@ -784,6 +852,11 @@ function CompactTransformingPair({
     slots.mainHand?.source === "customWeapons" &&
     slots.mainHand?.name === cwName;
   const swapFn = () => handleSwapForm(item.primaryForm);
+  const onDeleteParent = () =>
+    handleDelete?.("customWeapons", item.originalIndex, item.originalData);
+  const onAddParentToCompendium = handleAddToCompendium
+    ? () => handleAddToCompendium("customWeapons", item.originalData)
+    : undefined;
 
   return (
     <Box
@@ -803,6 +876,8 @@ function CompactTransformingPair({
         onEquip={handleEquipment}
         onRoll={handleDiceRoll}
         onEdit={handleEdit}
+        onDelete={onDeleteParent}
+        onAddToCompendium={onAddParentToCompendium}
         checkIfEquippable={checkIfEquippable}
         searchQuery={searchQuery}
         theme={theme}
@@ -817,6 +892,8 @@ function CompactTransformingPair({
         onEquip={handleEquipment}
         onRoll={handleDiceRoll}
         onEdit={handleEdit}
+        onDelete={onDeleteParent}
+        onAddToCompendium={onAddParentToCompendium}
         checkIfEquippable={checkIfEquippable}
         searchQuery={searchQuery}
         theme={theme}
@@ -1330,6 +1407,135 @@ function BonusRow({ label, value, compact }) {
   );
 }
 
+// --- Consumable row (not equippable; player.consumables) ---
+
+function ConsumableRow({
+  item,
+  index,
+  isEditMode,
+  searchQuery,
+  compact,
+  onSendToChat,
+  onEdit,
+  onDelete,
+  onAddToCompendium,
+  onPreview,
+  t,
+}) {
+  const [menuAnchor, setMenuAnchor] = useState(null);
+  return (
+    <>
+      <ItemRowCard
+        variant="outlined"
+        compact={compact}
+        onCardClick={() => onPreview?.(item, index)}
+        label={
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: 0.5,
+              minWidth: 0,
+            }}
+          >
+            <Typography
+              noWrap
+              sx={{
+                fontFamily: "Antonio",
+                fontWeight: 800,
+                fontSize: compact ? "0.9rem" : "1rem",
+                textTransform: "uppercase",
+                lineHeight: 1.3,
+              }}
+            >
+              {highlightMatch(t(item.name) || t("Unnamed"), searchQuery)}
+            </Typography>
+          </Box>
+        }
+        subtitle={
+          <Typography
+            sx={{
+              fontSize: "0.9rem",
+              color: "text.secondary",
+              lineHeight: 1.3,
+              fontWeight: "bold",
+            }}
+            noWrap
+          >
+            {item.ipCost ?? 0} {t("IP")}
+          </Typography>
+        }
+        actions={
+          <>
+            <Tooltip title={t("Send to Chat")} arrow>
+              <IconButton
+                size="small"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onSendToChat?.(item);
+                }}
+              >
+                <Message />
+              </IconButton>
+            </Tooltip>
+            <IconButton
+              size="small"
+              onClick={(e) => {
+                e.stopPropagation();
+                setMenuAnchor(e.currentTarget);
+              }}
+            >
+              <MenuIcon sx={{ fontSize: "1.1rem" }} />
+            </IconButton>
+          </>
+        }
+        paperSx={{
+          transition: "border-color 0.15s ease",
+          "&:hover": { borderColor: "primary.main" },
+        }}
+      />
+      <Menu
+        anchorEl={menuAnchor}
+        open={Boolean(menuAnchor)}
+        onClose={() => setMenuAnchor(null)}
+      >
+        <MenuItem
+          disabled={!isEditMode}
+          onClick={() => {
+            onEdit?.(index, item);
+            setMenuAnchor(null);
+          }}
+        >
+          <Edit fontSize="small" sx={{ mr: 1.5, flexShrink: 0 }} />
+          <ListItemText>{t("Edit")}</ListItemText>
+        </MenuItem>
+        <MenuItem
+          disabled={!isEditMode}
+          onClick={() => {
+            onDelete?.(index, item);
+            setMenuAnchor(null);
+          }}
+          sx={{ "&:not(.Mui-disabled)": { color: "error.main" } }}
+        >
+          <Delete fontSize="small" sx={{ mr: 1.5, flexShrink: 0 }} />
+          <ListItemText>{t("Delete")}</ListItemText>
+        </MenuItem>
+        {onAddToCompendium && (
+          <MenuItem
+            onClick={async () => {
+              await onAddToCompendium(item);
+              setMenuAnchor(null);
+            }}
+          >
+            <AddToPhotosIcon fontSize="small" sx={{ mr: 1.5, flexShrink: 0 }} />
+            <ListItemText>{t("Add to Compendium")}</ListItemText>
+          </MenuItem>
+        )}
+      </Menu>
+    </>
+  );
+}
+
 // --- resolveSlotLabel (full variant) ---
 
 function resolveSlotLabel(source, index, slots, itemName, item) {
@@ -1773,77 +1979,37 @@ export default function PcEquipment({
 
   // ---- equip helpers ----
   const equipToSlot = useCallback(
-    (source, itemName, itemIndex, slot, isTwoHand) => {
-      if (slot === "offHand") {
-        const mainRef = player.equippedSlots?.mainHand;
-        if (mainRef) {
-          if (mainRef.source === "customWeapons") return;
-          const inv0 = player.equipment?.[0];
-          const mainWeapon =
-            mainRef.index !== undefined
-              ? inv0?.weapons?.[mainRef.index]
-              : inv0?.weapons?.find((w) => w.name === mainRef.name);
-          if (mainWeapon?.hands === 2 || mainWeapon?.isTwoHand) return;
-        }
-      }
-      const unequipRef = (p, ref) => {
-        if (!ref) return p;
-        return patchInv(p, ref.source, (arr) =>
-          arr.map((it, idx) => {
-            const match =
-              ref.index !== undefined
-                ? idx === ref.index
-                : it.name === ref.name;
-            return match ? { ...it, isEquipped: false } : it;
-          }),
-        );
-      };
-      let updated = unequipRef(player, player.equippedSlots?.[slot]);
-      if (isTwoHand && slot === "mainHand")
-        updated = unequipRef(updated, updated.equippedSlots?.offHand);
-      updated = patchInv(updated, source, (arr) =>
-        arr.map((it, idx) => {
-          const match =
-            itemIndex !== undefined ? idx === itemIndex : it.name === itemName;
-          return match ? { ...it, isEquipped: true } : it;
-        }),
-      );
-      const prevSlots = updated.equippedSlots ?? {
-        mainHand: null,
-        offHand: null,
-        armor: null,
-        accessory: null,
-      };
-      setPlayer({
-        ...updated,
-        equippedSlots: {
-          ...prevSlots,
-          [slot]: { source, name: itemName, index: itemIndex },
-          ...(isTwoHand && slot === "mainHand" ? { offHand: null } : {}),
-        },
-        vehicleSlots: deriveVehicleSlots(updated),
+    (source, itemName, itemIndex, slot) => {
+      if (!setPlayer) return;
+      setPlayer((prev) => {
+        const arr = prev.equipment?.[0]?.[source] ?? [];
+        const item =
+          itemIndex !== undefined
+            ? arr[itemIndex]
+            : arr.find((it) => it.name === itemName);
+        return equipItemToSlot(prev, slot, {
+          source,
+          label: itemName,
+          index: itemIndex,
+          item: item ?? { name: itemName },
+        });
       });
     },
-    [player, setPlayer, patchInv],
+    [setPlayer],
   );
 
   const unequipItem = useCallback(
     (source, itemName) => {
-      const slots = player.equippedSlots ?? {};
-      const slotKey = Object.keys(slots).find(
-        (k) => slots[k]?.source === source && slots[k]?.name === itemName,
-      );
-      if (slotKey) setPlayer((prev) => clearSlotAction(prev, slotKey));
-      else {
-        const updated = patchInv(player, source, (arr) =>
-          arr.map((it) =>
-            it.name === itemName ? { ...it, isEquipped: false } : it,
-          ),
+      if (!setPlayer) return;
+      setPlayer((prev) => {
+        const slots = prev.equippedSlots ?? {};
+        const slotKey = Object.keys(slots).find(
+          (k) => slots[k]?.source === source && slots[k]?.name === itemName,
         );
-        setPlayer({ ...updated, vehicleSlots: deriveVehicleSlots(updated) });
-      }
+        return slotKey ? clearSlotAction(prev, slotKey) : prev;
+      });
     },
-    [player, setPlayer, patchInv],
+    [setPlayer],
   );
 
   const checkIfEquippable = useCallback(
@@ -1890,7 +2056,6 @@ export default function PcEquipment({
             cw.name,
             cwIndex >= 0 ? cwIndex : undefined,
             "mainHand",
-            true,
           );
         return;
       }
@@ -1920,13 +2085,12 @@ export default function PcEquipment({
           if (hasDualShieldBearer && event) {
             setShieldMenuAnchor({ top: event.clientY, left: event.clientX });
             setShieldMenuItem({ name: invItem.name, index: idx });
-          } else equipToSlot("shields", invItem.name, idx, "offHand", false);
+          } else equipToSlot("shields", invItem.name, idx, "offHand");
         } else if (item.equipType === "armor") {
-          equipToSlot("armor", invItem.name, idx, "armor", false);
+          equipToSlot("armor", invItem.name, idx, "armor");
         } else if (item.equipType === "weapon") {
           const isTwoHand = invItem.hands === 2 || invItem.isTwoHand;
-          if (isTwoHand)
-            equipToSlot("weapons", invItem.name, idx, "mainHand", true);
+          if (isTwoHand) equipToSlot("weapons", invItem.name, idx, "mainHand");
           else if (event) {
             setSlotMenuAnchor({ top: event.clientY, left: event.clientX });
             setSlotMenuWeapon({ name: invItem.name, index: idx });
@@ -1937,10 +2101,10 @@ export default function PcEquipment({
               : !slots.offHand
                 ? "offHand"
                 : null;
-            if (slot) equipToSlot("weapons", invItem.name, idx, slot, false);
+            if (slot) equipToSlot("weapons", invItem.name, idx, slot);
           }
         } else if (item.equipType === "accessory") {
-          equipToSlot("accessories", invItem.name, idx, "accessory", false);
+          equipToSlot("accessories", invItem.name, idx, "accessory");
         }
       }
     },
@@ -2223,6 +2387,14 @@ export default function PcEquipment({
   const openEditFromPreview = useCallback(
     (previewItem) => {
       if (!previewItem) return;
+      const index = previewItem._index ?? previewItem.originalIndex ?? null;
+      if (previewItem.equipType === "consumable") {
+        const rawItem =
+          (index != null ? player.consumables?.[index] : null) ?? previewItem;
+        setPreviewItem(null);
+        openEditDialog("consumables", index, rawItem);
+        return;
+      }
       const source =
         previewItem._source ??
         (previewItem.equipType === "weapon"
@@ -2234,7 +2406,6 @@ export default function PcEquipment({
               : previewItem.equipType === "armor"
                 ? "armor"
                 : "accessories");
-      const index = previewItem._index ?? previewItem.originalIndex ?? null;
       const rawItem =
         previewItem.originalData ??
         (index != null ? player.equipment?.[0]?.[source]?.[index] : null) ??
@@ -2248,21 +2419,43 @@ export default function PcEquipment({
   const handleSave = useCallback(
     (savedItem) => {
       if (!editSource || editIndex == null) return;
-      patchInvCallback(editSource, (arr) =>
-        arr.map((it, i) => (i === editIndex ? savedItem : it)),
-      );
+      if (editSource === "consumables") {
+        setPlayer((prev) => ({
+          ...prev,
+          consumables: (Array.isArray(prev.consumables)
+            ? prev.consumables
+            : []
+          ).map((it, i) => (i === editIndex ? savedItem : it)),
+        }));
+      } else {
+        patchInvCallback(editSource, (arr) =>
+          arr.map((it, i) => (i === editIndex ? savedItem : it)),
+        );
+      }
       setEditDialogOpen(false);
     },
-    [editSource, editIndex, patchInvCallback],
+    [editSource, editIndex, patchInvCallback, setPlayer],
   );
 
   const handleDeleteItem = useCallback(
     (index) => {
       if (!editSource || index == null) return;
-      patchInvCallback(editSource, (arr) => arr.filter((_, i) => i !== index));
+      if (editSource === "consumables") {
+        setPlayer((prev) => ({
+          ...prev,
+          consumables: (Array.isArray(prev.consumables)
+            ? prev.consumables
+            : []
+          ).filter((_, i) => i !== index),
+        }));
+      } else {
+        patchInvCallback(editSource, (arr) =>
+          arr.filter((_, i) => i !== index),
+        );
+      }
       setEditDialogOpen(false);
     },
-    [editSource, patchInvCallback],
+    [editSource, patchInvCallback, setPlayer],
   );
 
   const handleDelete = useCallback(
@@ -2311,6 +2504,16 @@ export default function PcEquipment({
   const handleImportFromCompendium = useCallback(
     (item, type) => {
       if (!setPlayer) return;
+      if (type === "consumables") {
+        setPlayer((prev) => ({
+          ...prev,
+          consumables: [
+            ...(Array.isArray(prev.consumables) ? prev.consumables : []),
+            { ...item },
+          ],
+        }));
+        return;
+      }
       const source =
         type === "weapons"
           ? "weapons"
@@ -2375,7 +2578,87 @@ export default function PcEquipment({
     shields: "shield",
     armor: "armor",
     accessories: "accessory",
+    consumables: "consumable",
   };
+
+  // ---- consumables (top-level player.consumables, not equippable) ----
+  const consumables = useMemo(
+    () => (Array.isArray(player.consumables) ? player.consumables : []),
+    [player.consumables],
+  );
+
+  const filteredConsumables = useMemo(() => {
+    if (!searchQuery)
+      return consumables.map((item, index) => ({ item, index }));
+    const q = searchQuery.toLowerCase();
+    return consumables
+      .map((item, index) => ({ item, index }))
+      .filter(
+        ({ item }) =>
+          t(item.name || "")
+            .toLowerCase()
+            .includes(q) ||
+          t(item.description || "")
+            .toLowerCase()
+            .includes(q),
+      );
+  }, [consumables, searchQuery, t]);
+
+  const patchConsumables = useCallback(
+    (updater) => {
+      setPlayer((prev) => ({
+        ...prev,
+        consumables: updater(
+          Array.isArray(prev.consumables) ? prev.consumables : [],
+        ),
+      }));
+    },
+    [setPlayer],
+  );
+
+  const handleAddConsumable = useCallback(() => {
+    if (!isEditMode) return;
+    const newItem = buildConsumableSavePayload(buildConsumableFormState(null));
+    const newIndex = consumables.length;
+    patchConsumables((arr) => [...arr, newItem]);
+    setEditSource("consumables");
+    setEditIndex(newIndex);
+    setEditItemData(newItem);
+    setEditDialogOpen(true);
+  }, [isEditMode, consumables.length, patchConsumables]);
+
+  const handleEditConsumable = useCallback((index, item) => {
+    setEditSource("consumables");
+    setEditIndex(index);
+    setEditItemData(item ?? null);
+    setEditDialogOpen(true);
+  }, []);
+
+  const handleDeleteConsumable = useCallback(
+    (index) => {
+      patchConsumables((arr) => arr.filter((_, i) => i !== index));
+    },
+    [patchConsumables],
+  );
+
+  const handleSendConsumableToChat = useCallback(
+    (item) => {
+      sendDisplayMessage("item", t(item?.name) || "", {
+        speaker: player?.info?.name || player?.name || "",
+        description: item?.description ? t(item.description) : undefined,
+        cost: { resource: "ip", amount: item?.ipCost ?? 0 },
+      });
+    },
+    [player, t],
+  );
+
+  const handleAddConsumableToCompendium = useCallback(
+    async (item) => {
+      const pack = await ensurePersonalPack();
+      await addCompendiumItem(pack.id, "consumable", item);
+    },
+    [ensurePersonalPack, addCompendiumItem],
+  );
 
   // ---- full-mode sections (row data by source key) ----
   const fullSections = useMemo(
@@ -2459,6 +2742,8 @@ export default function PcEquipment({
                   handleDiceRoll={handleDiceRoll}
                   handleSwapForm={handleSwapForm}
                   handleEdit={handleEdit}
+                  handleDelete={requestDelete}
+                  handleAddToCompendium={handleAddToCompendium}
                   checkIfEquippable={checkIfEquippable}
                   theme={theme}
                   t={t}
@@ -2475,6 +2760,8 @@ export default function PcEquipment({
                   handleDiceRoll={handleDiceRoll}
                   handleEdit={handleEdit}
                   checkIfEquippable={checkIfEquippable}
+                  handleDelete={requestDelete}
+                  handleAddToCompendium={handleAddToCompendium}
                   equipToSlot={equipToSlot}
                   unequipItem={unequipItem}
                   hasDualShieldBearer={hasDualShieldBearer}
@@ -2486,6 +2773,41 @@ export default function PcEquipment({
             )}
           </CompactSection>
         ))}
+
+        {!isMainTab && (
+          <CompactSection
+            group={{ label: t("Consumables"), key: "consumables" }}
+            isEditMode={isEditMode}
+            isMainTab={isMainTab}
+            onAdd={handleAddConsumable}
+            onCompendium={() => setCompendiumType("consumables")}
+            t={t}
+            theme={theme}
+          >
+            {filteredConsumables.map(({ item, index }) => (
+              <ConsumableRow
+                key={`consumable-${index}`}
+                item={item}
+                index={index}
+                isEditMode={isEditMode}
+                searchQuery={searchQuery}
+                compact
+                onSendToChat={handleSendConsumableToChat}
+                onEdit={handleEditConsumable}
+                onDelete={handleDeleteConsumable}
+                onAddToCompendium={handleAddConsumableToCompendium}
+                onPreview={(it, idx) =>
+                  setPreviewItem({
+                    ...it,
+                    equipType: "consumable",
+                    _index: idx,
+                  })
+                }
+                t={t}
+              />
+            ))}
+          </CompactSection>
+        )}
 
         {/* Slot menus & modals below */}
         <Menu
@@ -2505,7 +2827,6 @@ export default function PcEquipment({
                   slotMenuWeapon.name,
                   slotMenuWeapon.index,
                   "mainHand",
-                  false,
                 );
               setSlotMenuAnchor(null);
               setSlotMenuWeapon(null);
@@ -2521,7 +2842,6 @@ export default function PcEquipment({
                   slotMenuWeapon.name,
                   slotMenuWeapon.index,
                   "offHand",
-                  false,
                 );
               setSlotMenuAnchor(null);
               setSlotMenuWeapon(null);
@@ -2547,7 +2867,6 @@ export default function PcEquipment({
                   shieldMenuItem.name,
                   shieldMenuItem.index,
                   "mainHand",
-                  false,
                 );
               setShieldMenuAnchor(null);
               setShieldMenuItem(null);
@@ -2563,7 +2882,6 @@ export default function PcEquipment({
                   shieldMenuItem.name,
                   shieldMenuItem.index,
                   "offHand",
-                  false,
                 );
               setShieldMenuAnchor(null);
               setShieldMenuItem(null);
@@ -2593,6 +2911,7 @@ export default function PcEquipment({
             initialType={compendiumType}
             restrictToTypes={[compendiumType]}
             context="player"
+            allowMultiSelect
           />
         )}
         <ItemEditModal
@@ -2622,6 +2941,8 @@ export default function PcEquipment({
               <SharedShieldCard item={previewItem} />
             ) : previewItem?.equipType === "accessory" ? (
               <SharedAccessoryCard item={previewItem} />
+            ) : previewItem?.equipType === "consumable" ? (
+              <SharedConsumableCard item={previewItem} />
             ) : null}
           </DialogContent>
           <DialogActions sx={{ justifyContent: "space-between" }}>
@@ -2644,6 +2965,16 @@ export default function PcEquipment({
             </Button>
           </DialogActions>
         </Dialog>
+        <DeleteConfirmationDialog
+          open={Boolean(deleteConfirm)}
+          onClose={() => setDeleteConfirm(null)}
+          onConfirm={() => {
+            if (deleteConfirm)
+              handleDelete(deleteConfirm.source, deleteConfirm.index);
+          }}
+          title={t("Delete Item")}
+          message={`${t("Are you sure you want to delete")} ${deleteConfirm?.name ?? t("this item")}?`}
+        />
       </Box>
     );
   }
@@ -2743,6 +3074,48 @@ export default function PcEquipment({
           )}
         </React.Fragment>
       ))}
+      <FullSectionHeader
+        label={t("Consumables")}
+        isEditMode={isEditMode}
+        onAdd={handleAddConsumable}
+        onCompendium={() => setCompendiumType("consumables")}
+        primary={primary}
+        t={t}
+      />
+      {filteredConsumables.length === 0 ? (
+        <Grid size={12}>
+          <Typography
+            color="text.secondary"
+            variant="body2"
+            sx={{ px: 1, py: 0.5 }}
+          >
+            {t("No items.")}
+          </Typography>
+        </Grid>
+      ) : (
+        filteredConsumables.map(({ item, index }) => (
+          <Grid key={`consumable-${index}`} size={{ xs: 12, md: 6 }}>
+            <ConsumableRow
+              item={item}
+              index={index}
+              isEditMode={isEditMode}
+              searchQuery={searchQuery}
+              onSendToChat={handleSendConsumableToChat}
+              onEdit={handleEditConsumable}
+              onDelete={handleDeleteConsumable}
+              onAddToCompendium={handleAddConsumableToCompendium}
+              onPreview={(it, idx) =>
+                setPreviewItem({
+                  ...it,
+                  equipType: "consumable",
+                  _index: idx,
+                })
+              }
+              t={t}
+            />
+          </Grid>
+        ))
+      )}
       {showBonusRows &&
         [
           { label: t("Melee Accuracy Bonus"), value: precMeleeModifier },
@@ -2879,6 +3252,7 @@ export default function PcEquipment({
           initialType={compendiumType}
           restrictToTypes={[compendiumType]}
           context="player"
+          allowMultiSelect
         />
       )}
       <ItemEditModal
@@ -2908,6 +3282,8 @@ export default function PcEquipment({
             <SharedShieldCard item={previewItem} />
           ) : previewItem?.equipType === "accessory" ? (
             <SharedAccessoryCard item={previewItem} />
+          ) : previewItem?.equipType === "consumable" ? (
+            <SharedConsumableCard item={previewItem} />
           ) : null}
         </DialogContent>
         <DialogActions sx={{ justifyContent: "space-between" }}>

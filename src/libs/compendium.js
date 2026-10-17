@@ -1,6 +1,7 @@
 import weapons from "./weapons";
 import armor from "./armor";
 import shield from "./shields";
+import consumables from "./consumables";
 import heroics from "./heroics";
 import qualities from "./qualities";
 import { npcSpells } from "./npcSpells";
@@ -67,10 +68,16 @@ export const ITEM_TYPES = [
     label: staticT("Accessories", true),
     context: "player",
   },
+  {
+    key: "consumables",
+    label: staticT("Consumables", true),
+    context: "player",
+  },
   { key: "spells", label: staticT("NPC Spells", true), context: "npc" },
   { key: "attacks", label: staticT("NPC Attacks", true), context: "npc" },
   { key: "special", label: staticT("Special Rules", true), context: "npc" },
   { key: "actions", label: staticT("Other Actions", true), context: "npc" },
+  { key: "notes", label: staticT("Notes", true), context: "npc" },
   { key: "classes", label: staticT("Classes", true), context: "player" },
   { key: "player-spells", label: staticT("Spells", true), context: "both" },
   { key: "qualities", label: staticT("Qualities", true), context: "player" },
@@ -103,10 +110,16 @@ export const PACK_ITEM_TYPES = [
     label: staticT("Accessories", true),
     context: "player",
   },
+  {
+    key: "consumables",
+    label: staticT("Consumables", true),
+    context: "player",
+  },
   { key: "spells", label: staticT("NPC Spells", true), context: "npc" },
   { key: "attacks", label: staticT("NPC Attacks", true), context: "npc" },
   { key: "special", label: staticT("Special Rules", true), context: "npc" },
   { key: "actions", label: staticT("Other Actions", true), context: "npc" },
+  { key: "notes", label: staticT("Notes", true), context: "npc" },
   { key: "player-spells", label: staticT("Spells", true), context: "both" },
   { key: "qualities", label: staticT("Qualities", true), context: "player" },
   { key: "classes", label: staticT("Classes", true), context: "player" },
@@ -131,10 +144,12 @@ export const VIEWER_TO_PACK_TYPE = {
   shields: "shield",
   "custom-weapons": "custom-weapon",
   accessories: "accessory",
+  consumables: "consumable",
   spells: "npc-spell",
   attacks: "npc-attack",
   special: "npc-special",
   actions: "npc-action",
+  notes: "note",
   "player-spells": "player-spell",
   qualities: "quality",
   classes: "class",
@@ -153,6 +168,8 @@ export function getItems(type) {
       return armors;
     case "shields":
       return shields;
+    case "consumables":
+      return consumables;
     case "spells":
       return npcSpells;
     case "attacks":
@@ -171,6 +188,7 @@ export function getItems(type) {
       return officialEffects;
     case "special":
     case "actions":
+    case "notes":
     case "custom-weapons":
     case "accessories":
     case "optionals":

@@ -397,6 +397,7 @@ export default function EditActions({ npc, setNpc }) {
         context="npc"
         initialType="actions"
         initialCompendium="personal"
+        allowMultiSelect
         onAddItem={(item) => {
           setNpc((prev) => ({
             ...prev,
@@ -407,6 +408,7 @@ export default function EditActions({ npc, setNpc }) {
                 effect: item.effect || "",
                 spCost: item.spCost ?? 1,
                 fuid: item.fuid,
+                subtype: item.subtype,
               },
             ],
           }));

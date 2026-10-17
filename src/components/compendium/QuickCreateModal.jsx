@@ -70,6 +70,7 @@ import {
   SharedShieldCard,
   SharedCustomWeaponCard,
   SharedAccessoryCard,
+  SharedConsumableCard,
   SharedQualityCard,
   SharedMnemosphereCard,
   SharedHoplosphereCard,
@@ -822,7 +823,6 @@ function PlayerSpellPanel() {
 
   useEffect(() => {
     if (initialSubtype) {
-      // eslint-disable-next-line no-undef
       setFormState((prev) => ({ ...prev, spellType: initialSubtype }));
     }
   }, [initialSubtype]);
@@ -1733,7 +1733,6 @@ function QualityPanel() {
                   onChange={(_, q) => {
                     if (q) {
                       setFormState((prev) => ({
-                        // eslint-disable-next-line no-undef
                         ...prev,
                         name: q.name,
                         category: q.category,
@@ -1799,7 +1798,6 @@ function QualityPanel() {
           ) : (
             <QualitiesGenerator
               onGenerate={(text) =>
-                // eslint-disable-next-line no-undef
                 setFormState((prev) => ({ ...prev, quality: text }))
               }
             />
@@ -2004,7 +2002,9 @@ function ClassPanel() {
           <SharedClassCard
             item={{
               ...classData,
-              skills: classData.skills.filter((s) => s.skillName?.trim?.()),
+              skills: classData.skills.filter((s) =>
+                (s.skillName ?? s.name)?.trim?.(),
+              ),
             }}
           />
         }
@@ -2130,7 +2130,6 @@ function WeaponPanel() {
 
   useEffect(() => {
     setFormState((prev) => ({
-      // eslint-disable-next-line no-undef
       ...prev,
       totalBonus: Math.floor(cost / 1000) * 2,
     }));
@@ -2233,7 +2232,6 @@ function WeaponPanel() {
         filterType="weapon"
         onSelect={(q) =>
           setFormState((prev) => ({
-            // eslint-disable-next-line no-undef
             ...prev,
             selectedQuality: q.name,
             qualityName: q.name,
@@ -2375,7 +2373,6 @@ function ArmorPanel() {
         filterType="armor"
         onSelect={(q) =>
           setFormState((prev) => ({
-            // eslint-disable-next-line no-undef
             ...prev,
             selectedQuality: q.name,
             qualityName: q.name,
@@ -2514,7 +2511,6 @@ function ShieldPanel() {
         filterType="shield"
         onSelect={(q) =>
           setFormState((prev) => ({
-            // eslint-disable-next-line no-undef
             ...prev,
             selectedQuality: q.name,
             qualityName: q.name,
@@ -2829,7 +2825,6 @@ function CustomWeaponPanel() {
         filterType="customWeapon"
         onSelect={(q) =>
           setFormState((prev) => ({
-            // eslint-disable-next-line no-undef
             ...prev,
             selectedQuality: q.name,
             qualityName: q.name,
@@ -2958,7 +2953,6 @@ function AccessoryPanel() {
         filterType="accessory"
         onSelect={(q) =>
           setFormState((prev) => ({
-            // eslint-disable-next-line no-undef
             ...prev,
             selectedQuality: q.name,
             qualityName: q.name,
@@ -3572,6 +3566,7 @@ function ConsumablePanel() {
           }}
         />
       }
+      previewContent={<SharedConsumableCard item={data} />}
       addButton={
         <AddToCompendiumButton
           itemType={REG.consumable.addItemType}

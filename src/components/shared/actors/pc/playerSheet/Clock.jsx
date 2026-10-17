@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useTheme } from "@mui/material";
+import { useTheme, lighten } from "@mui/material";
 
 function calculateCoordinates(centerX, centerY, radius, angleInDegrees) {
   const angleInRadians = (angleInDegrees - 90) * (Math.PI / 180);
@@ -18,9 +18,12 @@ const Clock = ({
   onReset = () => {},
 }) => {
   const theme = useTheme();
-  const primary = theme.palette.primary.main;
+  const isDark = theme.palette.mode === "dark";
   const secondary = theme.palette.secondary.main;
   const hoveredActiveColor = theme.palette.info.main;
+  const activeColor = isDark
+    ? lighten(theme.palette.primary.main, 0.35)
+    : theme.palette.primary.main;
 
   const [hoveredIndex, setHoveredIndex] = useState(null);
 
@@ -76,7 +79,7 @@ const Clock = ({
     } else if (isHovered) {
       fill = secondary;
     } else if (isActive) {
-      fill = primary;
+      fill = activeColor;
     }
 
     sections.push(

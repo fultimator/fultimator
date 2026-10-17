@@ -54,6 +54,8 @@ export interface CompendiumPack {
   locked?: boolean; // when true, destructive actions are hidden
   fultimatorMinVersion?: string; // minimum Fultimator version required
   homepageUrl?: string; // URL to pack's homepage or repository
+  manifestUrl?: string; // URL where this pack's remote manifest is hosted
+  downloadUrl?: string; // URL where the exported .fcp can be downloaded
   requiresManual?: string[]; // user-managed hard dependencies
   requiresAuto?: string[]; // system-derived hard dependencies from cross-pack refs
   requires?: string[]; // hard dependencies (canonical pack fuids)

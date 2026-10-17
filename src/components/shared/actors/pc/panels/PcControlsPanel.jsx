@@ -615,7 +615,13 @@ function IpCell({
   );
 }
 
-function ZenitRow({ value, onApply, tooltip, isInteractive = false }) {
+function ZenitRow({
+  value,
+  onApply,
+  onBarClick,
+  tooltip,
+  isInteractive = false,
+}) {
   const { t } = useTranslate();
   const { shellBg, shellBorder, labelBg, labelBorder, trackBg } = useBarShell();
 
@@ -656,10 +662,12 @@ function ZenitRow({ value, onApply, tooltip, isInteractive = false }) {
             </Typography>
           </Box>
           <Box
+            onClick={isInteractive ? onBarClick : undefined}
             sx={{
               ...LABEL_SX,
               bgcolor: labelBg,
               borderLeft: `1px solid ${labelBorder}`,
+              cursor: isInteractive ? "pointer" : "default",
             }}
           >
             <ZenitResourceIcon size="1.4em" />
@@ -741,6 +749,7 @@ export default function PcControlsPanel({
   };
   const [resourceDialog, setResourceDialog] = useState(null);
   const [fpDialogOpen, setFpDialogOpen] = useState(false);
+  const [zenitDialogOpen, setZenitDialogOpen] = useState(false);
 
   const openResourceDialog = (resource) => {
     if (!isInteractive) return;
@@ -756,6 +765,13 @@ export default function PcControlsPanel({
 
   const closeFpDialog = () => setFpDialogOpen(false);
 
+  const openZenitDialog = () => {
+    if (!isInteractive) return;
+    setZenitDialogOpen(true);
+  };
+
+  const closeZenitDialog = () => setZenitDialogOpen(false);
+
   const applyFpDialogChange = (payload) => {
     if (!isInteractive || !onUpdate) return;
     const amount = Math.max(0, parseInt(payload?.amount, 10) || 0);
@@ -769,6 +785,20 @@ export default function PcControlsPanel({
           0,
           Math.min(9999, (prev.info.fabulapoints ?? 0) + delta),
         ),
+      },
+    }));
+  };
+
+  const applyZenitDialogChange = (payload) => {
+    if (!isInteractive || !onUpdate) return;
+    const amount = Math.max(0, parseInt(payload?.amount, 10) || 0);
+    if (amount <= 0) return;
+    const delta = payload.mode === "heal" ? amount : -amount;
+    onUpdate((prev) => ({
+      ...prev,
+      info: {
+        ...prev.info,
+        zenit: Math.max(0, (prev.info.zenit ?? 0) + delta),
       },
     }));
   };
@@ -1027,6 +1057,7 @@ export default function PcControlsPanel({
         <ZenitRow
           value={pc.info.zenit ?? 0}
           onApply={applyZenit}
+          onBarClick={openZenitDialog}
           tooltip={zenitTooltip}
           isInteractive={isInteractive}
         />
@@ -1082,6 +1113,20 @@ export default function PcControlsPanel({
           }
           onApply={applyFpDialogChange}
           onSetCurrent={setFpCurrent}
+        />
+      )}
+      {zenitDialogOpen && (
+        <EditResourcesModal
+          open
+          onClose={closeZenitDialog}
+          title={t("Zenit")}
+          resourceKey="zenit"
+          current={pc.info.zenit ?? 0}
+          resolvePreviewDelta={({ amount, mode }) =>
+            mode === "heal" ? amount : -amount
+          }
+          showQuickHpTargets={false}
+          onApply={applyZenitDialogChange}
         />
       )}
     </SectionCard>

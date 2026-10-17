@@ -11,6 +11,8 @@ import {
   TextField,
   Select,
   MenuItem,
+  ListItemIcon,
+  ListItemText,
   FormControl,
   InputLabel,
   Typography,
@@ -27,7 +29,6 @@ import {
   Tooltip,
   Divider,
   InputAdornment,
-  ThemeProvider,
   Snackbar,
   Autocomplete,
   useMediaQuery,
@@ -63,6 +64,7 @@ import { useCompendiumPacks } from "../../hooks/useCompendiumPacks";
 import CompendiumItemCreateDialog from "../../components/compendium/CompendiumItemCreateDialog";
 import QuickCreateModal from "../../components/compendium/QuickCreateModal";
 import CompendiumBrowser from "../../components/compendium/CompendiumBrowser";
+import DeleteConfirmationDialog from "../../components/common/DeleteConfirmationDialog";
 import { useTranslate } from "../../translation/translate";
 import { useCustomTheme } from "../../hooks/useCustomTheme";
 import { IS_ELECTRON } from "../../platform";
@@ -95,6 +97,7 @@ import {
   SharedShieldCard,
   SharedCustomWeaponCard,
   SharedAccessoryCard,
+  SharedConsumableCard,
   SharedQualityCard,
   SharedMnemosphereCard,
   SharedHoplosphereCard,
@@ -125,12 +128,20 @@ const INVOKER_WELLSPRINGS = [
   "Physical",
 ];
 
+const SPECIAL_SUBTYPE_LABELS = {
+  roleSkill: "shared.qaSubtype.roleSkill",
+  negativeSkill: "shared.qaSubtype.negativeSkill",
+  bossSkill: "shared.qaSubtype.bossSkill",
+};
+const SPECIAL_SUBTYPE_OPTIONS = Object.keys(SPECIAL_SUBTYPE_LABELS);
+
 function SidebarSecondaryValue(type, item, t) {
   if (type === "weapons") return `${item.cost}z`;
   if (type === "custom-weapons") return `${item.cost || 300}z`;
   if (type === "armor") return `${item.cost}z`;
   if (type === "shields") return `${item.cost}z`;
   if (type === "accessories") return `${item.cost}z`;
+  if (type === "consumables") return `${item.ipCost ?? 0} IP`;
   if (type === "qualities") return `${item.cost}z`;
   if (type === "spells") return `${item.cost?.amount} MP`;
   if (type === "player-spells")
@@ -157,6 +168,7 @@ function SidebarSecondaryLabel(type, t) {
   if (type === "mnemospheres") return t("Class");
   if (type === "hoplospheres") return t("Cost");
   if (type === "optionals") return t("Subtype");
+  if (type === "consumables") return t("IP");
   return t("Cost");
 }
 // Sidebar
@@ -252,6 +264,8 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
   onHeroicClassesChange,
   selectedOptionalSubtypes,
   onOptionalSubtypesChange,
+  selectedSpecialSubtypes,
+  onSpecialSubtypesChange,
   selectedEffectTransfer = "",
   onEffectTransferChange,
   selectedEffectApplicableTypes = [],
@@ -303,14 +317,10 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
     keepMounted: true,
     slotProps: {
       root: {
-        sx: {
-          zIndex: (theme) => theme.zIndex.modal + 3,
-        },
+        sx: { zIndex: 1500 },
       },
       paper: {
-        sx: {
-          zIndex: (theme) => theme.zIndex.modal + 3,
-        },
+        sx: { zIndex: 1500 },
       },
     },
   };
@@ -748,6 +758,37 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
           />
         )}
 
+        {(selectedType === "special" || selectedType === "actions") && (
+          <Autocomplete
+            {...(isMobile ? autocompleteOverlayProps : {})}
+            multiple
+            limitTags={1}
+            size="small"
+            fullWidth
+            sx={compactMultiAutocompleteSx}
+            options={SPECIAL_SUBTYPE_OPTIONS}
+            getOptionLabel={(o) => t(SPECIAL_SUBTYPE_LABELS[o] ?? o)}
+            value={selectedSpecialSubtypes}
+            onChange={(e, newValue) => onSpecialSubtypesChange(newValue)}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label={t("shared.qaSubtype")}
+                placeholder={t("All subtypes")}
+              />
+            )}
+            renderValue={(value, getTagProps) =>
+              value.map((option, index) => {
+                const { key, ...tagProps } = getTagProps({ index });
+                const label = SPECIAL_SUBTYPE_LABELS[option] ?? option;
+                return (
+                  <Chip key={key} label={t(label)} size="small" {...tagProps} />
+                );
+              })
+            }
+          />
+        )}
+
         {selectedType === "effects" && (
           <>
             <FormControl size="small" fullWidth>
@@ -1009,6 +1050,8 @@ export const ItemCard = React.memo(function ItemCard({
       return <SharedCustomWeaponCard {...sharedProps} />;
     case "accessories":
       return <SharedAccessoryCard {...sharedProps} />;
+    case "consumables":
+      return <SharedConsumableCard {...sharedProps} />;
     case "special":
       return <SharedSpecialRuleCard {...sharedProps} />;
     case "actions":
@@ -1053,6 +1096,7 @@ function CompendiumViewer() {
   const [quickCreateOpen, setQuickCreateOpen] = useState(false);
   const [editClassItem, setEditClassItem] = useState(null);
   const [manageDialogOpen, setManageDialogOpen] = useState(false);
+  const [deletePackConfirmOpen, setDeletePackConfirmOpen] = useState(false);
   const [editingPackName, setEditingPackName] = useState("");
   const [editingPackFuid, setEditingPackFuid] = useState("");
   const [editingPackFuidTouched, setEditingPackFuidTouched] = useState(false);
@@ -1161,6 +1205,10 @@ function CompendiumViewer() {
     const subtypes = searchParams.get("optionalSubtypes");
     return subtypes ? subtypes.split(",") : [];
   }, [searchParams]);
+  const selectedSpecialSubtypes = useMemo(() => {
+    const subtypes = searchParams.get("specialSubtypes");
+    return subtypes ? subtypes.split(",") : [];
+  }, [searchParams]);
   const selectedEffectTransfer = searchParams.get("effectTransfer") ?? "";
   const selectedEffectApplicableTypes = useMemo(() => {
     const types = searchParams.get("effectApplicableTypes");
@@ -1216,6 +1264,7 @@ function CompendiumViewer() {
     selectedQualityCategories,
     selectedHeroicClasses,
     selectedOptionalSubtypes,
+    selectedSpecialSubtypes,
     selectedEffectTransfer,
     selectedEffectApplicableTypes,
     selectedCompendium,
@@ -1348,6 +1397,14 @@ function CompendiumViewer() {
         setSearchParams(newParams);
         if (scrollRef?.current) scrollRef.current.scrollTop = 0;
       },
+      handleSpecialSubtypesChange: (subtypes, { scrollRef } = {}) => {
+        setSearchQuery("");
+        setSelectedIdx(null);
+        const newParams = { ...urlBase(), type: selectedType };
+        if (subtypes.length > 0) newParams.specialSubtypes = subtypes.join(",");
+        setSearchParams(newParams);
+        if (scrollRef?.current) scrollRef.current.scrollTop = 0;
+      },
       handleEffectTransferChange: (value, { scrollRef } = {}) => {
         setSearchQuery("");
         setSelectedIdx(null);
@@ -1408,6 +1465,9 @@ function CompendiumViewer() {
           ...(selectedOptionalSubtypes.length > 0
             ? { optionalSubtypes: selectedOptionalSubtypes.join(",") }
             : {}),
+          ...(selectedSpecialSubtypes.length > 0
+            ? { specialSubtypes: selectedSpecialSubtypes.join(",") }
+            : {}),
           item: toSlug(item.name),
         });
       },
@@ -1426,6 +1486,7 @@ function CompendiumViewer() {
       selectedQualityCategories,
       selectedHeroicClasses,
       selectedOptionalSubtypes,
+      selectedSpecialSubtypes,
       selectedEffectTransfer,
       selectedEffectApplicableTypes,
     ],
@@ -1487,22 +1548,66 @@ function CompendiumViewer() {
 
   // Route-specific item actions (share, download, export, pack management)
   const renderItemActions = useCallback(
-    (item, _idx, _selectedItem) => (
-      <>
-        <Tooltip title={t("Share URL")}>
-          <IconButton size="small" onClick={handleShareUrl}>
-            <ShareIcon fontSize="small" />
-          </IconButton>
-        </Tooltip>
-        <Tooltip title={t("Download as Image")}>
-          {/* download is handled by CompendiumBrowser via showDownloadImage */}
-          <span style={{ display: "none" }} />
-        </Tooltip>
-        <Export name={item.name} dataType={selectedType} data={item} />
-        {selectedCompendium !== "official" &&
-          selectedType === "classes" &&
-          item._packItemId &&
-          !activePack?.locked && (
+    (item, _idx, _selectedItem, opts = {}) => {
+      const inMenu = opts.inMenu;
+      const canEditClass =
+        selectedCompendium !== "official" &&
+        selectedType === "classes" &&
+        item._packItemId &&
+        !activePack?.locked;
+      const canRemove =
+        selectedCompendium !== "official" &&
+        item._packItemId &&
+        !activePack?.locked;
+
+      if (inMenu) {
+        return (
+          <>
+            <MenuItem onClick={handleShareUrl}>
+              <ListItemIcon>
+                <ShareIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText>{t("Share URL")}</ListItemText>
+            </MenuItem>
+            <Export
+              name={item.name}
+              dataType={selectedType}
+              data={item}
+              menuItemLabel={t("Export")}
+            />
+            {canEditClass && (
+              <MenuItem
+                onClick={() =>
+                  setEditClassItem({ item, packItemId: item._packItemId })
+                }
+              >
+                <ListItemIcon>
+                  <EditIcon fontSize="small" />
+                </ListItemIcon>
+                <ListItemText>{t("Edit Class")}</ListItemText>
+              </MenuItem>
+            )}
+            {canRemove && (
+              <MenuItem onClick={() => handleRemoveFromPack(item)}>
+                <ListItemIcon>
+                  <DeleteIcon fontSize="small" color="error" />
+                </ListItemIcon>
+                <ListItemText>{t("Remove from pack")}</ListItemText>
+              </MenuItem>
+            )}
+          </>
+        );
+      }
+
+      return (
+        <>
+          <Tooltip title={t("Share URL")}>
+            <IconButton size="small" onClick={handleShareUrl}>
+              <ShareIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+          <Export name={item.name} dataType={selectedType} data={item} />
+          {canEditClass && (
             <Tooltip title={t("Edit Class")}>
               <IconButton
                 size="small"
@@ -1514,9 +1619,7 @@ function CompendiumViewer() {
               </IconButton>
             </Tooltip>
           )}
-        {selectedCompendium !== "official" &&
-          item._packItemId &&
-          !activePack?.locked && (
+          {canRemove && (
             <Tooltip title={t("Remove from pack")}>
               <IconButton
                 size="small"
@@ -1527,8 +1630,9 @@ function CompendiumViewer() {
               </IconButton>
             </Tooltip>
           )}
-      </>
-    ),
+        </>
+      );
+    },
     [
       t,
       handleShareUrl,
@@ -1540,7 +1644,7 @@ function CompendiumViewer() {
   );
 
   return (
-    <ThemeProvider theme={customTheme}>
+    <>
       <Layout>
         <Box
           sx={{
@@ -1574,10 +1678,10 @@ function CompendiumViewer() {
               setEditingAutoRequires(activePack?.requiresAuto ?? []);
               setEditingOptional(activePack?.optional ?? []);
               setExportMeta({
-                version: "1.0.0",
-                homepageUrl: "",
-                manifestUrl: "",
-                downloadUrl: "",
+                version: activePack?.version ?? "1.0.0",
+                homepageUrl: activePack?.homepageUrl ?? "",
+                manifestUrl: activePack?.manifestUrl ?? "",
+                downloadUrl: activePack?.downloadUrl ?? "",
               });
               setManageDialogOpen(true);
             }}
@@ -2000,11 +2104,7 @@ function CompendiumViewer() {
             <Button
               color="error"
               disabled={exporting}
-              onClick={async () => {
-                await deletePack(activePack.id);
-                setPendingNavPackId("official");
-                setManageDialogOpen(false);
-              }}
+              onClick={() => setDeletePackConfirmOpen(true)}
             >
               {t("Delete Pack")}
             </Button>
@@ -2051,6 +2151,10 @@ function CompendiumViewer() {
                   author: editingAuthor.trim() || undefined,
                   requiresManual: editingRequires,
                   optional: editingOptional,
+                  version: exportMeta.version.trim() || undefined,
+                  homepageUrl: exportMeta.homepageUrl.trim() || undefined,
+                  manifestUrl: exportMeta.manifestUrl.trim() || undefined,
+                  downloadUrl: exportMeta.downloadUrl.trim() || undefined,
                 };
                 await updatePack(activePack.id, changes);
                 setManageDialogOpen(false);
@@ -2062,6 +2166,33 @@ function CompendiumViewer() {
         </DialogActions>
       </Dialog>
 
+      {/* Delete pack confirmation */}
+      <DeleteConfirmationDialog
+        open={deletePackConfirmOpen}
+        onClose={() => setDeletePackConfirmOpen(false)}
+        onConfirm={async () => {
+          if (!activePack) return;
+          await deletePack(activePack.id);
+          setPendingNavPackId("official");
+          setDeletePackConfirmOpen(false);
+          setManageDialogOpen(false);
+        }}
+        title={t("Confirm Deletion")}
+        message={t(
+          "Are you sure you want to delete this pack and all its items?",
+        )}
+        itemPreview={
+          activePack ? (
+            <Box>
+              <Typography variant="h4">{activePack.name}</Typography>
+              <Typography variant="body2" sx={{ color: "text.secondary" }}>
+                {activePack.items?.length ?? 0} {t("items")}
+              </Typography>
+            </Box>
+          ) : null
+        }
+      />
+
       <ManageModulesModal
         open={manageModulesOpen}
         onClose={() => setManageModulesOpen(false)}
@@ -2070,7 +2201,7 @@ function CompendiumViewer() {
           handlers.handleCompendiumChange(id);
         }}
       />
-    </ThemeProvider>
+    </>
   );
 }
 

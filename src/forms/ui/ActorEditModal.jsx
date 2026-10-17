@@ -14,10 +14,12 @@ import { Close } from "@mui/icons-material";
 export default function ActorEditModal({
   open,
   onClose,
-  onConfirm,
+  onConfirm = null,
   title,
-  subtitle,
+  subtitle = null,
   maxWidth = "sm",
+  fullWidth = true,
+  paperSx = undefined,
   children,
   actions,
 }) {
@@ -45,9 +47,11 @@ export default function ActorEditModal({
       open={open}
       onClose={onClose}
       onKeyDown={handleKeyDown}
-      fullWidth
+      fullWidth={fullWidth}
       maxWidth={maxWidth}
-      slotProps={{ paper: { sx: { width: "100%" } } }}
+      slotProps={{
+        paper: { sx: { width: fullWidth ? "100%" : undefined, ...paperSx } },
+      }}
     >
       <DialogTitle variant="h3" sx={{ fontWeight: 700 }}>
         {title}

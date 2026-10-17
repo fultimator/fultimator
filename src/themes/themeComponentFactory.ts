@@ -1359,7 +1359,17 @@ export function createThemeComponents({
               : "none",
           zIndex: 1,
           "&.Mui-selected": {
-            color: isDark ? "#ffffff" : primary,
+            color: isDark ? secondary : primary,
+          },
+        },
+      },
+    },
+    MuiBottomNavigationAction: {
+      styleOverrides: {
+        root: {
+          color: isDark ? alpha("#ffffff", 0.6) : alpha(quaternary, 0.8),
+          "&.Mui-selected": {
+            color: isDark ? secondary : primary,
           },
         },
       },

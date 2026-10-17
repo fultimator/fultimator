@@ -97,9 +97,9 @@ export default function SpellDefault({
                   {t("Magic Check") + ": "}
                   <strong>
                     <OpenBracket />
-                    {t(attributes[attr1].shortcaps)}
+                    {t(attributes[attr1]?.shortcaps)}
                     {t(" + ")}
-                    {t(attributes[attr2].shortcaps)}
+                    {t(attributes[attr2]?.shortcaps)}
                     <CloseBracket />
                   </strong>
                 </Typography>

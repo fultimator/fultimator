@@ -27,6 +27,7 @@ interface Props {
   excludePackId?: string;
   /** Override tooltip text (e.g. "Clone to Custom" for official classes) */
   tooltipOverride?: string;
+  menuItemLabel?: string;
 }
 
 export default function AddToCompendiumButton({
@@ -35,6 +36,7 @@ export default function AddToCompendiumButton({
   size = "small",
   excludePackId,
   tooltipOverride,
+  menuItemLabel,
 }: Props) {
   const { packs, ensurePersonalPack, addItem } = useCompendiumPacks();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
@@ -106,17 +108,30 @@ export default function AddToCompendiumButton({
 
   return (
     <>
-      <Tooltip title={tooltipOverride ?? "Add to Compendium"}>
-        <span style={{ display: "inline-flex" }}>
-          <IconButton size={size} onClick={handleClick} disabled={adding}>
+      {menuItemLabel ? (
+        <MenuItem onClick={handleClick} disabled={adding}>
+          <ListItemIcon>
             {adding ? (
               <CircularProgress size={16} />
             ) : (
-              <LibraryAddIcon fontSize={size} />
+              <LibraryAddIcon fontSize="small" />
             )}
-          </IconButton>
-        </span>
-      </Tooltip>
+          </ListItemIcon>
+          <ListItemText>{menuItemLabel}</ListItemText>
+        </MenuItem>
+      ) : (
+        <Tooltip title={tooltipOverride ?? "Add to Compendium"}>
+          <span style={{ display: "inline-flex" }}>
+            <IconButton size={size} onClick={handleClick} disabled={adding}>
+              {adding ? (
+                <CircularProgress size={16} />
+              ) : (
+                <LibraryAddIcon fontSize={size} />
+              )}
+            </IconButton>
+          </span>
+        </Tooltip>
+      )}
 
       <Menu
         anchorEl={anchorEl}

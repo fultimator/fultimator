@@ -79,12 +79,19 @@ const ActionTemplate: TemplateComponent = ({ message }) => {
 
 const AccuracyTemplate: TemplateComponent = ({ message }) => {
   if (message.kind !== "accuracy") return null;
-  return <AccuracyCheckMessageTemplate check={message.check} />;
+  return (
+    <AccuracyCheckMessageTemplate
+      messageId={message.id}
+      check={message.check}
+    />
+  );
 };
 
 const MagicTemplate: TemplateComponent = ({ message }) => {
   if (message.kind !== "magic") return null;
-  return <MagicCheckMessageTemplate check={message.check} />;
+  return (
+    <MagicCheckMessageTemplate messageId={message.id} check={message.check} />
+  );
 };
 
 const DisplayTemplate: TemplateComponent = ({ message }) => {

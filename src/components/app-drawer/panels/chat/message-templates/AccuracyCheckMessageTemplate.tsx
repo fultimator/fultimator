@@ -38,12 +38,13 @@ function formatRange(range: string): string {
 }
 
 interface AccuracyCheckMessageTemplateProps {
+  messageId: string;
   check: AccuracyCheckResult;
 }
 
 export const AccuracyCheckMessageTemplate: React.FC<
   AccuracyCheckMessageTemplateProps
-> = ({ check }) => {
+> = ({ messageId, check }) => {
   const theme = useTheme();
   const [open, setOpen] = useState(false);
   const [activeTargets, setActiveTargets] = useState<DamagePipelineTarget[]>(
@@ -355,10 +356,12 @@ export const AccuracyCheckMessageTemplate: React.FC<
         }
       />
       <DamagePipelineTargets
+        messageId={messageId}
         targets={activeTargets}
         damage={check.damage}
         damageType={check.intent.damageType}
         fumble={check.fumble}
+        persistedAppliedMap={check.appliedMap}
       />
       <OnHitZone
         attackerCombatId={speakerCombatId}

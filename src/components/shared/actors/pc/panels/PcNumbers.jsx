@@ -5,16 +5,13 @@ import {
   Typography,
   Box,
   TextField,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   Button,
   ToggleButton,
   ToggleButtonGroup,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "/src/translation/translate";
+import ActorEditModal from "/src/forms/ui/ActorEditModal";
 
 const zenitIcon = "/assets/icons/resources/zenit.png";
 
@@ -22,8 +19,7 @@ function ZenitDialog({ open, onClose, currentValue, onApply, t }) {
   const [amount, setAmount] = useState("");
   const [type, setType] = useState("+");
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleSubmit = () => {
     const val = parseInt(amount, 10) || 0;
     onApply(type === "+" ? val : -val);
     setAmount("");
@@ -31,71 +27,64 @@ function ZenitDialog({ open, onClose, currentValue, onApply, t }) {
   };
 
   return (
-    <Dialog open={open} onClose={onClose}>
-      <form onSubmit={handleSubmit}>
-        <DialogTitle
-          variant="h4"
-          sx={{
-            fontWeight: "bold",
-            textAlign: "center",
-            borderBottom: "1px solid #ddd",
-            pb: 1,
-          }}
-        >
-          {t("Update Zenit")}
-        </DialogTitle>
-        <DialogContent
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            mt: 2,
-            minWidth: 250,
-          }}
-        >
-          <Typography variant="h6" sx={{ mb: 2 }}>
-            {t("Current")}: {currentValue}
-          </Typography>
-          <ToggleButtonGroup
-            value={type}
-            exclusive
-            onChange={(_, v) => v !== null && setType(v)}
-            sx={{ mb: 2 }}
-          >
-            <ToggleButton
-              value="+"
-              color="success"
-              sx={{ px: 3, fontSize: "1.2rem", fontWeight: "bold" }}
-            >
-              +
-            </ToggleButton>
-            <ToggleButton
-              value="-"
-              color="error"
-              sx={{ px: 3, fontSize: "1.2rem", fontWeight: "bold" }}
-            >
-              -
-            </ToggleButton>
-          </ToggleButtonGroup>
-          <TextField
-            fullWidth
-            type="number"
-            label={t("Amount")}
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            autoFocus
-          />
-        </DialogContent>
-        <DialogActions sx={{ justifyContent: "center", pb: 2 }}>
+    <ActorEditModal
+      open={open}
+      onClose={onClose}
+      onConfirm={handleSubmit}
+      title={t("Update Zenit")}
+      maxWidth="xs"
+      actions={
+        <Box sx={{ display: "flex", justifyContent: "center", gap: 1 }}>
           <Button onClick={onClose} color="secondary" variant="contained">
             {t("Cancel")}
           </Button>
-          <Button type="submit" variant="contained" color="primary">
+          <Button onClick={handleSubmit} variant="contained" color="primary">
             {t("Apply")}
           </Button>
-        </DialogActions>
-      </form>
-    </Dialog>
+        </Box>
+      }
+    >
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
+      >
+        <Typography variant="h6" sx={{ mb: 2 }}>
+          {t("Current")}: {currentValue}
+        </Typography>
+        <ToggleButtonGroup
+          value={type}
+          exclusive
+          onChange={(_, v) => v !== null && setType(v)}
+          sx={{ mb: 2 }}
+        >
+          <ToggleButton
+            value="+"
+            color="success"
+            sx={{ px: 3, fontSize: "1.2rem", fontWeight: "bold" }}
+          >
+            +
+          </ToggleButton>
+          <ToggleButton
+            value="-"
+            color="error"
+            sx={{ px: 3, fontSize: "1.2rem", fontWeight: "bold" }}
+          >
+            -
+          </ToggleButton>
+        </ToggleButtonGroup>
+        <TextField
+          fullWidth
+          type="number"
+          label={t("Amount")}
+          value={amount}
+          onChange={(e) => setAmount(e.target.value)}
+          autoFocus
+        />
+      </Box>
+    </ActorEditModal>
   );
 }
 

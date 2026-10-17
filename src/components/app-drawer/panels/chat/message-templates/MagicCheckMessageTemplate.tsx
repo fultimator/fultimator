@@ -26,12 +26,13 @@ const gridSx = {
 };
 
 interface MagicCheckMessageTemplateProps {
+  messageId: string;
   check: MagicCheckResult;
 }
 
 export const MagicCheckMessageTemplate: React.FC<
   MagicCheckMessageTemplateProps
-> = ({ check }) => {
+> = ({ messageId, check }) => {
   const theme = useTheme();
   const [open, setOpen] = useState(false);
 
@@ -310,10 +311,12 @@ export const MagicCheckMessageTemplate: React.FC<
       </Box>
 
       <DamagePipelineTargets
+        messageId={messageId}
         targets={check.targetsSnapshot ?? []}
         damage={check.damage}
         damageType={check.intent.damageType}
         fumble={check.fumble}
+        persistedAppliedMap={check.appliedMap}
       />
     </>
   );

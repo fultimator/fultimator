@@ -1262,6 +1262,8 @@ export function ClassForm({
 
   const [name, setName] = useState(editData?.name ?? "");
   const [book, setBook] = useState(editData?.book ?? "homebrew");
+  const [also, setAlso] = useState(editData?.also ?? "");
+  const [description, setDescription] = useState(editData?.description ?? "");
   const [hpplus, setHpplus] = useState(initBenefits.hpplus ?? 0);
   const [mpplus, setMpplus] = useState(initBenefits.mpplus ?? 0);
   const [ipplus, setIpplus] = useState(initBenefits.ipplus ?? 0);
@@ -1308,6 +1310,8 @@ export function ClassForm({
       name: name.trim(),
       fuid: slugify(name.trim()),
       book: book.trim() || "homebrew",
+      also: also.trim(),
+      description: description.trim(),
       meta: createMetaFromBook(book),
       benefits: {
         hpplus: Number(hpplus) || 0,
@@ -1400,6 +1404,28 @@ export function ClassForm({
               fullWidth
               size="small"
               placeholder="homebrew"
+            />
+          </Grid>
+          <Grid size={12}>
+            <TextField
+              label={t("class.also")}
+              value={also}
+              onChange={(e) => setAlso(e.target.value)}
+              fullWidth
+              size="small"
+              placeholder="Druid, Shapeshifter"
+              slotProps={{
+                htmlInput: { maxLength: 150 },
+              }}
+            />
+          </Grid>
+          <Grid size={12}>
+            <CustomTextarea
+              label={t("class.description")}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              minRows={3}
+              maxLength={1500}
             />
           </Grid>
 

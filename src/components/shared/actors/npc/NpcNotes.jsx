@@ -10,7 +10,7 @@ import Diamond from "/src/components/Diamond";
 import { NotesIcon } from "/src/components/icons";
 import { SpanMarkdown, ClickableName } from "./NpcMarkdown";
 
-function NoteRow({ note, npc, showRoll }) {
+function NoteRow({ note, npc, showRoll, t }) {
   const addMessage = useAddChatMessage();
 
   const handleSend = (e) => {
@@ -24,8 +24,15 @@ function NoteRow({ note, npc, showRoll }) {
       name: note.name,
       tags: [],
       description: note.effect,
+      clocks: note.clocks?.map((clock) => ({
+        sections: clock.sections,
+        state: clock.state,
+        name: clock.name,
+      })),
     });
   };
+
+  const clockSummaries = note.clocks ?? [];
 
   return (
     <Fragment>
@@ -41,6 +48,15 @@ function NoteRow({ note, npc, showRoll }) {
           ) : (
             <strong>{note.name}</strong>
           )}{" "}
+          {clockSummaries.map((clock, i) => (
+            <Fragment key={i}>
+              <Diamond />{" "}
+              <strong>
+                {t("npc_note_clock_sections", [clock.sections])}
+                {clock.name ? ` (${clock.name})` : ""}
+              </strong>{" "}
+            </Fragment>
+          ))}
           <Diamond /> <SpanMarkdown>{note.effect}</SpanMarkdown>
         </Typography>
       </Grid>
@@ -70,7 +86,7 @@ export function NpcNotes({ npc, variant = "interactive" }) {
         </Typography>
       </Grid>
       {npc.notes.map((note, i) => (
-        <NoteRow key={i} note={note} npc={npc} showRoll={showRoll} />
+        <NoteRow key={i} note={note} npc={npc} showRoll={showRoll} t={t} />
       ))}
     </Grid>
   );

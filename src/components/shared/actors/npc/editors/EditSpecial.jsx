@@ -401,6 +401,7 @@ export default function EditSpecial({ npc, setNpc }) {
         context="npc"
         initialType="special"
         initialCompendium="personal"
+        allowMultiSelect
         onAddItem={(item) => {
           setNpc((prev) => ({
             ...prev,
@@ -411,6 +412,7 @@ export default function EditSpecial({ npc, setNpc }) {
                 effect: item.effect || "",
                 spCost: item.spCost ?? 1,
                 fuid: item.fuid,
+                subtype: item.subtype,
               },
             ],
           }));

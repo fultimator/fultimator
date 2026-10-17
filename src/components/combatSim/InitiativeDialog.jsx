@@ -117,43 +117,45 @@ export default function InitiativeDialog({
               Turn order this round
             </Typography>
             <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.75, mb: 2 }}>
-              {turnOrder.map((label, i) => (
-                <React.Fragment key={i}>
-                  {i > 0 && (
-                    <Typography
-                      variant="caption"
-                      color="text.disabled"
-                      sx={{ alignSelf: "center" }}
+              {turnOrder.map((label, i) => {
+                const accent =
+                  label === "PC"
+                    ? theme.palette.mode === "dark"
+                      ? theme.palette.secondary.main
+                      : theme.palette.primary.main
+                    : theme.palette.error.main;
+                return (
+                  <React.Fragment key={i}>
+                    {i > 0 && (
+                      <Typography
+                        variant="caption"
+                        color="text.disabled"
+                        sx={{ alignSelf: "center" }}
+                      >
+                        →
+                      </Typography>
+                    )}
+                    <Box
+                      sx={{
+                        px: 1.25,
+                        py: 0.4,
+                        borderRadius: 1,
+                        backgroundColor: accent + "22",
+                        border: "1px solid",
+                        borderColor: accent + "66",
+                      }}
                     >
-                      →
-                    </Typography>
-                  )}
-                  <Box
-                    sx={{
-                      px: 1.25,
-                      py: 0.4,
-                      borderRadius: 1,
-                      backgroundColor:
-                        label === "PC"
-                          ? theme.palette.primary.main + "22"
-                          : theme.palette.error.main + "22",
-                      border: "1px solid",
-                      borderColor:
-                        label === "PC"
-                          ? theme.palette.primary.main + "66"
-                          : theme.palette.error.main + "66",
-                    }}
-                  >
-                    <Typography
-                      variant="caption"
-                      fontWeight="bold"
-                      color={label === "PC" ? "primary" : "error"}
-                    >
-                      {label}
-                    </Typography>
-                  </Box>
-                </React.Fragment>
-              ))}
+                      <Typography
+                        variant="caption"
+                        fontWeight="bold"
+                        sx={{ color: accent }}
+                      >
+                        {label}
+                      </Typography>
+                    </Box>
+                  </React.Fragment>
+                );
+              })}
             </Box>
           </>
         )}

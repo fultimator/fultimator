@@ -42,6 +42,7 @@ export default [
         URL: "readonly",
         URLSearchParams: "readonly",
         requestAnimationFrame: "readonly",
+        cancelAnimationFrame: "readonly",
         structuredClone: "readonly",
         Response: "readonly",
         setTimeout: "readonly",
@@ -66,6 +67,7 @@ export default [
         TextEncoder: "readonly",
         DOMException: "readonly",
         Event: "readonly",
+        CustomEvent: "readonly",
         KeyboardEvent: "readonly",
         Window: "readonly",
         // Node globals

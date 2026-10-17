@@ -10,6 +10,7 @@ import {
   MenuItem,
   ListItemIcon,
   ListItemText,
+  Paper,
   Snackbar,
   Tooltip,
   Typography,
@@ -30,6 +31,7 @@ import { getHoplosphereCoagKey } from "/src/libs/technospheres";
 import { getMnemosphereCost } from "/src/libs/mnemospheres";
 import CompendiumViewerModal from "/src/components/compendium/CompendiumViewerModal";
 import SectionCard from "/src/components/shared/actors/common/SectionCard";
+import CompactSectionHeader from "/src/components/shared/actors/pc/variants/compact/CompactSectionHeader";
 import DeleteConfirmationDialog from "/src/components/common/DeleteConfirmationDialog";
 import MnemosphereClassCard from "/src/components/shared/actors/pc/editors/classes/MnemosphereClassCard";
 import CompendiumSphereImportDialog from "/src/components/shared/actors/pc/editors/equipment/technospheres/CompendiumSphereImportDialog";
@@ -184,8 +186,51 @@ function SphereMenu({
   );
 }
 
-export default function SphereInventory({ player, setPlayer, advancement }) {
+export default function SphereInventory({
+  player,
+  setPlayer,
+  advancement,
+  compact = false,
+}) {
   const { t } = useTranslate();
+
+  const BankShell = ({ title, actions, children }) =>
+    compact ? (
+      <Paper
+        sx={{ mb: 1, overflow: "hidden", borderRadius: "8px" }}
+        elevation={0}
+        variant="outlined"
+      >
+        <CompactSectionHeader title={title}>{actions}</CompactSectionHeader>
+        {children}
+      </Paper>
+    ) : (
+      <SectionCard
+        title={title}
+        sx={{ mb: 2, borderRadius: "8px" }}
+        actions={actions}
+      >
+        {children}
+      </SectionCard>
+    );
+
+  const emptyText = (label) =>
+    compact ? (
+      <Typography
+        color="text.secondary"
+        variant="body2"
+        sx={{ px: 1, py: 0.5 }}
+      >
+        {label}
+      </Typography>
+    ) : (
+      <Typography variant="h3" align="center" sx={{ p: 2 }}>
+        {label}
+      </Typography>
+    );
+
+  const actionButtonSx = { color: "#fff", p: compact ? "2px" : "4px" };
+  const actionIconSx = { fontSize: compact ? "1.15rem" : "1.3rem" };
   const technospheresVariant =
     player?.settings?.optionalRules?.technospheresVariant ?? "standard";
   const isTechnospheres =
@@ -370,42 +415,39 @@ export default function SphereInventory({ player, setPlayer, advancement }) {
       {(isIntegrated || isMnemospheresOnly) && (
         <>
           <MnemoReceptaclePanel player={player} setPlayer={setPlayer} />
-          <Divider sx={{ my: 3 }} />
+          {!compact && <Divider sx={{ my: 3 }} />}
         </>
       )}
 
       {!mnemoHidden && (
         <>
-          <SectionCard
+          <BankShell
             title={t("Mnemosphere Bank")}
-            sx={{ mb: 2 }}
             actions={
               <Box sx={{ display: "flex", gap: "2px" }}>
-                <Tooltip title={t("Search Compendium")} arrow>
-                  <IconButton
-                    size="small"
-                    sx={{ color: "#fff", p: "4px" }}
-                    onClick={() => setCompendiumType("mnemospheres")}
-                  >
-                    <Search sx={{ fontSize: "1.3rem" }} />
-                  </IconButton>
-                </Tooltip>
                 <Tooltip title={t("Add Mnemosphere")} arrow>
                   <IconButton
                     size="small"
-                    sx={{ color: "#fff", p: "4px" }}
+                    sx={actionButtonSx}
                     onClick={() => setCreateMnemoOpen(true)}
                   >
-                    <Add sx={{ fontSize: "1.3rem" }} />
+                    <Add sx={actionIconSx} />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title={t("Search Compendium")} arrow>
+                  <IconButton
+                    size="small"
+                    sx={actionButtonSx}
+                    onClick={() => setCompendiumType("mnemospheres")}
+                  >
+                    <Search sx={actionIconSx} />
                   </IconButton>
                 </Tooltip>
               </Box>
             }
           >
             {mnemospheres.length === 0 ? (
-              <Typography variant="h3" align="center" sx={{ p: 2 }}>
-                {t("No mnemospheres added yet")}
-              </Typography>
+              emptyText(t("No mnemospheres added yet"))
             ) : (
               <Box
                 sx={{ p: 1, display: "flex", flexDirection: "column", gap: 1 }}
@@ -454,44 +496,41 @@ export default function SphereInventory({ player, setPlayer, advancement }) {
                 ))}
               </Box>
             )}
-          </SectionCard>
+          </BankShell>
         </>
       )}
 
       {!isMnemospheresOnly && (
         <>
-          {!isHoplospheresOnly && <Divider sx={{ my: 3 }} />}
+          {!isHoplospheresOnly && !compact && <Divider sx={{ my: 3 }} />}
 
-          <SectionCard
+          <BankShell
             title={t("Hoplosphere Bank")}
-            sx={{ mb: 2 }}
             actions={
               <Box sx={{ display: "flex", gap: "2px" }}>
-                <Tooltip title={t("Search Compendium")} arrow>
-                  <IconButton
-                    size="small"
-                    sx={{ color: "#fff", p: "4px" }}
-                    onClick={() => setCompendiumType("hoplospheres")}
-                  >
-                    <Search sx={{ fontSize: "1.3rem" }} />
-                  </IconButton>
-                </Tooltip>
                 <Tooltip title={t("Add Hoplosphere")} arrow>
                   <IconButton
                     size="small"
-                    sx={{ color: "#fff", p: "4px" }}
+                    sx={actionButtonSx}
                     onClick={() => setCreateHoploOpen(true)}
                   >
-                    <Add sx={{ fontSize: "1.3rem" }} />
+                    <Add sx={actionIconSx} />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title={t("Search Compendium")} arrow>
+                  <IconButton
+                    size="small"
+                    sx={actionButtonSx}
+                    onClick={() => setCompendiumType("hoplospheres")}
+                  >
+                    <Search sx={actionIconSx} />
                   </IconButton>
                 </Tooltip>
               </Box>
             }
           >
             {hoplospheres.length === 0 ? (
-              <Typography variant="h3" align="center" sx={{ p: 2 }}>
-                {t("No hoplospheres added yet")}
-              </Typography>
+              emptyText(t("No hoplospheres added yet"))
             ) : (
               <Box
                 sx={{ p: 1, display: "flex", flexDirection: "column", gap: 1 }}
@@ -557,7 +596,7 @@ export default function SphereInventory({ player, setPlayer, advancement }) {
                 })}
               </Box>
             )}
-          </SectionCard>
+          </BankShell>
         </>
       )}
 

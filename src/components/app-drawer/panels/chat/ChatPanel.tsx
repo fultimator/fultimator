@@ -13,15 +13,20 @@ import {
   DialogContent,
   DialogTitle,
   Divider,
+  IconButton,
   List,
   ListItem,
   ListItemButton,
   ListItemIcon,
   ListItemText,
+  Menu,
+  MenuItem,
   Typography,
   Button,
 } from "@mui/material";
 import { useLocation } from "react-router";
+import MenuIcon from "@mui/icons-material/Menu";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutlined";
 import PrecisionManufacturingIcon from "@mui/icons-material/PrecisionManufacturing";
 import DeleteConfirmationDialog from "../../../common/DeleteConfirmationDialog";
 import { AUTHOR_NAME, DEFAULT_SPEAKER, LOCAL_SPEAKER_KEY } from "./constants";
@@ -192,6 +197,30 @@ function getOppositeResourceDirection(
   return direction === "loss" ? "gain" : "loss";
 }
 
+function getResourceCurrent(
+  actorDoc: Record<string, unknown>,
+  resource: ResourceKind,
+  runtimeIp?: number,
+): number {
+  if (resource === "fp") {
+    const doc = actorDoc as { info?: { fabulapoints?: number } };
+    return doc.info?.fabulapoints ?? 0;
+  }
+  if (resource === "up") {
+    const doc = actorDoc as { combatStats?: { ultima?: number } };
+    return doc.combatStats?.ultima ?? 0;
+  }
+  if (resource === "ip" && runtimeIp !== undefined) {
+    return runtimeIp;
+  }
+  const stats = (
+    actorDoc as {
+      stats?: Record<string, { current?: number }>;
+    }
+  ).stats;
+  return stats?.[resource]?.current ?? 0;
+}
+
 function applyResourceDelta(
   actorDoc: Record<string, unknown>,
   resource: ResourceKind,
@@ -274,6 +303,39 @@ function buildResourceApplicationLog({
   };
 }
 
+const LogMessageMenu: React.FC<{ onDelete: () => void }> = ({ onDelete }) => {
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  return (
+    <>
+      <IconButton
+        size="small"
+        aria-label="Message options"
+        onClick={(e) => setAnchorEl(e.currentTarget)}
+        sx={{ color: "text.secondary", flexShrink: 0 }}
+      >
+        <MenuIcon sx={{ fontSize: 16 }} />
+      </IconButton>
+      <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={() => setAnchorEl(null)}
+      >
+        <MenuItem
+          onClick={() => {
+            setAnchorEl(null);
+            onDelete();
+          }}
+        >
+          <ListItemIcon>
+            <DeleteOutlineIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>Delete Message</ListItemText>
+        </MenuItem>
+      </Menu>
+    </>
+  );
+};
+
 export const ChatPanel: React.FC = () => {
   const { t } = useTranslate();
   const [selectedSpeaker, setSelectedSpeaker] = useState<string>(
@@ -304,6 +366,10 @@ export const ChatPanel: React.FC = () => {
   const contextActorName = useActorName(playerDoc, npcDoc);
   const combatSimActors = useCombatSimActors();
   const activeActorName = useCombatEncounterStore((s) => s.activeActorName);
+  const updateRuntimeActor = useCombatEncounterStore(
+    (s) => s.updateRuntimeActor,
+  );
+  const getRuntimeActor = useCombatEncounterStore((s) => s.getRuntimeActor);
   const localDb = useDatabase("local");
   const cloudDb = useDatabase("cloud");
 
@@ -435,6 +501,40 @@ export const ChatPanel: React.FC = () => {
       window.removeEventListener("chat:run-command", handler);
     };
   }, []);
+  useEffect(() => {
+    const handler = (event: Event) => {
+      const detail = (
+        event as CustomEvent<{
+          name?: string;
+          description?: string;
+          itemType?: string;
+          tags?: string[];
+          speaker?: string;
+          cost?: {
+            resource: "hp" | "mp" | "ip" | "fp" | "up";
+            amount: number;
+            perTarget?: boolean;
+          };
+        }>
+      ).detail;
+      if (!detail?.name) return;
+      addMessage({
+        id: crypto.randomUUID(),
+        createdAt: Date.now(),
+        speaker: detail.speaker,
+        kind: "display",
+        itemType: detail.itemType ?? "skill",
+        name: detail.name,
+        tags: detail.tags ?? [],
+        description: detail.description,
+        cost: detail.cost,
+      });
+    };
+    window.addEventListener("chat:add-message", handler);
+    return () => {
+      window.removeEventListener("chat:add-message", handler);
+    };
+  }, [addMessage]);
 
   useEffect(() => {
     const handler = (event: Event) => {
@@ -680,14 +780,46 @@ export const ChatPanel: React.FC = () => {
             resource,
           }),
         );
-        return;
+        return false;
       }
-      const updated = applyResourceDelta(
-        activeActorDoc as Record<string, unknown>,
-        resource,
-        getResourceDelta(amount, direction),
-      );
-      setActiveActorDoc(updated);
+      const combatId = activeActorDoc.combatId as string | undefined;
+      const useRuntimeIp = isCombatSim && resource === "ip" && !!combatId;
+      const runtimeIp = useRuntimeIp
+        ? getRuntimeActor(combatId!)?.currentIp
+        : undefined;
+
+      if (direction === "loss") {
+        const current = getResourceCurrent(
+          activeActorDoc as unknown as Record<string, unknown>,
+          resource,
+          runtimeIp,
+        );
+        if (current < amount) {
+          return false;
+        }
+      }
+
+      const delta = getResourceDelta(amount, direction);
+      if (useRuntimeIp) {
+        updateRuntimeActor(combatId!, (actor) => {
+          const stats = activeActorDoc.stats as
+            | Record<string, { max?: number }>
+            | undefined;
+          const maxIp = stats?.ip?.max ?? Number.POSITIVE_INFINITY;
+          return {
+            ...actor,
+            currentIp: Math.max(0, Math.min(actor.currentIp + delta, maxIp)),
+          };
+        });
+      } else {
+        setActiveActorDoc((prev) =>
+          applyResourceDelta(
+            prev as unknown as Record<string, unknown>,
+            resource,
+            delta,
+          ),
+        );
+      }
       addMessage(
         buildResourceApplicationLog({
           actorName,
@@ -697,14 +829,39 @@ export const ChatPanel: React.FC = () => {
           resource,
         }),
       );
+      return true;
     },
     [
       activeActorDoc,
       addMessage,
       contextActorName,
+      getRuntimeActor,
+      isCombatSim,
+      updateRuntimeActor,
       selectedSpeaker,
       setActiveActorDoc,
     ],
+  );
+
+  const handleUpdateCost = useCallback(
+    (message: import("./types").DisplayMessage, amount: number) => {
+      const inEncounter = encounterMessages.some((m) => m.id === message.id);
+      const updateCost = (m: ChatMessage): ChatMessage => {
+        if (m.id !== message.id || m.kind !== "display" || !m.cost) return m;
+        return { ...m, cost: { ...m.cost, amount } };
+      };
+
+      if (inEncounter) {
+        if (!encounterId) return;
+        setEncounterMessages(
+          encounterId,
+          (encounterMessages as ChatMessage[]).map(updateCost),
+        );
+      } else {
+        store.setMessages(store.messages.map(updateCost));
+      }
+    },
+    [store, encounterMessages, encounterId, setEncounterMessages],
   );
 
   const handleToggleResourceApplication = useCallback(
@@ -730,12 +887,28 @@ export const ChatPanel: React.FC = () => {
         return;
       }
 
-      const updated = applyResourceDelta(
-        activeActorDoc as Record<string, unknown>,
-        event.resource,
-        getResourceDelta(event.amount, nextDirection),
-      );
-      setActiveActorDoc(updated);
+      const delta = getResourceDelta(event.amount, nextDirection);
+      const combatId = activeActorDoc.combatId as string | undefined;
+      if (isCombatSim && event.resource === "ip" && combatId) {
+        updateRuntimeActor(combatId, (actor) => {
+          const stats = activeActorDoc.stats as
+            | Record<string, { max?: number }>
+            | undefined;
+          const maxIp = stats?.ip?.max ?? Number.POSITIVE_INFINITY;
+          return {
+            ...actor,
+            currentIp: Math.max(0, Math.min(actor.currentIp + delta, maxIp)),
+          };
+        });
+      } else {
+        setActiveActorDoc((prev) =>
+          applyResourceDelta(
+            prev as unknown as Record<string, unknown>,
+            event.resource,
+            delta,
+          ),
+        );
+      }
       setUndoneResourceLogIds((prev) => {
         const next = new Set(prev);
         if (isUndone) next.delete(logMsg.id);
@@ -743,7 +916,14 @@ export const ChatPanel: React.FC = () => {
         return next;
       });
     },
-    [activeActorDoc, addMessage, setActiveActorDoc, undoneResourceLogIds],
+    [
+      activeActorDoc,
+      addMessage,
+      isCombatSim,
+      updateRuntimeActor,
+      setActiveActorDoc,
+      undoneResourceLogIds,
+    ],
   );
 
   useEffect(() => {
@@ -840,6 +1020,7 @@ export const ChatPanel: React.FC = () => {
             handleResourceChange(msg, resource, amount, "loss"),
           onGainResource: (msg, resource, amount) =>
             handleResourceChange(msg, resource, amount, "gain"),
+          onUpdateCost: handleUpdateCost,
           selectedSpeaker,
         }}
       >
@@ -925,6 +1106,9 @@ export const ChatPanel: React.FC = () => {
                       >
                         {formatTimeAgo(logMsg.createdAt)}
                       </Typography>
+                      <LogMessageMenu
+                        onDelete={() => deleteActiveMessage(logMsg.id)}
+                      />
                     </Box>
                   );
                 }

@@ -1,5 +1,13 @@
-import React from "react";
-import { Box, Button, Typography } from "@mui/material";
+import React, { useState } from "react";
+import {
+  Box,
+  Button,
+  IconButton,
+  Popover,
+  TextField,
+  Typography,
+} from "@mui/material";
+import SettingsIcon from "@mui/icons-material/Settings";
 import type { DisplayMessage } from "../types";
 import Diamond from "../../../../Diamond";
 import NotesMarkdown from "../../../../common/NotesMarkdown";
@@ -16,7 +24,12 @@ interface DisplayMessageTemplateProps {
 export const DisplayMessageTemplate: React.FC<DisplayMessageTemplateProps> = ({
   message,
 }) => {
-  const { onLossResource } = useChatActions();
+  const { onLossResource, onUpdateCost } = useChatActions();
+  const [costEditAnchor, setCostEditAnchor] = useState<HTMLElement | null>(
+    null,
+  );
+  const [costEditValue, setCostEditValue] = useState("");
+  const [insufficientWarning, setInsufficientWarning] = useState(false);
   const tags = message.tags.map((t) =>
     t === "default" ? formatSpellType(t) : t,
   );
@@ -26,18 +39,20 @@ export const DisplayMessageTemplate: React.FC<DisplayMessageTemplateProps> = ({
         message.itemType || "",
       ).toLowerCase() as keyof typeof ACTION_ICON_SRC_BY_KEY
     ];
-  const clockSections = Number(message.clock?.sections) || 0;
-  const clockState =
-    clockSections > 0
-      ? Array.isArray(message.clock?.state) &&
-        message.clock.state.length === clockSections
-        ? message.clock.state
-        : new Array(clockSections).fill(false)
-      : [];
-  const filledClockSections = clockState.filter(Boolean).length;
+  const clocks = (message.clocks ?? [])
+    .map((clock) => {
+      const sections = Number(clock?.sections) || 0;
+      if (sections <= 0) return null;
+      const state =
+        Array.isArray(clock?.state) && clock.state.length === sections
+          ? clock.state
+          : new Array(sections).fill(false);
+      return { name: clock?.name, sections, state };
+    })
+    .filter((clock): clock is NonNullable<typeof clock> => clock !== null);
   const hasDescription = Boolean(message.description);
   const hasEffect = Boolean(message.effect);
-  const hasClock = clockSections > 0;
+  const hasClock = clocks.length > 0;
 
   return (
     <Box
@@ -163,69 +178,144 @@ export const DisplayMessageTemplate: React.FC<DisplayMessageTemplateProps> = ({
           )}
 
           {hasClock ? (
-            <Box
-              sx={{
-                px: 1.2,
-                py: 1,
-                border: "1px solid",
-                borderColor: "divider",
-                borderRadius: 1,
-                backgroundColor: "action.hover",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "flex-start",
-                gap: 1.25,
-                minHeight: 72,
-              }}
-            >
-              <Clock
-                numSections={clockSections}
-                size={56}
-                state={clockState}
-                setState={() => {}}
-                isCharacterSheet
-              />
-              <Box>
-                <Typography
-                  variant="caption"
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+              {clocks.map((clock, index) => (
+                <Box
+                  key={index}
                   sx={{
-                    display: "block",
-                    color: "text.secondary",
-                    fontWeight: 700,
+                    px: 1.2,
+                    py: 1,
+                    border: "1px solid",
+                    borderColor: "divider",
+                    borderRadius: 1,
+                    backgroundColor: "action.hover",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "flex-start",
+                    gap: 1.25,
+                    minHeight: 72,
                   }}
                 >
-                  {message.clock?.name || "Clock"}
-                </Typography>
-                <Typography
-                  sx={{ fontSize: "1.25rem", lineHeight: 1.1, fontWeight: 800 }}
-                >
-                  {filledClockSections}/{clockSections}
-                </Typography>
-              </Box>
+                  <Clock
+                    numSections={clock.sections}
+                    size={56}
+                    state={clock.state}
+                    setState={() => {}}
+                    isCharacterSheet
+                  />
+                  <Box>
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        display: "block",
+                        color: "text.secondary",
+                        fontWeight: 700,
+                      }}
+                    >
+                      {clock.name || "Clock"}
+                    </Typography>
+                    <Typography
+                      sx={{
+                        fontSize: "1.25rem",
+                        lineHeight: 1.1,
+                        fontWeight: 800,
+                      }}
+                    >
+                      {clock.state.filter(Boolean).length}/{clock.sections}
+                    </Typography>
+                  </Box>
+                </Box>
+              ))}
             </Box>
           ) : null}
         </Box>
       )}
       {message.cost != null && (
         <Box sx={{ mt: 1 }}>
-          <Button
-            variant="outlined"
-            size="small"
-            fullWidth
-            onClick={() => {
-              if (onLossResource) {
-                onLossResource(
-                  message,
-                  message.cost!.resource,
-                  message.cost!.amount,
-                );
-                return;
-              }
-            }}
-            sx={{ textTransform: "none", fontWeight: 600 }}
-          >
-            Spend {message.cost.amount} {message.cost.resource.toUpperCase()}
-          </Button>
+          <Box sx={{ display: "flex", gap: 0.5 }}>
+            <Button
+              variant="outlined"
+              size="small"
+              fullWidth
+              onClick={() => {
+                if (onLossResource) {
+                  const applied = onLossResource(
+                    message,
+                    message.cost!.resource,
+                    message.cost!.amount,
+                  );
+                  if (!applied) {
+                    setInsufficientWarning(true);
+                    setTimeout(() => setInsufficientWarning(false), 2500);
+                  }
+                  return;
+                }
+              }}
+              sx={{ textTransform: "none", fontWeight: 600 }}
+            >
+              Spend {message.cost.amount} {message.cost.resource.toUpperCase()}
+            </Button>
+            {onUpdateCost && (
+              <IconButton
+                size="small"
+                onClick={(e) => {
+                  setCostEditValue(String(message.cost!.amount));
+                  setCostEditAnchor(e.currentTarget);
+                }}
+              >
+                <SettingsIcon fontSize="small" />
+              </IconButton>
+            )}
+            <Popover
+              open={Boolean(costEditAnchor)}
+              anchorEl={costEditAnchor}
+              onClose={() => setCostEditAnchor(null)}
+              anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+              transformOrigin={{ vertical: "top", horizontal: "right" }}
+              slotProps={{
+                paper: { sx: { p: 1.5, display: "flex", gap: 1 } },
+              }}
+            >
+              <TextField
+                autoFocus
+                type="number"
+                size="small"
+                label={`Spend ${message.cost?.resource.toUpperCase()}`}
+                value={costEditValue}
+                onChange={(e) => setCostEditValue(e.target.value)}
+                slotProps={{ htmlInput: { min: 0 } }}
+                sx={{ width: 120 }}
+              />
+              <Button
+                variant="contained"
+                size="small"
+                onClick={() => {
+                  const amount = Math.max(0, parseInt(costEditValue, 10) || 0);
+                  onUpdateCost?.(message, amount);
+                  const applied = onLossResource?.(
+                    message,
+                    message.cost!.resource,
+                    amount,
+                  );
+                  if (applied === false) {
+                    setInsufficientWarning(true);
+                    setTimeout(() => setInsufficientWarning(false), 2500);
+                  }
+                  setCostEditAnchor(null);
+                }}
+              >
+                Spend
+              </Button>
+            </Popover>
+          </Box>
+          {insufficientWarning && (
+            <Typography
+              variant="caption"
+              sx={{ display: "block", mt: 0.4, color: "error.main" }}
+            >
+              Insufficient {message.cost.resource.toUpperCase()}
+            </Typography>
+          )}
         </Box>
       )}
     </Box>

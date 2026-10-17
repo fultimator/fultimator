@@ -1245,6 +1245,131 @@ export const SharedAccessoryCard = React.memo(function SharedAccessoryCard({
   );
 });
 
+export const SharedConsumableCard = React.memo(function SharedConsumableCard({
+  item,
+  id = CARD_DEFAULTS.id,
+  onHeaderClick = CARD_DEFAULTS.onHeaderClick,
+  showHeader = CARD_DEFAULTS.showHeader,
+  showCard = CARD_DEFAULTS.showCard,
+  variant = CARD_DEFAULTS.variant,
+  imageMode = CARD_DEFAULTS.imageMode,
+  imageSize = CARD_DEFAULTS.imageSize,
+  imageSlot = CARD_DEFAULTS.imageSlot,
+  showImageToggle = CARD_DEFAULTS.showImageToggle,
+  showImage = CARD_DEFAULTS.showImage,
+  onShowImageChange = CARD_DEFAULTS.onShowImageChange,
+  showImageTempInfo = CARD_DEFAULTS.showImageTempInfo,
+  imageTempInfoTextKey = CARD_DEFAULTS.imageTempInfoTextKey,
+  actionContent = CARD_DEFAULTS.actionContent,
+  defaultImageVisible = CARD_DEFAULTS.defaultImageVisible,
+}) {
+  const {
+    t,
+    customTheme,
+    scale,
+    background,
+    imageVisible,
+    setImageVisible,
+    imageTempInfoText,
+  } = useCardSetup({
+    variant,
+    showImage,
+    onShowImageChange,
+    defaultImageVisible,
+    imageTempInfoTextKey,
+  });
+
+  const withImage = isImageMode(imageMode);
+  const cols = withImage ? { name: 8, cost: 4 } : { name: 9, cost: 3 };
+
+  return (
+    <CardContentWrapper
+      showCard={showCard}
+      id={id}
+      showImageToggle={showImageToggle}
+      imageMode={imageMode}
+      imageVisible={imageVisible}
+      setImageVisible={setImageVisible}
+      showImageTempInfo={showImageTempInfo}
+      imageTempInfoText={imageTempInfoText}
+      actionContent={actionContent}
+    >
+      <RowsWithOptionalImage
+        header={
+          showHeader && (
+            <Grid
+              container
+              onClick={onHeaderClick}
+              sx={headerSx(customTheme, scale, onHeaderClick, imageMode)}
+            >
+              <Grid
+                container
+                sx={{ flex: 1, pl: rowPl(imageMode), pr: rowPl(imageMode) }}
+              >
+                <Grid size={cols.name}>
+                  <Typography>{t("Consumable")}</Typography>
+                </Grid>
+                <Grid size={cols.cost}>
+                  <Typography sx={{ textAlign: "center" }}>
+                    {t("IP")}
+                  </Typography>
+                </Grid>
+              </Grid>
+            </Grid>
+          )
+        }
+        imageMode={imageMode}
+        imageSize={imageSize}
+        imageVisible={imageVisible}
+        imageSlot={imageSlot}
+        customTheme={customTheme}
+      >
+        <Grid
+          container
+          sx={dataRowSx(customTheme, imageMode, background, {
+            pr: rowPl(imageMode),
+            borderBottom: `1px solid ${customTheme.secondary}`,
+          })}
+        >
+          <Grid size={cols.name}>
+            <Typography
+              sx={{
+                fontWeight: 600,
+                fontSize: scale.headingRow,
+                lineHeight: 1,
+                margin: 0,
+              }}
+            >
+              {t(item.name)}
+            </Typography>
+          </Grid>
+          <Grid size={cols.cost}>
+            <Typography
+              sx={{
+                textAlign: "center",
+                fontSize: scale.body,
+                lineHeight: 1,
+                margin: 0,
+              }}
+            >
+              {item.ipCost ?? 0}
+            </Typography>
+          </Grid>
+        </Grid>
+
+        <DescriptionRow
+          item={{
+            ...item,
+            description: item.description && t(item.description),
+          }}
+          customTheme={customTheme}
+          imageMode={imageMode}
+        />
+      </RowsWithOptionalImage>
+    </CardContentWrapper>
+  );
+});
+
 export const SharedMnemosphereCard = React.memo(function SharedMnemosphereCard({
   item,
   id = CARD_DEFAULTS.id,
@@ -1314,37 +1439,48 @@ export const SharedMnemosphereCard = React.memo(function SharedMnemosphereCard({
         <Divider />
 
         {skills.map((sk, i) => (
-          <Box
-            key={i}
-            sx={{
-              borderBottom:
-                i < skills.length - 1 || heroic.length > 0 || spells.length > 0
-                  ? `1px solid ${customTheme.secondary}`
-                  : undefined,
-            }}
-          >
+          <Box key={i}>
             <Box
               sx={{
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
+                gap: 1,
                 px: 2,
-                pt: 0.75,
-                pb: 0.25,
+                py: 0.5,
+                background: customTheme.primary,
+                color: "#ffffff",
+                borderTop: `1px solid ${customTheme.secondary}`,
               }}
             >
-              <Typography variant="body2" sx={{ fontWeight: "bold" }}>
-                {t(sk.name)}
+              <Typography
+                sx={{
+                  color: "inherit",
+                  fontFamily: "Antonio",
+                  fontWeight: "bold",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.5px",
+                  fontSize: scale.body,
+                  lineHeight: 1.4,
+                }}
+              >
+                {t(sk.skillName ?? sk.name)}
               </Typography>
               <Chip
                 label={`Max ${sk.maxLvl}`}
                 size="small"
-                variant="outlined"
-                sx={{ fontSize: "0.65rem", height: 18, flexShrink: 0 }}
+                sx={{
+                  fontSize: "0.65rem",
+                  height: 18,
+                  flexShrink: 0,
+                  backgroundColor: "rgba(255,255,255,0.2)",
+                  color: "#ffffff",
+                  fontWeight: "bold",
+                }}
               />
             </Box>
             {sk.description && (
-              <Box sx={{ px: 2, pb: 0.75 }}>
+              <Box sx={{ px: 2, py: 0.75 }}>
                 <Typography
                   variant="body2"
                   component="div"

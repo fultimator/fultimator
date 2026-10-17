@@ -78,7 +78,7 @@ export default function SpellEntropistGamble({ gamble }) {
               sx={{ color: "#fff", fontWeight: "bold", fontSize: "0.85rem" }}
             >
               {gamble.spellName} - {gamble.mp}MP × {gamble.maxTargets}{" "}
-              {t("Max Dices")} - {t(attributes[gamble.attr].shortcaps)}
+              {t("Max Dices")} - {t(attributes[gamble.attr]?.shortcaps)}
             </Typography>
           </StyledTableCell>
         </TableRow>

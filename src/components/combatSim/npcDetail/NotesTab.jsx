@@ -1,6 +1,5 @@
-import React, { useState } from "react";
-import { TextField, Button } from "@mui/material";
-import { Send } from "@mui/icons-material";
+import React from "react";
+import { TextField } from "@mui/material";
 import { t } from "../../../translation/translate";
 
 const NotesTab = ({
@@ -8,24 +7,7 @@ const NotesTab = ({
   setSelectedNPC,
   selectedNPCs,
   setSelectedNPCs,
-  emitLog,
 }) => {
-  const [customLog, setCustomLog] = useState("");
-
-  const handleSendLog = () => {
-    const npcName =
-      selectedNPC.name +
-      (selectedNPC?.combatStats?.combatNotes
-        ? "【" + selectedNPC.combatStats.combatNotes + "】"
-        : "");
-    const trimmedLog = customLog.trim();
-    if (!trimmedLog) return;
-
-    emitLog({ type: "text", text: npcName + ": " + trimmedLog });
-
-    setCustomLog("");
-  };
-
   return (
     <>
       <TextField
@@ -97,29 +79,6 @@ const NotesTab = ({
         sx={{ mt: 2 }}
         slotProps={{
           htmlInput: { maxLength: 2000 },
-        }}
-      />
-      <TextField
-        label={t("combat_sim_custom_log")}
-        variant="outlined"
-        fullWidth
-        value={customLog}
-        onChange={(e) => setCustomLog(e.target.value)}
-        sx={{ mt: 2 }}
-        slotProps={{
-          input: {
-            endAdornment: (
-              <Button
-                onClick={handleSendLog}
-                color="primary"
-                variant="contained"
-                startIcon={<Send />}
-                disabled={!customLog}
-              >
-                {t("combat_sim_send_log")}
-              </Button>
-            ),
-          },
         }}
       />
     </>

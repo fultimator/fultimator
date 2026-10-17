@@ -1,7 +1,5 @@
 import React from "react";
 import {
-  Alert,
-  AlertTitle,
   Box,
   Button,
   Card,
@@ -70,8 +68,10 @@ import {
   removeSpell,
   npcHasSpell,
   isSpeciesGrantApplied,
+  clearSpeciesOptionPicks,
 } from "/src/libs/quickAssembly/speciesGrants";
 import CompendiumViewerModal from "/src/components/compendium/CompendiumViewerModal";
+import DeleteConfirmationDialog from "/src/components/common/DeleteConfirmationDialog";
 
 const ROLE_OPTIONS = QA_ROLE_KEYS.map((key) => ({
   value: key,
@@ -93,6 +93,17 @@ function findFlyingSpecial(personalPack) {
   return item?.data ?? null;
 }
 
+const THORNS_PATTERN = /\bthorns\b/i;
+function findThornsSpecial(personalPack) {
+  const item = (personalPack?.items ?? []).find(
+    (i) =>
+      i.type === "npc-special" &&
+      (THORNS_PATTERN.test(i.data?.name ?? "") ||
+        THORNS_PATTERN.test(i.data?.fuid ?? "")),
+  );
+  return item?.data ?? null;
+}
+
 export default function EditQuickAssembly({ npc, setNpc }) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
@@ -100,9 +111,13 @@ export default function EditQuickAssembly({ npc, setNpc }) {
   const { personalPack } = useCompendiumPacks();
   const [compendiumOpen, setCompendiumOpen] = React.useState(false);
   const [compendiumType, setCompendiumType] = React.useState("special");
+  const [compendiumSubtype, setCompendiumSubtype] = React.useState(null);
   const [activeSlot, setActiveSlot] = React.useState(null);
+  const [activeSlotMaxAdd, setActiveSlotMaxAdd] = React.useState(Infinity);
+  const addedForSlotRef = React.useRef(0);
   const [activeStep, setActiveStep] = React.useState(0);
   const [showAll, setShowAll] = React.useState(false);
+  const [pendingDelete, setPendingDelete] = React.useState(null);
   const background =
     theme.mode === "dark"
       ? `linear-gradient(to right, ${theme.primary}, ${theme.quaternary})`
@@ -119,11 +134,19 @@ export default function EditQuickAssembly({ npc, setNpc }) {
   // Construct/Elemental/Undead unlock their option list only once the user adds the
   // extra restricted Vulnerability.
   const optionalVulnTypes = speciesStep?.optionalVuln ?? null;
+  const optionalVulnCount = (optionalVulnTypes ?? []).filter(
+    (type) => npc.affinities?.[type] === "vu",
+  ).length;
   const optionalVulnSatisfied =
-    !speciesStep?.optionsRequireVuln ||
-    (optionalVulnTypes ?? []).some((type) => npc.affinities?.[type] === "vu");
+    !speciesStep?.optionsRequireVuln || optionalVulnCount > 0;
 
-  const speciesChooseTarget = speciesStep?.choose ?? 0;
+  const speciesChooseTarget = speciesStep?.optionsRequireVuln
+    ? Math.min(optionalVulnCount, optionalVulnTypes?.length ?? 0)
+    : (speciesStep?.choose ?? 0);
+
+  const fixedStatusImmunities = (speciesStep?.fixed ?? [])
+    .filter((g) => g.kind === "statusImmunity")
+    .flatMap((g) => g.options ?? []);
 
   const countableGrants = [...grants, ...rankGrants].filter((g) =>
     isGrantCountable(g),
@@ -134,32 +157,49 @@ export default function EditQuickAssembly({ npc, setNpc }) {
   ).length;
   const grantsDone = grantsTotal === 0 || grantsApplied >= grantsTotal;
 
-  const openCompendium = (type = "special", slot = null) => {
+  const openCompendium = (
+    type = "special",
+    slot = null,
+    subtype = null,
+    maxAdd = Infinity,
+  ) => {
     setCompendiumType(type);
     setActiveSlot(slot);
+    setActiveSlotMaxAdd(maxAdd);
+    addedForSlotRef.current = 0;
+    setCompendiumSubtype(subtype);
     setCompendiumOpen(true);
   };
 
-  const toggleSpell = (fuid) =>
-    setNpc((prev) =>
-      npcHasSpell(prev, fuid)
-        ? removeSpell(prev, fuid)
-        : addOfficialSpell(prev, fuid),
-    );
+  const toggleSpell = (fuid, mpBonus = 0) =>
+    setNpc((prev) => {
+      const had = npcHasSpell(prev, fuid);
+      const next = had ? removeSpell(prev, fuid) : addOfficialSpell(prev, fuid);
+      if (!mpBonus) return next;
+      const current = next.resources?.mp?.bonus ?? next.extra?.mp ?? 0;
+      const bonus = had ? Math.max(0, current - mpBonus) : current + mpBonus;
+      if (next.resources?.mp) {
+        return {
+          ...next,
+          resources: { ...next.resources, mp: { ...next.resources.mp, bonus } },
+        };
+      }
+      return { ...next, extra: { ...next.extra, mp: bonus } };
+    });
 
-  // Adds a compendium Flying rule if the user has one, else a "Flying" stub.
-  const addFlying = (slot) => {
-    const match = findFlyingSpecial(personalPack);
+  // Adds a matching compendium special rule if the user has one, else a bare-name stub.
+  const addScaffoldSpecial = (find, name, descriptionKey) => (slot) => {
+    const match = find(personalPack);
     const item = match
       ? {
-          name: match.name || "Flying",
+          name: match.name || name,
           effect: match.effect || "",
           spCost: match.spCost ?? 1,
           fuid: match.fuid,
         }
       : {
-          name: "Flying",
-          effect: t("role_species_note_flying_desc"),
+          name,
+          effect: descriptionKey ? t(descriptionKey) : "",
           spCost: 1,
         };
     setNpc((prev) => ({
@@ -170,6 +210,16 @@ export default function EditQuickAssembly({ npc, setNpc }) {
       ],
     }));
   };
+  const addFlying = addScaffoldSpecial(
+    findFlyingSpecial,
+    "Flying",
+    "role_species_note_flying_desc",
+  );
+  const addThorns = addScaffoldSpecial(
+    findThornsSpecial,
+    "Thorns",
+    "role_species_note_thorns_desc",
+  );
 
   const toggleSelection = (slot) =>
     setNpc((prev) => ({
@@ -191,6 +241,64 @@ export default function EditQuickAssembly({ npc, setNpc }) {
       ...prev,
       [ref.list]: (prev[ref.list] ?? []).filter((_, i) => i !== ref.index),
     }));
+
+  const requestRemoveReference = (ref) =>
+    setPendingDelete({
+      title: t("role_qa_remove_skill_title"),
+      message: t("role_qa_remove_skill_confirm"),
+      itemPreview: (
+        <Typography variant="h4">
+          {ref.name || t("role_grant_roleSkill")}
+        </Typography>
+      ),
+      onConfirm: () => removeReference(ref),
+    });
+
+  const negativeSkills = npc.qaNegativeSkills ?? [];
+
+  const addNegativeSkill = () =>
+    setNpc((prev) => ({
+      ...prev,
+      qaNegativeSkills: [
+        ...(prev.qaNegativeSkills ?? []),
+        { id: crypto.randomUUID(), bonusKind: "roleSkill" },
+      ],
+    }));
+
+  const setNegativeBonusKind = (id, bonusKind) =>
+    setNpc((prev) => ({
+      ...prev,
+      qaNegativeSkills: (prev.qaNegativeSkills ?? []).map((n) =>
+        n.id === id ? { ...n, bonusKind } : n,
+      ),
+    }));
+
+  const removeNegativeSkill = (id) =>
+    setNpc((prev) => {
+      const slots = new Set([`neg-${id}-drawback`, `neg-${id}-bonus`]);
+      const strip = (arr) =>
+        (arr ?? []).filter((s) => !(s._qaAdded && slots.has(s._qaSlot)));
+      return {
+        ...prev,
+        qaNegativeSkills: (prev.qaNegativeSkills ?? []).filter(
+          (n) => n.id !== id,
+        ),
+        special: strip(prev.special),
+        actions: strip(prev.actions),
+      };
+    });
+
+  const requestRemoveNegativeSkill = (id, index) =>
+    setPendingDelete({
+      title: t("role_qa_remove_negative_title"),
+      message: t("role_qa_remove_negative_confirm"),
+      itemPreview: (
+        <Typography variant="h4">
+          {t("role_negative_skill")} {index + 1}
+        </Typography>
+      ),
+      onConfirm: () => removeNegativeSkill(id),
+    });
 
   // Route and combat-sim modal use different anchor ids; try both.
   const scrollToSection = (list) => {
@@ -228,22 +336,40 @@ export default function EditQuickAssembly({ npc, setNpc }) {
     (grant.kind === "reminder" && grant.note === "flying");
 
   const isManualSelectOption = (grant) =>
-    grant.kind === "replaceAffinity" ||
-    (grant.kind === "reminder" && grant.note !== "flying");
+    grant.kind === "reminder" && grant.note !== "flying";
 
-  const isOptionApplied = (grant, index) => {
+  const speciesOptionRows = (speciesStep?.options ?? []).map((grant, index) => {
+    const slotId = grantSlotId(grant, "species", index);
+    const slotQaSpecials = qaSpecialsForSlot(slotId);
+    let choiceCount;
     if (isSlotBackedOption(grant)) {
-      return qaSpecialsForSlot(grantSlotId(grant, "species", index)).length > 0;
+      choiceCount = Math.min(slotQaSpecials.length, grant.maxPicks ?? 1);
+    } else if (isManualSelectOption(grant)) {
+      choiceCount = npc.qaSelections?.[slotId] ? 1 : 0;
+    } else {
+      const opts =
+        grant.kind === "statusImmunity"
+          ? { excludeStatuses: fixedStatusImmunities }
+          : undefined;
+      choiceCount = isSpeciesGrantApplied(grant, npc, opts) ? 1 : 0;
     }
-    if (isManualSelectOption(grant)) {
-      return !!npc.qaSelections?.[grantSlotId(grant, "species", index)];
-    }
-    return isSpeciesGrantApplied(grant, npc);
-  };
+    return { grant, index, slotId, qaSpecials: slotQaSpecials, choiceCount };
+  });
 
-  const speciesChosen = (speciesStep?.options ?? []).filter(
-    isOptionApplied,
-  ).length;
+  const speciesChosen = speciesOptionRows.reduce(
+    (sum, row) => sum + row.choiceCount,
+    0,
+  );
+
+  const upgradedAffinityTypes = new Set(
+    (speciesStep?.options ?? [])
+      .filter((g) => g.kind === "replaceAffinity")
+      .flatMap((g) =>
+        (g.type ? [g.type] : DAMAGE_TYPES).filter(
+          (type) => npc.affinities?.[type] === g.to,
+        ),
+      ),
+  );
 
   // resources.hp.bonus (post-v10) with an extra.hp fallback.
   const toggleHpBonus = (amount, done) =>
@@ -292,6 +418,35 @@ export default function EditQuickAssembly({ npc, setNpc }) {
         [type]: prev.affinities?.[type] === value ? "no" : value,
       },
     }));
+
+  const toggleReplaceAffinity = (type, grant) =>
+    setNpc((prev) => {
+      const affinities = { ...prev.affinities };
+      const alreadyOn = affinities[type] === grant.to;
+      for (const t of DAMAGE_TYPES) {
+        if (affinities[t] === grant.to) affinities[t] = grant.from;
+      }
+      if (!alreadyOn) affinities[type] = grant.to;
+      return { ...prev, affinities };
+    });
+
+  const toggleOptionalVuln = (type) =>
+    setNpc((prev) => {
+      const wasOn = prev.affinities?.[type] === "vu";
+      const next = {
+        ...prev,
+        affinities: {
+          ...prev.affinities,
+          [type]: wasOn ? "no" : "vu",
+        },
+      };
+      const newBudget = wasOn
+        ? speciesChooseTarget - 1
+        : speciesChooseTarget + 1;
+      return wasOn && speciesChosen > newBudget
+        ? clearSpeciesOptionPicks(next, speciesStep)
+        : next;
+    });
 
   const toggleStatusImmunity = (status) =>
     setNpc((prev) => ({
@@ -416,6 +571,7 @@ export default function EditQuickAssembly({ npc, setNpc }) {
             <Tooltip title={t("role_reapply_hint")}>
               <Button
                 fullWidth
+                size="small"
                 variant="outlined"
                 startIcon={<Refresh />}
                 onClick={() => seedRole(npc.role)}
@@ -482,7 +638,7 @@ export default function EditQuickAssembly({ npc, setNpc }) {
               {t("role_step_grants")}
             </StepLabel>
             <StepContent>
-              {allGrants.length > 0 && (
+              {(allGrants.length > 0 || rankGrants.length > 0) && (
                 <>
                   <Typography
                     variant="caption"
@@ -491,75 +647,233 @@ export default function EditQuickAssembly({ npc, setNpc }) {
                   >
                     {t("role_progression_hint")}
                   </Typography>
-                  <Stack spacing={1} sx={{ mb: rankGrants.length ? 2 : 0 }}>
-                    {allGrants
-                      .filter(
-                        (grant) => !grant.locked || activeStep === 1 || showAll,
-                      )
-                      .map((grant, i) => {
-                        const slotId = grantSlotId(grant, grant.source, i);
+                  <TableContainer sx={{ overflowX: "auto" }}>
+                    <Table size="small">
+                      <TableBody>
+                        {allGrants
+                          .filter(
+                            (grant) =>
+                              !grant.locked || activeStep === 1 || showAll,
+                          )
+                          .map((grant, i) => {
+                            const slotId = grantSlotId(grant, grant.source, i);
+                            return (
+                              <GrantRow
+                                key={`${grant.level}-${grant.kind}`}
+                                grant={grant}
+                                locked={grant.locked}
+                                npc={npc}
+                                t={t}
+                                onToggleAffinity={toggleAffinity}
+                                onToggleStatusImmunity={toggleStatusImmunity}
+                                onToggleFeature={toggleFeature}
+                                onToggleDefBonus={toggleDefBonus}
+                                onOpenCompendium={openCompendium}
+                                slotId={slotId}
+                                qaSpecials={qaSpecialsForSlot(slotId)}
+                                onRemoveReference={requestRemoveReference}
+                                onScrollTo={scrollToSection}
+                              />
+                            );
+                          })}
+                        {rankGrants.length > 0 && (
+                          <TableRow>
+                            <TableCell
+                              colSpan={2}
+                              sx={{ borderBottom: "none", pt: 2 }}
+                            >
+                              <Typography
+                                variant="overline"
+                                color="text.secondary"
+                                sx={{ display: "block", lineHeight: 1.6 }}
+                              >
+                                {t("role_rank_grants")}
+                              </Typography>
+                              <Typography
+                                variant="caption"
+                                color="text.secondary"
+                                sx={{ display: "block" }}
+                              >
+                                {t("role_rank_grants_hint")}
+                              </Typography>
+                            </TableCell>
+                          </TableRow>
+                        )}
+                        {rankGrants.map((grant, i) => {
+                          const slotId = grantSlotId(grant, "rank", i);
+                          return (
+                            <GrantRow
+                              key={`rank-${grant.kind}-${i}`}
+                              grant={grant}
+                              npc={npc}
+                              t={t}
+                              onToggleAffinity={toggleAffinity}
+                              onToggleStatusImmunity={toggleStatusImmunity}
+                              onToggleFeature={toggleFeature}
+                              onToggleDefBonus={toggleDefBonus}
+                              onOpenCompendium={openCompendium}
+                              slotId={slotId}
+                              qaSpecials={qaSpecialsForSlot(slotId)}
+                              onRemoveReference={requestRemoveReference}
+                              onScrollTo={scrollToSection}
+                            />
+                          );
+                        })}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </>
+              )}
+            </StepContent>
+          </Step>
+
+          <Step expanded={showAll || undefined} active={activeStep === 2}>
+            <StepLabel
+              onClick={() => setActiveStep(2)}
+              sx={{ cursor: "pointer" }}
+              optional={
+                <Typography variant="caption" color="text.secondary">
+                  {t("role_step_optional")}
+                </Typography>
+              }
+            >
+              {t("role_step_negative_skills")}
+            </StepLabel>
+            <StepContent>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ display: "block", mb: 1.5 }}
+              >
+                {t("role_negative_skills_hint")}
+              </Typography>
+              {negativeSkills.length > 0 && (
+                <TableContainer sx={{ overflowX: "auto" }}>
+                  <Table
+                    size="small"
+                    sx={{ "& td, & th": { verticalAlign: "middle" } }}
+                  >
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>{t("role_negative_drawback")}</TableCell>
+                        <TableCell>{t("role_negative_grants")}</TableCell>
+                        <TableCell>{t("role_negative_bonus_skill")}</TableCell>
+                        <TableCell padding="checkbox" />
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {negativeSkills.map((neg, i) => {
+                        const drawbackSlot = `neg-${neg.id}-drawback`;
+                        const bonusSlot = `neg-${neg.id}-bonus`;
                         return (
-                          <GrantRow
-                            key={`${grant.level}-${grant.kind}`}
-                            grant={grant}
-                            locked={grant.locked}
-                            npc={npc}
-                            t={t}
-                            onToggleAffinity={toggleAffinity}
-                            onToggleStatusImmunity={toggleStatusImmunity}
-                            onToggleFeature={toggleFeature}
-                            onToggleDefBonus={toggleDefBonus}
-                            onOpenCompendium={openCompendium}
-                            slotId={slotId}
-                            qaSpecials={qaSpecialsForSlot(slotId)}
-                            onRemoveReference={removeReference}
-                            onScrollTo={scrollToSection}
-                          />
+                          <TableRow key={neg.id}>
+                            <TableCell>
+                              <Box
+                                sx={{
+                                  display: "inline-flex",
+                                  maxWidth: "100%",
+                                }}
+                              >
+                                <GrantFiller
+                                  grant={{ kind: "roleSkill" }}
+                                  npc={npc}
+                                  t={t}
+                                  slotId={drawbackSlot}
+                                  qaSpecials={qaSpecialsForSlot(drawbackSlot)}
+                                  onOpenCompendium={openCompendium}
+                                  onRemoveReference={requestRemoveReference}
+                                  onScrollTo={scrollToSection}
+                                  subtypeOverride="negativeSkill"
+                                />
+                              </Box>
+                            </TableCell>
+                            <TableCell>
+                              <Stack
+                                direction="row"
+                                spacing={0.5}
+                                sx={{ flexWrap: "wrap", gap: 0.5 }}
+                              >
+                                <Chip
+                                  size="small"
+                                  label={t("role_grant_roleSkill")}
+                                  color={
+                                    neg.bonusKind === "roleSkill"
+                                      ? "primary"
+                                      : "default"
+                                  }
+                                  variant={
+                                    neg.bonusKind === "roleSkill"
+                                      ? "filled"
+                                      : "outlined"
+                                  }
+                                  onClick={() =>
+                                    setNegativeBonusKind(neg.id, "roleSkill")
+                                  }
+                                />
+                                <Chip
+                                  size="small"
+                                  label={t("role_grant_bossSkill")}
+                                  color={
+                                    neg.bonusKind === "bossSkill"
+                                      ? "primary"
+                                      : "default"
+                                  }
+                                  variant={
+                                    neg.bonusKind === "bossSkill"
+                                      ? "filled"
+                                      : "outlined"
+                                  }
+                                  onClick={() =>
+                                    setNegativeBonusKind(neg.id, "bossSkill")
+                                  }
+                                />
+                              </Stack>
+                            </TableCell>
+                            <TableCell>
+                              <Box
+                                sx={{
+                                  display: "inline-flex",
+                                  maxWidth: "100%",
+                                }}
+                              >
+                                <GrantFiller
+                                  grant={{ kind: neg.bonusKind }}
+                                  npc={npc}
+                                  t={t}
+                                  slotId={bonusSlot}
+                                  qaSpecials={qaSpecialsForSlot(bonusSlot)}
+                                  onOpenCompendium={openCompendium}
+                                  onRemoveReference={requestRemoveReference}
+                                  onScrollTo={scrollToSection}
+                                />
+                              </Box>
+                            </TableCell>
+                            <TableCell align="right" padding="checkbox">
+                              <IconButton
+                                size="small"
+                                color="error"
+                                onClick={() =>
+                                  requestRemoveNegativeSkill(neg.id, i)
+                                }
+                              >
+                                <Delete fontSize="small" />
+                              </IconButton>
+                            </TableCell>
+                          </TableRow>
                         );
                       })}
-                  </Stack>
-                </>
+                    </TableBody>
+                  </Table>
+                </TableContainer>
               )}
-              {rankGrants.length > 0 && (
-                <>
-                  <Typography
-                    variant="overline"
-                    color="text.secondary"
-                    sx={{ display: "block", lineHeight: 1.6 }}
-                  >
-                    {t("role_rank_grants")}
-                  </Typography>
-                  <Typography
-                    variant="caption"
-                    color="text.secondary"
-                    sx={{ display: "block", mb: 1 }}
-                  >
-                    {t("role_rank_grants_hint")}
-                  </Typography>
-                  <Stack spacing={1}>
-                    {rankGrants.map((grant, i) => {
-                      const slotId = grantSlotId(grant, "rank", i);
-                      return (
-                        <GrantRow
-                          key={`rank-${grant.kind}-${i}`}
-                          grant={grant}
-                          npc={npc}
-                          t={t}
-                          onToggleAffinity={toggleAffinity}
-                          onToggleStatusImmunity={toggleStatusImmunity}
-                          onToggleFeature={toggleFeature}
-                          onToggleDefBonus={toggleDefBonus}
-                          onOpenCompendium={openCompendium}
-                          slotId={slotId}
-                          qaSpecials={qaSpecialsForSlot(slotId)}
-                          onRemoveReference={removeReference}
-                          onScrollTo={scrollToSection}
-                        />
-                      );
-                    })}
-                  </Stack>
-                </>
-              )}
+              <Button
+                size="small"
+                startIcon={<AutoFixHigh />}
+                onClick={addNegativeSkill}
+                sx={{ mt: negativeSkills.length ? 1.5 : 0 }}
+              >
+                {t("role_negative_add")}
+              </Button>
             </StepContent>
           </Step>
 
@@ -569,7 +883,7 @@ export default function EditQuickAssembly({ npc, setNpc }) {
               completed={speciesChosen >= speciesChooseTarget}
             >
               <StepLabel
-                onClick={() => setActiveStep(2)}
+                onClick={() => setActiveStep(3)}
                 sx={{ cursor: "pointer" }}
                 optional={
                   <Typography variant="caption" color="text.secondary">
@@ -603,7 +917,7 @@ export default function EditQuickAssembly({ npc, setNpc }) {
                 >
                   {t("role_species_options_hint", [
                     t(npc.species, undefined, true),
-                    speciesStep.choose,
+                    speciesChooseTarget,
                   ])}
                 </Typography>
 
@@ -637,6 +951,7 @@ export default function EditQuickAssembly({ npc, setNpc }) {
                           onToggleSpell={toggleSpell}
                           onToggleHpBonus={toggleHpBonus}
                           onOpenCompendium={openCompendium}
+                          upgradedAffinityTypes={upgradedAffinityTypes}
                         />
                       ))}
                     </Stack>
@@ -644,34 +959,67 @@ export default function EditQuickAssembly({ npc, setNpc }) {
                 )}
 
                 {optionalVulnTypes && (
-                  <Alert
-                    severity={optionalVulnSatisfied ? "success" : "info"}
-                    icon={optionalVulnSatisfied ? <Check /> : undefined}
-                    sx={{ mb: 1.5, "& .MuiAlert-message": { width: "100%" } }}
+                  <Card
+                    variant="outlined"
+                    sx={{
+                      borderLeft: 3,
+                      borderLeftColor: optionalVulnSatisfied
+                        ? "success.main"
+                        : "transparent",
+                      bgcolor: optionalVulnSatisfied
+                        ? "action.hover"
+                        : "transparent",
+                      transition: "border-color 120ms, background-color 120ms",
+                      mb: 1.5,
+                    }}
                   >
-                    <AlertTitle sx={{ mb: 0.5 }}>
-                      {t("role_species_optional_vuln")}
-                    </AlertTitle>
-                    <Stack
-                      direction="row"
-                      spacing={0.5}
-                      sx={{ flexWrap: "wrap", gap: 0.5 }}
+                    <CardContent
+                      sx={{ py: 1, px: 1.5, "&:last-child": { pb: 1 } }}
                     >
-                      {optionalVulnTypes.map((type) => {
-                        const on = npc.affinities?.[type] === "vu";
-                        return (
-                          <Chip
-                            key={type}
-                            size="small"
-                            label={t(type)}
-                            color={on ? "warning" : "default"}
-                            variant={on ? "filled" : "outlined"}
-                            onClick={() => toggleAffinity(type, "vu")}
-                          />
-                        );
-                      })}
-                    </Stack>
-                  </Alert>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          flexWrap: "wrap",
+                          alignItems: "center",
+                          gap: 1,
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <Typography variant="body2" sx={{ flex: "1 1 200px" }}>
+                          {optionalVulnSatisfied && (
+                            <Check
+                              fontSize="inherit"
+                              sx={{
+                                verticalAlign: "text-bottom",
+                                mr: 0.5,
+                                color: "success.main",
+                              }}
+                            />
+                          )}
+                          {t("role_species_optional_vuln")}
+                        </Typography>
+                        <Stack
+                          direction="row"
+                          spacing={0.5}
+                          sx={{ flexWrap: "wrap", gap: 0.5 }}
+                        >
+                          {optionalVulnTypes.map((type) => {
+                            const on = npc.affinities?.[type] === "vu";
+                            return (
+                              <Chip
+                                key={type}
+                                size="small"
+                                label={t(type)}
+                                color={on ? "primary" : "default"}
+                                variant={on ? "filled" : "outlined"}
+                                onClick={() => toggleOptionalVuln(type)}
+                              />
+                            );
+                          })}
+                        </Stack>
+                      </Box>
+                    </CardContent>
+                  </Card>
                 )}
 
                 <Box
@@ -681,30 +1029,37 @@ export default function EditQuickAssembly({ npc, setNpc }) {
                   }}
                 >
                   <Stack spacing={1}>
-                    {speciesStep.options.map((grant, i) => {
-                      const slotId = grantSlotId(grant, "species", i);
-                      return (
+                    {speciesOptionRows.map(
+                      ({ grant, index, slotId, qaSpecials, choiceCount }) => (
                         <SpeciesOptionCard
-                          key={`species-opt-${i}`}
+                          key={`species-opt-${index}`}
                           grant={grant}
-                          applied={isOptionApplied(grant, i)}
+                          applied={choiceCount > 0}
                           npc={npc}
                           t={t}
                           onToggleAffinity={toggleAffinity}
+                          onToggleReplaceAffinity={toggleReplaceAffinity}
                           onToggleStatusImmunity={toggleStatusImmunity}
                           onToggleSpell={toggleSpell}
                           onToggleHpBonus={toggleHpBonus}
                           onOpenCompendium={openCompendium}
                           onAddFlying={addFlying}
+                          onAddThorns={addThorns}
                           onToggleSelection={toggleSelection}
                           selected={!!npc.qaSelections?.[slotId]}
                           slotId={slotId}
-                          qaSpecials={qaSpecialsForSlot(slotId)}
-                          onRemoveReference={removeReference}
+                          qaSpecials={qaSpecials}
+                          statusImmunityOpts={{
+                            max: speciesStep.optionsRequireVuln
+                              ? optionalVulnCount * 2
+                              : undefined,
+                            exclude: fixedStatusImmunities,
+                          }}
+                          onRemoveReference={requestRemoveReference}
                           onScrollTo={scrollToSection}
                         />
-                      );
-                    })}
+                      ),
+                    )}
                   </Stack>
                 </Box>
               </StepContent>
@@ -718,7 +1073,9 @@ export default function EditQuickAssembly({ npc, setNpc }) {
         onClose={() => setCompendiumOpen(false)}
         context="npc"
         initialType={compendiumType}
+        initialSpecialSubtypes={compendiumSubtype ? [compendiumSubtype] : []}
         initialCompendium="personal"
+        allowMultiSelect
         onAddItem={(item) => {
           if (compendiumType === "spells") {
             setNpc((prev) => ({
@@ -728,21 +1085,36 @@ export default function EditQuickAssembly({ npc, setNpc }) {
             return;
           }
           const list = compendiumType === "actions" ? "actions" : "special";
-          setNpc((prev) => ({
-            ...prev,
-            [list]: [
-              ...(prev[list] || []),
-              {
-                name: item.name,
-                effect: item.effect || "",
-                spCost: item.spCost ?? 1,
-                fuid: item.fuid,
-                _qaAdded: true,
-                _qaSlot: activeSlot,
-              },
-            ],
-          }));
+          setNpc((prev) => {
+            if (addedForSlotRef.current >= activeSlotMaxAdd) return prev;
+            addedForSlotRef.current += 1;
+            return {
+              ...prev,
+              [list]: [
+                ...(prev[list] || []),
+                {
+                  name: item.name,
+                  effect: item.effect || "",
+                  spCost: item.spCost ?? 1,
+                  fuid: item.fuid,
+                  subtype: item.subtype,
+                  _qaAdded: true,
+                  _qaSlot: activeSlot,
+                },
+              ],
+            };
+          });
         }}
+      />
+
+      <DeleteConfirmationDialog
+        open={!!pendingDelete}
+        onClose={() => setPendingDelete(null)}
+        onConfirm={() => pendingDelete?.onConfirm?.()}
+        title={pendingDelete?.title ?? ""}
+        message={pendingDelete?.message ?? ""}
+        itemPreview={pendingDelete?.itemPreview}
+        enableCtrlBypass={false}
       />
     </Card>
   );
@@ -808,8 +1180,8 @@ function StatChangesTable({ rows, currentLevel, t }) {
   );
 }
 
-// A single unlocked grant slot: label on the left, kind-specific filler on the right.
-// "Done" is derived from the NPC fields, never stored.
+// A single unlocked grant slot rendered as a table row: label cell on the left,
+// kind-specific filler cell on the right. "Done" is derived from NPC fields.
 function GrantRow({
   grant,
   locked,
@@ -832,43 +1204,53 @@ function GrantRow({
   const noteKey = grant.note ? NOTE_KEYS[grant.note] : null;
 
   return (
-    <Box
+    <TableRow
       sx={{
-        display: "flex",
-        flexWrap: "wrap",
-        alignItems: "center",
-        gap: 1,
-        justifyContent: "space-between",
         opacity: locked ? 0.45 : 1,
         pointerEvents: locked ? "none" : "auto",
       }}
     >
-      <Typography variant="body2" sx={{ flex: "1 1 200px" }}>
-        {label}
-        {noteKey && (
-          <Typography component="span" variant="caption" color="text.secondary">
-            {" - "}
-            {t(noteKey)}
-          </Typography>
-        )}
-      </Typography>
-      <Box sx={{ flex: "0 0 auto" }}>
-        <GrantFiller
-          grant={grant}
-          npc={npc}
-          t={t}
-          onToggleAffinity={onToggleAffinity}
-          onToggleStatusImmunity={onToggleStatusImmunity}
-          onToggleFeature={onToggleFeature}
-          onToggleDefBonus={onToggleDefBonus}
-          onOpenCompendium={onOpenCompendium}
-          slotId={slotId}
-          qaSpecials={qaSpecials}
-          onRemoveReference={onRemoveReference}
-          onScrollTo={onScrollTo}
-        />
-      </Box>
-    </Box>
+      <TableCell sx={{ verticalAlign: "middle" }}>
+        <Typography variant="body2">
+          {label}
+          {noteKey && (
+            <Typography
+              component="span"
+              variant="caption"
+              color="text.secondary"
+            >
+              {" - "}
+              {t(noteKey)}
+            </Typography>
+          )}
+        </Typography>
+      </TableCell>
+      <TableCell align="right" sx={{ verticalAlign: "middle" }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "flex-end",
+            flexWrap: "wrap",
+            gap: 0.5,
+          }}
+        >
+          <GrantFiller
+            grant={grant}
+            npc={npc}
+            t={t}
+            onToggleAffinity={onToggleAffinity}
+            onToggleStatusImmunity={onToggleStatusImmunity}
+            onToggleFeature={onToggleFeature}
+            onToggleDefBonus={onToggleDefBonus}
+            onOpenCompendium={onOpenCompendium}
+            slotId={slotId}
+            qaSpecials={qaSpecials}
+            onRemoveReference={onRemoveReference}
+            onScrollTo={onScrollTo}
+          />
+        </Box>
+      </TableCell>
+    </TableRow>
   );
 }
 
@@ -885,6 +1267,7 @@ function GrantFiller({
   qaSpecials,
   onRemoveReference,
   onScrollTo,
+  subtypeOverride,
 }) {
   switch (grant.kind) {
     case "roleSkill":
@@ -909,15 +1292,24 @@ function GrantFiller({
               onDelete={() => onRemoveReference(ref)}
             />
           ))}
-          <AddSkillButton
-            t={t}
-            label={
-              grant.kind === "bossSkill"
-                ? t("role_grant_add_boss_skill")
-                : undefined
-            }
-            onPick={(type) => onOpenCompendium(type, slotId)}
-          />
+          {(qaSpecials ?? []).length < (grant.count ?? 1) && (
+            <AddSkillButton
+              t={t}
+              label={
+                grant.kind === "bossSkill"
+                  ? t("role_grant_add_boss_skill")
+                  : undefined
+              }
+              onPick={(type) =>
+                onOpenCompendium(
+                  type,
+                  slotId,
+                  subtypeOverride ?? grant.kind,
+                  (grant.count ?? 1) - (qaSpecials ?? []).length,
+                )
+              }
+            />
+          )}
         </Stack>
       );
 
@@ -1003,6 +1395,7 @@ function GrantFiller({
           <Button
             size="small"
             variant={precisionOn ? "contained" : "outlined"}
+            color={precisionOn ? "success" : "primary"}
             startIcon={precisionOn ? <Check /> : undefined}
             onClick={() => {
               onToggleFeature("precision");
@@ -1014,6 +1407,7 @@ function GrantFiller({
           <Button
             size="small"
             variant={magicOn ? "contained" : "outlined"}
+            color={magicOn ? "success" : "primary"}
             startIcon={magicOn ? <Check /> : undefined}
             onClick={() => {
               onToggleFeature("magic");
@@ -1124,8 +1518,8 @@ function QaReferenceChip({ reference, t, onClick, onDelete }) {
     <Tooltip title={t("role_qa_ref_jump", [name])}>
       <Chip
         size="small"
-        color="secondary"
-        variant="outlined"
+        color="primary"
+        variant="filled"
         label={name}
         onClick={onClick}
         onDelete={onDelete}
@@ -1136,11 +1530,15 @@ function QaReferenceChip({ reference, t, onClick, onDelete }) {
   );
 }
 
-function speciesGrantLabel(grant, t) {
+function speciesGrantLabel(grant, t, countOverride) {
   const base = t(`role_species_${grant.kind}`);
-  const count = grant.count > 1 ? ` (${grant.count})` : "";
+  const effectiveCount = countOverride ?? grant.count;
+  const count = effectiveCount > 1 ? ` (${effectiveCount})` : "";
+  const mpBonus = grant.mpBonus ? ` (+${grant.mpBonus} ${t("MP")})` : "";
+  const maxPicks =
+    grant.maxPicks > 1 ? ` (${t("role_species_up_to", [grant.maxPicks])})` : "";
   const noteKey = grant.note ? SPECIES_NOTE_KEYS[grant.note] : null;
-  return { base: `${base}${count}`, noteKey };
+  return { base: `${base}${count}${mpBonus}${maxPicks}`, noteKey };
 }
 
 const SPECIES_NOTE_KEYS = {
@@ -1179,19 +1577,25 @@ function SpeciesGrantRow({
   npc,
   t,
   onToggleAffinity,
+  onToggleReplaceAffinity,
   onToggleStatusImmunity,
   onToggleSpell,
   onToggleHpBonus,
   onOpenCompendium,
   onAddFlying,
+  onAddThorns,
   onToggleSelection,
   selected,
   slotId,
   qaSpecials,
   onRemoveReference,
   onScrollTo,
+  statusImmunityOpts,
+  upgradedAffinityTypes,
 }) {
-  const { base, noteKey } = speciesGrantLabel(grant, t);
+  const countOverride =
+    grant.kind === "statusImmunity" ? statusImmunityOpts?.max : undefined;
+  const { base, noteKey } = speciesGrantLabel(grant, t, countOverride);
 
   return (
     <Box
@@ -1225,17 +1629,21 @@ function SpeciesGrantRow({
           npc={npc}
           t={t}
           onToggleAffinity={onToggleAffinity}
+          onToggleReplaceAffinity={onToggleReplaceAffinity}
           onToggleStatusImmunity={onToggleStatusImmunity}
           onToggleSpell={onToggleSpell}
           onToggleHpBonus={onToggleHpBonus}
           onOpenCompendium={onOpenCompendium}
           onAddFlying={onAddFlying}
+          onAddThorns={onAddThorns}
           onToggleSelection={onToggleSelection}
           selected={selected}
           slotId={slotId}
           qaSpecials={qaSpecials}
+          statusImmunityOpts={statusImmunityOpts}
           onRemoveReference={onRemoveReference}
           onScrollTo={onScrollTo}
+          upgradedAffinityTypes={upgradedAffinityTypes}
         />
       </Box>
     </Box>
@@ -1251,13 +1659,17 @@ function SpeciesGrantFiller({
   onRemoveReference,
   onScrollTo,
   onToggleAffinity,
+  onToggleReplaceAffinity,
   onToggleStatusImmunity,
   onToggleSpell,
   onToggleHpBonus,
   onOpenCompendium,
   onAddFlying,
+  onAddThorns,
   onToggleSelection,
   selected,
+  statusImmunityOpts,
+  upgradedAffinityTypes,
 }) {
   switch (grant.kind) {
     case "affinity": {
@@ -1274,14 +1686,16 @@ function SpeciesGrantFiller({
           sx={{ flexWrap: "wrap", gap: 0.5, justifyContent: "flex-end" }}
         >
           {types.map((type) => {
-            const on = npc.affinities?.[type] === grant.value;
+            const upgraded = upgradedAffinityTypes?.has(type);
+            const on = npc.affinities?.[type] === grant.value || upgraded;
             return (
               <Chip
                 key={type}
                 size="small"
-                label={t(type)}
+                label={upgraded ? `${t(type)} (${t("Absorption")})` : t(type)}
                 color={on ? "primary" : "default"}
                 variant={on ? "filled" : "outlined"}
+                disabled={upgraded}
                 onClick={() => onToggleAffinity(type, grant.value)}
               />
             );
@@ -1291,23 +1705,34 @@ function SpeciesGrantFiller({
     }
 
     case "statusImmunity": {
-      const options = grant.options ?? STATUS_EFFECTS;
+      const exclude = statusImmunityOpts?.exclude ?? [];
+      const options = (grant.options ?? STATUS_EFFECTS).filter(
+        (status) => !exclude.includes(status),
+      );
+      const max = statusImmunityOpts?.max ?? grant.count ?? 1;
+      const pickedCount = options.filter(
+        (status) => npc.immunities?.[status],
+      ).length;
       return (
         <Stack
           direction="row"
           spacing={0.5}
           sx={{ flexWrap: "wrap", gap: 0.5 }}
         >
-          {options.map((status) => (
-            <Chip
-              key={status}
-              size="small"
-              label={t(status)}
-              color={npc.immunities?.[status] ? "primary" : "default"}
-              variant={npc.immunities?.[status] ? "filled" : "outlined"}
-              onClick={() => onToggleStatusImmunity(status)}
-            />
-          ))}
+          {options.map((status) => {
+            const on = !!npc.immunities?.[status];
+            return (
+              <Chip
+                key={status}
+                size="small"
+                label={t(status)}
+                color={on ? "primary" : "default"}
+                variant={on ? "filled" : "outlined"}
+                disabled={!on && pickedCount >= max}
+                onClick={() => onToggleStatusImmunity(status)}
+              />
+            );
+          })}
         </Stack>
       );
     }
@@ -1340,12 +1765,10 @@ function SpeciesGrantFiller({
               <Chip
                 key={opt.fuid}
                 size="small"
-                icon={on ? <Check /> : undefined}
                 label={opt.name}
-                color={on ? "success" : "default"}
+                color={on ? "primary" : "default"}
                 variant={on ? "filled" : "outlined"}
-                onClick={() => onToggleSpell(opt.fuid)}
-                onDelete={on ? () => onToggleSpell(opt.fuid) : undefined}
+                onClick={() => onToggleSpell(opt.fuid, grant.mpBonus)}
               />
             );
           })}
@@ -1354,6 +1777,39 @@ function SpeciesGrantFiller({
     }
 
     case "roleSkill":
+      if (grant.note === "thorns") {
+        return (
+          <Stack
+            direction="row"
+            spacing={0.5}
+            sx={{
+              flexWrap: "wrap",
+              alignItems: "center",
+              gap: 0.5,
+              justifyContent: "flex-end",
+            }}
+          >
+            {(qaSpecials ?? []).map((ref) => (
+              <QaReferenceChip
+                key={ref.id ?? ref.index}
+                reference={ref}
+                t={t}
+                onClick={() => onScrollTo(ref.list)}
+                onDelete={() => onRemoveReference(ref)}
+              />
+            ))}
+            {(qaSpecials ?? []).length < (grant.count ?? 1) && (
+              <Button
+                size="small"
+                variant="outlined"
+                onClick={() => onAddThorns(slotId)}
+              >
+                {t("role_grant_add_skill")}
+              </Button>
+            )}
+          </Stack>
+        );
+      }
       return (
         <Stack
           direction="row"
@@ -1374,10 +1830,19 @@ function SpeciesGrantFiller({
               onDelete={() => onRemoveReference(ref)}
             />
           ))}
-          <AddSkillButton
-            t={t}
-            onPick={(type) => onOpenCompendium(type, slotId)}
-          />
+          {(qaSpecials ?? []).length < (grant.maxPicks ?? 1) && (
+            <AddSkillButton
+              t={t}
+              onPick={(type) =>
+                onOpenCompendium(
+                  type,
+                  slotId,
+                  "roleSkill",
+                  (grant.maxPicks ?? 1) - (qaSpecials ?? []).length,
+                )
+              }
+            />
+          )}
         </Stack>
       );
 
@@ -1422,14 +1887,34 @@ function SpeciesGrantFiller({
         />
       );
 
-    case "replaceAffinity":
+    case "replaceAffinity": {
+      const types = grant.type
+        ? [grant.type]
+        : DAMAGE_TYPES.filter((type) =>
+            [grant.from, grant.to].includes(npc.affinities?.[type]),
+          );
       return (
-        <SelectButton
-          selected={selected}
-          t={t}
-          onClick={() => onToggleSelection(slotId)}
-        />
+        <Stack
+          direction="row"
+          spacing={0.5}
+          sx={{ flexWrap: "wrap", gap: 0.5, justifyContent: "flex-end" }}
+        >
+          {types.map((type) => {
+            const on = npc.affinities?.[type] === grant.to;
+            return (
+              <Chip
+                key={type}
+                size="small"
+                label={t(type)}
+                color={on ? "primary" : "default"}
+                variant={on ? "filled" : "outlined"}
+                onClick={() => onToggleReplaceAffinity(type, grant)}
+              />
+            );
+          })}
+        </Stack>
       );
+    }
 
     default:
       return null;

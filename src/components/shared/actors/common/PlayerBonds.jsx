@@ -12,7 +12,7 @@ import {
   ToggleButtonGroup,
   Tooltip,
 } from "@mui/material";
-import { useTheme } from "@mui/material/styles";
+import { alpha, useTheme } from "@mui/material/styles";
 import { useTranslate } from "/src/translation/translate";
 import SectionCard from "./SectionCard";
 import CompactSectionHeader from "/src/components/shared/actors/pc/variants/compact/CompactSectionHeader";
@@ -41,8 +41,21 @@ export default function PlayerBonds({
 }) {
   const { t } = useTranslate();
   const theme = useTheme();
-  const positiveColor = theme.palette.success.main;
-  const negativeColor = theme.palette.error.main;
+  const isDark = theme.palette.mode === "dark";
+  const positiveColor = isDark
+    ? theme.palette.success.light
+    : theme.palette.success.main;
+  const negativeColor = isDark
+    ? theme.palette.error.light
+    : theme.palette.error.main;
+  const positiveSelectedBg = alpha(
+    theme.palette.success.main,
+    isDark ? 0.28 : 0.11,
+  );
+  const negativeSelectedBg = alpha(
+    theme.palette.error.main,
+    isDark ? 0.28 : 0.1,
+  );
 
   const [editBondIndex, setEditBondIndex] = useState(null);
   const [isCreatingBond, setIsCreatingBond] = useState(false);
@@ -235,7 +248,8 @@ export default function PlayerBonds({
                       color: positiveColor,
                       "&.Mui-selected": {
                         color: positiveColor,
-                        bgcolor: "rgba(76, 175, 80, 0.11)",
+                        bgcolor: positiveSelectedBg,
+                        "&:hover": { bgcolor: positiveSelectedBg },
                       },
                     }}
                   >
@@ -247,7 +261,8 @@ export default function PlayerBonds({
                       color: negativeColor,
                       "&.Mui-selected": {
                         color: negativeColor,
-                        bgcolor: "rgba(244, 67, 54, 0.1)",
+                        bgcolor: negativeSelectedBg,
+                        "&:hover": { bgcolor: negativeSelectedBg },
                       },
                     }}
                   >
@@ -312,7 +327,7 @@ export default function PlayerBonds({
     return (
       <>
         <Paper
-          sx={{ mb: 1, overflow: "hidden" }}
+          sx={{ mb: 1, overflow: "hidden", containerType: "inline-size" }}
           elevation={0}
           variant="outlined"
         >
@@ -322,9 +337,15 @@ export default function PlayerBonds({
           <Box
             sx={{
               display: "grid",
-              gridTemplateColumns: "repeat(3, 1fr)",
+              gridTemplateColumns: "repeat(1, 1fr)",
               gap: "6px",
               p: "6px",
+              "@container (min-width: 340px)": {
+                gridTemplateColumns: "repeat(2, 1fr)",
+              },
+              "@container (min-width: 500px)": {
+                gridTemplateColumns: "repeat(3, 1fr)",
+              },
             }}
           >
             {visibleBonds.map((bond) => (
@@ -383,7 +404,10 @@ export default function PlayerBonds({
           sx={{ p: 0.75, flex: 1, minWidth: 0, width: "100%" }}
         >
           {visibleBonds.map((bond) => (
-            <Grid key={bond.originalIndex} size={{ xs: 12, sm: 6, md: 4 }}>
+            <Grid
+              key={bond.originalIndex}
+              size={{ xs: 12, sm: 12, md: 6, lg: 4 }}
+            >
               <BondCard
                 bond={bond}
                 isEditMode={isEditMode}
@@ -395,7 +419,7 @@ export default function PlayerBonds({
             </Grid>
           ))}
           {isEditMode && bonds.length < 6 && (
-            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+            <Grid size={{ xs: 12, sm: 12, md: 6, lg: 4 }}>
               <Card
                 onClick={openAddBond}
                 sx={{

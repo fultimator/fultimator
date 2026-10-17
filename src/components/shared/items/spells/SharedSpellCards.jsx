@@ -1182,24 +1182,23 @@ export const SharedArcanumCard = React.memo(function SharedArcanumCard({
 
   const domainDesc = item.domainDesc ? t(item.domainDesc) : "";
   const domainText = item.domain ? t(item.domain) : "";
-
   const mergeDesc = item.mergeDesc
     ? t(item.mergeDesc)
     : (item.mergeBenefit ?? "");
-  const mergeName = item.mergeName ?? "";
-  const mergeLabel = item.merge ? t(item.merge) : t("Merge");
+  const mergeName = item.merge ? t(item.merge) : (item.mergeName ?? "");
+  const mergeLabel = t("Merge");
 
   const pulseDesc = item.pulseDesc
     ? t(item.pulseDesc)
     : (item.pulseBenefit ?? "");
-  const pulseName = item.pulseName ?? "";
-  const pulseLabel = item.pulse ? t(item.pulse) : t("Pulse");
+  const pulseName = item.pulse ? t(item.pulse) : (item.pulseName ?? "");
+  const pulseLabel = t("Pulse");
 
   const dismissDesc = item.dismissDesc
     ? t(item.dismissDesc)
     : (item.dismissBenefit ?? "");
-  const dismissName = item.dismissName ?? "";
-  const dismissLabel = item.dismiss ? t(item.dismiss) : t("Dismiss");
+  const dismissName = item.dismiss ? t(item.dismiss) : (item.dismissName ?? "");
+  const dismissLabel = t("Dismiss");
 
   return (
     <CardContentWrapper

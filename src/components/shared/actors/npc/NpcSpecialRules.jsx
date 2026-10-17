@@ -55,7 +55,7 @@ export function NpcSpecialRules({ npc, variant = "interactive" }) {
     special.push({
       name: t("Construct"),
       effect: t(
-        "Immune to **poison** damage and Resistant to **earth** damage, and immune to poisoned.",
+        "Immune to **poison** damage and Resistant to **earth** damage, and immune to **poisoned**.",
         true,
       ),
     });

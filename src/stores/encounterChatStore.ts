@@ -7,6 +7,10 @@ interface EncounterChatState {
   isDirty: boolean;
   isHydrated: boolean;
   addMessage: (message: ChatMessage) => void;
+  updateMessage: (
+    id: string,
+    updater: (message: ChatMessage) => ChatMessage,
+  ) => void;
   deleteMessage: (id: string) => void;
   setMessages: (encounterId: string, messages: ChatMessage[]) => void;
   markClean: () => void;
@@ -25,6 +29,17 @@ export const useEncounterChatStore = create<EncounterChatState>((set) => ({
       messages: [...state.messages, message],
       isDirty: true,
     })),
+
+  updateMessage: (id, updater) =>
+    set((state) => {
+      let changed = false;
+      const messages = state.messages.map((m) => {
+        if (m.id !== id) return m;
+        changed = true;
+        return updater(m);
+      });
+      return changed ? { messages, isDirty: true } : state;
+    }),
 
   deleteMessage: (id) =>
     set((state) => ({

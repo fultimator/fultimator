@@ -1,6 +1,10 @@
 import { z } from "zod";
 import { MetaSchema } from "../meta";
 import { BehaviorSchema } from "../shared/behaviorSchemas";
+import {
+  ResourceTrackSchema,
+  emptyResourceTrack,
+} from "../shared/resourceTrackSchema";
 
 export const HeroicSchema = z.object({
   itemType: z.literal("heroic").default("heroic"),
@@ -11,6 +15,7 @@ export const HeroicSchema = z.object({
   applicableTo: z.array(z.string()).default([]),
   meta: MetaSchema.optional(),
   behaviors: z.array(BehaviorSchema).optional(),
+  resource: ResourceTrackSchema.optional(),
 });
 
 export type Heroic = z.infer<typeof HeroicSchema>;
@@ -34,9 +39,12 @@ export function buildHeroicFormState(item?: Partial<Heroic> | null): Heroic {
     description: item?.description ?? "",
     applicableTo: item?.applicableTo ?? [],
     meta: item?.meta,
+    resource: item?.resource ?? emptyResourceTrack(),
   };
 }
 
 export function buildHeroicSavePayload(formState: Heroic): Heroic {
-  return { ...formState };
+  const { resource, ...rest } = formState;
+  // Only persist the resource track when it's enabled.
+  return resource?.enabled ? { ...rest, resource } : rest;
 }

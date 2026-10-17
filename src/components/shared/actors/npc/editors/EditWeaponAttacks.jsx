@@ -511,7 +511,15 @@ export default function EditWeaponAttacks({ npc, setNpc }) {
                           <MeleeIcon />
                         )}
                       </Box>
-                      <Typography noWrap>
+                      <Typography
+                        noWrap
+                        sx={{
+                          fontFamily: "Antonio",
+                          fontWeight: 800,
+                          fontSize: "1rem",
+                          textTransform: "uppercase",
+                        }}
+                      >
                         {attack.name || t("(unnamed)")}
                       </Typography>
                     </Box>

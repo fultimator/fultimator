@@ -36,6 +36,9 @@ function StatLink({
           gap: "2px",
           transition: "color 0.16s ease",
           "&:hover": { color: hoverColor, textDecoration: "underline" },
+          "@container initiative-row (max-width: 620px)": {
+            py: "4px",
+          },
         }}
       >
         {current}/{max} {label}

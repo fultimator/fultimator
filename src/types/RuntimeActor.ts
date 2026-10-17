@@ -12,6 +12,7 @@ export interface RuntimeActor {
   // resources
   currentHp: number;
   currentMp: number;
+  currentIp: number;
 
   // combat state
   isGuarding: boolean;
@@ -34,12 +35,14 @@ export function createRuntimeActor(
   source: RuntimeActorSource,
   currentHp: number,
   currentMp: number,
+  currentIp: number = 0,
 ): RuntimeActor {
   return {
     combatId,
     source,
     currentHp,
     currentMp,
+    currentIp,
     isGuarding: false,
     statusEffects: {
       slow: false,

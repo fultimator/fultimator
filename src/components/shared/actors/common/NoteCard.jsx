@@ -82,6 +82,11 @@ export default function NoteCard({
     sendDisplayMessage("note", note.name, {
       description: note.description ?? "",
       speaker,
+      clocks: note.clocks?.map((clock) => ({
+        sections: clock.sections,
+        state: clock.state,
+        name: clock.name,
+      })),
     });
   };
   const normalizedQuery = searchQuery.trim().toLowerCase();
@@ -96,7 +101,7 @@ export default function NoteCard({
 
   const clockGridCols = compact
     ? "1fr"
-    : "repeat(auto-fill, minmax(160px, 1fr))";
+    : "repeat(auto-fill, minmax(220px, 1fr))";
 
   const hasDescription = !!note.description;
   const hasClocks = visibleClocks.length > 0;

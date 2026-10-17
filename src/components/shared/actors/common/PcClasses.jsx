@@ -18,6 +18,7 @@ import {
   DialogActions,
   Button,
   TextField,
+  useMediaQuery,
 } from "@mui/material";
 import {
   Star,
@@ -83,6 +84,9 @@ import {
   SharedHeroicCard,
 } from "/src/components/shared/items/class/SharedClassCards";
 import { SharedPlayerSpellCard } from "/src/components/shared/items/spells/SharedSpellCards";
+import SkillResourceTracker from "/src/components/shared/actors/pc/editors/classes/SkillResourceTracker";
+import ItemEditModal from "/src/forms/ui/ItemEditModal";
+import SkillLevelModal from "/src/components/common/SkillLevelModal";
 // Utilities
 
 function SectionSubHeader({ children, theme }) {
@@ -449,11 +453,24 @@ function DescriptionArea({ children }) {
 }
 // SkillStars
 
-function SkillStars({ current, max, secondaryColor }) {
+function SkillStars({ current, max, secondaryColor, onClick, sx }) {
   const size = 26;
   return (
     <Box
-      sx={{ display: "flex", alignItems: "center", flexShrink: 0, gap: "1px" }}
+      onClick={onClick}
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        flexShrink: 0,
+        gap: "2px",
+        ...(onClick && {
+          cursor: "pointer",
+          borderRadius: "4px",
+          transition: "filter 0.15s ease",
+          "&:hover": { filter: "brightness(1.2)" },
+        }),
+        ...sx,
+      }}
     >
       {[...Array(Number(max))].map((_, i) =>
         i < Number(current) ? (
@@ -515,6 +532,8 @@ function SkillCard({
   onPreview,
 }) {
   const [descOpen, setDescOpen] = useState(!compact);
+  const [levelModalOpen, setLevelModalOpen] = useState(false);
+  const isMobile = useMediaQuery((th) => th.breakpoints.down("sm"));
   const cls = pc?.classes?.[classIdx];
   const totalSkillLevels = (cls?.skills ?? []).reduce(
     (sum, s) => sum + (Number(s.currentLvl) || 0),
@@ -569,118 +588,402 @@ function SkillCard({
     if (updateMaxStats) updateMaxStats();
   };
 
+  // Runtime update of the skill's resource-point current value.
+  const handleSetResourceCurrent = (next) => {
+    if (!onUpdate) return;
+    onUpdate((prev) => ({
+      ...prev,
+      classes: prev.classes.map((c, ci) =>
+        ci !== classIdx
+          ? c
+          : {
+              ...c,
+              skills: c.skills.map((s, si) =>
+                si === originalIdx && s.resource
+                  ? { ...s, resource: { ...s.resource, current: next } }
+                  : s,
+              ),
+            },
+      ),
+    }));
+  };
+
+  const hasResourceTracker = !!skill.resource?.enabled;
+  const resourceTracker = hasResourceTracker ? (
+    <SkillResourceTracker
+      resource={skill.resource}
+      skillLevel={skill.currentLvl}
+      onChange={handleSetResourceCurrent}
+    />
+  ) : null;
+
   if (!compact) {
     const hasDesc = !!translatedDescription;
     const forceOpen = !!searchQuery?.trim();
-    const expanded = hasDesc ? descOpen || forceOpen : false;
+    const expandable = hasDesc || hasResourceTracker;
+    const expanded = expandable ? descOpen || forceOpen : false;
     return (
-      <Accordion
-        disableGutters
-        elevation={0}
-        square
-        expanded={expanded}
-        onChange={() => hasDesc && setDescOpen((v) => !v)}
-        sx={{
-          borderTop: `1px solid ${theme.secondary}`,
-          overflow: "hidden",
-          background: "transparent",
-          "&:before": { display: "none" },
-        }}
-      >
-        <AccordionSummary
-          component="div"
+      <>
+        <Accordion
+          disableGutters
+          elevation={0}
+          square
+          expanded={expanded}
+          onChange={() => expandable && setDescOpen((v) => !v)}
           sx={{
-            minHeight: 0,
-            p: 0,
-            background: theme.primary,
-            "& .MuiAccordionSummary-content": { m: 0 },
-            "& .MuiAccordionSummary-expandIconWrapper": { display: "none" },
-            cursor: hasDesc ? "pointer" : "default",
+            borderTop: `1px solid ${theme.secondary}`,
+            overflow: "hidden",
+            background: "transparent",
+            "&:before": { display: "none" },
           }}
         >
-          <Box
+          <AccordionSummary
+            component="div"
             sx={{
-              display: "flex",
-              alignItems: "center",
-              px: 2,
-              py: 0.5,
-              gap: 1,
-              minHeight: 40,
-              width: "100%",
+              minHeight: 0,
+              p: 0,
+              background: theme.primary,
+              "& .MuiAccordionSummary-content": { m: 0 },
+              "& .MuiAccordionSummary-expandIconWrapper": { display: "none" },
+              cursor: expandable ? "pointer" : "default",
             }}
           >
-            <Typography
+            <Box
               sx={{
-                fontFamily: "Antonio",
-                fontWeight: "bold",
-                fontSize: { xs: "1rem", sm: "1.1rem" },
-                textTransform: "uppercase",
-                color: "#fff",
-                flex: 1,
-                lineHeight: 1.3,
+                display: "flex",
+                alignItems: "center",
+                px: 2,
+                py: 0.5,
+                gap: 1,
+                minHeight: 40,
+                width: "100%",
               }}
             >
-              {highlightMatch(t(skill.skillName), searchQuery)}
-            </Typography>
+              <Typography
+                sx={{
+                  fontFamily: "Antonio",
+                  fontWeight: "bold",
+                  fontSize: { xs: "1rem", sm: "1.1rem" },
+                  textTransform: "uppercase",
+                  color: "#fff",
+                  flex: 1,
+                  lineHeight: 1.3,
+                }}
+              >
+                {highlightMatch(t(skill.skillName), searchQuery)}
+              </Typography>
+              {isInteractive && onUpdate ? (
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "4px",
+                    flexShrink: 0,
+                  }}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {isMobile ? (
+                    <>
+                      <Tooltip title={t("Decrease Level")}>
+                        <span>
+                          <IconButton
+                            size="small"
+                            sx={{
+                              p: "3px",
+                              color: "#fff",
+                              border: "1px solid rgba(255,255,255,0.4)",
+                              borderRadius: "4px",
+                            }}
+                            onClick={handleDecrement}
+                            disabled={skill.currentLvl <= 0}
+                          >
+                            <Remove sx={{ fontSize: "1rem" }} />
+                          </IconButton>
+                        </span>
+                      </Tooltip>
+                      <Tooltip title={t("View Skill Level")}>
+                        <Typography
+                          onClick={() => setLevelModalOpen(true)}
+                          sx={{
+                            fontFamily: "Antonio",
+                            fontSize: "0.85rem",
+                            fontWeight: "bold",
+                            color: "#fff",
+                            lineHeight: 1,
+                            cursor: "pointer",
+                            "&:hover": { textDecoration: "underline" },
+                          }}
+                        >
+                          SL{skill.currentLvl}/{skill.maxLvl}
+                        </Typography>
+                      </Tooltip>
+                    </>
+                  ) : (
+                    <>
+                      <Tooltip title={t("View Skill Level")}>
+                        <span>
+                          <SkillStars
+                            current={skill.currentLvl}
+                            max={skill.maxLvl}
+                            secondaryColor={theme.secondary}
+                            onClick={() => setLevelModalOpen(true)}
+                            sx={{ mx: "8px" }}
+                          />
+                        </span>
+                      </Tooltip>
+                      <Tooltip title={t("Decrease Level")}>
+                        <span>
+                          <IconButton
+                            size="small"
+                            sx={{
+                              p: "3px",
+                              color: "#fff",
+                              border: "1px solid rgba(255,255,255,0.4)",
+                              borderRadius: "4px",
+                            }}
+                            onClick={handleDecrement}
+                            disabled={skill.currentLvl <= 0}
+                          >
+                            <Remove sx={{ fontSize: "1rem" }} />
+                          </IconButton>
+                        </span>
+                      </Tooltip>
+                      <Typography
+                        sx={{
+                          fontFamily: "Antonio",
+                          fontSize: "0.85rem",
+                          fontWeight: "bold",
+                          color: "#fff",
+                          lineHeight: 1,
+                          mr: "4px",
+                        }}
+                      >
+                        SL{skill.currentLvl}
+                      </Typography>
+                    </>
+                  )}
+                  <Tooltip title={t("Increase Level")}>
+                    <span>
+                      <IconButton
+                        size="small"
+                        sx={{
+                          p: "3px",
+                          color: "#fff",
+                          border: "1px solid rgba(255,255,255,0.4)",
+                          borderRadius: "4px",
+                        }}
+                        onClick={handleIncrement}
+                        disabled={
+                          skill.currentLvl >= skill.maxLvl || atClassLevelCap
+                        }
+                      >
+                        <Add sx={{ fontSize: "1rem" }} />
+                      </IconButton>
+                    </span>
+                  </Tooltip>
+                </Box>
+              ) : (
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 1,
+                    flexShrink: 0,
+                  }}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {isMobile ? (
+                    <Tooltip title={t("View Skill Level")}>
+                      <Typography
+                        onClick={() => setLevelModalOpen(true)}
+                        sx={{
+                          fontFamily: "Antonio",
+                          fontSize: "0.85rem",
+                          fontWeight: "bold",
+                          color: "rgba(255,255,255,0.9)",
+                          lineHeight: 1,
+                          cursor: "pointer",
+                          "&:hover": { textDecoration: "underline" },
+                        }}
+                      >
+                        SL{skill.currentLvl}/{skill.maxLvl}
+                      </Typography>
+                    </Tooltip>
+                  ) : (
+                    <>
+                      <Tooltip title={t("View Skill Level")}>
+                        <span>
+                          <SkillStars
+                            current={skill.currentLvl}
+                            max={skill.maxLvl}
+                            secondaryColor={theme.secondary}
+                            onClick={() => setLevelModalOpen(true)}
+                            sx={{ mr: "8px" }}
+                          />
+                        </span>
+                      </Tooltip>
+                      <Typography
+                        sx={{
+                          fontFamily: "Antonio",
+                          fontSize: "0.85rem",
+                          fontWeight: "bold",
+                          color: "rgba(255,255,255,0.9)",
+                          lineHeight: 1,
+                        }}
+                      >
+                        SL{skill.currentLvl}
+                      </Typography>
+                    </>
+                  )}
+                </Box>
+              )}
+              <Tooltip title={t("Send to Chat")}>
+                <IconButton
+                  size="small"
+                  sx={{
+                    p: "3px",
+                    color: "rgba(255,255,255,0.85)",
+                    border: "1px solid rgba(255,255,255,0.4)",
+                    borderRadius: "4px",
+                    flexShrink: 0,
+                  }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    sendDisplayMessage("skill", t(skill.skillName), {
+                      speaker: pc?.info?.name || pc?.name || "",
+                      description: translatedDescription || undefined,
+                    });
+                  }}
+                >
+                  <MessageOutlined sx={{ fontSize: "1.2rem" }} />
+                </IconButton>
+              </Tooltip>
+              {expandable && (
+                <IconButton
+                  size="small"
+                  sx={{
+                    p: "3px",
+                    color: "rgba(255,255,255,0.7)",
+                    flexShrink: 0,
+                  }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setDescOpen((v) => !v);
+                  }}
+                >
+                  {descOpen ? (
+                    <KeyboardArrowUp sx={{ fontSize: "1.2rem" }} />
+                  ) : (
+                    <KeyboardArrowDown sx={{ fontSize: "1.2rem" }} />
+                  )}
+                </IconButton>
+              )}
+            </Box>
+          </AccordionSummary>
+          {expandable && (
+            <AccordionDetails sx={{ p: 0 }}>
+              {hasDesc && (
+                <DescriptionArea>
+                  <NotesMarkdown uniform fontSize="1rem">
+                    {highlightMarkdownText(translatedDescription, searchQuery)}
+                  </NotesMarkdown>
+                </DescriptionArea>
+              )}
+              {isInteractive && resourceTracker}
+            </AccordionDetails>
+          )}
+        </Accordion>
+        <SkillLevelModal
+          open={levelModalOpen}
+          onClose={() => setLevelModalOpen(false)}
+          headerText={t(skill.skillName)}
+          currentLvl={skill.currentLvl}
+          maxLvl={skill.maxLvl}
+          onIncrease={handleIncrement}
+          onDecrease={handleDecrement}
+          isEditMode={isInteractive && !!onUpdate}
+          increaseDisabled={atClassLevelCap}
+          investedLevels={totalSkillLevels}
+        />
+      </>
+    );
+  }
+
+  return (
+    <>
+      <ItemRowCard
+        compact
+        variant="outlined"
+        onCardClick={
+          translatedDescription
+            ? () => onPreview?.({ type: "skill", skill })
+            : undefined
+        }
+        paperSx={{
+          transition: "border-color 0.15s ease",
+          "&:hover": { borderColor: theme.secondary },
+        }}
+        label={
+          <Typography
+            noWrap
+            sx={{
+              fontFamily: "Antonio",
+              fontWeight: 800,
+              fontSize: "0.9rem",
+              textTransform: "uppercase",
+              lineHeight: 1.3,
+            }}
+          >
+            {highlightMatch(t(skill.skillName), searchQuery)}
+          </Typography>
+        }
+        actions={
+          <>
             {isInteractive && onUpdate ? (
               <Box
                 sx={{
                   display: "flex",
                   alignItems: "center",
-                  gap: "4px",
+                  gap: "2px",
                   flexShrink: 0,
                 }}
                 onClick={(e) => e.stopPropagation()}
               >
-                <SkillStars
-                  current={skill.currentLvl}
-                  max={skill.maxLvl}
-                  secondaryColor={theme.secondary}
-                />
                 <Tooltip title={t("Decrease Level")}>
                   <span>
                     <IconButton
                       size="small"
-                      sx={{
-                        p: "3px",
-                        color: "#fff",
-                        border: "1px solid rgba(255,255,255,0.4)",
-                        borderRadius: "4px",
-                      }}
+                      sx={{ p: 0, width: 28, height: 28 }}
                       onClick={handleDecrement}
                       disabled={skill.currentLvl <= 0}
                     >
-                      <Remove sx={{ fontSize: "1rem" }} />
+                      <Remove sx={{ fontSize: "1.1rem" }} />
                     </IconButton>
                   </span>
                 </Tooltip>
-                <Typography
+                <Box
                   sx={{
                     fontFamily: "Antonio",
-                    fontSize: "0.85rem",
+                    fontSize: "0.8rem",
                     fontWeight: "bold",
+                    minWidth: 28,
+                    textAlign: "center",
                     color: "#fff",
-                    lineHeight: 1,
                   }}
                 >
-                  SL{skill.currentLvl}
-                </Typography>
+                  {skill.currentLvl}/{skill.maxLvl}
+                </Box>
                 <Tooltip title={t("Increase Level")}>
                   <span>
                     <IconButton
                       size="small"
-                      sx={{
-                        p: "3px",
-                        color: "#fff",
-                        border: "1px solid rgba(255,255,255,0.4)",
-                        borderRadius: "4px",
-                      }}
+                      sx={{ p: 0, width: 28, height: 28 }}
                       onClick={handleIncrement}
                       disabled={
                         skill.currentLvl >= skill.maxLvl || atClassLevelCap
                       }
                     >
-                      <Add sx={{ fontSize: "1rem" }} />
+                      <Add sx={{ fontSize: "1.1rem" }} />
                     </IconButton>
                   </span>
                 </Tooltip>
@@ -688,40 +991,20 @@ function SkillCard({
             ) : (
               <Box
                 sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 1,
+                  fontFamily: "Antonio",
+                  fontSize: "0.8rem",
+                  fontWeight: "bold",
+                  color: "#fff",
+                  px: "4px",
                   flexShrink: 0,
                 }}
               >
-                <SkillStars
-                  current={skill.currentLvl}
-                  max={skill.maxLvl}
-                  secondaryColor={theme.secondary}
-                />
-                <Typography
-                  sx={{
-                    fontFamily: "Antonio",
-                    fontSize: "0.85rem",
-                    fontWeight: "bold",
-                    color: "rgba(255,255,255,0.9)",
-                    lineHeight: 1,
-                  }}
-                >
-                  SL{skill.currentLvl}
-                </Typography>
+                {skill.currentLvl}/{skill.maxLvl}
               </Box>
             )}
             <Tooltip title={t("Send to Chat")}>
               <IconButton
                 size="small"
-                sx={{
-                  p: "3px",
-                  color: "rgba(255,255,255,0.85)",
-                  border: "1px solid rgba(255,255,255,0.4)",
-                  borderRadius: "4px",
-                  flexShrink: 0,
-                }}
                 onClick={(e) => {
                   e.stopPropagation();
                   sendDisplayMessage("skill", t(skill.skillName), {
@@ -730,149 +1013,16 @@ function SkillCard({
                   });
                 }}
               >
-                <MessageOutlined sx={{ fontSize: "1.2rem" }} />
+                <MessageOutlined />
               </IconButton>
             </Tooltip>
-            {translatedDescription && (
-              <IconButton
-                size="small"
-                sx={{ p: "3px", color: "rgba(255,255,255,0.7)", flexShrink: 0 }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setDescOpen((v) => !v);
-                }}
-              >
-                {descOpen ? (
-                  <KeyboardArrowUp sx={{ fontSize: "1.2rem" }} />
-                ) : (
-                  <KeyboardArrowDown sx={{ fontSize: "1.2rem" }} />
-                )}
-              </IconButton>
-            )}
-          </Box>
-        </AccordionSummary>
-        {hasDesc && (
-          <AccordionDetails sx={{ p: 0 }}>
-            <DescriptionArea>
-              <NotesMarkdown uniform fontSize="1rem">
-                {highlightMarkdownText(translatedDescription, searchQuery)}
-              </NotesMarkdown>
-            </DescriptionArea>
-          </AccordionDetails>
-        )}
-      </Accordion>
-    );
-  }
-
-  return (
-    <ItemRowCard
-      compact
-      variant="outlined"
-      onCardClick={
-        translatedDescription
-          ? () => onPreview?.({ type: "skill", skill })
-          : undefined
-      }
-      paperSx={{
-        transition: "border-color 0.15s ease",
-        "&:hover": { borderColor: theme.secondary },
-      }}
-      label={
-        <Typography
-          noWrap
-          sx={{
-            fontFamily: "Antonio",
-            fontWeight: 800,
-            fontSize: "0.9rem",
-            textTransform: "uppercase",
-            lineHeight: 1.3,
-          }}
-        >
-          {highlightMatch(t(skill.skillName), searchQuery)}
-        </Typography>
-      }
-      actions={
-        <>
-          {isInteractive && onUpdate ? (
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                gap: "2px",
-                flexShrink: 0,
-              }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <Tooltip title={t("Decrease Level")}>
-                <span>
-                  <IconButton
-                    size="small"
-                    sx={{ p: 0, width: 28, height: 28 }}
-                    onClick={handleDecrement}
-                    disabled={skill.currentLvl <= 0}
-                  >
-                    <Remove sx={{ fontSize: "1.1rem" }} />
-                  </IconButton>
-                </span>
-              </Tooltip>
-              <Box
-                sx={{
-                  fontFamily: "Antonio",
-                  fontSize: "0.8rem",
-                  fontWeight: "bold",
-                  minWidth: 28,
-                  textAlign: "center",
-                  color: "#fff",
-                }}
-              >
-                {skill.currentLvl}/{skill.maxLvl}
-              </Box>
-              <Tooltip title={t("Increase Level")}>
-                <span>
-                  <IconButton
-                    size="small"
-                    sx={{ p: 0, width: 28, height: 28 }}
-                    onClick={handleIncrement}
-                    disabled={
-                      skill.currentLvl >= skill.maxLvl || atClassLevelCap
-                    }
-                  >
-                    <Add sx={{ fontSize: "1.1rem" }} />
-                  </IconButton>
-                </span>
-              </Tooltip>
-            </Box>
-          ) : (
-            <Box
-              sx={{
-                fontFamily: "Antonio",
-                fontSize: "0.8rem",
-                fontWeight: "bold",
-                color: "#fff",
-                px: "4px",
-                flexShrink: 0,
-              }}
-            >
-              {skill.currentLvl}/{skill.maxLvl}
-            </Box>
-          )}
-          <Tooltip title={t("Send to Chat")}>
-            <IconButton
-              size="small"
-              onClick={(e) => {
-                e.stopPropagation();
-                sendDisplayMessage("skill", t(skill.skillName), {
-                  speaker: pc?.info?.name || pc?.name || "",
-                  description: translatedDescription || undefined,
-                });
-              }}
-            >
-              <MessageOutlined />
-            </IconButton>
-          </Tooltip>
-        </>
-      }
-    />
+          </>
+        }
+      />
+      {isInteractive && resourceTracker && (
+        <Box sx={{ mt: 0.5 }}>{resourceTracker}</Box>
+      )}
+    </>
   );
 }
 
@@ -1057,12 +1207,13 @@ function SpellCard({ spell, onUpdate, searchQuery, compact, theme, t }) {
 
 function HeroicCard({
   cls,
-  _classIdx,
-  _isInteractive,
-  _onUpdate,
+  classIdx,
+  isInteractive,
+  onUpdate,
   pc,
   searchQuery,
-  _setHeroicPickerClassIdx,
+  setHeroicPickerClassIdx,
+  setHeroicEditClassIdx,
   compact,
   theme,
   t,
@@ -1074,17 +1225,46 @@ function HeroicCard({
     ? t(cls.heroic.description)
     : "";
 
+  // Runtime update of the heroic skill's resource-point current value.
+  const handleSetResourceCurrent = (next) => {
+    if (!onUpdate) return;
+    onUpdate((prev) => ({
+      ...prev,
+      classes: prev.classes.map((c, ci) =>
+        ci !== classIdx || !c.heroic?.resource
+          ? c
+          : {
+              ...c,
+              heroic: {
+                ...c.heroic,
+                resource: { ...c.heroic.resource, current: next },
+              },
+            },
+      ),
+    }));
+  };
+
+  const hasResourceTracker = !!cls.heroic?.resource?.enabled;
+  const resourceTracker = hasResourceTracker ? (
+    <SkillResourceTracker
+      resource={cls.heroic.resource}
+      skillLevel={pc?.lvl ?? 0}
+      onChange={handleSetResourceCurrent}
+    />
+  ) : null;
+
   if (!compact) {
     const forceOpen = !!searchQuery?.trim();
-    const expanded =
-      hasHeroic && translatedDesc ? descOpen || forceOpen : false;
+    const expandable =
+      hasHeroic && (!!translatedDesc || (isInteractive && hasResourceTracker));
+    const expanded = expandable ? descOpen || forceOpen : false;
     return (
       <Accordion
         disableGutters
         elevation={0}
         square
         expanded={expanded}
-        onChange={() => hasHeroic && translatedDesc && setDescOpen((v) => !v)}
+        onChange={() => expandable && setDescOpen((v) => !v)}
         sx={{
           borderTop: `1px solid ${theme.secondary}`,
           overflow: "hidden",
@@ -1100,7 +1280,7 @@ function HeroicCard({
             background: theme.primary,
             "& .MuiAccordionSummary-content": { m: 0 },
             "& .MuiAccordionSummary-expandIconWrapper": { display: "none" },
-            cursor: hasHeroic && translatedDesc ? "pointer" : "default",
+            cursor: expandable ? "pointer" : "default",
           }}
         >
           <Box
@@ -1132,6 +1312,46 @@ function HeroicCard({
                 <em>{t("No Heroic Skill")}</em>
               )}
             </Typography>
+            {isInteractive && setHeroicPickerClassIdx && (
+              <Tooltip title={t("Choose from Compendium")}>
+                <IconButton
+                  size="small"
+                  sx={{
+                    p: "3px",
+                    color: "rgba(255,255,255,0.85)",
+                    border: "1px solid rgba(255,255,255,0.4)",
+                    borderRadius: "4px",
+                    flexShrink: 0,
+                  }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setHeroicPickerClassIdx(classIdx);
+                  }}
+                >
+                  <Search sx={{ fontSize: "1.2rem" }} />
+                </IconButton>
+              </Tooltip>
+            )}
+            {isInteractive && setHeroicEditClassIdx && (
+              <Tooltip title={t("Edit Manually (Homebrew)")}>
+                <IconButton
+                  size="small"
+                  sx={{
+                    p: "3px",
+                    color: "rgba(255,255,255,0.85)",
+                    border: "1px solid rgba(255,255,255,0.4)",
+                    borderRadius: "4px",
+                    flexShrink: 0,
+                  }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setHeroicEditClassIdx(classIdx);
+                  }}
+                >
+                  <Edit sx={{ fontSize: "1.2rem" }} />
+                </IconButton>
+              </Tooltip>
+            )}
             {hasHeroic && (
               <Tooltip title={t("Send to Chat")}>
                 <IconButton
@@ -1155,7 +1375,7 @@ function HeroicCard({
                 </IconButton>
               </Tooltip>
             )}
-            {hasHeroic && translatedDesc && (
+            {expandable && (
               <IconButton
                 size="small"
                 sx={{ p: "3px", color: "rgba(255,255,255,0.7)", flexShrink: 0 }}
@@ -1173,13 +1393,16 @@ function HeroicCard({
             )}
           </Box>
         </AccordionSummary>
-        {hasHeroic && translatedDesc && (
+        {expandable && (
           <AccordionDetails sx={{ p: 0 }}>
-            <DescriptionArea>
-              <NotesMarkdown uniform fontSize="1rem">
-                {highlightMarkdownText(translatedDesc, searchQuery)}
-              </NotesMarkdown>
-            </DescriptionArea>
+            {translatedDesc && (
+              <DescriptionArea>
+                <NotesMarkdown uniform fontSize="1rem">
+                  {highlightMarkdownText(translatedDesc, searchQuery)}
+                </NotesMarkdown>
+              </DescriptionArea>
+            )}
+            {isInteractive && resourceTracker}
           </AccordionDetails>
         )}
       </Accordion>
@@ -1187,56 +1410,89 @@ function HeroicCard({
   }
 
   return (
-    <ItemRowCard
-      compact
-      variant="outlined"
-      onCardClick={
-        hasHeroic && translatedDesc
-          ? () => onPreview?.({ type: "heroic", heroic: cls.heroic })
-          : undefined
-      }
-      paperSx={{
-        transition: "border-color 0.15s ease",
-        "&:hover": { borderColor: theme.secondary },
-      }}
-      label={
-        <Typography
-          noWrap
-          sx={{
-            fontFamily: "Antonio",
-            fontWeight: 800,
-            fontSize: "0.9rem",
-            textTransform: "uppercase",
-            lineHeight: 1.3,
-            color: hasHeroic ? "inherit" : "text.disabled",
-          }}
-        >
-          {hasHeroic ? (
-            highlightMatch(t(cls.heroic.name), searchQuery)
-          ) : (
-            <em>{t("No Heroic Skill")}</em>
-          )}
-        </Typography>
-      }
-      actions={
-        hasHeroic ? (
-          <Tooltip title={t("Send to Chat")}>
-            <IconButton
-              size="small"
-              onClick={(e) => {
-                e.stopPropagation();
-                sendDisplayMessage("heroic skill", t(cls.heroic.name), {
-                  speaker: pc?.info?.name || pc?.name || "",
-                  description: translatedDesc || undefined,
-                });
-              }}
-            >
-              <MessageOutlined />
-            </IconButton>
-          </Tooltip>
-        ) : null
-      }
-    />
+    <>
+      <ItemRowCard
+        compact
+        variant="outlined"
+        onCardClick={
+          hasHeroic && translatedDesc
+            ? () => onPreview?.({ type: "heroic", heroic: cls.heroic })
+            : undefined
+        }
+        paperSx={{
+          transition: "border-color 0.15s ease",
+          "&:hover": { borderColor: theme.secondary },
+        }}
+        label={
+          <Typography
+            noWrap
+            sx={{
+              fontFamily: "Antonio",
+              fontWeight: 800,
+              fontSize: "0.9rem",
+              textTransform: "uppercase",
+              lineHeight: 1.3,
+              color: hasHeroic ? "inherit" : "text.disabled",
+            }}
+          >
+            {hasHeroic ? (
+              highlightMatch(t(cls.heroic.name), searchQuery)
+            ) : (
+              <em>{t("No Heroic Skill")}</em>
+            )}
+          </Typography>
+        }
+        actions={
+          <>
+            {isInteractive && setHeroicPickerClassIdx && (
+              <Tooltip title={t("Choose from Compendium")}>
+                <IconButton
+                  size="small"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setHeroicPickerClassIdx(classIdx);
+                  }}
+                >
+                  <Search />
+                </IconButton>
+              </Tooltip>
+            )}
+            {isInteractive && setHeroicEditClassIdx && (
+              <Tooltip title={t("Edit Manually (Homebrew)")}>
+                <IconButton
+                  size="small"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setHeroicEditClassIdx(classIdx);
+                  }}
+                >
+                  <Edit />
+                </IconButton>
+              </Tooltip>
+            )}
+            {hasHeroic && (
+              <Tooltip title={t("Send to Chat")}>
+                <IconButton
+                  size="small"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    sendDisplayMessage("heroic skill", t(cls.heroic.name), {
+                      speaker: pc?.info?.name || pc?.name || "",
+                      description: translatedDesc || undefined,
+                    });
+                  }}
+                >
+                  <MessageOutlined />
+                </IconButton>
+              </Tooltip>
+            )}
+          </>
+        }
+      />
+      {isInteractive && resourceTracker && (
+        <Box sx={{ mt: 0.5 }}>{resourceTracker}</Box>
+      )}
+    </>
   );
 }
 // SpellTypeAccordion
@@ -1367,6 +1623,7 @@ function ClassSection({
   pc,
   searchQuery,
   setHeroicPickerClassIdx,
+  setHeroicEditClassIdx,
   compact,
   defaultExpanded = false,
   forceExpanded,
@@ -1577,6 +1834,7 @@ function ClassSection({
                     pc={pc}
                     searchQuery={searchQuery}
                     setHeroicPickerClassIdx={setHeroicPickerClassIdx}
+                    setHeroicEditClassIdx={setHeroicEditClassIdx}
                     compact={true}
                     theme={theme}
                     t={t}
@@ -1967,6 +2225,7 @@ function ClassSection({
                     pc={pc}
                     searchQuery={searchQuery}
                     setHeroicPickerClassIdx={setHeroicPickerClassIdx}
+                    setHeroicEditClassIdx={setHeroicEditClassIdx}
                     compact={false}
                     theme={theme}
                     t={t}
@@ -2093,6 +2352,7 @@ export default function PcClasses({
     !usesInnateClassRules || (pc?.classes?.length ?? 0) < 3;
 
   const [heroicPickerClassIdx, setHeroicPickerClassIdx] = useState(null);
+  const [heroicEditClassIdx, setHeroicEditClassIdx] = useState(null);
   const [editClassIdx, setEditClassIdx] = useState(null);
   const [pendingEditClassRef, setPendingEditClassRef] = useState(null);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -2245,11 +2505,26 @@ export default function PcClasses({
         i === heroicPickerClassIdx
           ? {
               ...cls,
-              heroic: { name: item.name, description: item.description },
+              heroic: {
+                name: item.name,
+                description: item.description,
+                ...(item.resource?.enabled ? { resource: item.resource } : {}),
+              },
             }
           : cls,
       ),
     }));
+  };
+
+  const handleSaveHeroic = (saved) => {
+    if (heroicEditClassIdx === null || !onUpdate) return;
+    applyUpdate((prev) => ({
+      ...prev,
+      classes: prev.classes.map((cls, i) =>
+        i === heroicEditClassIdx ? { ...cls, heroic: saved } : cls,
+      ),
+    }));
+    setHeroicEditClassIdx(null);
   };
 
   const openEditClass = (idx) => setEditClassIdx(idx);
@@ -2484,31 +2759,35 @@ export default function PcClasses({
           </Box>
         )}
 
-        {filteredClasses.map((cls, classIdx) => (
-          <ClassSection
-            key={`class-${classIdx}`}
-            cls={cls}
-            classIdx={classIdx}
-            isInteractive={isInteractive}
-            onUpdate={isInteractive ? applyUpdate : undefined}
-            updateMaxStats={updateMaxStats}
-            onLevelChange={
-              isInteractive && !automaticClassLevel
-                ? handleLevelChange
-                : undefined
-            }
-            onRemoveClass={isInteractive ? handleRemoveClass : undefined}
-            onEditClass={isInteractive ? openEditClass : undefined}
-            pc={pc}
-            searchQuery={searchQuery}
-            setHeroicPickerClassIdx={setHeroicPickerClassIdx}
-            compact={isCompact}
-            defaultExpanded={defaultExpanded}
-            forceExpanded={expandSignal}
-            theme={theme}
-            t={t}
-          />
-        ))}
+        {filteredClasses.map((cls) => {
+          const classIdx = (pc?.classes ?? []).indexOf(cls);
+          return (
+            <ClassSection
+              key={`class-${classIdx}`}
+              cls={cls}
+              classIdx={classIdx}
+              isInteractive={isInteractive}
+              onUpdate={isInteractive ? applyUpdate : undefined}
+              updateMaxStats={updateMaxStats}
+              onLevelChange={
+                isInteractive && !automaticClassLevel
+                  ? handleLevelChange
+                  : undefined
+              }
+              onRemoveClass={isInteractive ? handleRemoveClass : undefined}
+              onEditClass={isInteractive ? openEditClass : undefined}
+              pc={pc}
+              searchQuery={searchQuery}
+              setHeroicPickerClassIdx={setHeroicPickerClassIdx}
+              setHeroicEditClassIdx={setHeroicEditClassIdx}
+              compact={isCompact}
+              defaultExpanded={defaultExpanded}
+              forceExpanded={expandSignal}
+              theme={theme}
+              t={t}
+            />
+          );
+        })}
         {filteredClasses.length === 0 && (
           <Typography
             sx={{
@@ -2617,6 +2896,20 @@ export default function PcClasses({
         initialType="heroics"
         restrictToTypes={["heroics"]}
         context="player"
+      />
+
+      <ItemEditModal
+        open={heroicEditClassIdx !== null}
+        onClose={() => setHeroicEditClassIdx(null)}
+        itemType="heroic"
+        item={
+          heroicEditClassIdx !== null
+            ? (pc?.classes?.[heroicEditClassIdx]?.heroic ?? null)
+            : null
+        }
+        editIndex={null}
+        onSave={handleSaveHeroic}
+        onDelete={() => {}}
       />
     </>
   );

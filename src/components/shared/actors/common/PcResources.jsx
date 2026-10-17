@@ -2,10 +2,6 @@ import React, { useState } from "react";
 import {
   Box,
   Typography,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   Button,
   TextField,
   ToggleButtonGroup,
@@ -30,6 +26,7 @@ import {
   useAnimatedDeltaPercent,
   useAnimatedDeltaNumber,
 } from "/src/components/shared/actors/common/resourceBarMotion";
+import ActorEditModal from "/src/forms/ui/ActorEditModal";
 
 function StatChangeDialog({
   open,
@@ -44,8 +41,7 @@ function StatChangeDialog({
   const [amount, setAmount] = useState("");
   const [isHealing, setIsHealing] = useState(true);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleSubmit = () => {
     const val = parseInt(amount, 10) || 0;
     if (val <= 0) return;
     onApply(pip ? (isHealing ? val : -val) : isHealing ? val : -val);
@@ -54,58 +50,59 @@ function StatChangeDialog({
   };
 
   return (
-    <Dialog open={open} onClose={onClose}>
-      <form onSubmit={handleSubmit}>
-        <DialogTitle sx={{ fontWeight: "bold", textAlign: "center", pb: 1 }}>
-          {t("Update")} {stat}
-        </DialogTitle>
-        <DialogContent
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            pt: "16px !important",
-            minWidth: 250,
-          }}
-        >
-          <Typography variant="h6" sx={{ mb: 2 }}>
-            {stat}: {value}
-            {max != null ? ` / ${max}` : ""}
-          </Typography>
-          <ToggleButtonGroup
-            value={isHealing ? "gain" : "lose"}
-            exclusive
-            onChange={(_, v) => v !== null && setIsHealing(v === "gain")}
-            sx={{ mb: 2 }}
-            fullWidth
-          >
-            <ToggleButton value="lose" color="error">
-              {t("Lose")}
-            </ToggleButton>
-            <ToggleButton value="gain" color="success">
-              {t("Gain")}
-            </ToggleButton>
-          </ToggleButtonGroup>
-          <TextField
-            fullWidth
-            type="number"
-            label={t("Amount")}
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            autoFocus
-            slotProps={{ htmlInput: { min: 1 } }}
-          />
-        </DialogContent>
-        <DialogActions sx={{ justifyContent: "center", pb: 2 }}>
+    <ActorEditModal
+      open={open}
+      onClose={onClose}
+      onConfirm={handleSubmit}
+      title={`${t("Update")} ${stat}`}
+      maxWidth="xs"
+      actions={
+        <Box sx={{ display: "flex", justifyContent: "center", gap: 1 }}>
           <Button onClick={onClose} color="secondary" variant="contained">
             {t("Cancel")}
           </Button>
-          <Button type="submit" variant="contained" color="primary">
+          <Button onClick={handleSubmit} variant="contained" color="primary">
             {t("Apply")}
           </Button>
-        </DialogActions>
-      </form>
-    </Dialog>
+        </Box>
+      }
+    >
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
+      >
+        <Typography variant="h6" sx={{ mb: 2 }}>
+          {stat}: {value}
+          {max != null ? ` / ${max}` : ""}
+        </Typography>
+        <ToggleButtonGroup
+          value={isHealing ? "gain" : "lose"}
+          exclusive
+          onChange={(_, v) => v !== null && setIsHealing(v === "gain")}
+          sx={{ mb: 2 }}
+          fullWidth
+        >
+          <ToggleButton value="lose" color="error">
+            {t("Lose")}
+          </ToggleButton>
+          <ToggleButton value="gain" color="success">
+            {t("Gain")}
+          </ToggleButton>
+        </ToggleButtonGroup>
+        <TextField
+          fullWidth
+          type="number"
+          label={t("Amount")}
+          value={amount}
+          onChange={(e) => setAmount(e.target.value)}
+          autoFocus
+          slotProps={{ htmlInput: { min: 1 } }}
+        />
+      </Box>
+    </ActorEditModal>
   );
 }
 

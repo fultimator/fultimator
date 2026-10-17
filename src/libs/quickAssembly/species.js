@@ -47,7 +47,7 @@ export const QA_SPECIES = {
       { kind: "replaceAffinity", from: "rs", to: "ab" },
       spell(["breath", "curse-xl", "mind-theft", "weaken"]),
       flying,
-      roleSkill(2),
+      roleSkill(),
     ],
   },
 

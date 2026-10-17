@@ -169,6 +169,11 @@ export default function PcListItem({
             cursor: "grab",
             touchAction: "none",
             "&:hover": { color: theme.palette.text.primary },
+            "@container initiative-row (max-width: 620px)": {
+              width: 16,
+              mr: 0,
+              "& svg": { fontSize: "1.1rem" },
+            },
           }}
         >
           <DragIndicator fontSize="small" />
@@ -241,6 +246,10 @@ export default function PcListItem({
           borderRight: `1px solid ${theme.palette.divider}`,
           padding: "0 7px",
           gap: "2px",
+          "@container initiative-row (max-width: 620px)": {
+            width: 18,
+            padding: "0 3px",
+          },
         }}
       >
         <Typography
@@ -361,6 +370,9 @@ export default function PcListItem({
           flexShrink: 0,
           zIndex: 5,
           gap: 0.25,
+          "@container initiative-row (max-width: 620px)": {
+            minWidth: "96px",
+          },
         }}
       >
         <TurnTokens
@@ -380,7 +392,12 @@ export default function PcListItem({
             e.stopPropagation();
             setAnchorMenu(e.currentTarget);
           }}
-          sx={{ padding: 0.5 }}
+          sx={{
+            padding: 0.5,
+            "@container initiative-row (max-width: 620px)": {
+              padding: 1,
+            },
+          }}
         >
           <MoreVert fontSize="small" />
         </IconButton>

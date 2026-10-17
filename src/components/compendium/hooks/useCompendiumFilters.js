@@ -22,6 +22,7 @@ export function useCompendiumFilters({
   initialQualityCategories = [],
   initialHeroicClasses = [],
   initialOptionalSubtypes = [],
+  initialSpecialSubtypes = [],
   initialEffectTransfer = "",
   initialEffectApplicableTypes = [],
   initialCompendium = "official",
@@ -58,6 +59,9 @@ export function useCompendiumFilters({
     useState(initialHeroicClasses);
   const [selectedOptionalSubtypes, setSelectedOptionalSubtypes] = useState(
     initialOptionalSubtypes,
+  );
+  const [selectedSpecialSubtypes, setSelectedSpecialSubtypes] = useState(
+    initialSpecialSubtypes,
   );
   const [selectedEffectTransfer, setSelectedEffectTransfer] = useState(
     initialEffectTransfer,
@@ -97,6 +101,7 @@ export function useCompendiumFilters({
       setSelectedQualityCategories(initialQualityCategories);
       setSelectedHeroicClasses(initialHeroicClasses);
       setSelectedOptionalSubtypes(initialOptionalSubtypes);
+      setSelectedSpecialSubtypes(initialSpecialSubtypes);
       setSelectedEffectTransfer(initialEffectTransfer);
       setSelectedEffectApplicableTypes(initialEffectApplicableTypes);
     } else if (!open) {
@@ -222,6 +227,16 @@ export function useCompendiumFilters({
     [],
   );
 
+  const handleSpecialSubtypesChange = useCallback(
+    (subtypes, { scrollRef } = {}) => {
+      setSelectedSpecialSubtypes(subtypes);
+      setSearchQuery("");
+      setSelectedIdx(null);
+      if (scrollRef?.current) scrollRef.current.scrollTop = 0;
+    },
+    [],
+  );
+
   const handleEffectTransferChange = useCallback(
     (value, { scrollRef } = {}) => {
       setSelectedEffectTransfer(value);
@@ -276,6 +291,7 @@ export function useCompendiumFilters({
       selectedQualityCategories,
       selectedHeroicClasses,
       selectedOptionalSubtypes,
+      selectedSpecialSubtypes,
       selectedEffectTransfer,
       selectedEffectApplicableTypes,
       selectedCompendium,
@@ -295,6 +311,7 @@ export function useCompendiumFilters({
       handleQualityCategoriesChange,
       handleHeroicClassesChange,
       handleOptionalSubtypesChange,
+      handleSpecialSubtypesChange,
       handleEffectTransferChange,
       handleEffectApplicableTypesChange,
       handleCompendiumChange,

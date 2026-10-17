@@ -92,6 +92,7 @@ import useDownload from "../../hooks/useDownload";
 import useDownloadImage from "../../hooks/useDownloadImage";
 import SettingRow from "../../components/common/SettingRow";
 import classList from "../../libs/classes";
+import defaultConsumables from "../../libs/consumables";
 import { buildItemText } from "../../libs/buildItemText";
 import MnemosphereCreateDialog from "/src/libs/player/MnemosphereCreateDialog";
 import {
@@ -379,6 +380,7 @@ function Personal() {
         },
       ],
       armor: [],
+      consumables: defaultConsumables.map((c) => ({ ...c })),
       notes: [],
       modifiers: {
         hp: grantsTechnosphereHpMpBonus ? 5 : 0,

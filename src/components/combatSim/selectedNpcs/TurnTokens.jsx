@@ -36,8 +36,11 @@ export default function TurnTokens({
   const handleClick = (e) => {
     e.stopPropagation();
     if (!combatActive) {
-      const anyTaken = turns.some(Boolean);
-      onToggle?.(anyTaken ? turns.map(() => false) : turns.map(() => true));
+      if (allTaken) {
+        onToggle?.(turns.map(() => false));
+      } else {
+        onToggle?.(turns.map((taken, i) => (i === nextSlot ? true : taken)));
+      }
       return;
     }
     if (inProgress) {
@@ -48,7 +51,14 @@ export default function TurnTokens({
   };
 
   let tooltipTitle;
-  if (!combatActive) tooltipTitle = allTaken ? "Reset turn" : "Mark turn taken";
+  if (!combatActive)
+    tooltipTitle = allTaken
+      ? total > 1
+        ? "Reset turns"
+        : "Reset turn"
+      : total > 1
+        ? `Mark turn taken (${remaining} left)`
+        : "Mark turn taken";
   else if (inProgress) tooltipTitle = "End turn";
   else if (canStart) tooltipTitle = "Start turn";
   else if (allTaken) tooltipTitle = "All turns taken";
@@ -89,6 +99,10 @@ export default function TurnTokens({
           justifyContent: "center",
           cursor,
           flexShrink: 0,
+          "@container initiative-row (max-width: 620px)": {
+            width: 40,
+            height: 40,
+          },
           backgroundColor:
             inProgress || isCurrentFactionToken
               ? borderColor

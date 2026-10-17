@@ -42,7 +42,7 @@ const NpcImmunitiesSchema = z.object({
 });
 
 const NpcExtraSchema = z.object({
-  statusImmunity: z.number().int().min(0).max(3).optional(),
+  statusImmunity: z.number().min(0).max(3).multipleOf(0.5).optional(),
 });
 
 const NpcFeatureSchema = z.object({
@@ -297,6 +297,14 @@ export const NpcPersistedSchema = z.object({
     .default("custom"),
   rank: z.string().optional(),
   qaSelections: z.record(z.string(), z.boolean()).optional(),
+  qaNegativeSkills: z
+    .array(
+      z.object({
+        id: z.string(),
+        bonusKind: z.enum(["roleSkill", "bossSkill"]).default("roleSkill"),
+      }),
+    )
+    .optional(),
   sizes: z.string().optional(),
   phases: z.number().optional(),
   villain: z.string().optional(),

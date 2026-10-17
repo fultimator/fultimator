@@ -6,6 +6,8 @@ import {
   IconButton,
   Menu,
   MenuItem,
+  ListItemIcon,
+  ListItemText,
   Snackbar,
   Divider,
 } from "@mui/material";
@@ -21,6 +23,7 @@ type Props = {
   dataType: string;
   data?: Record<string, unknown>;
   size?: "small" | "medium" | "large";
+  menuItemLabel?: string;
 };
 
 enum ExportAction {
@@ -28,7 +31,13 @@ enum ExportAction {
   CLIPBOARD,
 }
 
-function Export({ name = "", dataType, data = {}, size = "medium" }: Props) {
+function Export({
+  name = "",
+  dataType,
+  data = {},
+  size = "medium",
+  menuItemLabel,
+}: Props) {
   const { t } = useTranslate();
   const canonicalData = React.useMemo(
     () => canonicalizeForTransfer(dataType, data),
@@ -52,7 +61,7 @@ function Export({ name = "", dataType, data = {}, size = "medium" }: Props) {
   const [exportAnchor, setExportAnchor] = useState(null);
   const isExportMenuOpen = Boolean(exportAnchor);
 
-  function handleOpenExportMenu(event: React.MouseEvent<HTMLButtonElement>) {
+  function handleOpenExportMenu(event: React.MouseEvent<HTMLElement>) {
     setExportAnchor(event.currentTarget);
   }
 
@@ -106,11 +115,20 @@ function Export({ name = "", dataType, data = {}, size = "medium" }: Props) {
 
   return (
     <>
-      <Tooltip title={t("Export")}>
-        <IconButton onClick={handleOpenExportMenu} size={size}>
-          <Code fontSize={size === "small" ? "small" : "medium"} />
-        </IconButton>
-      </Tooltip>
+      {menuItemLabel ? (
+        <MenuItem onClick={handleOpenExportMenu}>
+          <ListItemIcon>
+            <Code fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{menuItemLabel}</ListItemText>
+        </MenuItem>
+      ) : (
+        <Tooltip title={t("Export")}>
+          <IconButton onClick={handleOpenExportMenu} size={size}>
+            <Code fontSize={size === "small" ? "small" : "medium"} />
+          </IconButton>
+        </Tooltip>
+      )}
 
       {/* Menu component shows a modal in the whole screen. Can't rely on mouseover or mouseleave events */}
       <Menu

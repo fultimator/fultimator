@@ -151,9 +151,11 @@ export default function EditEffects({ npc, setNpc }) {
     >
       <Box sx={{ display: "flex", flexDirection: "column", gap: 0.75, p: 1 }}>
         {effects.length === 0 ? (
-          <Typography color="text.secondary" variant="body2" sx={{ px: 0.5 }}>
-            {t("no_effects")}
-          </Typography>
+          <Typography
+            color="text.secondary"
+            variant="body2"
+            sx={{ px: 0.5 }}
+          ></Typography>
         ) : (
           effects.map((effect, index) => (
             <ItemRowCard

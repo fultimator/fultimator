@@ -15,11 +15,13 @@ import {
   useMediaQuery,
   Snackbar,
   Alert,
+  Button,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import BattleHeader from "../../components/combatSim/BattleHeader";
 import PCDetail from "../../components/combatSim/PCDetail";
 import { calcHP, calcMP } from "../../libs/npcs";
+import { clamp } from "../../libs/playerCalculations";
 import SelectedActors from "../../components/combatSim/SelectedActors";
 import useDownloadImage from "../../hooks/useDownloadImage";
 import NPCDetail from "../../components/combatSim/NPCDetail";
@@ -33,6 +35,7 @@ import { globalConfirm } from "../../utility/globalConfirm";
 import { useCombatSimSettingsStore } from "../../stores/combatSimSettingsStore";
 import { useCombatEncounterStore } from "../../stores/combatEncounterStore";
 import { useCombatActorSelectStore } from "../../store/combatActorSelectStore";
+import { useCombatProgressClocksStore } from "../../store/combatProgressClocksStore";
 import GeneralNotesDialog from "../../components/combatSim/GeneralNotesDialog";
 import InitiativeDialog from "../../components/combatSim/InitiativeDialog";
 import NpcEditModal from "../../components/combatSim/NpcEditModal";
@@ -218,6 +221,7 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
   const [pcTabIndex, setPcTabIndex] = useState(0); // PC sheet tab index
   const [selectedStudy, setSelectedStudy] = useState(0); // NPC study level (0 = full sheet, 1-3 = study tiers)
   const [isSaveSnackbarOpen, setIsSaveSnackbarOpen] = useState(false); // Save notification state
+  const [undoRemoval, setUndoRemoval] = useState(null);
   const isDifferentUser = !isLocalMode && encounter?.uid !== user?.uid;
   const isPrivate = encounter?.private && isDifferentUser;
   const [notesDialogOpen, setNotesDialogOpen] = useState(false);
@@ -273,15 +277,83 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
   );
   const clearTargets = useCombatEncounterStore((s) => s.clearTargets);
   const runtimeActors = useCombatEncounterStore((s) => s.runtimeActors);
+  const updateRuntimeActor = useCombatEncounterStore(
+    (s) => s.updateRuntimeActor,
+  );
   const setActorSelectPanelData = useCombatActorSelectStore(
     (s) => s.setPanelData,
   );
   const clearActorSelectPanelData = useCombatActorSelectStore(
     (s) => s.clearPanelData,
   );
+  const setProgressClocksPanelData = useCombatProgressClocksStore(
+    (s) => s.setPanelData,
+  );
+  const clearProgressClocksPanelData = useCombatProgressClocksStore(
+    (s) => s.clearPanelData,
+  );
   useEffect(() => {
     setEncounterActors(id, selectedNPCs, selectedPCs);
   }, [id, selectedNPCs, selectedPCs]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const mirrorRuntimeResources = useCallback(
+    (prev) => {
+      let changed = false;
+      const next = prev.map((doc) => {
+        const runtime = runtimeActors[doc.combatId];
+        if (!runtime) return doc;
+        const stats = doc.combatStats ?? {};
+        const rtHp = runtime.currentHp;
+        const rtMp = runtime.currentMp;
+        const rtIp = runtime.currentIp;
+        const hpDiffers =
+          Number.isFinite(rtHp) &&
+          stats.currentHp !== undefined &&
+          rtHp !== stats.currentHp;
+        const mpDiffers =
+          Number.isFinite(rtMp) &&
+          stats.currentMp !== undefined &&
+          rtMp !== stats.currentMp;
+        const ipDiffers =
+          Number.isFinite(rtIp) &&
+          stats.currentIp !== undefined &&
+          rtIp !== stats.currentIp;
+        if (!hpDiffers && !mpDiffers && !ipDiffers) return doc;
+        changed = true;
+        return {
+          ...doc,
+          combatStats: {
+            ...stats,
+            currentHp: hpDiffers ? rtHp : stats.currentHp,
+            currentMp: mpDiffers ? rtMp : stats.currentMp,
+            currentIp: ipDiffers ? rtIp : stats.currentIp,
+          },
+        };
+      });
+      return changed ? next : prev;
+    },
+    [runtimeActors],
+  );
+
+  useEffect(() => {
+    setSelectedNPCs(mirrorRuntimeResources);
+    setSelectedPCs(mirrorRuntimeResources);
+  }, [mirrorRuntimeResources]);
+
+  const syncRuntimeResource = (combatId, statType, delta, maxForStat) => {
+    if (statType !== "HP" && statType !== "MP" && statType !== "IP") return;
+    const key =
+      statType === "HP"
+        ? "currentHp"
+        : statType === "MP"
+          ? "currentMp"
+          : "currentIp";
+    updateRuntimeActor(combatId, (actor) => ({
+      ...actor,
+      [key]: clamp(actor[key] + delta, 0, maxForStat),
+    }));
+  };
+
   useEffect(
     () => () => {
       clearEncounterActors();
@@ -886,6 +958,54 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
     [clearActorSelectPanelData],
   );
 
+  const actorClockEntries = useMemo(
+    () =>
+      [
+        ...selectedNPCs.map((npc) => ({ actor: npc, actorKind: "npc" })),
+        ...selectedPCs.map((pc) => ({ actor: pc, actorKind: "pc" })),
+      ].flatMap(({ actor, actorKind }) =>
+        (actor.notes || []).flatMap((note, noteIndex) =>
+          (note.clocks || []).map((clock, clockIndex) => ({
+            actorKind,
+            actorCombatId: actor.combatId,
+            actorName: actor.name,
+            noteIndex,
+            noteName: note.name,
+            clockIndex,
+            clock,
+          })),
+        ),
+      ),
+    [selectedNPCs, selectedPCs],
+  );
+
+  useEffect(() => {
+    if (isDifferentUser) {
+      clearProgressClocksPanelData();
+      return;
+    }
+    setProgressClocksPanelData({
+      encounterClocks,
+      actorClockEntries,
+      onUpdateEncounterClock: handleUpdateClock,
+      onUpdateActorClock: handleUpdateActorClock,
+      emitLog,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    isDifferentUser,
+    actorClockEntries,
+    encounterClocks,
+    emitLog,
+    clearProgressClocksPanelData,
+    setProgressClocksPanelData,
+  ]);
+
+  useEffect(
+    () => () => clearProgressClocksPanelData(),
+    [clearProgressClocksPanelData],
+  );
+
   // Handle Remove PC from the selected PCs list
   const handleRemovePC = async (pcCombatId) => {
     if (askBeforeRemoveNpc) {
@@ -894,7 +1014,10 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
       );
       if (!confirmRemove) return;
     }
-    const pcToRemove = selectedPCs.find((pc) => pc.combatId === pcCombatId);
+    const removedIndex = selectedPCs.findIndex(
+      (pc) => pc.combatId === pcCombatId,
+    );
+    const pcToRemove = selectedPCs[removedIndex];
     setSelectedPCs((prev) => prev.filter((pc) => pc.combatId !== pcCombatId));
     if (selectedPC?.combatId === pcCombatId) {
       setSelectedPC(null);
@@ -902,6 +1025,16 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
 
     if (pcToRemove) {
       emitLog({ type: "actor-removed", name: pcToRemove.name });
+      setUndoRemoval({
+        name: pcToRemove.name,
+        restore: () =>
+          setSelectedPCs((prev) => {
+            if (prev.some((pc) => pc.combatId === pcCombatId)) return prev;
+            const next = [...prev];
+            next.splice(Math.min(removedIndex, next.length), 0, pcToRemove);
+            return next;
+          }),
+      });
     }
   };
 
@@ -945,9 +1078,10 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
       if (!confirmRemove) return;
     }
 
-    const npcToRemove = selectedNPCs.find(
+    const removedIndex = selectedNPCs.findIndex(
       (npc) => npc.combatId === npcCombatId,
     );
+    const npcToRemove = selectedNPCs[removedIndex];
     setSelectedNPCs((prev) =>
       prev.filter((npc) => npc.combatId !== npcCombatId),
     );
@@ -958,6 +1092,16 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
 
     if (npcToRemove) {
       emitLog({ type: "actor-removed", name: npcToRemove.name });
+      setUndoRemoval({
+        name: npcToRemove.name,
+        restore: () =>
+          setSelectedNPCs((prev) => {
+            if (prev.some((npc) => npc.combatId === npcCombatId)) return prev;
+            const next = [...prev];
+            next.splice(Math.min(removedIndex, next.length), 0, npcToRemove);
+            return next;
+          }),
+      });
     }
   };
 
@@ -1024,6 +1168,83 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
   const handleStudyChange = (event) => {
     setSelectedStudy(event.target.value);
   };
+
+  // Desktop keyboard shortcuts
+  useEffect(() => {
+    if (isMobile || isDifferentUser) return;
+
+    const isTypingTarget = (el) => {
+      if (!el) return false;
+      const tag = el.tagName;
+      return (
+        tag === "INPUT" ||
+        tag === "TEXTAREA" ||
+        tag === "SELECT" ||
+        el.isContentEditable
+      );
+    };
+
+    const handleKeyDown = (e) => {
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      if (isTypingTarget(e.target)) return;
+
+      if (e.key === "Escape") {
+        if (selectedNPC || selectedPC) {
+          e.preventDefault();
+          setSelectedNPC(null);
+          setSelectedPC(null);
+        }
+        return;
+      }
+
+      if (e.key === " " || e.key === "Enter") {
+        if (activeTurn) {
+          e.preventDefault();
+          handleEndActorTurn(
+            activeTurn.combatId,
+            activeTurn.turnIndex,
+            activeTurn.faction,
+            activeTurn.faction === "npcs",
+          );
+        }
+        return;
+      }
+
+      // 1-9 select the Nth actor in on-screen order
+      if (e.key >= "1" && e.key <= "9") {
+        const index = Number(e.key) - 1;
+        const pcs = selectedPCs.map((pc) => ({ id: pc.combatId, isPc: true }));
+        const npcs = selectedNPCs.map((npc) => ({
+          id: npc.combatId,
+          isPc: false,
+        }));
+        const pcsFirst = combatActive && initiative === "players";
+        const roster = pcsFirst ? [...pcs, ...npcs] : [...npcs, ...pcs];
+        const actor = roster[index];
+        if (!actor) return;
+        e.preventDefault();
+        if (actor.isPc) {
+          handlePcClick(actor.id);
+        } else {
+          handleNpcClick(actor.id);
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    isMobile,
+    isDifferentUser,
+    activeTurn,
+    selectedNPC,
+    selectedPC,
+    selectedNPCs,
+    selectedPCs,
+    combatActive,
+    initiative,
+  ]);
 
   // Handle Open HP/MP Dialog
   const handleOpen = (type, entity, entityType = "npc") => {
@@ -1107,6 +1328,13 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
             },
           };
         }),
+      );
+
+      syncRuntimeResource(
+        npcClicked.combatId,
+        statType,
+        adjustedValue,
+        statType === "HP" ? maxHP : statType === "MP" ? maxMP : maxIP,
       );
 
       if (selectedPC && selectedPC.combatId === npcClicked.combatId) {
@@ -1269,6 +1497,17 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
     });
 
     setSelectedNPCs(updatedNPCs);
+
+    syncRuntimeResource(
+      npcClicked.combatId,
+      statType,
+      adjustedValue,
+      statType === "HP"
+        ? calcHP(npcClicked)
+        : statType === "MP"
+          ? calcMP(npcClicked)
+          : (npcClicked.stats?.ip?.max ?? 0),
+    );
 
     if (selectedNPC && selectedNPC.combatId === npcClicked.combatId) {
       const maxHP = calcHP(npcClicked);
@@ -1570,6 +1809,34 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
     emitLog({ type: "clock-reset", clockName: updatedClocks[index].name });
   };
 
+  const handleUpdateActorClock = ({
+    actorKind,
+    actorCombatId,
+    noteIndex,
+    clockIndex,
+    newState,
+  }) => {
+    const setActors = actorKind === "npc" ? setSelectedNPCs : setSelectedPCs;
+    setActors((prev) =>
+      prev.map((actor) => {
+        if (actor.combatId !== actorCombatId) return actor;
+        return {
+          ...actor,
+          notes: actor.notes.map((note, ni) =>
+            ni !== noteIndex
+              ? note
+              : {
+                  ...note,
+                  clocks: note.clocks.map((c, ci) =>
+                    ci !== clockIndex ? c : { ...c, state: newState },
+                  ),
+                },
+          ),
+        };
+      }),
+    );
+  };
+
   const handleNotesSave = (newNotes) => {
     setEncounterNotes(newNotes);
   };
@@ -1666,6 +1933,60 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
         isDirty={isDirty}
       />
 
+      {/* Mobile sticky "active turn" bar: only while an actor's turn is in
+          progress, so End Turn stays reachable without scrolling the list. */}
+      {isMobile &&
+        activeTurn &&
+        (() => {
+          const roster = [...selectedNPCs, ...selectedPCs];
+          const active = roster.find((a) => a.combatId === activeTurn.combatId);
+          if (!active) return null;
+          return (
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
+                px: 1.5,
+                py: 0.75,
+                borderRadius: 2,
+                bgcolor:
+                  activeTurn.faction === "npcs" ? "error.main" : "primary.main",
+                color: "#fff",
+              }}
+            >
+              <Typography
+                variant="body2"
+                noWrap
+                sx={{ flex: 1, minWidth: 0, fontWeight: 700 }}
+              >
+                {t("combat_sim_active_turn")}: {active.name}
+              </Typography>
+              <Button
+                size="small"
+                variant="contained"
+                sx={{
+                  bgcolor: "#fff",
+                  color: "text.primary",
+                  fontWeight: 700,
+                  flexShrink: 0,
+                  "&:hover": { bgcolor: "rgba(255,255,255,0.85)" },
+                }}
+                onClick={() =>
+                  handleEndActorTurn(
+                    activeTurn.combatId,
+                    activeTurn.turnIndex,
+                    activeTurn.faction,
+                    activeTurn.faction === "npcs",
+                  )
+                }
+              >
+                {t("combat_sim_end_turn")}
+              </Button>
+            </Box>
+          );
+        })()}
+
       {/* Clock Management Dialog */}
       <CombatSimClocks
         open={clockDialogOpen}
@@ -1714,7 +2035,7 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
             isMobile={isMobile}
             selectedNpcID={selectedNPC?.combatId}
             isDifferentUser={isDifferentUser}
-            useDragAndDrop={npcReorderingMethod === "dragAndDrop"}
+            useDragAndDrop={!isMobile && npcReorderingMethod === "dragAndDrop"}
             onSortEnd={handleSortEnd}
             onSortEndPC={handlePcSortEnd}
             onClockClick={() => setClockDialogOpen(true)}
@@ -1741,7 +2062,7 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
           />
         </Box>
         {/* Detail Resize Handle */}
-        {(selectedNPC || selectedPC) && (
+        {!isMobile && (selectedNPC || selectedPC) && (
           <Box
             sx={{
               width: "5px",
@@ -1805,7 +2126,6 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
             isMobile={isMobile}
             selectedPCs={selectedPCs}
             setSelectedPCs={setSelectedPCs}
-            emitLog={emitLog}
             addMessage={addMessage}
             handleOpen={handleOpen}
             tabIndex={pcTabIndex}
@@ -1880,7 +2200,7 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
         onClose={() => setNotesDialogOpen(false)}
         onSave={handleNotesSave}
         notes={encounterNotes}
-        useDragAndDrop={noteReorderingMethod === "dragAndDrop"}
+        useDragAndDrop={!isMobile && noteReorderingMethod === "dragAndDrop"}
         maxNotesCount={5} // unlimited in desktop version
         maxNoteLength={500} // unlimited in desktop version
       />
@@ -1902,6 +2222,29 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
         </Snackbar>
       )}
       {downloadSnackbar}
+      <Snackbar
+        open={undoRemoval !== null}
+        autoHideDuration={6000}
+        onClose={() => setUndoRemoval(null)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        message={
+          undoRemoval
+            ? t("combat_sim_actor_removed", [undoRemoval.name], true)
+            : ""
+        }
+        action={
+          <Button
+            color="secondary"
+            size="small"
+            onClick={() => {
+              undoRemoval?.restore();
+              setUndoRemoval(null);
+            }}
+          >
+            {t("combat_sim_undo", undefined, true)}
+          </Button>
+        }
+      />
       <NpcEditModal
         npcId={selectedNPC?.id}
         open={npcEditModalOpen}

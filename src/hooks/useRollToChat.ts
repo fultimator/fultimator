@@ -55,6 +55,11 @@ export function sendDisplayMessage(
       amount: number;
       perTarget?: boolean;
     };
+    clocks?: {
+      sections: number;
+      state?: boolean[];
+      name?: string;
+    }[];
   } = {},
 ) {
   const msg: DisplayMessage = {
@@ -68,6 +73,7 @@ export function sendDisplayMessage(
     description: opts.description,
     effect: opts.effect,
     cost: opts.cost,
+    clocks: opts.clocks,
   };
   addToChat(msg as ChatMessage);
 }

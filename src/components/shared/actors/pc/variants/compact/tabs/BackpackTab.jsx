@@ -2,8 +2,8 @@ import React from "react";
 import { Box } from "@mui/material";
 import PcCompactLoadout from "/src/components/shared/actors/pc/variants/compact/panels/PcCompactLoadout";
 import SpellVehiclePanel from "/src/components/shared/actors/pc/variants/compact/spells/SpellVehiclePanel";
-import CompactSphereInventory from "/src/components/shared/actors/pc/playerSheet/PlayerEquipment";
 import PcEquipment from "/src/components/shared/actors/common/PcEquipment";
+import SphereInventory from "/src/components/shared/actors/pc/editors/equipment/technospheres/SphereInventory";
 
 export default function BackpackTab({
   player,
@@ -36,10 +36,10 @@ export default function BackpackTab({
       />
 
       {isTechnospheres && (
-        <CompactSphereInventory
+        <SphereInventory
           player={player}
           setPlayer={setPlayer}
-          isEditMode={isEditMode}
+          advancement={player?.settings?.advancement ?? false}
           compact
         />
       )}
