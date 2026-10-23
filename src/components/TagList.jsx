@@ -5,14 +5,14 @@ import Stack from "@mui/material/Stack";
 import Paper from "@mui/material/Paper";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
-import { useTheme } from "@mui/system";
+import { useCustomTheme } from "../hooks/useCustomTheme";
 import { useTranslate } from "../translation/translate";
 import AddIcon from "@mui/icons-material/Add";
 
 const TagList = ({ npc, setNpc }) => {
   const { t } = useTranslate();
-  const theme = useTheme();
-  const secondary = theme.palette.secondary.main;
+  const theme = useCustomTheme();
+  const secondary = theme.secondary;
 
   const [inputValue, setInputValue] = useState("");
   const maxTags = 5; // Maximum tag count
@@ -56,7 +56,7 @@ const TagList = ({ npc, setNpc }) => {
       trimmedValue &&
       (npc.tags?.length < maxTags || !npc.tags) &&
       !npc.tags?.some(
-        (tag) => tag.name.toUpperCase() === trimmedValue.toUpperCase()
+        (tag) => tag.name.toUpperCase() === trimmedValue.toUpperCase(),
       )
     ) {
       setNpc((prevState) => {
@@ -87,17 +87,21 @@ const TagList = ({ npc, setNpc }) => {
     >
       {/* Label for the tag list */}
       <Typography
-        mb={1}
         sx={{
+          mb: 1,
           fontFamily: "Antonio",
           textTransform: "uppercase",
           fontSize: "1.3rem",
+          color: theme.white,
+          background: theme.primary,
+          padding: "2px 10px",
+          borderRadius: "4px",
         }}
       >
         {t("Personal Tags")}
       </Typography>
       {/* Stack for input field and add button */}
-      <Stack direction="row" spacing={1} alignItems="flex-start">
+      <Stack direction="row" spacing={1} sx={{ alignItems: "flex-start" }}>
         {/* Text field for adding tags */}
         <TextField
           value={inputValue}
@@ -108,8 +112,10 @@ const TagList = ({ npc, setNpc }) => {
           size="small"
           fullWidth
           disabled={isInputDisabled}
-          inputProps={{ maxLength: maxTagLength }} // Limit input to maxTagLength characters
           sx={{ height: "40px" }} // Set fixed height for the TextField
+          slotProps={{
+            htmlInput: { maxLength: maxTagLength },
+          }}
         />
         {/* Button to add tags */}
         <Button

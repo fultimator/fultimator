@@ -10,7 +10,6 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogActions,
   List,
   ListItem,
   ListItemButton,
@@ -26,7 +25,7 @@ import { useTheme } from "@mui/material/styles";
 import {
   getTypeIcon,
   getTypeColor,
-  getTypeLabel,
+  useTypeLabel,
   languages,
 } from "./resourceUtils";
 
@@ -38,6 +37,7 @@ export default function ResourceCard({
   const { t } = useTranslate();
   const theme = useTheme();
   const isDarkMode = theme.palette.mode === "dark";
+  const getTypeLabel = useTypeLabel();
 
   const [digitalDialogOpen, setDigitalDialogOpen] = useState(false);
   const [physicalDialogOpen, setPhysicalDialogOpen] = useState(false);
@@ -83,8 +83,14 @@ export default function ResourceCard({
         </IconButton>
       </DialogTitle>
       <DialogContent>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-          Choose your preferred reseller:
+        <Typography
+          variant="body2"
+          sx={{
+            color: "text.secondary",
+            mb: 2,
+          }}
+        >
+          {t("resources_choose_reseller")}
         </Typography>
         <List>
           {options.map((option, index) => (
@@ -107,11 +113,13 @@ export default function ResourceCard({
                 <ListItemText
                   primary={option.reseller}
                   secondary={option.url}
-                  secondaryTypographyProps={{
-                    sx: {
-                      fontSize: "0.75rem",
-                      opacity: 0.7,
-                      wordBreak: "break-all",
+                  slotProps={{
+                    secondary: {
+                      sx: {
+                        fontSize: "0.75rem",
+                        opacity: 0.7,
+                        wordBreak: "break-all",
+                      },
                     },
                   }}
                 />
@@ -206,7 +214,7 @@ export default function ResourceCard({
                     fontStyle: "italic",
                   }}
                 >
-                  {t("by")} {resource.author}
+                  {t("resources_by")} {resource.author}
                 </Typography>
               )}
               {!isHomebrew && resource.publisher && (
@@ -357,7 +365,7 @@ export default function ResourceCard({
                     fontSize: "0.8rem",
                   }}
                 >
-                  Digital
+                  {t("resources_digital")}
                 </Button>
               )}
               {physicalOptions.length > 0 && (
@@ -406,7 +414,7 @@ export default function ResourceCard({
                     fontSize: "0.8rem",
                   }}
                 >
-                  Physical
+                  {t("resources_physical")}
                 </Button>
               )}
             </Box>
@@ -457,10 +465,10 @@ export default function ResourceCard({
               }}
             >
               {resource.type === "coming_soon" || resource.url === "#"
-                ? t("Coming Soon")
+                ? t("resources_coming_soon")
                 : activeTab === 0
-                ? t("Access Resource")
-                : t("View Content")}
+                  ? t("resources_access_resource")
+                  : t("resources_view_content")}
             </Button>
           )}
         </CardActions>
@@ -472,7 +480,7 @@ export default function ResourceCard({
         () => setDigitalDialogOpen(false),
         digitalOptions,
         "Digital Options",
-        <CloudDownloadIcon />
+        <CloudDownloadIcon />,
       )}
 
       {/* Physical Options Dialog */}
@@ -481,7 +489,7 @@ export default function ResourceCard({
         () => setPhysicalDialogOpen(false),
         physicalOptions,
         "Physical Options",
-        <LocalShippingIcon />
+        <LocalShippingIcon />,
       )}
     </>
   );

@@ -7,7 +7,8 @@ import NewReleasesIcon from "@mui/icons-material/NewReleases";
 import ExtensionIcon from "@mui/icons-material/Extension";
 import StarIcon from "@mui/icons-material/Star";
 import Diversity1Icon from "@mui/icons-material/Diversity1";
-import ConnectWithoutContactIcon from '@mui/icons-material/ConnectWithoutContact';
+import ConnectWithoutContactIcon from "@mui/icons-material/ConnectWithoutContact";
+import { useTranslate } from "../../translation/translate";
 
 export const getTypeIcon = (type) => {
   switch (type) {
@@ -36,7 +37,7 @@ export const getTypeIcon = (type) => {
   }
 };
 
-export const getTypeColor = ({type, isDarkMode = false}) => {
+export const getTypeColor = ({ type, isDarkMode = false }) => {
   switch (type) {
     case "both":
       return isDarkMode ? "#64b5f6" : "#1565c0";
@@ -63,31 +64,34 @@ export const getTypeColor = ({type, isDarkMode = false}) => {
   }
 };
 
-export const getTypeLabel = (type) => {
-  switch (type) {
-    case "pdf":
-      return "PDF Download";
-    case "physical":
-      return "Physical Book";
-    case "both":
-      return "Book & PDF";
-    case "free":
-      return "Free Resource";
-    case "website":
-      return "Website";
-    case "coming_soon":
-      return "Coming Soon";
-    case "tools":
-      return "Tool";
-    case "content":
-      return "Content";
-    case "crowdfunding":
-      return "Crowdfunding";
-    case "social_media":
-      return "Social Media";
-    default:
-      return "Resource";
-  }
+export const useTypeLabel = () => {
+  const { t } = useTranslate();
+  return (type) => {
+    switch (type) {
+      case "pdf":
+        return t("resources_pdf_download");
+      case "physical":
+        return t("resources_physical_book");
+      case "both":
+        return t("resources_book_pdf");
+      case "free":
+        return t("resources_free_resource");
+      case "website":
+        return t("resources_website");
+      case "coming_soon":
+        return t("resources_coming_soon");
+      case "tools":
+        return t("resources_tools");
+      case "content":
+        return t("resources_content");
+      case "crowdfunding":
+        return t("resources_crowdfunding");
+      case "social_media":
+        return t("resources_social_media");
+      default:
+        return t("resources_resource");
+    }
+  };
 };
 
 export const languages = {

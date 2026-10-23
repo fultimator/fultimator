@@ -1,10 +1,16 @@
 import { Button } from "@mui/material";
-import { auth, googleAuthProvider } from "../firebase";
-
-import { signInWithPopup } from "@firebase/auth";
+import { auth, googleAuthProvider, signInWithPopup } from "@platform/db";
+import { IS_CAPACITOR } from "../platform";
 
 export function SignIn() {
-  const signInWithGoogle = () => {
+  const signInWithGoogle = async () => {
+    if (IS_CAPACITOR) {
+      // Web OAuth popup/redirect does not work in the Capacitor WebView; use the
+      // native Google sign-in plugin instead.
+      const { signInWithGoogleNative } = await import("../nativeAuth");
+      await signInWithGoogleNative();
+      return;
+    }
     signInWithPopup(auth, googleAuthProvider);
   };
 

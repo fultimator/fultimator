@@ -1,5 +1,5 @@
 import { useTheme } from "@mui/material/styles";
-import { Theme } from "@mui/material/styles/createTheme";
+import type { Components, Theme } from "@mui/material/styles";
 
 // Define a CustomTheme interface to include all theme properties you need
 interface CustomTheme {
@@ -9,7 +9,8 @@ interface CustomTheme {
   quaternary: string;
   white: string;
   transparent: string;
-  mode: 'light' | 'dark';
+  mode: "light" | "dark";
+  panelRadius: number;
   background: {
     default: string;
     paper: string;
@@ -18,23 +19,40 @@ interface CustomTheme {
     primary: string;
     secondary: string;
   };
-  breakpoints: Theme['breakpoints'];
-  spacing: Theme['spacing'];
-  typography: Theme['typography'];
-  zIndex: Theme['zIndex'];
+  breakpoints: Theme["breakpoints"];
+  spacing: Theme["spacing"];
+  typography: Theme["typography"];
+  zIndex: Theme["zIndex"];
 }
 
 // Custom hook to access theme variables
 export const useCustomTheme = (): CustomTheme => {
   const theme = useTheme<Theme>();
 
+  const paperOverrides = (
+    theme.components?.MuiPaper as Components<Theme>["MuiPaper"]
+  )?.styleOverrides?.root;
+  const panelRadius =
+    typeof paperOverrides === "object" &&
+    paperOverrides !== null &&
+    !Array.isArray(paperOverrides) &&
+    "borderRadius" in paperOverrides &&
+    typeof (paperOverrides as { borderRadius?: unknown }).borderRadius ===
+      "number"
+      ? ((paperOverrides as { borderRadius: number }).borderRadius ?? 4)
+      : 4;
+
   return {
     primary: theme.palette.primary.main,
     secondary: theme.palette.secondary.main,
-    ternary: theme.palette.ternary?.main || '',
-    quaternary: theme.palette.quaternary?.main || '',
+    ternary: theme.palette.ternary?.main || "",
+    quaternary: theme.palette.quaternary?.main || "",
     white: theme.palette.common.white,
-    transparent: theme.palette.mode === 'dark' ? 'rgba(0, 0, 0, 0)' : 'rgba(255, 255, 255, 0)',
+    panelRadius,
+    transparent:
+      theme.palette.mode === "dark"
+        ? "rgba(0, 0, 0, 0)"
+        : "rgba(255, 255, 255, 0)",
     mode: theme.palette.mode,
     background: {
       default: theme.palette.background.default,

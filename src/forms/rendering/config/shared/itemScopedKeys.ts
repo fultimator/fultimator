@@ -1,0 +1,118 @@
+// Curated item-scoped stat key options per item type.
+// These are the only paths that are safe to modify via a non-transferring passive
+// (i.e. one that modifies the item's own data rather than the actor).
+// Keys use dot-notation matching the item schema shape.
+
+export const ITEM_SCOPED_KEYS: Record<string, string[]> = {
+  npcAttack: [
+    "accuracy.value",
+    "attr1",
+    "attr2",
+    "defense",
+    "damage.value",
+    "damage.type",
+    "range",
+  ],
+  npcSpell: [
+    "accuracy.value",
+    "attr1",
+    "attr2",
+    "defense",
+    "damage.value",
+    "damage.type",
+    "damage.hrZero",
+    "range",
+    "cost.amount",
+    "maxTargets",
+  ],
+  npcAction: ["spCost"],
+  npcSpecial: ["spCost"],
+  heroic: [],
+  weapon: ["accuracy.value", "damage.value"],
+  customWeapon: ["accuracy.value", "damage.value"],
+  armor: [
+    "def",
+    "mdef",
+    "init",
+    "modifiers.def",
+    "modifiers.mdef",
+    "modifiers.init",
+    "modifiers.accuracy",
+    "modifiers.damageMelee",
+    "modifiers.damageRanged",
+  ],
+  shield: [
+    "def",
+    "mdef",
+    "init",
+    "modifiers.def",
+    "modifiers.mdef",
+    "modifiers.init",
+    "modifiers.accuracy",
+    "modifiers.damageMelee",
+    "modifiers.damageRanged",
+  ],
+  accessory: [
+    "modifiers.def",
+    "modifiers.mdef",
+    "modifiers.init",
+    "modifiers.accuracy",
+    "modifiers.damageMelee",
+    "modifiers.damageRanged",
+  ],
+  hoplosphere: [],
+  playerSpell: ["accuracy.value", "damage.value", "cost.amount", "maxTargets"],
+};
+
+// Per-sub-item scoped keys
+export const SPELL_SUBITEM_SCOPED_KEYS: Record<string, string[]> = {
+  magichantTone: [],
+  magichantKey: [],
+  gift: [],
+  dance: [],
+  symbol: [],
+  therioform: [],
+  magiseed: [],
+  invocation: [],
+  infusionEffect: [],
+  alchemyEffect: [],
+  alchemyTarget: [],
+  pilotVehicle: ["maxEnabledModules"],
+  pilotModule: [
+    "accuracy.value",
+    "damage.value",
+    "def",
+    "mdef",
+    "cost",
+    "qualityCost",
+  ],
+};
+
+// Per-spellType scoped keys - only fields that exist on that spell type's schema.
+export const PLAYER_SPELL_SCOPED_KEYS_BY_TYPE: Record<string, string[]> = {
+  default: [
+    "accuracy.value",
+    "damage.value",
+    "damage.type",
+    "cost.amount",
+    "maxTargets",
+  ],
+  arcanist: [],
+  "arcanist-rework": [],
+  gift: [],
+  dance: [],
+  therioform: [],
+  symbol: [],
+  invocation: [],
+  wellspring: [],
+  "magichant-key": [],
+  magichant: [],
+  "tinkerer-alchemy": [],
+  "tinkerer-infusion": [],
+  "tinkerer-magitech": [],
+  "pilot-vehicle": [],
+  cooking: [],
+  magiseed: [],
+  gamble: [],
+  deck: [],
+};

@@ -1,0 +1,249 @@
+import { Children, cloneElement, isValidElement, useState } from "react";
+import {
+  Box,
+  Card,
+  Checkbox,
+  FormControlLabel,
+  Grid,
+  IconButton,
+  Paper,
+  Popover,
+  Stack,
+  Tooltip,
+  Typography,
+  useMediaQuery,
+} from "@mui/material";
+import { useTheme } from "@mui/material/styles";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+import EditableImage from "/src/components/EditableImage";
+import { useTranslate } from "/src/translation/translate";
+import {
+  getImageBackground,
+  isImageMode,
+  HEADER_MIN_HEIGHT,
+} from "./core-utils";
+
+function ImageInfoIcon({ text }) {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const [anchorEl, setAnchorEl] = useState(null);
+  if (!text) return null;
+  if (isMobile) {
+    return (
+      <>
+        <IconButton
+          size="small"
+          onClick={(e) => setAnchorEl(e.currentTarget)}
+          sx={{ ml: 0.5 }}
+        >
+          <InfoOutlinedIcon fontSize="inherit" />
+        </IconButton>
+        <Popover
+          open={Boolean(anchorEl)}
+          anchorEl={anchorEl}
+          onClose={() => setAnchorEl(null)}
+          anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+          transformOrigin={{ vertical: "top", horizontal: "left" }}
+        >
+          <Typography sx={{ p: 1.25, maxWidth: 260, fontSize: "0.8rem" }}>
+            {text}
+          </Typography>
+        </Popover>
+      </>
+    );
+  }
+  return (
+    <Tooltip title={text} placement="top" arrow>
+      <IconButton size="small" sx={{ ml: 0.5 }}>
+        <InfoOutlinedIcon fontSize="inherit" />
+      </IconButton>
+    </Tooltip>
+  );
+}
+
+export function ImageToggleRow({
+  showImageToggle,
+  imageMode,
+  imageVisible,
+  setImageVisible,
+  showImageTempInfo,
+  imageTempInfoText,
+  actionContent,
+}) {
+  const { t } = useTranslate();
+  const shouldShowToggle = showImageToggle && imageMode === "slot";
+  if (!shouldShowToggle && !actionContent) return null;
+  return (
+    <Paper
+      variant="outlined"
+      data-html2canvas-ignore="true"
+      sx={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        gap: 1,
+        px: 1,
+        py: 0.25,
+        borderTop: 0,
+        borderRadius: "0 0 4px 4px",
+      }}
+    >
+      {shouldShowToggle && (
+        <Box sx={{ display: "flex", alignItems: "center" }}>
+          <FormControlLabel
+            sx={{ mr: 0 }}
+            control={
+              <Checkbox
+                checked={imageVisible}
+                onChange={(e) => setImageVisible(e.target.checked)}
+              />
+            }
+            label={t("Add Image")}
+          />
+          {showImageTempInfo && <ImageInfoIcon text={imageTempInfoText} />}
+        </Box>
+      )}
+      <Box sx={{ display: "flex", alignItems: "center", minHeight: 32 }}>
+        {actionContent}
+      </Box>
+    </Paper>
+  );
+}
+
+export function CardWrapper({ showCard, id, cardRef, children }) {
+  if (!showCard) return children;
+  return (
+    <Card id={id} elevation={1} ref={cardRef}>
+      {children}
+    </Card>
+  );
+}
+
+export function HeaderSpacer({ imageMode, imageSize, imageVisible }) {
+  if (!isImageMode(imageMode) || !imageVisible) return null;
+  return (
+    <Grid
+      sx={{
+        flex: `0 0 ${imageSize}px`,
+        minWidth: `${imageSize}px`,
+        minHeight: HEADER_MIN_HEIGHT,
+      }}
+    />
+  );
+}
+
+function withRowMinHeight(row) {
+  if (!isValidElement(row)) return row;
+  if (row.type === Symbol.for("react.fragment")) return row;
+  const muiName = row.type?.muiName;
+  if (muiName === "Divider" || muiName === "MuiDivider") return row;
+
+  return cloneElement(row, {
+    sx: [
+      ...(Array.isArray(row.props.sx) ? row.props.sx : [row.props.sx]),
+      { minHeight: HEADER_MIN_HEIGHT },
+    ],
+  });
+}
+
+export function RowsWithOptionalImage({
+  header = null,
+  imageMode,
+  imageSize,
+  imageVisible,
+  imageSlot,
+  customTheme,
+  imageRowCount = 1,
+  children,
+}) {
+  const rows = Children.toArray(children);
+  const normalizedRows = rows.map(withRowMinHeight);
+
+  if (!isImageMode(imageMode) || !imageVisible) {
+    return (
+      <>
+        {header}
+        {normalizedRows}
+      </>
+    );
+  }
+
+  const imageRows = normalizedRows.slice(0, imageRowCount);
+  const remainingRows = normalizedRows.slice(imageRowCount);
+  const imageContentSize = Math.min(imageSize, 72);
+
+  return (
+    <Box>
+      <Box sx={{ display: "flex", alignItems: "stretch" }}>
+        <Grid
+          sx={{
+            flex: `0 0 ${imageSize}px`,
+            width: `${imageSize}px`,
+            minHeight: `${imageSize}px`,
+            background: getImageBackground(customTheme),
+            border: `1px solid ${customTheme.secondary}`,
+            boxSizing: "border-box",
+            display: "flex",
+            alignItems: "flex-start",
+            justifyContent: "center",
+            overflow: "hidden",
+          }}
+        >
+          {imageSlot ?? <EditableImage size={imageContentSize} />}
+        </Grid>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            flexGrow: 1,
+            flexShrink: 1,
+            flexBasis: 0,
+            minWidth: 0,
+            minHeight: imageSize,
+          }}
+        >
+          {header}
+          {imageRows}
+        </Box>
+      </Box>
+      {remainingRows}
+    </Box>
+  );
+}
+
+export function CardContentWrapper({
+  showCard,
+  id,
+  cardRef,
+  showImageToggle,
+  imageMode,
+  imageVisible,
+  setImageVisible,
+  showImageTempInfo,
+  imageTempInfoText,
+  actionContent,
+  children,
+}) {
+  return (
+    <Stack
+      sx={{
+        "& .MuiChip-label": {
+          fontWeight: 700,
+        },
+      }}
+    >
+      <CardWrapper showCard={showCard} id={id} cardRef={cardRef}>
+        <Stack>{children}</Stack>
+      </CardWrapper>
+      <ImageToggleRow
+        showImageToggle={showImageToggle}
+        imageMode={imageMode}
+        imageVisible={imageVisible}
+        setImageVisible={setImageVisible}
+        showImageTempInfo={showImageTempInfo}
+        imageTempInfoText={imageTempInfoText}
+        actionContent={actionContent}
+      />
+    </Stack>
+  );
+}

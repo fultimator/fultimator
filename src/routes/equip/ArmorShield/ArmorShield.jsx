@@ -1,196 +1,366 @@
-import { Grid, Paper, useTheme, Button, Divider } from "@mui/material";
-import { AutoAwesome } from "@mui/icons-material";
+import { Grid, Paper, useTheme, Button, Typography } from "@mui/material";
+import CompendiumViewerModal from "../../../components/compendium/CompendiumViewerModal";
+import {
+  AutoAwesome,
+  ArrowDownward,
+  Download,
+  Search,
+} from "@mui/icons-material";
+import { IconButton, Tooltip } from "@mui/material";
+import useDownloadImage from "../../../hooks/useDownloadImage";
 import { useState, useRef } from "react";
-import armor from "./base";
-import ChangeBase from "./ChangeBase";
-import Pretty from "./Pretty";
-import ChangeQuality from "../common/ChangeQuality";
-import SelectQuality from "./SelectQuality";
-import ChangeName from "../common/ChangeName";
-import qualities from "./qualities";
+import armorBases from "../../../libs/armor";
+import shieldBases from "../../../libs/shields";
+import {
+  SharedArmorCard,
+  SharedShieldCard,
+} from "../../../components/shared/items";
 import { useTranslate } from "../../../translation/translate";
+import { useStickyTop } from "../../../hooks/useStickyTop";
 import CustomHeaderAlt from "../../../components/common/CustomHeaderAlt";
-import useUploadJSON from "../../../hooks/useUploadJSON";
-import ApplyRework from "../common/ApplyRework";
+import Export from "../../../components/Export";
+import AddToCompendiumButton from "../../../components/compendium/AddToCompendiumButton";
+import { SchemaFieldRenderer } from "../../../forms/rendering/SchemaFieldRenderer";
+import {
+  armorFieldConfig,
+  armorGroupLabels,
+} from "../../../forms/rendering/config/itemConfigs/armor";
+import {
+  shieldFieldConfig,
+  shieldGroupLabels,
+} from "../../../forms/rendering/config/itemConfigs/shield";
 
-function ArmorShield() {
+function buildState(base) {
+  return {
+    itemType: base.category === "Shield" ? "shield" : "armor",
+    base,
+    name: base.name,
+    martial: base.martial ?? false,
+    def: base.def ?? 0,
+    mdef: base.mdef ?? 0,
+    init: base.init ?? 0,
+    rework: false,
+    quality: "",
+    qualityCost: 0,
+    selectedQuality: "",
+    cost: base.cost ?? 0,
+    defModifier: 0,
+    mDefModifier: 0,
+    initModifier: 0,
+    magicModifier: 0,
+    precModifier: 0,
+    damageMeleeModifier: 0,
+    damageRangedModifier: 0,
+    isEquipped: false,
+    isSlotsVariant: false,
+    slots: "alpha",
+    slotted: [],
+    modifiers: {
+      def: 0,
+      mdef: 0,
+      init: 0,
+      magic: 0,
+      accuracy: 0,
+      damageMelee: 0,
+      damageRanged: 0,
+    },
+  };
+}
+
+function applyFileUpload(rawData, bases) {
+  const baseMatch = rawData.base
+    ? (bases.find((b) => b.name === rawData.base?.name) ?? bases[0])
+    : bases[0];
+  const next = buildState(baseMatch);
+  if (rawData.name) next.name = rawData.name;
+  if (rawData.quality) {
+    next.selectedQuality = "";
+    next.quality = rawData.quality;
+  }
+  if (rawData.martial !== undefined) next.martial = rawData.martial;
+  if (rawData.qualityCost) next.qualityCost = rawData.qualityCost;
+  if (rawData.rework) next.rework = rawData.rework;
+  if (rawData.defModifier) next.defModifier = rawData.defModifier;
+  if (rawData.mDefModifier) next.mDefModifier = rawData.mDefModifier;
+  if (rawData.initModifier) next.initModifier = rawData.initModifier;
+  if (rawData.magicModifier) next.magicModifier = rawData.magicModifier;
+  if (rawData.precModifier ?? rawData.modifiers?.accuracy)
+    next.precModifier = rawData.modifiers?.accuracy ?? rawData.precModifier;
+  if (rawData.damageMeleeModifier)
+    next.damageMeleeModifier = rawData.damageMeleeModifier;
+  if (rawData.damageRangedModifier)
+    next.damageRangedModifier = rawData.damageRangedModifier;
+  next.cost = (baseMatch.cost ?? 0) + (Number(next.qualityCost) || 0);
+  return next;
+}
+
+function ItemPanel({
+  title,
+  bases,
+  fieldConfig,
+  groupLabels,
+  SharedCard,
+  itemTypeFilter,
+  variant = "equip",
+}) {
   const { t } = useTranslate();
   const theme = useTheme();
   const secondary = theme.palette.secondary.main;
+  const stickyTop = useStickyTop();
 
-  const [base, setBase] = useState(armor[0]);
-  const [name, setName] = useState(armor[0].name);
-  const [quality, setQuality] = useState("");
-  const [martial, setMartial] = useState(false);
-  const [qualityCost, setQualityCost] = useState(0);
-  const [selectedQuality, setSelectedQuality] = useState("");
-  const [init, setInit] = useState(0);
-  const [rework, setRework] = useState(false);
+  const [formState, setFormState] = useState(() => buildState(bases[0]));
+  const [qualityBrowserOpen, setQualityBrowserOpen] = useState(false);
+  const [baseBrowserOpen, setBaseBrowserOpen] = useState(false);
 
-  function calcCost() {
-    let cost = base.cost;
-    // Quality
-    cost += parseInt(qualityCost);
-    return cost;
-  }
-
-  const cost = calcCost();
-
-  const fileInputRef = useRef(null);
-
-  const { handleFileUpload } = useUploadJSON((data) => {
-    if (data) {
-      const { base, name, quality, martial, cost, init, rework } = data;
-
-      if (base) {
-        setBase(base);
-      }
-      if (name) {
-        setName(name);
-      }
-      if (quality) {
-        setQuality(quality);
-      }
-      if (martial) {
-        setMartial(martial);
-      }
-      if (cost) {
-        setQualityCost(cost);
-      }
-      if (init) {
-        setInit(init);
-      }
-      if (rework) {
-        setRework(rework);
-      }
-    }
-  });
-
-  const handleClearFields = () => {
-    setBase(armor[0]);
-    setName(armor[0].name);
-    setMartial(armor[0].martial);
-    setQuality("");
-    setQualityCost(0);
-    setSelectedQuality("");
-    setInit(armor[0].init);
-    setRework(false);
+  const handleBaseSelected = (item) => {
+    const matched =
+      bases.find((b) => b.name === item.base?.name || b.name === item.name) ??
+      bases[0];
+    setFormState(applyFileUpload(item, bases.length ? bases : [matched]));
+    setBaseBrowserOpen(false);
   };
 
+  const fileInputRef = useRef(null);
+  const cardRef = useRef(null);
+  const [downloadImage, downloadSnackbar] = useDownloadImage(
+    formState.name,
+    cardRef,
+  );
+
+  const handleQualitySelected = (item) => {
+    setFormState((prev) => ({
+      ...prev,
+      selectedQuality: item.name,
+      qualityName: item.name,
+      quality: item.quality ?? "",
+      qualityCost: item.cost ?? 0,
+      qualityApplicableTo: Array.isArray(item.filter) ? item.filter : [],
+      cost: (prev.cost ?? 0) - (prev.qualityCost ?? 0) + (item.cost ?? 0),
+    }));
+    setQualityBrowserOpen(false);
+  };
+
+  const handleFileUpload = (rawData) => {
+    if (!rawData) return;
+    setFormState(applyFileUpload(rawData, bases));
+  };
+
+  const customItem = { ...formState.base, ...formState };
+  const itemType = formState.itemType;
+
   return (
-    <Grid container spacing={2}>
-      {/* Form */}
-      <Grid item xs={12} sm={6}>
-        <Paper
-          elevation={3}
-          sx={{
-            p: "14px",
-            borderRadius: "8px",
-            border: "2px solid",
-            borderColor: secondary,
-          }}
-        >
-          {/* Header */}
-          <CustomHeaderAlt
-            headerText={t("Armor and Shield")}
-            icon={<AutoAwesome fontSize="large" />}
-          />
-          <Grid container spacing={2} alignItems="center">
-            {/* Change Base */}
-            <Grid item xs={4}>
-              <ChangeBase
-                value={base.name}
-                onChange={(e) => {
-                  const base = armor.find((el) => el.name === e.target.value);
-
-                  setBase(base);
-                  setName(base.name);
-                  setMartial(base.martial);
-                  setInit(base.init);
-                }}
+    <>
+      <Grid container spacing={2}>
+        <Grid size={{ xs: 12, sm: 6 }}>
+          <Paper
+            elevation={3}
+            sx={{
+              p: "14px",
+              borderRadius: "8px",
+              border: "2px solid",
+              borderColor: secondary,
+            }}
+          >
+            <CustomHeaderAlt
+              headerText={t(title)}
+              icon={<AutoAwesome fontSize="large" />}
+              actionIcon={<Search fontSize="large" />}
+              onAction={() => setBaseBrowserOpen(true)}
+              actionTooltip={t("Browse Compendium")}
+            />
+            <Grid container spacing={2} sx={{ mb: 2 }}>
+              <SchemaFieldRenderer
+                config={fieldConfig}
+                groupLabels={groupLabels}
+                state={formState}
+                onChange={setFormState}
+                surface="edit"
+                group="base"
+                cols={1}
+              />
+              <SchemaFieldRenderer
+                config={fieldConfig}
+                groupLabels={groupLabels}
+                state={formState}
+                onChange={setFormState}
+                surface="edit"
+                group="core"
+                cols={2}
               />
             </Grid>
-            {/* <Grid item xs={2}>
-              <ChangeMartial martial={martial} setMartial={setMartial} />
-            </Grid> */}
-            <Grid item xs={4}>
-              <SelectQuality
-                quality={selectedQuality}
-                setQuality={(e) => {
-                  const quality = qualities.find(
-                    (el) => el.name === e.target.value
-                  );
-                  setSelectedQuality(quality.name);
-                  setQuality(quality.quality);
-                  setQualityCost(quality.cost);
-                }}
+            <Grid container spacing={2} sx={{ mb: 2 }}>
+              <SchemaFieldRenderer
+                config={fieldConfig}
+                groupLabels={groupLabels}
+                state={formState}
+                onChange={setFormState}
+                surface="edit"
+                group="quality"
+                cols={2}
+                extraProps={{ onBrowse: () => setQualityBrowserOpen(true) }}
               />
             </Grid>
-
-            <Grid item xs={4}>
-              <ChangeName
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+            <Grid container spacing={2} sx={{ mb: 2 }}>
+              <SchemaFieldRenderer
+                config={fieldConfig}
+                groupLabels={groupLabels}
+                state={formState}
+                onChange={setFormState}
+                surface="edit"
+                group="modifiers"
+                cols={2}
               />
             </Grid>
-            <Grid item xs={12}>
-              <ChangeQuality
-                quality={quality}
-                setQuality={(e) => setQuality(e.target.value)}
-                qualityCost={qualityCost}
-                setQualityCost={(e) => setQualityCost(e.target.value)}
-              />
-              <Divider />
-            </Grid>
-            <Grid item xs={12} sx={{ py: 0 }}>
-              <Grid container spacing={2} alignItems="center">
-                <Grid item>
-                  <Button
-                    variant="outlined"
-                    onClick={() => fileInputRef.current.click()}
-                  >
-                    {t("Upload JSON")}
-                  </Button>
-                </Grid>
-                <Grid item>
-                  <Button variant="outlined" onClick={handleClearFields}>
-                    {t("Clear All Fields")}
-                  </Button>
-                </Grid>
-                {/* Rework */}
-                <Grid item xs>
-                  <ApplyRework rework={rework} setRework={setRework} />
-                </Grid>
+            <Grid container spacing={2}>
+              <Grid size={6}>
+                <Button
+                  variant="outlined"
+                  fullWidth
+                  onClick={() => fileInputRef.current.click()}
+                >
+                  {t("Upload JSON")}
+                </Button>
               </Grid>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept=".json"
-                onChange={handleFileUpload}
-                style={{ display: "none" }}
-              />
+              <Grid size={6}>
+                <Button
+                  variant="outlined"
+                  fullWidth
+                  onClick={() => setFormState(buildState(bases[0]))}
+                >
+                  {t("Clear All Fields")}
+                </Button>
+              </Grid>
             </Grid>
-          </Grid>
-        </Paper>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".json"
+              onChange={(e) => {
+                const file = e.target.files[0];
+                if (file) {
+                  const reader = new FileReader();
+                  reader.onload = () => {
+                    try {
+                      handleFileUpload(JSON.parse(reader.result));
+                    } catch {
+                      // ignore malformed JSON
+                    }
+                  };
+                  reader.readAsText(file);
+                }
+              }}
+              style={{ display: "none" }}
+            />
+          </Paper>
+        </Grid>
+        <Grid
+          size={{ xs: 12, sm: 6 }}
+          sx={{ position: "sticky", top: stickyTop, alignSelf: "flex-start" }}
+        >
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            <SharedCard
+              item={formState.base}
+              variant={variant}
+              imageMode="slot"
+              showImageToggle
+            />
+            <Typography sx={{ textAlign: "center" }}>
+              <ArrowDownward />
+            </Typography>
+            <div ref={cardRef}>
+              <SharedCard
+                item={customItem}
+                variant={variant}
+                imageMode="slot"
+                showImageToggle
+                actionContent={
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                    }}
+                  >
+                    <Tooltip title={t("Download as Image")}>
+                      <IconButton onClick={downloadImage}>
+                        <Download />
+                      </IconButton>
+                    </Tooltip>
+                    <Export
+                      name={formState.name}
+                      dataType={itemType}
+                      data={customItem}
+                    />
+                    <AddToCompendiumButton
+                      itemType={itemType}
+                      data={customItem}
+                    />
+                  </div>
+                }
+              />
+            </div>
+          </div>
+        </Grid>
       </Grid>
+      {downloadSnackbar}
+      <CompendiumViewerModal
+        open={qualityBrowserOpen}
+        onClose={() => setQualityBrowserOpen(false)}
+        onAddItem={handleQualitySelected}
+        initialType="qualities"
+        restrictToTypes={["qualities"]}
+        initialQualityFilters={[itemTypeFilter]}
+      />
+      <CompendiumViewerModal
+        open={baseBrowserOpen}
+        onClose={() => setBaseBrowserOpen(false)}
+        onAddItem={handleBaseSelected}
+        initialType={itemTypeFilter === "armor" ? "armor" : "shields"}
+        restrictToTypes={[itemTypeFilter === "armor" ? "armor" : "shields"]}
+      />
+    </>
+  );
+}
 
-      {/* Pretty */}
-      <Grid item xs={12} sm={6}>
-        <Pretty
-          base={base}
-          custom={{
-            base,
-            ...base,
-            name: name,
-            cost: cost,
-            martial: martial,
-            quality: quality,
-            init: init,
-            rework: rework,
-          }}
-        />
+export function ArmorPanel({ variant = "equip" }) {
+  return (
+    <ItemPanel
+      title="Armor"
+      bases={armorBases}
+      fieldConfig={armorFieldConfig}
+      groupLabels={armorGroupLabels}
+      SharedCard={SharedArmorCard}
+      itemTypeFilter="armor"
+      variant={variant}
+    />
+  );
+}
+
+export function ShieldPanel({ variant = "equip" }) {
+  return (
+    <ItemPanel
+      title="Shield"
+      bases={shieldBases}
+      fieldConfig={shieldFieldConfig}
+      groupLabels={shieldGroupLabels}
+      SharedCard={SharedShieldCard}
+      itemTypeFilter="shield"
+      variant={variant}
+    />
+  );
+}
+
+function ArmorShield() {
+  return (
+    <Grid container spacing={4}>
+      <Grid size={12}>
+        <ArmorPanel />
+      </Grid>
+      <Grid size={12}>
+        <ShieldPanel />
       </Grid>
     </Grid>
   );
 }
+
 export default ArmorShield;

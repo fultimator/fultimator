@@ -22,11 +22,16 @@ function ChangeCustomizations({
   currentCustomizations,
   selectedCategory,
   isSecondForm,
+  rareAccuracyBonus,
 }) {
   const { t } = useTranslate();
 
   // Filter out already chosen customizations
   const availableCustomizations = customizations.filter((custom) => {
+    if (custom.name === "weapon_customization_accurate" && rareAccuracyBonus) {
+      return false;
+    }
+
     // Prevent selecting 'powerful' for arcane or dagger weapons
     if (
       custom.name === "weapon_customization_powerful" &&
@@ -40,29 +45,29 @@ function ChangeCustomizations({
     if (
       (custom.name === "weapon_customization_powerful" &&
         currentCustomizations.some(
-          (c) => c.name === "weapon_customization_quick"
+          (c) => c.name === "weapon_customization_quick",
         )) ||
       (custom.name === "weapon_customization_quick" &&
         currentCustomizations.some(
-          (c) => c.name === "weapon_customization_powerful"
+          (c) => c.name === "weapon_customization_powerful",
         ))
     ) {
       return false;
     }
 
     return !currentCustomizations.some(
-      (selected) => selected.name === custom.name
+      (selected) => selected.name === custom.name,
     );
   });
 
   const totalCustomizationCost = currentCustomizations.reduce(
     (total, customization) => total + customization.customCost,
-    0
+    0,
   );
 
   // Get the cost of the selected customization
   const selectedCustomizationObject = customizations.find(
-    (custom) => custom.name === selectedCustomization
+    (custom) => custom.name === selectedCustomization,
   );
   const selectedCustomizationCost = selectedCustomizationObject
     ? selectedCustomizationObject.customCost
@@ -72,10 +77,10 @@ function ChangeCustomizations({
     totalCustomizationCost + selectedCustomizationCost > 3;
 
   return (
-    <Grid container item xs={12} spacing={1}>
+    <Grid container spacing={1} size={12}>
       {/* Customization Selection */}
-      <Grid item xs={10}>
-        <FormControl fullWidth>
+      <Grid size={10}>
+        <FormControl fullWidth size="small">
           <InputLabel>{t("weapons_customization_select")}</InputLabel>
           <Select
             label={t("weapons_customization_select")}
@@ -83,10 +88,13 @@ function ChangeCustomizations({
             onChange={(e) => setSelectedCustomization(e.target.value)}
             disabled={totalCustomizationCost === 3}
             sx={{
-              '& .MuiSelect-select': {
-                display: 'flex',
-                alignItems: 'center'
-              }
+              "& .MuiSelect-select": {
+                display: "flex",
+                alignItems: "center",
+                minHeight: "unset !important",
+                paddingTop: "8.5px",
+                paddingBottom: "8.5px",
+              },
             }}
           >
             {availableCustomizations.map((custom) => (
@@ -104,15 +112,14 @@ function ChangeCustomizations({
           </Select>
         </FormControl>
       </Grid>
-
       {/* Add Customization Button */}
-      <Grid item xs={2}>
+      <Grid size={2}>
         <Button
           variant="contained"
           onClick={() => {
             if (selectedCustomization) {
               const customToAdd = customizations.find(
-                (c) => c.name === selectedCustomization
+                (c) => c.name === selectedCustomization,
               );
               if (customToAdd) {
                 onCustomizationAdd(customToAdd);
@@ -121,25 +128,46 @@ function ChangeCustomizations({
             }
           }}
           disabled={isButtonDisabled || !selectedCustomization}
-          sx={{ height: "100%", width: "100%" }}
+          sx={{
+            height: 40,
+            minHeight: 40,
+            width: "100%",
+            boxSizing: "border-box",
+            border: "1px solid transparent",
+            "&.Mui-disabled": {
+              color: "rgba(255,255,255,0.7)",
+              backgroundColor: "rgba(120,120,120,0.45)",
+              border: "1px solid rgba(140,140,140,0.55)",
+              filter: "grayscale(100%)",
+              opacity: 0.9,
+            },
+          }}
         >
           {"+"}
         </Button>
       </Grid>
-
       {/* List of selected customizations */}
-      <Grid item xs={12}>
+      <Grid size={12}>
         <Grid container spacing={1} direction="row">
           {currentCustomizations.map((customization) => (
-            <Grid item key={customization.name}>
+            <Grid key={customization.name}>
               <Chip
                 label={
-                  <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <span
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "4px",
+                    }}
+                  >
                     {t(customization.name)}
                     {customization.martial && <Martial />}
                   </span>
                 }
-                disabled={isSecondForm && customization.name === "weapon_customization_transforming"}
+                disabled={
+                  isSecondForm &&
+                  customization.name === "weapon_customization_transforming"
+                }
                 onDelete={() => onCustomizationRemove(customization.name)}
                 color="primary"
               />

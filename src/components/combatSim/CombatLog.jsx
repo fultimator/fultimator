@@ -25,13 +25,14 @@ import { t } from "../../translation/translate";
 import { ExpandLess, ExpandMore } from "@mui/icons-material";
 import ReactMarkdown from "react-markdown";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import DeleteConfirmationDialog from "../common/DeleteConfirmationDialog";
 
 // Define the mapping of tags to components
 const tagMap = {
   "{{physical-icon}}": (
     <TypeIcon type={"physical"} sx={{ verticalAlign: "middle" }} />
   ),
-  "{{wind-icon}}": <TypeIcon type={"wind"} sx={{ verticalAlign: "middle" }} />,
+  "{{air-icon}}": <TypeIcon type={"air"} sx={{ verticalAlign: "middle" }} />,
   "{{bolt-icon}}": <TypeIcon type={"bolt"} sx={{ verticalAlign: "middle" }} />,
   "{{dark-icon}}": <TypeIcon type={"dark"} sx={{ verticalAlign: "middle" }} />,
   "{{earth-icon}}": (
@@ -69,14 +70,14 @@ const SpanMarkdown = ({ children, ...props }) => {
       <ReactMarkdown
         {...props}
         components={{
-          p: ({ ...props }) => <span {...props} />, // Render <p> as <span>
-          strong: ({ ...props }) => (
+          p: ({ _node, ...props }) => <span {...props} />, // Render <p> as <span>
+          strong: ({ _node, ...props }) => (
             <strong style={{ fontWeight: "bold" }} {...props} />
           ),
-          em: ({ ...props }) => (
+          em: ({ _node, ...props }) => (
             <em style={{ fontStyle: "italic" }} {...props} />
           ),
-          span: ({ ...props }) => <span {...props} />,
+          span: ({ _node, ...props }) => <span {...props} />,
         }}
       >
         {children}
@@ -91,200 +92,187 @@ function replaceTagsWithComponents(
   value2,
   value3,
   value4,
-  value5
+  value5,
 ) {
   if (value1 === "--isAttack--") {
-    return t(text)
-      .split(/(\{\{.*?\}\})/)
-      .map((part) => {
-        if (part === "{{npc-name}}") {
-          return <b>{value2.npcName}</b>; // Return npcName wrapped in <b> tags
+    return (t(text) || "").split(/(\{\{.*?\}\})/).map((part) => {
+      if (part === "{{npc-name}}") {
+        return <b>{value2.npcName}</b>; // Return npcName wrapped in <b> tags
+      }
+      if (part === "{{attack-name}}") {
+        return <b>{value2.attackName}</b>; // Return attackName wrapped in <b> tags
+      }
+      if (part === "{{dice1}}") {
+        return <b>{value2.dice1}</b>;
+      }
+      if (part === "{{dice2}}") {
+        return <b>{value2.dice2}</b>;
+      }
+      if (part === "{{prec}}") {
+        return <b>{value2.prec}</b>;
+      }
+      if (part === "{{total-hit-score}}") {
+        return <b>{value2.totalHitScore}</b>;
+      }
+      if (part === "{{hr}}") {
+        return <b>{value2.hr}</b>; // Return hr wrapped in <b> tags
+      }
+      if (part === "{{extra-damage}}") {
+        return <b>{value2.extraDamage}</b>; // Return extra damage wrapped in <b> tags
+      }
+      if (part === "{{damage}}") {
+        return <b>{value2.damage}</b>; // Return damage wrapped in <b> tags
+      }
+      if (part === "{{attack-range-icon}}") {
+        if (value2.range === "melee") {
+          return <MeleeIcon sx={{ verticalAlign: "middle" }} />;
+        } else {
+          return <DistanceIcon sx={{ verticalAlign: "middle" }} />;
         }
-        if (part === "{{attack-name}}") {
-          return <b>{value2.attackName}</b>; // Return attackName wrapped in <b> tags
-        }
-        if (part === "{{dice1}}") {
-          return <b>{value2.dice1}</b>;
-        }
-        if (part === "{{dice2}}") {
-          return <b>{value2.dice2}</b>;
-        }
-        if (part === "{{prec}}") {
-          return <b>{value2.prec}</b>;
-        }
-        if (part === "{{total-hit-score}}") {
-          return <b>{value2.totalHitScore}</b>;
-        }
-        if (part === "{{hr}}") {
-          return <b>{value2.hr}</b>; // Return hr wrapped in <b> tags
-        }
-        if (part === "{{extra-damage}}") {
-          return <b>{value2.extraDamage}</b>; // Return extra damage wrapped in <b> tags
-        }
-        if (part === "{{damage}}") {
-          return <b>{value2.damage}</b>; // Return damage wrapped in <b> tags
-        }
-        if (part === "{{attack-range-icon}}") {
-          if (value2.range === "melee") {
-            return <MeleeIcon sx={{ verticalAlign: "middle" }} />;
-          } else {
-            return <DistanceIcon sx={{ verticalAlign: "middle" }} />;
-          }
-        }
-        if (part === "{{damage-type-icon}}") {
-          return (
-            <TypeIcon
-              type={value2.damageType}
-              sx={{ verticalAlign: "middle" }}
-            />
-          );
-        }
-        if (part === "{{damage-type}}") {
-          return <b>{t(value2.damageType)}</b>;
-        }
-        if (part === "{{effect}}") {
-          return (
-            <SpanMarkdown>
-              {typeof value2.effect === "string" ? value2.effect : ""}
-            </SpanMarkdown>
-          );
-        }
+      }
+      if (part === "{{damage-type-icon}}") {
+        return (
+          <TypeIcon type={value2.damageType} sx={{ verticalAlign: "middle" }} />
+        );
+      }
+      if (part === "{{damage-type}}") {
+        return <b>{t(value2.damageType)}</b>;
+      }
+      if (part === "{{effect}}") {
+        return (
+          <SpanMarkdown>
+            {typeof value2.effect === "string" ? value2.effect : ""}
+          </SpanMarkdown>
+        );
+      }
 
-        // Return the part as it is if no match
-        return part;
-      });
+      // Return the part as it is if no match
+      return part;
+    });
   } else if (value1 === "--isSpell--") {
-    return t(text)
-      .split(/(\{\{.*?\}\})/)
-      .map((part) => {
-        if (part === "{{npc-name}}") {
-          return <b>{value2.npcName}</b>; // Return npcName wrapped in <b> tags
-        }
-        if (part === "{{spell-name}}") {
-          return <b>{value2.spellName}</b>;
-        }
-        if (part === "{{dice1}}") {
-          return <b>{value2.dice1}</b>;
-        }
-        if (part === "{{dice2}}") {
-          return <b>{value2.dice2}</b>;
-        }
-        if (part === "{{extra-magic}}") {
-          return <b>{value2.extraMagic}</b>;
-        }
-        if (part === "{{total-hit-score}}") {
-          return <b>{value2.totalHitScore}</b>;
-        }
-        if (part === "{{hr}}") {
-          return <b>{value2.hr}</b>; // Return hr wrapped in <b> tags
-        }
-        if (part === "{{offensive-spell-icon}}") {
-          return <OffensiveSpellIcon sx={{ verticalAlign: "middle" }} />;
-        }
-        if (part === "{{targets}}") {
-          return <b>{value2.targets}</b>;
-        }
-        if (part === "{{effect}}") {
-          return (
-            <SpanMarkdown>
-              {typeof value2.effect === "string" ? value2.effect : ""}
-            </SpanMarkdown>
-          );
-        }
+    return (t(text) || "").split(/(\{\{.*?\}\})/).map((part) => {
+      if (part === "{{npc-name}}") {
+        return <b>{value2.npcName}</b>; // Return npcName wrapped in <b> tags
+      }
+      if (part === "{{spell-name}}") {
+        return <b>{value2.spellName}</b>;
+      }
+      if (part === "{{dice1}}") {
+        return <b>{value2.dice1}</b>;
+      }
+      if (part === "{{dice2}}") {
+        return <b>{value2.dice2}</b>;
+      }
+      if (part === "{{extra-magic}}") {
+        return <b>{value2.extraMagic}</b>;
+      }
+      if (part === "{{total-hit-score}}") {
+        return <b>{value2.totalHitScore}</b>;
+      }
+      if (part === "{{hr}}") {
+        return <b>{value2.hr}</b>; // Return hr wrapped in <b> tags
+      }
+      if (part === "{{offensive-spell-icon}}") {
+        return <OffensiveSpellIcon sx={{ verticalAlign: "middle" }} />;
+      }
+      if (part === "{{targets}}") {
+        return <b>{value2.targets}</b>;
+      }
+      if (part === "{{effect}}") {
+        return (
+          <SpanMarkdown>
+            {typeof value2.effect === "string" ? value2.effect : ""}
+          </SpanMarkdown>
+        );
+      }
 
-        // Return the part as it is if no match
-        return part;
-      });
+      // Return the part as it is if no match
+      return part;
+    });
   } else if (value1 === "--isStandardRoll--") {
-    return t(text)
-      .split(/(\{\{.*?\}\})/)
-      .map((part) => {
-        if (part === "{{npc-name}}") {
-          return <b>{value2.npcName}</b>; // Return npcName wrapped in <b> tags
-        }
-        if (part === "{{dice1}}") {
-          return <b>{value2.dice1}</b>;
-        }
-        if (part === "{{dice2}}") {
-          return <b>{value2.dice2}</b>;
-        }
-        if (part === "{{dice1-label}}") {
-          return <b>{t(value2.dice1Label)}</b>;
-        }
-        if (part === "{{dice2-label}}") {
-          return <b>{t(value2.dice2Label)}</b>;
-        }
-        if (part === "{{total-hit-score}}") {
-          return <b>{value2.totalHitScore}</b>;
-        }
+    return (t(text) || "").split(/(\{\{.*?\}\})/).map((part) => {
+      if (part === "{{npc-name}}") {
+        return <b>{value2.npcName}</b>; // Return npcName wrapped in <b> tags
+      }
+      if (part === "{{dice1}}") {
+        return <b>{value2.dice1}</b>;
+      }
+      if (part === "{{dice2}}") {
+        return <b>{value2.dice2}</b>;
+      }
+      if (part === "{{dice1-label}}") {
+        return <b>{t(value2.dice1Label)}</b>;
+      }
+      if (part === "{{dice2-label}}") {
+        return <b>{t(value2.dice2Label)}</b>;
+      }
+      if (part === "{{total-hit-score}}") {
+        return <b>{value2.totalHitScore}</b>;
+      }
 
-        // Return the part as it is if no match
-        return part;
-      });
+      // Return the part as it is if no match
+      return part;
+    });
   } else if (value1 === "--isClock--") {
-    return t(text)
-      .split(/(\{\{.*?\}\})/)
-      .map((part) => {
-        // If the part matches the value placeholders, replace with actual values
-        if (part === "{{name}}") {
-          return <b>{value2.name}</b>; // Return value2 wrapped in <b> tags
-        }
-        if (part === "{{current}}") {
-          return <b>{value2.current}</b>; // Return value2 wrapped in <b> tags
-        }
-        if (part === "{{max}}") {
-          return <b>{value2.max}</b>; // Return value2 wrapped in <b> tags
-        }
+    return (t(text) || "").split(/(\{\{.*?\}\})/).map((part) => {
+      // If the part matches the value placeholders, replace with actual values
+      if (part === "{{name}}") {
+        return <b>{value2.name}</b>; // Return value2 wrapped in <b> tags
+      }
+      if (part === "{{current}}") {
+        return <b>{value2.current}</b>; // Return value2 wrapped in <b> tags
+      }
+      if (part === "{{max}}") {
+        return <b>{value2.max}</b>; // Return value2 wrapped in <b> tags
+      }
 
-        // Return the part as it is if no match
-        return part;
-      });
+      // Return the part as it is if no match
+      return part;
+    });
   } else {
     // Use a regular expression to replace tags with the corresponding component
-    return t(text)
-      .split(/(\{\{.*?\}\})/)
-      .map((part) => {
-        // If the part matches the value placeholders, replace with actual values
-        if (part === "{{value1}}") {
-          return <b>{value1}</b>; // Return value1 wrapped in <b> tags
-        }
-        if (part === "{{value2}}") {
-          return <b>{value2}</b>; // Return value2 wrapped in <b> tags
-        }
-        if (part === "{{value3}}") {
-          return <b>{t(value3)}</b>; // Return translated value3 wrapped in <b> tags
-        }
-        if (part === "{{value4}}") {
-          // if value4 is object and markdown is true, render it as a markdown component
-          if (typeof value4 === "object" && value4.markdown) {
-            return (
-              <SpanMarkdown>
-                {typeof value4.effect === "string" ? value4.effect : ""}
-              </SpanMarkdown>
-            );
-          }
-
-          return <b>{value4}</b>; // Return value4 wrapped in <b> tags
-        }
-        if (part === "{{value5}}") {
-          return <b>{value5}</b>; // Return value5 wrapped in <b> tags
-        }
-        if (part === "{{attack-range-icon}}" && value2) {
-          return <TypeIcon type={value2} sx={{ verticalAlign: "middle" }} />;
+    return (t(text) || "").split(/(\{\{.*?\}\})/).map((part) => {
+      // If the part matches the value placeholders, replace with actual values
+      if (part === "{{value1}}") {
+        return <b>{value1}</b>; // Return value1 wrapped in <b> tags
+      }
+      if (part === "{{value2}}") {
+        return <b>{value2}</b>; // Return value2 wrapped in <b> tags
+      }
+      if (part === "{{value3}}") {
+        return <b>{t(value3)}</b>; // Return translated value3 wrapped in <b> tags
+      }
+      if (part === "{{value4}}") {
+        // if value4 is object and markdown is true, render it as a markdown component
+        if (typeof value4 === "object" && value4.markdown) {
+          return (
+            <SpanMarkdown>
+              {typeof value4.effect === "string" ? value4.effect : ""}
+            </SpanMarkdown>
+          );
         }
 
-        if (part === "{{attack-type-icon}}" && value3) {
-          return <TypeIcon type={value3} sx={{ verticalAlign: "middle" }} />;
-        }
+        return <b>{value4}</b>; // Return value4 wrapped in <b> tags
+      }
+      if (part === "{{value5}}") {
+        return <b>{value5}</b>; // Return value5 wrapped in <b> tags
+      }
+      if (part === "{{attack-range-icon}}" && value2) {
+        return <TypeIcon type={value2} sx={{ verticalAlign: "middle" }} />;
+      }
 
-        // Otherwise, check if it's a tag that maps to an icon or other component
-        if (tagMap[part]) {
-          return tagMap[part]; // Replace with the corresponding component if tag matches
-        }
+      if (part === "{{attack-type-icon}}" && value3) {
+        return <TypeIcon type={value3} sx={{ verticalAlign: "middle" }} />;
+      }
 
-        // Return the part as it is if no match
-        return part;
-      });
+      // Otherwise, check if it's a tag that maps to an icon or other component
+      if (tagMap[part]) {
+        return tagMap[part]; // Replace with the corresponding component if tag matches
+      }
+
+      // Return the part as it is if no match
+      return part;
+    });
   }
 }
 
@@ -304,6 +292,7 @@ export default function CombatLog({
 
   const [open, setOpen] = useState(controlledOpen);
   const [height, setHeight] = useState(isSmallScreen ? 150 : 200);
+  const [isClearLogsDialogOpen, setIsClearLogsDialogOpen] = useState(false);
   const logContainerRef = useRef(null);
   const isResizing = useRef(false);
   const startY = useRef(0);
@@ -335,7 +324,7 @@ export default function CombatLog({
     const deltaY = e.clientY - startY.current;
     const newHeight = Math.max(
       100,
-      Math.min(400, startHeight.current - deltaY)
+      Math.min(400, startHeight.current - deltaY),
     );
     setHeight(newHeight);
   };
@@ -372,7 +361,7 @@ export default function CombatLog({
   // Improved function to convert formatted log text to plain text
   const getPlainTextLog = (text, value1, value2, value3, value4, value5) => {
     // Start with the original text template
-    let plainText = t(text);
+    let plainText = t(text) || "";
 
     // Handle special case for attack logs
     if (value1 === "--isAttack--") {
@@ -384,23 +373,23 @@ export default function CombatLog({
       plainText = plainText.replace(/\{\{prec\}\}/g, value2.prec);
       plainText = plainText.replace(
         /\{\{total-hit-score\}\}/g,
-        value2.totalHitScore
+        value2.totalHitScore,
       );
       plainText = plainText.replace(/\{\{hr\}\}/g, value2.hr);
       plainText = plainText.replace(
         /\{\{extra-damage\}\}/g,
-        value2.extraDamage
+        value2.extraDamage,
       );
       plainText = plainText.replace(/\{\{damage\}\}/g, value2.damage);
       plainText = plainText.replace(
         /\{\{damage-type\}\}/g,
-        t(value2.damageType)
+        t(value2.damageType),
       );
 
       // Replace icons with text descriptions
       plainText = plainText.replace(
         /\{\{attack-range-icon\}\}/g,
-        value2.range === "melee" ? "" : ""
+        value2.range === "melee" ? "" : "",
       );
       plainText = plainText.replace(/\{\{damage-type-icon\}\}/g, "");
 
@@ -417,7 +406,7 @@ export default function CombatLog({
       plainText = plainText.replace(/\{\{extra-magic\}\}/g, value2.extraMagic);
       plainText = plainText.replace(
         /\{\{total-hit-score\}\}/g,
-        value2.totalHitScore
+        value2.totalHitScore,
       );
       plainText = plainText.replace(/\{\{hr\}\}/g, value2.hr);
       plainText = plainText.replace(/\{\{targets\}\}/g, value2.targets);
@@ -435,15 +424,15 @@ export default function CombatLog({
       plainText = plainText.replace(/\{\{dice2\}\}/g, value2.dice2);
       plainText = plainText.replace(
         /\{\{dice1-label\}\}/g,
-        t(value2.dice1Label)
+        t(value2.dice1Label),
       );
       plainText = plainText.replace(
         /\{\{dice2-label\}\}/g,
-        t(value2.dice2Label)
+        t(value2.dice2Label),
       );
       plainText = plainText.replace(
         /\{\{total-hit-score\}\}/g,
-        value2.totalHitScore
+        value2.totalHitScore,
       );
     }
     // Handle special case for clock logs
@@ -474,17 +463,18 @@ export default function CombatLog({
       if (value2)
         plainText = plainText.replace(
           /\{\{attack-range-icon\}\}/g,
-          `[${value2}]`
+          `[${value2}]`,
         );
       if (value3)
         plainText = plainText.replace(
           /\{\{attack-type-icon\}\}/g,
-          `[${t(value3)}]`
+          `[${t(value3)}]`,
         );
     }
 
     // Replace other standard icon tags from tagMap with text equivalents
     plainText = plainText.replace(/\{\{physical-icon\}\}/g, "");
+    plainText = plainText.replace(/\{\{air-icon\}\}/g, "");
     plainText = plainText.replace(/\{\{wind-icon\}\}/g, "");
     plainText = plainText.replace(/\{\{bolt-icon\}\}/g, "");
     plainText = plainText.replace(/\{\{dark-icon\}\}/g, "");
@@ -500,11 +490,11 @@ export default function CombatLog({
     plainText = plainText.replace(/\{\{fainted-icon\}\}/g, "");
     plainText = plainText.replace(
       /\{\{crit-failure\}\}/g,
-      t("Critical Failure")
+      t("Critical Failure"),
     );
     plainText = plainText.replace(
       /\{\{crit-success\}\}/g,
-      t("Critical Success")
+      t("Critical Success"),
     );
 
     // Replace any remaining markdown syntax or double asterisks with appropriate text formatting
@@ -530,13 +520,13 @@ export default function CombatLog({
         {open && (
           <Tooltip title={t("combat_sim_log_clear")} placement="top">
             <Button
-              onClick={clearLogs}
+              onClick={() => setIsClearLogsDialogOpen(true)}
               size="small"
               sx={{
                 minWidth: "auto",
                 padding: 0,
                 marginLeft: 1,
-                color: isDarkMode ? "#ddd" : "#555",
+                color: theme.palette.text.secondary,
               }}
             >
               <DeleteSweepIcon />
@@ -555,17 +545,17 @@ export default function CombatLog({
               justifyContent: "center",
               alignItems: "center",
               cursor: "ns-resize",
-              backgroundColor: isDarkMode ? "#555" : "#ccc",
+              backgroundColor: theme.palette.action.hover,
               borderRadius: "8px 8px 0 0",
               py: 0.5,
               mt: 1,
-              "&:hover": { backgroundColor: isDarkMode ? "#777" : "#aaa" },
+              "&:hover": { backgroundColor: theme.palette.action.selected },
             }}
             onMouseDown={handleMouseDown}
           >
             <DragHandleIcon
               fontSize="small"
-              sx={{ color: isDarkMode ? "#ddd" : "#555", m: -1 }}
+              sx={{ color: theme.palette.text.secondary, m: -1 }}
             />
           </Box>
         )}
@@ -577,11 +567,11 @@ export default function CombatLog({
             p: 2,
             height: isSmallScreen ? 150 : height, // Fixed height on mobile
             overflowY: "auto",
-            backgroundColor: isDarkMode ? "#333" : "#f9f9f9",
+            backgroundColor: theme.palette.background.default,
             borderRadius: "0 0 8px 8px",
             "&::-webkit-scrollbar": { width: 6 },
             "&::-webkit-scrollbar-thumb": {
-              background: "#888",
+              background: theme.palette.divider,
               borderRadius: 3,
             },
           }}
@@ -595,7 +585,7 @@ export default function CombatLog({
               log.value2,
               log.value3,
               log.value4,
-              log.value5
+              log.value5,
             );
 
             return (
@@ -621,9 +611,11 @@ export default function CombatLog({
                   }}
                 >
                   <Typography variant="caption" color="textSecondary">
-                    {isToday(log.timestamp)
-                      ? format(log.timestamp, "HH:mm:ss")
-                      : format(log.timestamp, "PP HH:mm:ss")}
+                    {log.timestamp && new Date(log.timestamp).getTime() > 0
+                      ? isToday(log.timestamp)
+                        ? format(log.timestamp, "HH:mm:ss")
+                        : format(log.timestamp, "PP HH:mm:ss")
+                      : "--:--:--"}
                   </Typography>
                   <Tooltip
                     title={t("combat_sim_copy_log_entry")}
@@ -651,13 +643,13 @@ export default function CombatLog({
                     log.value2,
                     log.value3,
                     log.value4,
-                    log.value5
+                    log.value5,
                   ).map((part, idx) =>
                     typeof part === "string" ? (
                       <span key={idx}>{part}</span>
                     ) : (
                       <span key={idx}>{part}</span>
-                    )
+                    ),
                   )}
                 </Typography>
               </Box>
@@ -670,6 +662,16 @@ export default function CombatLog({
           )}
         </Paper>
       </Collapse>
+      <DeleteConfirmationDialog
+        open={isClearLogsDialogOpen}
+        onClose={() => setIsClearLogsDialogOpen(false)}
+        onConfirm={() => {
+          clearLogs();
+          setIsClearLogsDialogOpen(false);
+        }}
+        title={t("combat_sim_log_clear")}
+        message={t("Are you sure you want to delete?")}
+      />
     </Box>
   );
 }

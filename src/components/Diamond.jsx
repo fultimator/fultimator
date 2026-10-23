@@ -8,8 +8,10 @@ export default function Diamond({ color }) {
     <Typography
       color={color}
       component="span"
-      fontSize="smaller"
-      sx={{ verticalAlign: "text-bottom" }}
+      sx={{
+        fontSize: "smaller",
+        verticalAlign: "text-bottom",
+      }}
     >
       ⬥
     </Typography>

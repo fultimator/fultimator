@@ -71,7 +71,7 @@ export const customizations = [
 
 export const types = [
   "physical",
-  "wind",
+  "air",
   "bolt",
   "dark",
   "earth",

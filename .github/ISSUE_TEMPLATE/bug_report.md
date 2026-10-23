@@ -2,16 +2,16 @@
 name: Bug report
 about: Create a report to help us improve
 title: "[BUG]"
-labels: ''
+labels: ""
 assignees: spyrella
 type: Bug
-
 ---
 
 **Bug Description:**
 The bug involves [describe the issue in detail, such as a functionality not working as expected, an error message occurring, or unexpected behavior].
 
 **Steps to Reproduce:**
+
 1. Navigate to '...'
 2. Click on '....'
 3. Scroll down to '....'

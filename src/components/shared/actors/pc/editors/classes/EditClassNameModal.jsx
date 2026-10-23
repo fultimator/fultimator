@@ -1,0 +1,88 @@
+import React from "react";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  TextField,
+  IconButton,
+} from "@mui/material";
+import { useTranslate } from "/src/translation/translate";
+import { Close } from "@mui/icons-material";
+import FuidField from "/src/components/common/FuidField";
+import { slugify } from "/src/libs/slugify";
+
+export default function EditClassNameModal({
+  open,
+  onClose,
+  onSave,
+  className,
+  setClassName,
+  classFuid,
+  setClassFuid,
+  isHomebrew,
+}) {
+  const { t } = useTranslate();
+
+  const handleSave = () => {
+    onSave();
+    onClose();
+  };
+
+  return (
+    <Dialog
+      open={open}
+      onClose={onClose}
+      slotProps={{
+        paper: {
+          sx: {
+            width: { xs: "80%", md: "40%" },
+            maxWidth: "lg",
+          },
+        },
+      }}
+    >
+      <DialogTitle variant="h3" sx={{ fontWeight: "bold" }}>
+        {t("Edit Class Name")}
+      </DialogTitle>
+      <IconButton
+        aria-label="close"
+        onClick={onClose}
+        sx={{
+          position: "absolute",
+          right: 8,
+          top: 8,
+          color: (theme) => theme.palette.grey[500],
+        }}
+      >
+        <Close />
+      </IconButton>
+      <DialogContent>
+        <FuidField
+          value={classFuid}
+          name={className}
+          onChange={setClassFuid}
+          disabled={!isHomebrew}
+        />
+        <TextField
+          fullWidth
+          label={t("Class Name")}
+          value={className}
+          onChange={(e) => setClassName(e.target.value)}
+          onBlur={() => {
+            if (!classFuid) setClassFuid(slugify(className));
+          }}
+          slotProps={{
+            htmlInput: { maxLength: 50 },
+          }}
+        />
+      </DialogContent>
+      <DialogActions>
+        <Button variant="contained" color="primary" onClick={handleSave}>
+          {t("Save Changes")}
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+}

@@ -32,7 +32,6 @@ import {
   DragIndicator as UseDragAndDropIcon,
   SaveAs as AutosaveIcon,
   History as AutoOpenLogsIcon,
-  Timer as AutosaveIntervalIcon,
   Notifications as ShowSaveSnackbarIcon,
   ExpandMore as ExpandMoreIcon,
   ExpandLess as ExpandLessIcon,
@@ -56,7 +55,7 @@ import {
   getDefaultSettings,
   SETTINGS_CONFIG,
 } from "../../utility/combatSimSettings";
-import { globalConfirm } from "../../utility/globalConfirm";
+import DeleteConfirmationDialog from "../common/DeleteConfirmationDialog";
 
 const SettingsDialog = ({
   open,
@@ -76,6 +75,7 @@ const SettingsDialog = ({
     interface: true,
     logVisibility: true,
   });
+  const [isResetConfirmOpen, setIsResetConfirmOpen] = useState(false);
 
   const toggleCategory = (category) => {
     setExpandedCategories((prev) => ({
@@ -155,7 +155,7 @@ const SettingsDialog = ({
     autoOpenLogs,
     npcReorderingMethod,
     noteReorderingMethod,
-    autosaveEnabled,    
+    autosaveEnabled,
     showSaveSnackbar,
     hideLogs,
     showBaseAttackEffect,
@@ -337,18 +337,12 @@ const SettingsDialog = ({
               label: t("combat_sim_settings_study_values_playtest"),
             },
           ],
-        }
+        },
       ],
     },
   ];
 
-  const handleResetDefaults = async () => {
-    const confirmReset = await globalConfirm(
-      t("combat_sim_settings_reset_defaults_confirm")
-    );
-
-    if (!confirmReset) return;
-
+  const handleResetDefaults = () => {
     // Reset the settings store to defaults
     resetToDefaults();
 
@@ -359,6 +353,8 @@ const SettingsDialog = ({
     Object.entries(defaultSettings).forEach(([name, value]) => {
       onSettingChange(name, value);
     });
+
+    setIsResetConfirmOpen(false);
   };
 
   // Check if all log types are selected or none are selected
@@ -392,7 +388,12 @@ const SettingsDialog = ({
           px: 3,
         }}
       >
-        <Box display="flex" alignItems="center">
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+          }}
+        >
           <SaveIcon
             sx={{
               mr: 1.5,
@@ -401,7 +402,7 @@ const SettingsDialog = ({
                 : theme.palette.primary.main,
             }}
           />
-          <Typography variant="h3" fontWeight="bold">
+          <Typography variant="h3" sx={{ fontWeight: "bold" }}>
             {t("combat_sim_settings")}
           </Typography>
         </Box>
@@ -409,7 +410,6 @@ const SettingsDialog = ({
           <CloseIcon />
         </IconButton>
       </DialogTitle>
-
       <DialogContent sx={{ p: 0 }}>
         <Box
           sx={{
@@ -448,7 +448,7 @@ const SettingsDialog = ({
                 }}
                 onClick={() => toggleCategory(category.key)}
               >
-                <Typography variant="subtitle1" fontWeight="bold">
+                <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
                   {category.title}
                 </Typography>
                 <IconButton
@@ -474,7 +474,6 @@ const SettingsDialog = ({
                   {category.items.map((item, itemIndex) => (
                     <ListItem
                       key={itemIndex}
-                      button
                       onClick={() => {
                         if (item.type === "switch")
                           handleSwitchChange(item.name)({
@@ -599,8 +598,13 @@ const SettingsDialog = ({
                 }}
                 onClick={() => toggleCategory("logVisibility")}
               >
-                <Box display="flex" alignItems="center">
-                  <Typography variant="subtitle1" fontWeight="bold">
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                  }}
+                >
+                  <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
                     {t("combat_sim_settings_log_visibility")}
                   </Typography>
                 </Box>
@@ -636,8 +640,10 @@ const SettingsDialog = ({
                   >
                     <Typography
                       variant="body2"
-                      color="text.secondary"
-                      sx={{ mb: 1 }}
+                      sx={{
+                        color: "text.secondary",
+                        mb: 1,
+                      }}
                     >
                       {t("combat_sim_settings_log_visibility_desc")}
                     </Typography>
@@ -674,7 +680,6 @@ const SettingsDialog = ({
                     {logSettings.map((item, index) => (
                       <ListItem
                         key={item.key}
-                        button
                         onClick={() => handleLogTypeToggle(item.key)}
                         sx={{
                           borderBottom:
@@ -702,7 +707,6 @@ const SettingsDialog = ({
           )}
         </Box>
       </DialogContent>
-
       <DialogActions
         sx={{
           flexDirection: "row",
@@ -727,14 +731,14 @@ const SettingsDialog = ({
             <Button
               color="inherit"
               variant="outlined"
-              onClick={handleResetDefaults}
+              onClick={() => setIsResetConfirmOpen(true)}
               sx={{ borderRadius: 2, textTransform: "none", px: 3 }}
             >
               <ResetDefaultsIcon />
             </Button>
           ) : (
             <Button
-              onClick={handleResetDefaults}
+              onClick={() => setIsResetConfirmOpen(true)}
               color="inherit"
               variant="outlined"
               sx={{ borderRadius: 2, textTransform: "none", px: 3 }}
@@ -775,6 +779,13 @@ const SettingsDialog = ({
           </Button>
         </Box>
       </DialogActions>
+      <DeleteConfirmationDialog
+        open={isResetConfirmOpen}
+        onClose={() => setIsResetConfirmOpen(false)}
+        onConfirm={handleResetDefaults}
+        title={t("combat_sim_settings_reset_defaults")}
+        message={t("combat_sim_settings_reset_defaults_confirm")}
+      />
     </Dialog>
   );
 };

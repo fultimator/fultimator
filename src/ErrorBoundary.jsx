@@ -23,7 +23,7 @@ class ErrorBoundary extends Component {
     };
   }
 
-  static getDerivedStateFromError(error) {
+  static getDerivedStateFromError(_error) {
     return { hasError: true };
   }
 
@@ -49,7 +49,7 @@ class ErrorBoundary extends Component {
     if (!contact || !message) {
       if (window.electron) {
         window.electron.alert(
-          "Both message and contact information are required."
+          "Both message and contact information are required.",
         );
       } else {
         alert("Both message and contact information are required.");
@@ -81,10 +81,10 @@ class ErrorBoundary extends Component {
         (errorDetail, index) =>
           `Error ${index + 1}: ${errorDetail.error.message}\nStack Trace: ${
             errorDetail.error.stack
-          }`
+          }`,
       )
       .join(
-        "\n\n"
+        "\n\n",
       )}\n\nUser Message: ${truncatedMessage}\n\nContact Info: ${contact}`;
 
     // Send a message to a Discord webhook
@@ -126,7 +126,11 @@ class ErrorBoundary extends Component {
 
       return (
         <Container>
-          <Box mt={2}>
+          <Box
+            sx={{
+              mt: 2,
+            }}
+          >
             <Typography variant="h2" gutterBottom color={"error"}>
               Something went wrong. Please report the error below or contact us
               in the Discord server #support channel.
@@ -134,9 +138,13 @@ class ErrorBoundary extends Component {
 
             <ReturnHomeButton />
             <Box
-              mt={2}
-              p={2}
-              sx={{ background: "white", borderRadius: 1, boxShadow: 1 }}
+              sx={{
+                mt: 2,
+                p: 2,
+                background: "white",
+                borderRadius: 1,
+                boxShadow: 1,
+              }}
             >
               <Typography variant="h6" gutterBottom>
                 Error Details:
@@ -154,7 +162,11 @@ class ErrorBoundary extends Component {
                 ))}
               </List>
             </Box>
-            <Box mt={2}>
+            <Box
+              sx={{
+                mt: 2,
+              }}
+            >
               <Typography variant="body1" sx={{ fontWeight: "bold" }}>
                 Please provide as much information as possible to help us
                 diagnose the issue.
@@ -175,8 +187,10 @@ class ErrorBoundary extends Component {
                 fullWidth
                 value={this.state.message}
                 onChange={this.handleMessageChange}
-                inputProps={{ maxLength: 2000 }}
                 sx={{ mb: 2, background: "white" }}
+                slotProps={{
+                  htmlInput: { maxLength: 2000 },
+                }}
               />
               <Button
                 variant="contained"
@@ -200,7 +214,7 @@ class ErrorBoundary extends Component {
 const ReturnHomeButton = () => {
   const handleReturnHome = () => {
     if (window.electron) {
-        window.electron.navigateHome();
+      window.electron.navigateHome();
     } else {
       window.location.href = "/";
     }

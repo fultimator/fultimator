@@ -7,6 +7,7 @@ import {
   ListItem,
   Divider,
 } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 import CasinoIcon from "@mui/icons-material/Casino";
 import ReactMarkdown from "react-markdown";
 import {
@@ -27,6 +28,7 @@ const RollsTab = ({
   handleAttack,
   handleSpell,
 }) => {
+  const theme = useTheme();
   const hideLogs = useCombatSimSettingsStore.getState().settings.hideLogs;
   const autoUseMP = useCombatSimSettingsStore.getState().settings.autoUseMP;
   const autoRollSpellOneTarget =
@@ -41,33 +43,23 @@ const RollsTab = ({
     };
 
     // Determine the source and correct attribute keys
-    let source, attrKey1, attrKey2;
+    let attr1, attr2;
 
-    if (attack.weapon) {
-      source = attack.weapon;
-      attrKey1 = "att1";
-      attrKey2 = "att2";
-    } else if (attack.spell) {
-      source = attack.spell;
-      attrKey1 = "attr1";
-      attrKey2 = "attr2";
+    if (attack.spell) {
+      attr1 = attack.spell.accuracy?.attr1;
+      attr2 = attack.spell.accuracy?.attr2;
     } else {
-      source = attack;
-      attrKey1 = "attr1";
-      attrKey2 = "attr2";
+      attr1 = attack.accuracy?.attr1;
+      attr2 = attack.accuracy?.attr2;
     }
-
-    // Extract attributes
-    const attr1 = source?.[attrKey1];
-    const attr2 = source?.[attrKey2];
 
     if (!attr1 || !attr2) return "Invalid Attack"; // Handle missing attributes
 
     const translatedAttribute1 = `${t(attributeMap[attr1])} d${
-      selectedNPC.attributes[attr1]
+      selectedNPC.attributes[attr1]?.base
     }`;
     const translatedAttribute2 = `${t(attributeMap[attr2])} d${
-      selectedNPC.attributes[attr2]
+      selectedNPC.attributes[attr2]?.base
     }`;
 
     return `【${translatedAttribute1} + ${translatedAttribute2}】`;
@@ -75,7 +67,7 @@ const RollsTab = ({
 
   const damageTypeLabels = {
     physical: "physical_damage",
-    wind: "air_damage",
+    air: "air_damage",
     bolt: "bolt_damage",
     dark: "dark_damage",
     earth: "earth_damage",
@@ -83,6 +75,16 @@ const RollsTab = ({
     ice: "ice_damage",
     light: "light_damage",
     poison: "poison_damage",
+  };
+
+  const resolveAttackDamageType = (item, rowType) => {
+    const normalized =
+      item?.damage?.type ??
+      (rowType === "Attack" ? item?.type : item?.weapon?.type) ??
+      "physical";
+    if (normalized === "wind") return "air";
+    if (normalized === "lightning") return "bolt";
+    return normalized;
   };
 
   const StyledMarkdown = ({ children, ...props }) => {
@@ -98,13 +100,21 @@ const RollsTab = ({
         <ReactMarkdown
           {...props}
           components={{
-            p: (props) => <p style={{ margin: 0, padding: 0 }} {...props} />,
-            ul: (props) => <ul style={{ margin: 0, padding: 0 }} {...props} />,
-            li: (props) => <li style={{ margin: 0, padding: 0 }} {...props} />,
-            strong: (props) => (
+            p: ({ _node, ...props }) => (
+              <p style={{ margin: 0, padding: 0 }} {...props} />
+            ),
+            ul: ({ _node, ...props }) => (
+              <ul style={{ margin: 0, padding: 0 }} {...props} />
+            ),
+            li: ({ _node, ...props }) => (
+              <li style={{ margin: 0, padding: 0 }} {...props} />
+            ),
+            strong: ({ _node, ...props }) => (
               <strong style={{ fontWeight: "bold" }} {...props} />
             ),
-            em: (props) => <em style={{ fontStyle: "italic" }} {...props} />,
+            em: ({ _node, ...props }) => (
+              <em style={{ fontStyle: "italic" }} {...props} />
+            ),
           }}
         >
           {children}
@@ -133,7 +143,7 @@ const RollsTab = ({
   // Check if the selected NPC has enough MP to cast the spell for at least 1 target
   const getHasEnoughMP = (selectedNPC, spellData) => {
     if (!autoUseMP) return true;
-    const mpCost = spellData.mp;
+    const mpCost = spellData.cost?.amount ?? 0;
     const currentMp = selectedNPC.combatStats.currentMp;
     return mpCost <= currentMp;
   };
@@ -144,19 +154,18 @@ const RollsTab = ({
         ...(selectedNPC?.attacks || []).map((attack) => ({
           type: "Attack",
           data: attack,
-          extra: attack.special?.length ? attack.special.join("\n\n") : null,
-          icon: attack.range === "distance" ? <DistanceIcon /> : <MeleeIcon />,
+          extra:
+            attack.effect ||
+            (attack.special?.length ? attack.special.join("\n\n") : null),
+          icon: attack.range === "ranged" ? <DistanceIcon /> : <MeleeIcon />,
         })),
         ...(selectedNPC?.weaponattacks || []).map((wattack) => ({
           type: "Weapon Attack",
           data: wattack,
-          extra: wattack.special?.length ? wattack.special.join("\n\n") : null,
-          icon:
-            wattack.weapon.range === "distance" ? (
-              <DistanceIcon />
-            ) : (
-              <MeleeIcon />
-            ),
+          extra:
+            wattack.effect ||
+            (wattack.special?.length ? wattack.special.join("\n\n") : null),
+          icon: wattack.range === "ranged" ? <DistanceIcon /> : <MeleeIcon />,
         })),
         ...(selectedNPC?.spells || []).map((spell) => ({
           type: "Spell",
@@ -170,7 +179,7 @@ const RollsTab = ({
           sx={{
             display: "flex",
             alignItems: "stretch",
-            borderBottom: "1px solid #ddd",
+            borderBottom: `1px solid ${theme.palette.divider}`,
             py: 1,
             minHeight: 80,
           }}
@@ -180,7 +189,7 @@ const RollsTab = ({
           </Box>
           <Divider orientation="vertical" flexItem sx={{ mx: 1, my: -1 }} />
           <Box sx={{ flexGrow: 1, px: 2 }}>
-            <Typography variant="subtitle1" fontWeight="bold">
+            <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
               {data.name}{" "}
               {type === "Spell" && data.type === "offensive" && (
                 <OffensiveSpellIcon />
@@ -210,8 +219,8 @@ const RollsTab = ({
                         >
                           {t(
                             damageTypeLabels[
-                              type === "Attack" ? data.type : data.weapon.type
-                            ]
+                              resolveAttackDamageType(data, type)
+                            ],
                           )}
                         </StyledMarkdown>
                       </span>
@@ -229,8 +238,8 @@ const RollsTab = ({
                       <Diamond />
                     </>
                   )}{" "}
-                  {data.mp} MP <Diamond /> {data.target} <Diamond />{" "}
-                  {data.duration}
+                  {data.cost?.amount} MP <Diamond /> {data.targetDescription}{" "}
+                  <Diamond /> {data.duration}
                 </>
               )}
             </Typography>
@@ -238,9 +247,12 @@ const RollsTab = ({
               <Box sx={{ maxWidth: "80%", overflowWrap: "break-word" }}>
                 <Typography
                   variant="body2"
-                  color="text.secondary"
                   component="div"
-                  sx={{ whiteSpace: "pre-wrap", my: -1 }}
+                  sx={{
+                    color: "text.secondary",
+                    whiteSpace: "pre-wrap",
+                    my: -1,
+                  }}
                 >
                   <StyledMarkdown>{extra}</StyledMarkdown>
                 </Typography>
@@ -269,8 +281,8 @@ const RollsTab = ({
                       type === "Attack"
                         ? "attack"
                         : type === "Weapon Attack"
-                        ? "weapon"
-                        : "spell"
+                          ? "weapon"
+                          : "spell",
                     );
                   }
                 }}

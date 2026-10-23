@@ -4,10 +4,12 @@ import { Typography, Box, Link } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import remarkGfm from "remark-gfm"; // GitHub-flavored markdown
 import rehypeRaw from "rehype-raw"; // Raw HTML
+import rehypeSanitize from "rehype-sanitize"; // Strip unsafe HTML from user content
 import remarkParse from "remark-parse"; // Parse nested markdown
 import rehypeReact from "rehype-react"; // To render HTML as React components
 import remarkCustomCallouts from "../../utility/remarkCustomCallouts";
 import remarkDirective from "remark-directive";
+import { markdownSanitizeSchema } from "../../utility/markdownSanitizeSchema";
 
 import { TypeIcon } from "../types";
 import {
@@ -27,7 +29,13 @@ import {
 /**
  * NotesMarkdown Component
  */
-const NotesMarkdown = ({ children, ...props }) => {
+const NotesMarkdown = ({
+  children,
+  compact = false,
+  uniform = false,
+  fontSize = undefined,
+  ...props
+}) => {
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
 
@@ -51,10 +59,10 @@ const NotesMarkdown = ({ children, ...props }) => {
 
     // Handle type icons with [ICON:type] syntax
     const typeIconRegex =
-      /\[ICON:(physical|wind|bolt|dark|earth|fire|ice|light|poison)\]/g;
+      /\[ICON:(physical|air|bolt|dark|earth|fire|ice|light|poison)\]/g;
     intermediate = intermediate.replace(
       typeIconRegex,
-      (_, type) => `<span class="type-icon" data-type="${type}"></span>`
+      (_, type) => `<span class="type-icon" data-type="${type}"></span>`,
     );
 
     // Handle dice icons with [ICON:d4], [ICON:d6], etc. syntax
@@ -62,7 +70,7 @@ const NotesMarkdown = ({ children, ...props }) => {
     intermediate = intermediate.replace(
       diceIconRegex,
       (_, dice) =>
-        `<span class="dice-icon" data-dice="${dice.toLowerCase()}"></span>`
+        `<span class="dice-icon" data-dice="${dice.toLowerCase()}"></span>`,
     );
 
     // Handle other icons with [ICON:...] "melee", "ranged", "magic", "spell", "martial"
@@ -70,7 +78,7 @@ const NotesMarkdown = ({ children, ...props }) => {
     intermediate = intermediate.replace(
       otherIconRegex,
       (_, icon) =>
-        `<span class="other-icon" data-icon="${icon.toLowerCase()}"></span>`
+        `<span class="other-icon" data-icon="${icon.toLowerCase()}"></span>`,
     );
 
     // Return the processed markdown, including HTML for custom blocks and icons
@@ -86,21 +94,35 @@ const NotesMarkdown = ({ children, ...props }) => {
         remarkParse,
         remarkCustomCallouts,
       ]}
-      rehypePlugins={[rehypeRaw, rehypeReact]}
+      rehypePlugins={[
+        rehypeRaw,
+        [rehypeSanitize, markdownSanitizeSchema],
+        rehypeReact,
+      ]}
       components={{
         // Custom styling for paragraphs (p)
-        p: ({ ...props }) => (
+        p: ({ _node, ...props }) => (
           <Typography
             variant="body1"
-            sx={{
-              fontFamily: "'PT Sans Narrow', sans-serif",
-              mt: 0.75,
-              mb: 0.75,
-              marginLeft: 2,
-              lineHeight: 1.6,
-              fontSize: "1rem",
-              color: theme.palette.text.primary,
-            }}
+            component="div"
+            sx={
+              compact || uniform
+                ? {
+                    margin: 0,
+                    lineHeight: 1.5,
+                    fontSize: fontSize ?? "0.85rem",
+                    color: theme.palette.text.secondary,
+                  }
+                : {
+                    fontFamily: "'PT Sans Narrow', sans-serif",
+                    mt: 0.75,
+                    mb: 0.75,
+                    marginLeft: 2,
+                    lineHeight: 1.6,
+                    fontSize: fontSize ?? "1rem",
+                    color: theme.palette.text.primary,
+                  }
+            }
             {...props}
           />
         ),
@@ -142,7 +164,7 @@ const NotesMarkdown = ({ children, ...props }) => {
         ),
 
         // Custom styling for h2 headers
-        h2: ({ ...props }) => (
+        h2: ({ _node, ...props }) => (
           <Typography
             variant="h4"
             sx={{
@@ -163,7 +185,7 @@ const NotesMarkdown = ({ children, ...props }) => {
         ),
 
         // Custom styling for h3 headers
-        h3: ({ ...props }) => (
+        h3: ({ _node, ...props }) => (
           <Typography
             variant="h5"
             sx={{
@@ -186,7 +208,7 @@ const NotesMarkdown = ({ children, ...props }) => {
         ),
 
         // Custom styling for h4 headers
-        h4: ({ ...props }) => (
+        h4: ({ _node, ...props }) => (
           <Typography
             variant="h6"
             sx={{
@@ -205,7 +227,7 @@ const NotesMarkdown = ({ children, ...props }) => {
         ),
 
         // Custom styling for h5 headers
-        h5: ({ ...props }) => (
+        h5: ({ _node, ...props }) => (
           <Typography
             variant="h6"
             sx={{
@@ -224,7 +246,7 @@ const NotesMarkdown = ({ children, ...props }) => {
         ),
 
         // Custom styling for strong (bold) text
-        strong: ({ ...props }) => (
+        strong: ({ _node, ...props }) => (
           <strong
             style={{
               color: theme.palette.text.primary,
@@ -235,11 +257,23 @@ const NotesMarkdown = ({ children, ...props }) => {
         ),
 
         // Custom styling for emphasized (italic) text
-        em: ({ ...props }) => (
+        em: ({ _node, ...props }) => (
           <em
             style={{
               color: theme.palette.text.secondary,
               fontStyle: "italic",
+            }}
+            {...props}
+          />
+        ),
+
+        // Custom styling for highlighted text (search matches)
+        mark: ({ _node, ...props }) => (
+          <mark
+            style={{
+              backgroundColor: "#ffeb3b",
+              padding: "0 2px",
+              fontWeight: 600,
             }}
             {...props}
           />
@@ -266,7 +300,7 @@ const NotesMarkdown = ({ children, ...props }) => {
                       ordered: true,
                       index: itemIndex++,
                     })
-                  : child
+                  : child,
               )}
             </ol>
           );
@@ -288,7 +322,7 @@ const NotesMarkdown = ({ children, ...props }) => {
             {React.Children.map(children, (child) =>
               React.isValidElement(child)
                 ? React.cloneElement(child, { ordered: false })
-                : child
+                : child,
             )}
           </ul>
         ),
@@ -322,7 +356,7 @@ const NotesMarkdown = ({ children, ...props }) => {
         ),
 
         // Custom styling for tables
-        table: ({ ...props }) => (
+        table: ({ _node, ...props }) => (
           <table
             style={{
               fontFamily: "'PT Sans Narrow', sans-serif",
@@ -336,7 +370,7 @@ const NotesMarkdown = ({ children, ...props }) => {
         ),
 
         // Custom styling for table headers (th)
-        th: ({ ...props }) => (
+        th: ({ _node, ...props }) => (
           <th
             style={{
               textAlign: "left",
@@ -350,7 +384,7 @@ const NotesMarkdown = ({ children, ...props }) => {
         ),
 
         // Custom styling for table data (td)
-        td: ({ ...props }) => (
+        td: ({ _node, ...props }) => (
           <td
             style={{
               padding: "8px 12px",
@@ -364,7 +398,7 @@ const NotesMarkdown = ({ children, ...props }) => {
         ),
 
         // Custom styling for links
-        a: ({ ...props }) => (
+        a: ({ _node, ...props }) => (
           <Link
             style={{
               color: isDark
@@ -450,7 +484,7 @@ const NotesMarkdown = ({ children, ...props }) => {
         ),
 
         // Custom styling for spans (used for icons)
-        span: ({ ...props }) => {
+        span: ({ _node, ...props }) => {
           if (props.className === "type-icon" && props["data-type"]) {
             return (
               <TypeIcon
@@ -533,8 +567,8 @@ const NotesMarkdown = ({ children, ...props }) => {
               type === "ternary" || type === "quaternary"
                 ? selectedColor?.main || "#e0e0e0"
                 : isDark
-                ? `linear-gradient(to right, ${selectedColor.dark}, ${selectedColor.light})`
-                : `linear-gradient(to right, ${selectedColor.main}, ${selectedColor.light})`;
+                  ? `linear-gradient(to right, ${selectedColor.dark}, ${selectedColor.light})`
+                  : `linear-gradient(to right, ${selectedColor.main}, ${selectedColor.light})`;
 
             return (
               <Box
