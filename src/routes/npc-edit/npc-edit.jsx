@@ -553,7 +553,7 @@ export default function NpcEdit() {
                   <Grid size={{ xs: 12, md: 6 }}>
                     <SectionCard title={t("Affinity")}>
                       <Box sx={{ p: 2 }}>
-                        <ExplainAffinities npc={npcTemp} />
+                        <ExplainAffinities npc={npcTemp} setNpc={setNpcTemp} />
                         <EditAffinities npc={npcTemp} setNpc={setNpcTemp} />
                       </Box>
                     </SectionCard>

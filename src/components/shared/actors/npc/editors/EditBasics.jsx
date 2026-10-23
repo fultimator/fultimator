@@ -6,11 +6,9 @@ import {
   Card,
   Divider,
   FormControl,
-  FormControlLabel,
   Grid,
   IconButton,
   Snackbar,
-  Switch,
   TextField,
   Typography,
 } from "@mui/material";
@@ -222,107 +220,6 @@ export default function EditBasics({ npc, setNpc }) {
                   )}
                 </ReactMarkdown>
               </Typography>
-            </Card>
-          </Grid>
-        </Grid>
-      </SectionCard>
-
-      <SectionCard title={t("Defense Override")}>
-        <Grid container spacing={2} sx={{ p: 2 }}>
-          <Grid size={{ xs: 12, sm: 6 }}>
-            <Card sx={{ p: 2, background }}>
-              <Typography variant="h6" gutterBottom>
-                {t("DEF Override")}
-              </Typography>
-              <FormControl fullWidth>
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={npc.extra?.defOverride || false}
-                      onChange={(e) => {
-                        setNpc((prev) => ({
-                          ...prev,
-                          extra: {
-                            ...prev.extra,
-                            defOverride: e.target.checked,
-                            def: e.target.checked
-                              ? prev.extra?.def || 0
-                              : undefined,
-                          },
-                        }));
-                      }}
-                    />
-                  }
-                  label={t("Override DEF")}
-                />
-              </FormControl>
-              <FormControl variant="standard" fullWidth sx={{ mt: 2 }}>
-                <TextField
-                  type="number"
-                  label={
-                    npc.extra?.defOverride ? t("DEF Value") : t("DEF Bonus")
-                  }
-                  value={npc.extra?.def || 0}
-                  onChange={(e) => {
-                    setNpc((prev) => ({
-                      ...prev,
-                      extra: {
-                        ...prev.extra,
-                        def: parseInt(e.target.value) || 0,
-                      },
-                    }));
-                  }}
-                />
-              </FormControl>
-            </Card>
-          </Grid>
-          <Grid size={{ xs: 12, sm: 6 }}>
-            <Card sx={{ p: 2, background }}>
-              <Typography variant="h6" gutterBottom>
-                {t("M.DEF Override")}
-              </Typography>
-              <FormControl fullWidth>
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={npc.extra?.mDefOverride || false}
-                      onChange={(e) => {
-                        setNpc((prev) => ({
-                          ...prev,
-                          extra: {
-                            ...prev.extra,
-                            mDefOverride: e.target.checked,
-                            mDef: e.target.checked
-                              ? prev.extra?.mDef || 0
-                              : undefined,
-                          },
-                        }));
-                      }}
-                    />
-                  }
-                  label={t("Override M.DEF")}
-                />
-              </FormControl>
-              <FormControl variant="standard" fullWidth sx={{ mt: 2 }}>
-                <TextField
-                  type="number"
-                  label={
-                    npc.extra?.mDefOverride
-                      ? t("M.DEF Value")
-                      : t("M.DEF Bonus")
-                  }
-                  value={npc.extra?.mDef || 0}
-                  onChange={(e) => {
-                    setNpc((prev) => ({
-                      ...prev,
-                      extra: {
-                        ...prev.extra,
-                        mDef: parseInt(e.target.value) || 0,
-                      },
-                    }));
-                  }}
-                />
-              </FormControl>
             </Card>
           </Grid>
         </Grid>

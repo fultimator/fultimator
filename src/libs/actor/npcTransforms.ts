@@ -7,7 +7,7 @@ import {
 } from "../../types/Npcs";
 import { Affinities, Elements } from "../../types/Misc";
 import { normalizeDefensiveItem } from "../../libs/equipmentDefensiveNormalization";
-import { calcHP, calcMP } from "../../libs/npcs";
+import { calcHP, calcMP, ensureSpeciesGrants } from "../../libs/npcs";
 import { ensureId, backfillIds } from "./itemIds";
 
 type NpcTransform = (npc: TypeNpc) => TypeNpc;
@@ -317,8 +317,7 @@ function unifyNpcAttackSchema(npc: TypeNpc): TypeNpc {
           ...(wa.accuracy as Record<string, unknown>),
           defense: (wa.accuracy as Record<string, unknown>).defense
             ? ((wa.accuracy as Record<string, unknown>).defense as
-                | "def"
-                | "mdef")
+                "def" | "mdef")
             : categoryDefense(category),
         },
         damage: {
@@ -690,6 +689,12 @@ const POST_LOAD_TRANSFORMS: VersionedTransform[] = [
     label:
       "Quick Assembly: default role to 'custom' for pre-existing NPCs (freeform)",
     fn: defaultQuickAssemblyRole,
+  },
+  {
+    version: 13,
+    label:
+      "Species Grants: auto-detect and populate speciesGrants (affinities & immunities) from species defaults",
+    fn: ensureSpeciesGrants,
   },
 ];
 

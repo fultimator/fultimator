@@ -313,6 +313,12 @@ export const NpcPersistedSchema = z.object({
   multipart: z.string().optional(),
   attributes: NpcAttributesSchema,
   affinities: NpcAffinitiesSchema.default({}),
+  speciesGrants: z
+    .object({
+      affinities: z.record(z.string(), z.string()).optional(),
+      immunities: z.record(z.string(), z.boolean()).optional(),
+    })
+    .optional(),
   immunities: NpcImmunitiesSchema.default({
     slow: false,
     dazed: false,

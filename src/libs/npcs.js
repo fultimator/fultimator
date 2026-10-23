@@ -1,3 +1,64 @@
+const SPECIES_BENEFITS = {
+  Construct: {
+    affinities: [
+      { type: "poison", value: "im" },
+      { type: "earth", value: "rs" },
+    ],
+    immunities: ["poisoned"],
+  },
+  Elemental: {
+    affinities: [{ type: "poison", value: "im" }],
+    immunities: ["poisoned"],
+  },
+  Undead: {
+    affinities: [
+      { type: "dark", value: "im" },
+      { type: "poison", value: "im" },
+    ],
+    immunities: ["poisoned"],
+  },
+  Plant: {
+    immunities: ["dazed", "shaken", "enraged"],
+  },
+};
+
+export function ensureSpeciesGrants(npc) {
+  if (npc.speciesGrants) {
+    return npc;
+  }
+
+  const benefits = SPECIES_BENEFITS[npc.species] || {};
+  const speciesGrants = {};
+
+  if (benefits.affinities?.length) {
+    const affinities = {};
+    benefits.affinities.forEach((grant) => {
+      if (npc.affinities?.[grant.type] === grant.value) {
+        affinities[grant.type] = grant.value;
+      }
+    });
+    if (Object.keys(affinities).length > 0) {
+      speciesGrants.affinities = affinities;
+    }
+  }
+
+  if (benefits.immunities?.length) {
+    const immunities = {};
+    benefits.immunities.forEach((status) => {
+      if (npc.immunities?.[status] === true) {
+        immunities[status] = true;
+      }
+    });
+    if (Object.keys(immunities).length > 0) {
+      speciesGrants.immunities = immunities;
+    }
+  }
+
+  return Object.keys(speciesGrants).length > 0
+    ? { ...npc, speciesGrants }
+    : npc;
+}
+
 export function calcHP(npc) {
   if (!npc || !npc.attributes) return 0;
   const might = npc.attributes.might?.base ?? 8;

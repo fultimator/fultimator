@@ -344,7 +344,7 @@ export const npcFieldConfig: ItemFieldConfig<NpcFormState> = [
   {
     key: "extra",
     kind: "editable",
-    label: "Defenses",
+    label: "",
     component: "npc-defense-radio",
     group: "defenses",
     order: 0,
@@ -442,7 +442,7 @@ export const npcFieldConfig: ItemFieldConfig<NpcFormState> = [
   {
     key: "immunities",
     kind: "editable",
-    label: "Immunities",
+    label: "",
     component: "npc-immunities",
     group: "immunities",
     order: 0,

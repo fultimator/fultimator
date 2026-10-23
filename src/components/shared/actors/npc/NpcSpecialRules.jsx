@@ -69,6 +69,21 @@ export function NpcSpecialRules({ npc, variant = "interactive" }) {
       ),
     });
   }
+  if (npc.species === "Elemental") {
+    special.push({
+      name: t("Elemental"),
+      effect: t(
+        "Immune to **poison** damage, immune to **poisoned** status, and immune to a second damage type of your choice.",
+        true,
+      ),
+    });
+  }
+  if (npc.species === "Demon") {
+    special.push({
+      name: t("Demon"),
+      effect: t("Resistant to two damage types of your choice.", true),
+    });
+  }
   if (npc.species === "Plant") {
     special.push({
       name: t("Plant"),

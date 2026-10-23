@@ -336,7 +336,7 @@ function EditorPanels({ npcTemp, setNpcTemp, secondary, isSmallScreen, t }) {
               headerText={t("Affinity")}
               showIconButton={false}
             />
-            <ExplainAffinities npc={npcTemp} />
+            <ExplainAffinities npc={npcTemp} setNpc={setNpcTemp} />
             <EditAffinities npc={npcTemp} setNpc={setNpcTemp} />
           </Grid>
           <Grid size={{ xs: 12, md: 6 }}>

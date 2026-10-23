@@ -8,6 +8,11 @@ import {
   Paper,
   useMediaQuery,
   useTheme,
+  Box,
+  Chip,
+  Typography,
+  FormControlLabel,
+  Switch,
 } from "@mui/material";
 import {
   ShieldOutlined,
@@ -57,6 +62,35 @@ export default function EditExtra({ npc, setNpc }) {
         ...prev,
         extra: { ...prev.extra, statusImmunity: value },
       }));
+    },
+    [setNpc],
+  );
+
+  const toggleSpeciesImmunity = useCallback(
+    (status) => {
+      setNpc((prev) => {
+        const speciesGrants = prev.speciesGrants || {};
+        const immunities = { ...speciesGrants.immunities };
+        const npcImmunities = { ...prev.immunities };
+
+        if (immunities[status]) {
+          delete immunities[status];
+          npcImmunities[status] = false;
+        } else {
+          immunities[status] = true;
+          npcImmunities[status] = true;
+        }
+
+        return {
+          ...prev,
+          speciesGrants: {
+            ...speciesGrants,
+            immunities:
+              Object.keys(immunities).length > 0 ? immunities : undefined,
+          },
+          immunities: npcImmunities,
+        };
+      });
     },
     [setNpc],
   );
@@ -204,71 +238,328 @@ export default function EditExtra({ npc, setNpc }) {
 
   return (
     <Grid container spacing={2}>
-      {/* Left: Defenses + Immunities */}
+      {/* Left column: Defenses + Stats */}
       <Grid size={6}>
-        <Grid container spacing={1}>
-          <SchemaFieldRenderer
-            config={npcFieldConfig}
-            state={npc}
-            onChange={setNpc}
-            surface="edit"
-            group="defenses"
-            cols={1}
-          />
-          <SchemaFieldRenderer
-            config={npcFieldConfig}
-            state={npc}
-            onChange={setNpc}
-            surface="edit"
-            group="immunities"
-            cols={1}
-            extraProps={{ freeImmunities }}
-          />
+        <Grid container spacing={2}>
+          {/* Defenses */}
+          <Grid size={12}>
+            <Paper sx={{ p: 2 }}>
+              <Typography
+                sx={{
+                  fontFamily: "Antonio",
+                  fontSize: "0.875rem",
+                  fontWeight: 600,
+                  textTransform: "uppercase",
+                  mb: 1.5,
+                  color: "text.primary",
+                }}
+              >
+                {t("Defenses")}
+              </Typography>
+              <Grid container spacing={1.5}>
+                {/* Defenses */}
+                <Grid size={12}>
+                  <Grid
+                    container
+                    spacing={1}
+                    sx={{
+                      "& > :first-of-type .MuiFormLabel-root": {
+                        display: "none",
+                      },
+                    }}
+                  >
+                    <SchemaFieldRenderer
+                      config={npcFieldConfig}
+                      state={npc}
+                      onChange={setNpc}
+                      surface="edit"
+                      group="defenses"
+                      cols={1}
+                    />
+                  </Grid>
+                </Grid>
+
+                {/* Defense Overrides */}
+                <Grid
+                  size={12}
+                  sx={{
+                    borderTop: "1px solid",
+                    borderColor: "divider",
+                    pt: 1.5,
+                  }}
+                >
+                  <Typography
+                    sx={{
+                      fontSize: "0.75rem",
+                      fontWeight: 600,
+                      textTransform: "uppercase",
+                      mb: 1,
+                      color: "text.secondary",
+                    }}
+                  >
+                    {t("Overrides")}
+                  </Typography>
+                  <Grid container spacing={1.5}>
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                      <Typography
+                        sx={{
+                          fontSize: "0.75rem",
+                          fontWeight: 600,
+                          textTransform: "uppercase",
+                          mb: 1,
+                          color: "text.secondary",
+                        }}
+                      >
+                        {t("DEF Override")}
+                      </Typography>
+                      <FormControl fullWidth>
+                        <FormControlLabel
+                          control={
+                            <Switch
+                              checked={npc.extra?.defOverride || false}
+                              onChange={(e) => {
+                                setNpc((prev) => ({
+                                  ...prev,
+                                  extra: {
+                                    ...prev.extra,
+                                    defOverride: e.target.checked,
+                                    def: e.target.checked
+                                      ? prev.extra?.def || 0
+                                      : undefined,
+                                  },
+                                }));
+                              }}
+                            />
+                          }
+                          label={t("Override DEF")}
+                        />
+                      </FormControl>
+                      <FormControl variant="standard" fullWidth sx={{ mt: 1 }}>
+                        <TextField
+                          type="number"
+                          label={
+                            npc.extra?.defOverride
+                              ? t("DEF Value")
+                              : t("DEF Bonus")
+                          }
+                          value={npc.extra?.def || 0}
+                          onChange={(e) => {
+                            setNpc((prev) => ({
+                              ...prev,
+                              extra: {
+                                ...prev.extra,
+                                def: parseInt(e.target.value) || 0,
+                              },
+                            }));
+                          }}
+                        />
+                      </FormControl>
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                      <Typography
+                        sx={{
+                          fontSize: "0.75rem",
+                          fontWeight: 600,
+                          textTransform: "uppercase",
+                          mb: 1,
+                          color: "text.secondary",
+                        }}
+                      >
+                        {t("M.DEF Override")}
+                      </Typography>
+                      <FormControl fullWidth>
+                        <FormControlLabel
+                          control={
+                            <Switch
+                              checked={npc.extra?.mDefOverride || false}
+                              onChange={(e) => {
+                                setNpc((prev) => ({
+                                  ...prev,
+                                  extra: {
+                                    ...prev.extra,
+                                    mDefOverride: e.target.checked,
+                                    mDef: e.target.checked
+                                      ? prev.extra?.mDef || 0
+                                      : undefined,
+                                  },
+                                }));
+                              }}
+                            />
+                          }
+                          label={t("Override M.DEF")}
+                        />
+                      </FormControl>
+                      <FormControl variant="standard" fullWidth sx={{ mt: 1 }}>
+                        <TextField
+                          type="number"
+                          label={
+                            npc.extra?.mDefOverride
+                              ? t("M.DEF Value")
+                              : t("M.DEF Bonus")
+                          }
+                          value={npc.extra?.mDef || 0}
+                          onChange={(e) => {
+                            setNpc((prev) => ({
+                              ...prev,
+                              extra: {
+                                ...prev.extra,
+                                mDef: parseInt(e.target.value) || 0,
+                              },
+                            }));
+                          }}
+                        />
+                      </FormControl>
+                    </Grid>
+                  </Grid>
+                </Grid>
+              </Grid>
+            </Paper>
+          </Grid>
+
+          {/* Stats */}
+          <Grid size={12}>
+            <Paper sx={{ p: 2 }}>
+              <Typography
+                sx={{
+                  fontFamily: "Antonio",
+                  fontSize: "0.875rem",
+                  fontWeight: 600,
+                  textTransform: "uppercase",
+                  mb: 1.5,
+                  color: "text.primary",
+                }}
+              >
+                {t("Stats")}
+              </Typography>
+              <Grid container spacing={1}>
+                <SchemaFieldRenderer
+                  config={npcFieldConfig}
+                  state={npc}
+                  onChange={setNpc}
+                  surface="edit"
+                  group="stats"
+                  cols={2}
+                />
+              </Grid>
+            </Paper>
+          </Grid>
         </Grid>
       </Grid>
 
-      {/* Right: Stats + Overrides */}
+      {/* Right column: Immunities & Overrides */}
       <Grid size={6}>
-        <Grid container spacing={1}>
-          <SchemaFieldRenderer
-            config={npcFieldConfig}
-            state={npc}
-            onChange={setNpc}
-            surface="edit"
-            group="stats"
-            cols={3}
-          />
-          <Grid size={12}>
-            <FormLabel sx={{ display: "block", mb: 1 }}>
-              {t("Overrides")}
-            </FormLabel>
-            <FormControl variant="standard" fullWidth>
-              <TextField
-                type="number"
-                slotProps={{
-                  htmlInput: {
-                    inputMode: "decimal",
-                    min: 0,
-                    max: 3,
-                    step: 0.5,
-                  },
-                  formHelperText: {
-                    sx: {
-                      color:
-                        totalPicked > totalAllotted
-                          ? "red !important"
-                          : "inherit",
-                    },
-                  },
+        <Paper sx={{ p: 2 }}>
+          <Grid container spacing={1.5}>
+            {/* Species Immunities Grant */}
+            {Object.keys(freeImmunities).length > 0 && (
+              <Grid size={12}>
+                <Typography
+                  sx={{
+                    fontFamily: "Antonio",
+                    fontSize: "0.875rem",
+                    fontWeight: 600,
+                    textTransform: "uppercase",
+                    mb: 1,
+                    color: "text.primary",
+                  }}
+                >
+                  Species Immunities (Free)
+                </Typography>
+                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.75 }}>
+                  {Object.entries(freeImmunities).map(([status, isFree]) =>
+                    isFree ? (
+                      <Chip
+                        key={status}
+                        size="small"
+                        label={t(status, undefined, true)}
+                        color={npc.immunities?.[status] ? "primary" : "default"}
+                        variant={
+                          npc.immunities?.[status] ? "filled" : "outlined"
+                        }
+                        onClick={() => toggleSpeciesImmunity(status)}
+                        sx={{ cursor: "pointer" }}
+                      />
+                    ) : null,
+                  )}
+                </Box>
+              </Grid>
+            )}
+
+            {/* Status Immunities */}
+            <Grid size={12}>
+              <Typography
+                sx={{
+                  fontFamily: "Antonio",
+                  fontSize: "0.875rem",
+                  fontWeight: 600,
+                  textTransform: "uppercase",
+                  mb: 1.5,
+                  color: "text.primary",
                 }}
-                label={t("Status Effect Immunity")}
-                value={npc.extra?.statusImmunity || 0}
-                onChange={handleStatusImmunityChange}
-                helperText={`${t("Gain 2 Immunities per 1 SP")} - ${t("Total")}: ${totalPicked} / ${totalAllotted}`}
-              />
-            </FormControl>
+              >
+                {t("Immunities")}
+              </Typography>
+              <Grid
+                sx={{
+                  "& > :first-of-type .MuiFormLabel-root": { display: "none" },
+                }}
+              >
+                <SchemaFieldRenderer
+                  config={npcFieldConfig}
+                  state={npc}
+                  onChange={setNpc}
+                  surface="edit"
+                  group="immunities"
+                  cols={2}
+                  extraProps={{ freeImmunities }}
+                />
+              </Grid>
+            </Grid>
+
+            {/* Overrides */}
+            <Grid
+              size={12}
+              sx={{ borderTop: "1px solid", borderColor: "divider", pt: 1.5 }}
+            >
+              <Typography
+                sx={{
+                  fontSize: "0.75rem",
+                  fontWeight: 600,
+                  textTransform: "uppercase",
+                  mb: 1.5,
+                  color: "text.secondary",
+                }}
+              >
+                {t("Overrides")}
+              </Typography>
+              <FormControl variant="standard" fullWidth>
+                <TextField
+                  type="number"
+                  slotProps={{
+                    htmlInput: {
+                      inputMode: "decimal",
+                      min: 0,
+                      max: 3,
+                      step: 0.5,
+                    },
+                    formHelperText: {
+                      sx: {
+                        color:
+                          totalPicked > totalAllotted
+                            ? "red !important"
+                            : "inherit",
+                      },
+                    },
+                  }}
+                  label={t("Status Effect Immunity")}
+                  value={npc.extra?.statusImmunity || 0}
+                  onChange={handleStatusImmunityChange}
+                  helperText={`${t("Gain 2 Immunities per 1 SP")} - ${t("Total")}: ${totalPicked} / ${totalAllotted}`}
+                />
+              </FormControl>
+            </Grid>
           </Grid>
-        </Grid>
+        </Paper>
       </Grid>
     </Grid>
   );
