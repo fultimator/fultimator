@@ -14,6 +14,31 @@ export function SpanMarkdown({ children }) {
       <ReactMarkdown
         components={{
           p: ({ _node, ...props }) => <span {...props} />,
+          ul: ({ _node, ...props }) => (
+            <ul
+              style={{
+                margin: "-1em 0 -1.1em 0",
+                padding: "0 0 0 1.25rem",
+                display: "block",
+                lineHeight: 1.0,
+              }}
+              {...props}
+            />
+          ),
+          ol: ({ _node, ...props }) => (
+            <ol
+              style={{
+                margin: "-1em 0 -1.1em 0",
+                padding: "0 0 0 1.25rem",
+                display: "block",
+                lineHeight: 1.0,
+              }}
+              {...props}
+            />
+          ),
+          li: ({ _node, ...props }) => (
+            <li style={{ margin: 0, padding: 0 }} {...props} />
+          ),
           strong: ({ _node, ...props }) => (
             <strong style={{ fontWeight: "bold" }} {...props} />
           ),
@@ -38,10 +63,31 @@ export function StyledMarkdown({ children }) {
             <p style={{ margin: 0, padding: 0 }} {...props} />
           ),
           ul: ({ _node, ...props }) => (
-            <ul style={{ margin: 0, padding: 0 }} {...props} />
+            <ul
+              style={{
+                margin: "-1em 0 -1.1em 0",
+                padding: "0 0 0 1.25rem",
+                display: "block",
+                lineHeight: 1.0,
+              }}
+              {...props}
+            />
           ),
-          li: ({ _node, ...props }) => (
-            <li style={{ margin: 0, padding: 0 }} {...props} />
+          ol: ({ _node, ...props }) => (
+            <ol
+              style={{
+                margin: "-1em 0 -1.1em 0",
+                padding: "0 0 0 1.25rem",
+                display: "block",
+                lineHeight: 1.0,
+              }}
+              {...props}
+            />
+          ),
+          li: ({ _node, children: liChildren, ...props }) => (
+            <li style={{ margin: 0, padding: 0 }} {...props}>
+              {liChildren}
+            </li>
           ),
           strong: ({ _node, ...props }) => (
             <strong style={{ fontWeight: "bold" }} {...props} />
