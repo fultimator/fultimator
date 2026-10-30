@@ -67,7 +67,7 @@ export default function CommunityResources({
                   mb: 1,
                 }}
               >
-                {t("Community Content")}
+                {t("resources_community_content_title")}
               </Typography>
               <Typography
                 variant="body1"
@@ -76,13 +76,17 @@ export default function CommunityResources({
                   maxWidth: "500px",
                 }}
               >
-                {t(
-                  "Discover amazing homebrew content created by the community. Share your own creations and explore what others have built."
-                )}
+                {t("resources_community_content_description")}
               </Typography>
             </Box>
 
-            <Box sx={{ display: "flex", gap: 2, flexDirection: isMobile ? "column" : "row" }}>
+            <Box
+              sx={{
+                display: "flex",
+                gap: 2,
+                flexDirection: isMobile ? "column" : "row",
+              }}
+            >
               <Button
                 variant="contained"
                 size="large"
@@ -109,7 +113,7 @@ export default function CommunityResources({
                   transition: "all 0.3s ease",
                 }}
               >
-                {t("Request New Resource")}
+                {t("resource_request_btn")}
               </Button>
 
               {isModerator && (
@@ -129,13 +133,15 @@ export default function CommunityResources({
                     color: isDarkMode ? "#ff9800" : "#ff6f00",
                     "&:hover": {
                       borderColor: isDarkMode ? "#ffb74d" : "#e65100",
-                      backgroundColor: isDarkMode ? "rgba(255, 152, 0, 0.1)" : "rgba(255, 111, 0, 0.1)",
+                      backgroundColor: isDarkMode
+                        ? "rgba(255, 152, 0, 0.1)"
+                        : "rgba(255, 111, 0, 0.1)",
                       transform: "translateY(-1px)",
                     },
                     transition: "all 0.3s ease",
                   }}
                 >
-                  {t("Moderate Submissions")}
+                  {t("resources_moderate_submissions_btn")}
                 </Button>
               )}
             </Box>
@@ -176,19 +182,20 @@ export default function CommunityResources({
                   color: isDarkMode ? "#90caf9" : "#1976d2",
                 }}
               >
-                {t("Homebrew Resources Information")}
+                {t("resources_homebrew_resources_info")}
               </Typography>
             </Box>
             <Collapse in={expandedLicenseInfo}>
               <Box
                 sx={{
                   pt: 2,
-                  borderTop: `1px solid ${isDarkMode ? "#3f51b530" : "#2196f330"
-                    }`,
+                  borderTop: `1px solid ${
+                    isDarkMode ? "#3f51b530" : "#2196f330"
+                  }`,
                 }}
               >
                 <Typography variant="body2" sx={{ mb: 2 }}>
-                  {t("All homebrew content listed here is created under the")}{" "}
+                  {t("homebrew_copyright_notice_desc_1")}{" "}
                   <Link
                     href="https://need.games/wp-content/uploads/2024/06/Fabula-Ultima-Third-Party-Tabletop-License-1.0.pdf"
                     target="_blank"
@@ -205,32 +212,23 @@ export default function CommunityResources({
                   >
                     Fabula Ultima Third Party Tabletop License 1.0
                   </Link>
-                  {t(
-                    ". All content is the sole property and responsibility of its respective creators and is not affiliated with Need Games, Rooster Games, or Fultimator."
-                  )}
+                  {t("homebrew_copyright_notice_desc_2")}
                 </Typography>
 
                 <Typography variant="body2" sx={{ mb: 2 }}>
-                  {t(
-                    "Fultimator does not claim ownership of any user-submitted material. We review submissions only to ensure they are related to Fabula Ultima, are not duplicated, and do not blatantly violate community guidelines or copyright."
-                  )}
+                  {t("homebrew_copyright_notice_desc_3")}
                 </Typography>
 
                 <Typography variant="body2" sx={{ mb: 2 }}>
-                  {t(
-                    "If you believe a resource has been posted in error or violates any rules, please use the report button or contact us at"
-                  )}{" "}
+                  {t("homebrew_copyright_notice_desc_4")}{" "}
                   <strong>fultimator@gmail.com</strong>.{" "}
-                  {t(
-                    "Include relevant details to help us review and address the issue promptly."
-                  )}
+                  {t("homebrew_copyright_notice_desc_5")}
                 </Typography>
               </Box>
             </Collapse>
           </Alert>
         </Box>
       </Paper>
-
       {/* Content Grid */}
       {filteredResources.length === 0 ? (
         <Paper
@@ -276,7 +274,7 @@ export default function CommunityResources({
             sx={{ mb: 4, maxWidth: "400px", mx: "auto" }}
           >
             {t(
-              "Be the first to contribute! Try adjusting your search criteria or request a new resource."
+              "Be the first to contribute! Try adjusting your search criteria or request a new resource.",
             )}
           </Typography>
 
@@ -308,7 +306,14 @@ export default function CommunityResources({
       ) : (
         <Grid container spacing={3}>
           {filteredResources.map((content, index) => (
-            <Grid item xs={12} md={6} lg={4} key={index}>
+            <Grid
+              key={index}
+              size={{
+                xs: 12,
+                md: 6,
+                lg: 4,
+              }}
+            >
               <ResourceCard resource={content} isHomebrew />
             </Grid>
           ))}

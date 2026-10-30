@@ -15,6 +15,8 @@ import {
   ArrowLeft,
   Save,
   AutoAwesome,
+  PlayArrow,
+  Stop,
 } from "@mui/icons-material";
 import { t, replacePlaceholders } from "../../translation/translate";
 import { useTheme } from "@mui/material/styles";
@@ -31,6 +33,8 @@ export default function BattleHeader({
   round,
   handleIncreaseRound,
   handleDecreaseRound,
+  combatActive = false,
+  onToggleCombat,
   isMobile,
   isAutoSaveEnabled = false,
   lastManualSaved = null,
@@ -60,7 +64,7 @@ export default function BattleHeader({
         display: "flex",
         justifyContent: "space-between",
         alignItems: "center",
-        bgcolor: isDarkMode ? "#333333" : "#ffffff",
+        bgcolor: theme.palette.background.paper,
         paddingX: 2,
         paddingY: 1,
         borderRadius: 3,
@@ -91,8 +95,10 @@ export default function BattleHeader({
                 ? t("combat_sim_empty_name_warning")
                 : ""
             }
-            inputProps={{ maxLength: 100 }}
             sx={{ width: "100%" }}
+            slotProps={{
+              htmlInput: { maxLength: 100 },
+            }}
           />
         ) : (
           <Box
@@ -127,7 +133,6 @@ export default function BattleHeader({
           </Box>
         )}
       </Box>
-
       {/* Center Section for Round - Always Centered */}
       <Box
         sx={{
@@ -139,15 +144,16 @@ export default function BattleHeader({
         }}
       >
         <Tooltip title={t("combat_sim_previous_round")}>
-          <IconButton
-            onClick={handleDecreaseRound}
-            color={isDarkMode ? "#fff" : "primary"}
-            size="small"
-            sx={{ padding: 1 }}
-            disabled={round <= 1}
-          >
-            <ArrowLeft fontSize={isMobile ? "small" : "medium"} />
-          </IconButton>
+          <span>
+            <IconButton
+              onClick={handleDecreaseRound}
+              size="small"
+              sx={{ padding: 1, color: isDarkMode ? "#fff" : "primary" }}
+              disabled={round <= 1}
+            >
+              <ArrowLeft fontSize={isMobile ? "small" : "medium"} />
+            </IconButton>
+          </span>
         </Tooltip>
         <Typography
           variant="h5"
@@ -164,15 +170,33 @@ export default function BattleHeader({
         <Tooltip title={t("combat_sim_next_round")}>
           <IconButton
             onClick={handleIncreaseRound}
-            color={isDarkMode ? "#fff" : "primary"}
             size="small"
-            sx={{ padding: 1 }}
+            sx={{ padding: 1, color: isDarkMode ? "#fff" : "primary" }}
           >
             <ArrowRight fontSize={isMobile ? "small" : "medium"} />
           </IconButton>
         </Tooltip>
+        <Tooltip
+          title={
+            combatActive
+              ? t("combat_sim_end_encounter")
+              : t("combat_sim_start_encounter")
+          }
+        >
+          <IconButton
+            onClick={onToggleCombat}
+            size="small"
+            color={combatActive ? "error" : "success"}
+            sx={{ padding: 1, ml: 0.5 }}
+          >
+            {combatActive ? (
+              <Stop fontSize={isMobile ? "small" : "medium"} />
+            ) : (
+              <PlayArrow fontSize={isMobile ? "small" : "medium"} />
+            )}
+          </IconButton>
+        </Tooltip>
       </Box>
-
       {/* Save Button & Status Section (Right) */}
       <Box
         sx={{
@@ -204,15 +228,17 @@ export default function BattleHeader({
               />
             </Tooltip>
           )}
-          
+
           {/* Save time text */}
           {isAutoSaveEnabled && lastAutoSaved > lastManualSaved ? (
             <>
               {autoSaveTimeText && (
                 <Typography
                   variant="caption"
-                  color="text.secondary"
-                  whiteSpace="nowrap"
+                  sx={{
+                    color: "text.secondary",
+                    whiteSpace: "nowrap",
+                  }}
                 >
                   {autoSaveTimeText}
                 </Typography>
@@ -223,8 +249,10 @@ export default function BattleHeader({
             timeAgo !== "Not saved yet" && (
               <Typography
                 variant="caption"
-                color="text.secondary"
-                whiteSpace="nowrap"
+                sx={{
+                  color: "text.secondary",
+                  whiteSpace: "nowrap",
+                }}
               >
                 {timeAgo}
               </Typography>
@@ -235,18 +263,20 @@ export default function BattleHeader({
         {/* Save Button */}
         {isMobile ? (
           <Tooltip title={t("combat_sim_save")}>
-            <IconButton
-              onClick={handleSaveState}
-              color="white"
-              size="small"
-              disabled={!isDirty}
-              sx={{
-                backgroundColor: "primary.main",
-                margin: 0,
-              }}
-            >
-              <Save fontSize="medium" />
-            </IconButton>
+            <span>
+              <IconButton
+                onClick={handleSaveState}
+                color="white"
+                size="small"
+                disabled={!isDirty}
+                sx={{
+                  backgroundColor: "primary.main",
+                  margin: 0,
+                }}
+              >
+                <Save fontSize="medium" />
+              </IconButton>
+            </span>
           </Tooltip>
         ) : (
           <Button

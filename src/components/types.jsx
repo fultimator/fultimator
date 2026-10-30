@@ -8,7 +8,8 @@ import {
   LightIcon,
   PhysicalIcon,
   PoisonIcon,
-  WindIcon,
+  AirIcon,
+  UntypedIcon,
 } from "./icons";
 import { useTranslate } from "../translation/translate";
 
@@ -17,7 +18,7 @@ export function TypeName({ type }) {
   return (
     <>
       {type === "physical" && t("Physical")}
-      {type === "wind" && t("Air")}
+      {type === "air" && t("Air")}
       {type === "bolt" && t("Bolt")}
       {type === "dark" && t("Dark")}
       {type === "earth" && t("Earth")}
@@ -25,6 +26,7 @@ export function TypeName({ type }) {
       {type === "ice" && t("Ice")}
       {type === "light" && t("Light")}
       {type === "poison" && t("Poison")}
+      {type === "untyped" && t("Untyped")}
     </>
   );
 }
@@ -33,7 +35,7 @@ export function TypeIcon({ type, disabled }) {
   return (
     <>
       {type === "physical" && <PhysicalIcon disabled={disabled} />}
-      {type === "wind" && <WindIcon disabled={disabled} />}
+      {type === "air" && <AirIcon disabled={disabled} />}
       {type === "bolt" && <BoltIcon disabled={disabled} />}
       {type === "dark" && <DarkIcon disabled={disabled} />}
       {type === "earth" && <EarthIcon disabled={disabled} />}
@@ -41,24 +43,34 @@ export function TypeIcon({ type, disabled }) {
       {type === "ice" && <IceIcon disabled={disabled} />}
       {type === "light" && <LightIcon disabled={disabled} />}
       {type === "poison" && <PoisonIcon disabled={disabled} />}
+      {type === "untyped" && <UntypedIcon disabled={disabled} />}
     </>
   );
 }
 
 export function TypeAffinity({ type, affinity }) {
-  if (!affinity) {
+  if (!affinity || affinity === "no") {
     affinity = "";
   }
   const disabled = affinity === "";
 
   return (
     <Typography
-      fontSize="inherit"
-      color="red.main"
-      fontWeight="bold"
-      fontFamily="inherit"
-      textAlign="left"
-      sx={{ textTransform: "uppercase", px: 0.2 }}
+      sx={{
+        fontSize: "inherit",
+        color: "red.main",
+        fontWeight: "bold",
+        fontFamily: "inherit",
+        textAlign: "center",
+        textTransform: "uppercase",
+        px: 0,
+        width: "100%",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        lineHeight: 1,
+      }}
     >
       {/* Type */}
       <TypeIcon type={type} disabled={disabled} />
@@ -66,15 +78,3 @@ export function TypeAffinity({ type, affinity }) {
     </Typography>
   );
 }
-
-export const typeList = [
-  "physical",
-  "wind",
-  "bolt",
-  "dark",
-  "earth",
-  "fire",
-  "ice",
-  "light",
-  "poison",
-];

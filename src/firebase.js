@@ -1,7 +1,13 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
+import {
+  initializeFirestore,
+  getFirestore,
+  persistentLocalCache,
+  persistentMultipleTabManager,
+} from "firebase/firestore";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
+import { IS_ELECTRON } from "./platform";
 
 // Firebase configuration
 const firebaseConfig = {
@@ -16,6 +22,21 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-export const firestore = getFirestore(app);
+// Enable IndexedDB offline cache - serves reads from local cache after first load
+let firestore;
+try {
+  firestore = initializeFirestore(app, {
+    cache: persistentLocalCache(
+      IS_ELECTRON ? {} : { tabManager: persistentMultipleTabManager() },
+    ),
+  });
+} catch {
+  firestore = getFirestore(app);
+}
+export { firestore };
 export const auth = getAuth(app);
 export const googleAuthProvider = new GoogleAuthProvider();
+// Separate provider used only when the user opts into Drive Sync, so a normal
+// sign-in does not trigger the Google Drive consent screen.
+export const driveAuthProvider = new GoogleAuthProvider();
+driveAuthProvider.addScope("https://www.googleapis.com/auth/drive.file");

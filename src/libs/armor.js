@@ -1,5 +1,18 @@
 const armor = [
   {
+    fuid: "no-armor",
+    category: "Armor",
+    name: "No Armor",
+    cost: 0,
+    def: 0,
+    mdef: 0,
+    armor: true,
+    martial: false,
+    init: 0,
+    meta: { book: "core", page: "", isOfficial: true },
+  },
+  {
+    fuid: "silk-shirt",
     category: "Armor",
     name: "Silk Shirt",
     cost: 100,
@@ -7,9 +20,11 @@ const armor = [
     mdef: 2,
     armor: true,
     martial: false,
-    init: -1
+    init: -1,
+    meta: { book: "core", page: "", isOfficial: true },
   },
   {
+    fuid: "travel-garb",
     category: "Armor",
     name: "Travel Garb",
     cost: 100,
@@ -17,9 +32,11 @@ const armor = [
     mdef: 1,
     armor: true,
     martial: false,
-    init: -1
+    init: -1,
+    meta: { book: "core", page: "", isOfficial: true },
   },
   {
+    fuid: "combat-tunic",
     category: "Armor",
     name: "Combat Tunic",
     cost: 150,
@@ -27,9 +44,11 @@ const armor = [
     mdef: 1,
     armor: true,
     martial: false,
-    init: 0
+    init: 0,
+    meta: { book: "core", page: "", isOfficial: true },
   },
   {
+    fuid: "sage-robe",
     category: "Armor",
     name: "Combat Tunic (Rework)",
     cost: 150,
@@ -37,9 +56,11 @@ const armor = [
     mdef: 0,
     armor: true,
     martial: false,
-    init: 0
+    init: 0,
+    meta: { book: "core", page: "", isOfficial: true },
   },
   {
+    fuid: "sage-robe",
     category: "Armor",
     name: "Sage Robe",
     cost: 200,
@@ -47,9 +68,11 @@ const armor = [
     mdef: 2,
     armor: true,
     martial: false,
-    init: -2
+    init: -2,
+    meta: { book: "core", page: "", isOfficial: true },
   },
   {
+    fuid: "brigandine",
     category: "Armor",
     name: "Brigandine",
     cost: 150,
@@ -57,9 +80,11 @@ const armor = [
     mdef: 0,
     armor: true,
     martial: true,
-    init: -2
+    init: -2,
+    meta: { book: "core", page: "", isOfficial: true },
   },
   {
+    fuid: "bronze-plate",
     category: "Armor",
     name: "Bronze Plate",
     cost: 200,
@@ -67,9 +92,11 @@ const armor = [
     mdef: 0,
     armor: true,
     martial: true,
-    init: -3
+    init: -3,
+    meta: { book: "core", page: "", isOfficial: true },
   },
   {
+    fuid: "runic-plate",
     category: "Armor",
     name: "Runic Plate",
     cost: 250,
@@ -77,9 +104,11 @@ const armor = [
     mdef: 1,
     armor: true,
     martial: true,
-    init: -3
+    init: -3,
+    meta: { book: "core", page: "", isOfficial: true },
   },
   {
+    fuid: "steel-plate",
     category: "Armor",
     name: "Steel Plate",
     cost: 300,
@@ -87,7 +116,8 @@ const armor = [
     mdef: 0,
     armor: true,
     martial: true,
-    init: -4
+    init: -4,
+    meta: { book: "core", page: "", isOfficial: true },
   },
 ];
 

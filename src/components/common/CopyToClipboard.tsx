@@ -1,6 +1,6 @@
-import { Button, Snackbar } from '@mui/material';
-import { useState } from 'react';
-import ContentCopyOutlinedIcon from '@mui/icons-material/ContentCopyOutlined';
+import { Button, Snackbar } from "@mui/material";
+import { useState } from "react";
+import ContentCopyOutlinedIcon from "@mui/icons-material/ContentCopyOutlined";
 import { useTranslate } from "../../translation/translate";
 
 interface CopyToClipboardProps {
@@ -26,7 +26,7 @@ const CopyToClipboard: React.FC<CopyToClipboardProps> = ({ textToCopy }) => {
         onClose={() => setOpen(false)}
         autoHideDuration={2000}
         message={t("Copied to Clipboard!")}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
       />
     </>
   );

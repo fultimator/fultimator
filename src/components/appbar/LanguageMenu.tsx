@@ -25,8 +25,8 @@ const LanguageMenu = () => {
       if (
         window.confirm(
           t(
-            "Switching language will clear out all your unsaved progress, would you like to continue?"
-          )
+            "Switching language will clear out all your unsaved progress, would you like to continue?",
+          ),
         )
       ) {
         window.location.reload();
@@ -41,7 +41,7 @@ const LanguageMenu = () => {
       <MenuItem
         onClick={handleClick}
         aria-label={`${t("Change Language to:", true)} ${getLanguageName(
-          selectedLanguage
+          selectedLanguage,
         )}`}
       >
         <ListItemIcon>
@@ -49,7 +49,7 @@ const LanguageMenu = () => {
         </ListItemIcon>
         <ListItemText
           primary={`${t("Language:", true)} ${getLanguageName(
-            selectedLanguage
+            selectedLanguage,
           )}`}
         />
       </MenuItem>

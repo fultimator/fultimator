@@ -1,14 +1,9 @@
-import {
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-} from "@mui/material";
+import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
 import { useTranslate } from "../../../translation/translate";
 import { accuracyChecks } from "./libs.jsx";
-import {attrNoTranslation} from "../../../libs/attributes";
+import { attrNoTranslation } from "../../../libs/attributes";
 
-function ChangeAccuracyCheck({ value, onChange }) {
+function ChangeAccuracyCheck({ value, onChange, disabled }) {
   const { t } = useTranslate();
 
   const handleChange = (event) => {
@@ -17,7 +12,7 @@ function ChangeAccuracyCheck({ value, onChange }) {
   };
 
   return (
-    <FormControl fullWidth>
+    <FormControl fullWidth size="small">
       <InputLabel id="type">{t("weapon_accuracy_check")}</InputLabel>
       <Select
         labelId="type"
@@ -25,6 +20,14 @@ function ChangeAccuracyCheck({ value, onChange }) {
         value={`${value.att1}_${value.att2}`}
         label={t("weapon_accuracy_check")}
         onChange={handleChange}
+        disabled={disabled}
+        sx={{
+          "& .MuiSelect-select": {
+            minHeight: "unset !important",
+            paddingTop: "8.5px",
+            paddingBottom: "8.5px",
+          },
+        }}
       >
         {accuracyChecks.map((check, index) => (
           <MenuItem key={index} value={`${check.att1}_${check.att2}`}>

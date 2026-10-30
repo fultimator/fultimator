@@ -1,0 +1,35 @@
+export const SLOT_TIERS = [
+  {
+    value: "alpha",
+    label: "slot α",
+    slots: 1,
+    mnemoMax: 1,
+    cost: 0,
+    costLabel: "Free",
+  },
+  {
+    value: "beta",
+    label: "slot β",
+    slots: 2,
+    mnemoMax: 1,
+    cost: 600,
+    costLabel: "+600z",
+  },
+  {
+    value: "gamma",
+    label: "slot γ",
+    slots: 3,
+    mnemoMax: 2,
+    cost: 1500,
+    costLabel: "+1500z",
+  },
+  {
+    value: "delta",
+    label: "slot δ",
+    slots: 4,
+    mnemoMax: 2,
+    cost: 1800,
+    costLabel: "+1800z",
+    weaponOnly: true,
+  },
+];

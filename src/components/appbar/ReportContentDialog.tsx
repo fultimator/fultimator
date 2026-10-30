@@ -60,7 +60,7 @@ const ReportContentDialog: React.FC<ReportContentDialogProps> = ({
     setSelectedReasons((prevReasons) =>
       prevReasons.includes(reason)
         ? prevReasons.filter((r) => r !== reason)
-        : [...prevReasons, reason]
+        : [...prevReasons, reason],
     );
   };
 
@@ -119,7 +119,7 @@ const ReportContentDialog: React.FC<ReportContentDialogProps> = ({
     } catch (error) {
       if (error instanceof Error) {
         setErrorMessage(
-          "There was a problem with the fetch operation: " + error.message
+          "There was a problem with the fetch operation: " + error.message,
         );
       } else {
         setErrorMessage("An unknown error occurred");
@@ -140,10 +140,12 @@ const ReportContentDialog: React.FC<ReportContentDialogProps> = ({
     <Dialog
       open={open}
       onClose={handleClose}
-      PaperProps={{
-        sx: {
-          width: "100%",
-          maxWidth: "sm",
+      slotProps={{
+        paper: {
+          sx: {
+            width: "100%",
+            maxWidth: "sm",
+          },
         },
       }}
     >
@@ -180,8 +182,10 @@ const ReportContentDialog: React.FC<ReportContentDialogProps> = ({
           rows={4}
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          inputProps={{
-            maxLength: 5000,
+          slotProps={{
+            htmlInput: {
+              maxLength: 5000,
+            },
           }}
         />
         <Typography variant="body2" sx={{ mt: 1 }}>
