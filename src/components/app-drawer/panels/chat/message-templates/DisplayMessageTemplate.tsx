@@ -14,7 +14,10 @@ import NotesMarkdown from "../../../../common/NotesMarkdown";
 import { TagRow } from "./primitives";
 import { formatSpellType } from "./primitives-utils";
 import Clock from "/src/components/shared/actors/pc/playerSheet/Clock";
-import { ACTION_ICON_SRC_BY_KEY } from "../../../../actionIconSrc";
+import {
+  ACTION_ICON_SRC_BY_KEY,
+  getActionIconSrc,
+} from "../../../../actionIconSrc";
 import { useChatActions } from "../ChatActionsContext.shared";
 
 interface DisplayMessageTemplateProps {
@@ -33,12 +36,15 @@ export const DisplayMessageTemplate: React.FC<DisplayMessageTemplateProps> = ({
   const tags = message.tags.map((t) =>
     t === "default" ? formatSpellType(t) : t,
   );
+  const iconInfo = getActionIconSrc(message.itemType);
   const iconSrc =
+    iconInfo?.src ??
     ACTION_ICON_SRC_BY_KEY[
       String(
         message.itemType || "",
       ).toLowerCase() as keyof typeof ACTION_ICON_SRC_BY_KEY
     ];
+  const fallbackSrc = iconInfo?.fallbackSrc;
   const clocks = (message.clocks ?? [])
     .map((clock) => {
       const sections = Number(clock?.sections) || 0;
@@ -84,7 +90,19 @@ export const DisplayMessageTemplate: React.FC<DisplayMessageTemplateProps> = ({
             <Box
               component="img"
               src={iconSrc}
-              alt={message.itemType}
+              alt=""
+              onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
+                const target = e.currentTarget;
+                if (
+                  fallbackSrc &&
+                  target.src !== fallbackSrc &&
+                  !target.src.endsWith(fallbackSrc)
+                ) {
+                  target.src = fallbackSrc;
+                } else {
+                  target.style.display = "none";
+                }
+              }}
               sx={{
                 width: 32,
                 height: 32,

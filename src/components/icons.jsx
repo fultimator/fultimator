@@ -1,4 +1,4 @@
-import { ACTION_ICON_SRC_BY_KEY } from "./actionIconSrc";
+import { ACTION_ICON_SRC_BY_KEY, getActionIconSrc } from "./actionIconSrc";
 
 const AFFINITY_ICON_BASE = "/assets/icons/affinities";
 const RESOURCE_ICON_BASE = "/assets/icons/resources";
@@ -183,12 +183,26 @@ export function ActionCommandIcon({ action, size = "1em", alt = "" }) {
   if (key === "check") {
     return <CheckOpenIcon size={size} />;
   }
-  const src = ACTION_ICON_SRC_BY_KEY[key];
+  const iconInfo = getActionIconSrc(action);
+  const src = iconInfo?.src ?? ACTION_ICON_SRC_BY_KEY[key];
   if (!src) return null;
+  const fallbackSrc = iconInfo?.fallbackSrc;
   return (
     <img
       src={src}
       alt={alt}
+      onError={(e) => {
+        const target = e.currentTarget;
+        if (
+          fallbackSrc &&
+          target.src !== fallbackSrc &&
+          !target.src.endsWith(fallbackSrc)
+        ) {
+          target.src = fallbackSrc;
+        } else {
+          target.style.display = "none";
+        }
+      }}
       style={{
         width: size,
         height: size,

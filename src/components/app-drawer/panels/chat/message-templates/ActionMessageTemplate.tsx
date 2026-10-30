@@ -3,7 +3,10 @@ import { Box, Typography } from "@mui/material";
 import type { ActionMessage } from "../types";
 import { t } from "../../../../../translation/translate";
 import NotesMarkdown from "../../../../common/NotesMarkdown";
-import { ACTION_ICON_SRC_BY_KEY } from "../../../../actionIconSrc";
+import {
+  ACTION_ICON_SRC_BY_KEY,
+  getActionIconSrc,
+} from "../../../../actionIconSrc";
 import { TagRow } from "./primitives";
 import { ChatActionZone } from "./ChatActionZone";
 
@@ -66,8 +69,11 @@ export const ActionMessageTemplate: React.FC<ActionMessageTemplateProps> = ({
     resolveLocalizedKey(labelCandidates, message.action),
   );
   const description = resolveLocalizedKey(ruleCandidates, "");
+  const actionIconInfo = getActionIconSrc(actionKey);
   const actionIconSrc =
+    actionIconInfo?.src ??
     ACTION_ICON_SRC_BY_KEY[actionKey as keyof typeof ACTION_ICON_SRC_BY_KEY];
+  const fallbackSrc = actionIconInfo?.fallbackSrc;
 
   return (
     <>
@@ -97,7 +103,19 @@ export const ActionMessageTemplate: React.FC<ActionMessageTemplateProps> = ({
             <Box
               component="img"
               src={actionIconSrc}
-              alt={label}
+              alt=""
+              onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
+                const target = e.currentTarget;
+                if (
+                  fallbackSrc &&
+                  target.src !== fallbackSrc &&
+                  !target.src.endsWith(fallbackSrc)
+                ) {
+                  target.src = fallbackSrc;
+                } else {
+                  target.style.display = "none";
+                }
+              }}
               sx={{
                 width: 32,
                 height: 32,
