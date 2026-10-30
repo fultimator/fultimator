@@ -125,7 +125,7 @@ export default function PlayerRituals({
             fontStyle: "italic",
             color: "text.secondary",
             fontSize: "0.9rem",
-            py: 1,
+            m: 1,
           }}
         >
           {t("No rituals")}
