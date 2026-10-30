@@ -436,8 +436,7 @@ export function resolveAttackOptions(
               .modules as Record<string, unknown>[];
             const vehicleSlotsObj =
               ((activeVehicle as Record<string, unknown>).slots as
-                | Record<string, unknown>
-                | undefined) ?? {};
+                Record<string, unknown> | undefined) ?? {};
 
             const weaponsBySlot: Record<string, Record<string, unknown>> = {};
             for (const slot of ["main", "off"] as const) {
@@ -707,10 +706,20 @@ export const resolveAttributeDie = (
     playerDoc.attributes
       ? (playerDoc.attributes as Record<string, unknown>)
       : null;
-  const raw = attrs?.[ATTRIBUTE_KEY[attribute]];
+  const raw =
+    (attribute === "wlp"
+      ? (attrs?.willpower ?? attrs?.will ?? attrs?.wlp)
+      : attribute === "mig"
+        ? (attrs?.might ?? attrs?.mig)
+        : attribute === "ins"
+          ? (attrs?.insight ?? attrs?.ins)
+          : (attrs?.dexterity ?? attrs?.dex)) ??
+    attrs?.[ATTRIBUTE_KEY[attribute]] ??
+    attrs?.[attribute];
   const val =
     raw && typeof raw === "object"
-      ? (raw as Record<string, unknown>).base
+      ? ((raw as Record<string, unknown>).current ??
+        (raw as Record<string, unknown>).base)
       : raw;
   return typeof val === "number" && val > 0 ? val : 8;
 };

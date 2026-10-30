@@ -156,7 +156,9 @@ const AttributeSection = ({ selectedNPC, calcAttr }) => {
     >
       {ATTRS.map(({ label, Icon, calcArgs, baseKey, colorKey }) => {
         const value = calcAttr(...calcArgs, selectedNPC);
-        const raw = selectedNPC?.attributes?.[baseKey];
+        const raw =
+          selectedNPC?.attributes?.[baseKey] ??
+          (baseKey === "will" ? selectedNPC?.attributes?.willpower : undefined);
         const base = raw && typeof raw === "object" ? raw.base : raw;
         const diff = base != null ? value - base : 0;
         const color = theme.palette[colorKey].main;

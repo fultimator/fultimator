@@ -12,7 +12,7 @@ function normalizeAttrKey(raw) {
   if (key === "mig" || key === "might") return "might";
   if (key === "wlp" || key === "will" || key === "willpower")
     return "willpower";
-  return "dexterity";
+  return key;
 }
 
 export default function ItemStatSubtitle({ item }) {

@@ -624,7 +624,9 @@ function PcNotesTab({
 }
 
 function calcPcAttr(_status1, _status2, attrKey, pc) {
-  const raw = pc?.attributes?.[attrKey];
+  const normalizedKey =
+    attrKey === "will" || attrKey === "wlp" ? "willpower" : attrKey;
+  const raw = pc?.attributes?.[normalizedKey] ?? pc?.attributes?.[attrKey];
   return raw && typeof raw === "object"
     ? (raw.current ?? raw.base ?? 0)
     : (raw ?? 0);
