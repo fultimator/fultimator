@@ -18,6 +18,29 @@ import { checkForUpdates } from "./menus";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
+function getAllowedRoots(): string[] {
+  return [
+    app.getPath("temp"),
+    app.getPath("userData"),
+    app.getPath("downloads"),
+  ].map((root) => path.resolve(root));
+}
+
+function assertPathAllowed(filePath: unknown): string {
+  if (typeof filePath !== "string" || filePath.length === 0) {
+    throw new Error("Invalid file path");
+  }
+  const resolved = path.resolve(filePath);
+  const allowed = getAllowedRoots().some((root) => {
+    const rel = path.relative(root, resolved);
+    return rel === "" || (!rel.startsWith("..") && !path.isAbsolute(rel));
+  });
+  if (!allowed) {
+    throw new Error("Access to this path is not allowed");
+  }
+  return resolved;
+}
+
 // Remove any pre-existing handlers if necessary
 function removeExistingHandlers() {
   const handlers = [
@@ -140,7 +163,8 @@ export function setupIpcHandlers(mainWindow: BrowserWindow) {
   // Handle file read
   ipcMain.handle("read-file", async (event, filePath) => {
     try {
-      const fileContent = fs.readFileSync(filePath, "utf-8");
+      const safePath = assertPathAllowed(filePath);
+      const fileContent = fs.readFileSync(safePath, "utf-8");
       return fileContent;
     } catch (error) {
       console.error("Failed to read file", error);
@@ -163,7 +187,8 @@ export function setupIpcHandlers(mainWindow: BrowserWindow) {
   // Handle file open
   ipcMain.handle("open-file", async (event, filePath) => {
     try {
-      await shell.openPath(filePath);
+      const safePath = assertPathAllowed(filePath);
+      await shell.openPath(safePath);
       return true;
     } catch (error) {
       console.error("Failed to open file", error);
@@ -174,7 +199,8 @@ export function setupIpcHandlers(mainWindow: BrowserWindow) {
   // Handle showing a file in folder
   ipcMain.handle("show-file-in-folder", async (event, filePath: string) => {
     try {
-      await shell.showItemInFolder(filePath);
+      const safePath = assertPathAllowed(filePath);
+      await shell.showItemInFolder(safePath);
       return true;
     } catch (error) {
       console.error("Failed to show file in folder:", error);
