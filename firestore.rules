@@ -1,6 +1,47 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    function isOwner() {
+      return request.auth != null
+        && resource != null
+        && resource.data.uid == request.auth.uid;
+    }
+
+    function ownsIncoming() {
+      return request.auth != null
+        && request.resource.data.uid == request.auth.uid;
+    }
+
+    match /player-personal/{docId} {
+      allow read: if isOwner() || resource.data.published == true;
+      allow create: if ownsIncoming();
+      allow update, delete: if isOwner();
+    }
+
+    match /npc-personal/{docId} {
+      allow read: if isOwner() || resource.data.published == true;
+      allow create: if ownsIncoming();
+      allow update, delete: if isOwner();
+    }
+
+    match /encounters/{docId} {
+      allow read: if isOwner();
+      allow create: if ownsIncoming();
+      allow update, delete: if isOwner();
+    }
+
+    match /rolls/{docId} {
+      allow read: if true;
+      allow create: if ownsIncoming();
+      allow update, delete: if isOwner();
+    }
+
+    match /rolls-prepared/{docId} {
+      allow read: if isOwner();
+      allow create: if ownsIncoming();
+      allow update, delete: if isOwner();
+    }
+
     match /{document=**} {
       allow read, write: if false;
     }
