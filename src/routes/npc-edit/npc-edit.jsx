@@ -169,15 +169,21 @@ export default function NpcEdit() {
 
   const appDrawerOpen = useThemeStore((s) => s.drawerOpen);
   const [savedSnackbarOpen, setSavedSnackbarOpen] = useState(false);
+  const [saveErrorSnackbarOpen, setSaveErrorSnackbarOpen] = useState(false);
   const isDesktop = useMediaQuery("(min-width: 769px)");
 
-  const handleSave = useCallback(() => {
-    setIsUpdated(false);
-    activeSetDoc(
-      ref,
-      stampSave(applyNpcPreSaveTransforms(npcTemp), npcTemp.publishedAt),
-    );
-    setSavedSnackbarOpen(true);
+  const handleSave = useCallback(async () => {
+    try {
+      await activeSetDoc(
+        ref,
+        stampSave(applyNpcPreSaveTransforms(npcTemp), npcTemp.publishedAt),
+      );
+      setIsUpdated(false);
+      setSavedSnackbarOpen(true);
+    } catch (error) {
+      console.error("Failed to save NPC:", error);
+      setSaveErrorSnackbarOpen(true);
+    }
   }, [ref, npcTemp, activeSetDoc]);
 
   useDrawerSave({ canSave: isOwner && isUpdated, onSave: handleSave });
@@ -673,6 +679,21 @@ export default function NpcEdit() {
             sx={{ width: "100%" }}
           >
             {t("Saved")}
+          </Alert>
+        </Snackbar>
+        <Snackbar
+          open={saveErrorSnackbarOpen}
+          autoHideDuration={5000}
+          onClose={() => setSaveErrorSnackbarOpen(false)}
+          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        >
+          <Alert
+            onClose={() => setSaveErrorSnackbarOpen(false)}
+            severity="error"
+            variant="filled"
+            sx={{ width: "100%" }}
+          >
+            {t("Failed to save. Your changes have not been saved.")}
           </Alert>
         </Snackbar>
         {isSmallScreen && (

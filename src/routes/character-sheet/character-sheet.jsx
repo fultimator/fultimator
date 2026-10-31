@@ -182,10 +182,20 @@ export default function CharacterSheet() {
     });
   }, []);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (isOwner && player) {
-      db.setDoc(ref, applyPreSaveTransforms(player));
-      setIsUpdated(false);
+      try {
+        await db.setDoc(ref, applyPreSaveTransforms(player));
+        setIsUpdated(false);
+      } catch (error) {
+        console.error("Failed to save character sheet:", error);
+        const message = t("Failed to save. Your changes have not been saved.");
+        if (window.electron && typeof window.electron.alert === "function") {
+          window.electron.alert(message);
+        } else {
+          window.alert(message);
+        }
+      }
     }
   };
 
