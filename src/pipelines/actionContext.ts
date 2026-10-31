@@ -27,9 +27,7 @@ export type ResourceEvent =
     };
 
 export type CheckResult_Any =
-  | AccuracyCheckResult
-  | MagicCheckResult
-  | CheckResult;
+  AccuracyCheckResult | MagicCheckResult | CheckResult;
 
 export interface WeaponRef {
   source: "weapons" | "customWeapons";

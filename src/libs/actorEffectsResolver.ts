@@ -27,11 +27,7 @@ import type { TypeNpc } from "../types/Npcs";
 
 type Actor = TypePlayer | TypeNpc;
 type PlayerEquipmentItem =
-  | Weapons
-  | CustomWeapons
-  | Shields
-  | Armor
-  | Accessories;
+  Weapons | CustomWeapons | Shields | Armor | Accessories;
 type SlottedEquipmentItem = (Weapons | CustomWeapons) & { slotted?: string[] };
 
 export interface ResolveContext {

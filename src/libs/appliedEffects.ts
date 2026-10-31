@@ -73,11 +73,7 @@ export function isAppliedEffectActive(
 }
 
 export type SweepEvent =
-  | "start-of-turn"
-  | "end-of-turn"
-  | "end-of-round"
-  | "end-of-scene"
-  | "rest";
+  "start-of-turn" | "end-of-turn" | "end-of-round" | "end-of-scene" | "rest";
 
 export interface SweepContext {
   event: SweepEvent;

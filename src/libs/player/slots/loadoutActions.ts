@@ -138,8 +138,7 @@ function patchInv(
     [source]: updater(
       ((
         player.equipment?.[0] as unknown as
-          | Record<string, AnyEquipmentItem[]>
-          | undefined
+          Record<string, AnyEquipmentItem[]> | undefined
       )?.[source] ?? []) as AnyEquipmentItem[],
     ),
   } as unknown;
@@ -456,9 +455,7 @@ export function selectModuleForSlot(
     );
 
     let resolvedWeaponSlot: "main" | "off" | "both" = targetSlot as
-      | "main"
-      | "off"
-      | "both";
+      "main" | "off" | "both";
     if (selectingWeapon) {
       if (targetModule.cumbersome) {
         resolvedWeaponSlot = "both";

@@ -19,14 +19,7 @@ export interface DbError {
 // Do not use Firebase operators not in this list (e.g., array-contains-any)
 // without first implementing support in the local adapter.
 export type WhereOp =
-  | "=="
-  | "!="
-  | "<"
-  | "<="
-  | ">"
-  | ">="
-  | "array-contains"
-  | "in";
+  "==" | "!=" | "<" | "<=" | ">" | ">=" | "array-contains" | "in";
 
 export interface WriteBatch {
   set: (ref: unknown, data: unknown) => void;

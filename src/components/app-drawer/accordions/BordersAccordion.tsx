@@ -58,10 +58,7 @@ export const BordersAccordion = React.memo(function BordersAccordion({
                   onChange={(e) =>
                     setCustomization({
                       bevelBorderStyle: e.target.value as
-                        | "solid"
-                        | "dashed"
-                        | "dotted"
-                        | "double",
+                        "solid" | "dashed" | "dotted" | "double",
                     })
                   }
                 >

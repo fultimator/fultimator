@@ -97,17 +97,12 @@ export const validateCharacter = (character) => {
       ) {
         errors.push(`Missing: ${stat} in stats`);
       } else {
-        const subProps = ["max", "current"];
-        for (const prop of subProps) {
-          if (
-            !Object.prototype.hasOwnProperty.call(
-              character.stats[stat],
-              prop,
-            ) ||
-            typeof character.stats[stat][prop] !== "number"
-          ) {
-            errors.push(`Missing or invalid: ${stat} ${prop} in stats`);
-          }
+        const cap = character.stats[stat].base ?? character.stats[stat].max;
+        if (typeof cap !== "number") {
+          errors.push(`Missing or invalid: ${stat} base/max in stats`);
+        }
+        if (typeof character.stats[stat].current !== "number") {
+          errors.push(`Missing or invalid: ${stat} current in stats`);
         }
       }
     }
@@ -121,10 +116,6 @@ export const validateCharacter = (character) => {
     "weak",
     "shaken",
     "poisoned",
-    "dexUp",
-    "insUp",
-    "migUp",
-    "wlpUp",
   ];
   if (
     typeof character.statuses !== "object" ||

@@ -37,11 +37,7 @@ export type ThemeValue =
   | "MidnightBlue";
 
 export type StyleProfileValue =
-  | "ThemeDefault"
-  | "Flat"
-  | "Regalia"
-  | "Dystopian"
-  | "Noir";
+  "ThemeDefault" | "Flat" | "Regalia" | "Dystopian" | "Noir";
 
 interface ThemeStore {
   selectedTheme: ThemeValue;

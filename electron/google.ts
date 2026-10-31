@@ -258,15 +258,13 @@ export async function listGoogleDriveFiles() {
 
 export function getStoredIdToken(): string | null {
   const tokens = store.get("googleTokens") as
-    | Record<string, string>
-    | undefined;
+    Record<string, string> | undefined;
   return tokens?.id_token ?? null;
 }
 
 export function getStoredAccessToken(): string | null {
   const tokens = store.get("googleTokens") as
-    | Record<string, string>
-    | undefined;
+    Record<string, string> | undefined;
   return tokens?.access_token ?? null;
 }
 

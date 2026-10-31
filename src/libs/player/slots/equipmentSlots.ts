@@ -14,11 +14,7 @@ import {
 // Types
 // Vehicle helpers
 export type AnyEquipmentItem =
-  | Weapons
-  | CustomWeapons
-  | Armor
-  | Shields
-  | Accessories;
+  Weapons | CustomWeapons | Armor | Shields | Accessories;
 // deriveVehicleSlots
 export type ResolvedPlayerItem = AnyEquipmentItem;
 // deriveEquippedSlots
@@ -244,8 +240,7 @@ export function isItemEquipped(
     if (ref.index !== undefined) {
       // Index-aware match: only the item at that exact position qualifies
       const arr = inv?.[ref.source as keyof typeof inv] as
-        | AnyEquipmentItem[]
-        | undefined;
+        AnyEquipmentItem[] | undefined;
       return arr?.[ref.index] === item;
     }
     // Legacy: name-only (backward compat for refs without an index)
@@ -303,8 +298,7 @@ export function validateSlots(player: TypePlayer): TypePlayer {
   const isValid = (ref: SlotRef | null | undefined): boolean => {
     if (!ref) return true;
     const arr = inv?.[ref.source as keyof typeof inv] as
-      | AnyEquipmentItem[]
-      | undefined;
+      AnyEquipmentItem[] | undefined;
     if (!arr) return false;
     if (ref.index !== undefined) return !!arr[ref.index];
     return arr.some((it: AnyEquipmentItem) => it.name === ref.name);
@@ -370,8 +364,7 @@ export function resolveEffectiveSlot(
 
   const inv = player.equipment?.[0];
   const arr = inv?.[ref.source as keyof typeof inv] as
-    | ResolvedPlayerItem[]
-    | undefined;
+    ResolvedPlayerItem[] | undefined;
   const item =
     ref.index !== undefined
       ? arr?.[ref.index]

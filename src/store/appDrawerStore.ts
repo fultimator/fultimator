@@ -3,11 +3,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 export type DrawerTab =
-  | "chat"
-  | "actorSelect"
-  | "progressClocks"
-  | "customizer"
-  | "themes";
+  "chat" | "actorSelect" | "progressClocks" | "customizer" | "themes";
 
 export interface DrawerBottomAction {
   id: string;

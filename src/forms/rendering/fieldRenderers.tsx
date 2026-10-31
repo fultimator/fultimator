@@ -1363,9 +1363,7 @@ export function ObjectListRenderer({
     [componentProps?.fields],
   );
   const itemDefaultsProp = componentProps?.itemDefaults as
-    | Record<string, unknown>
-    | (() => Record<string, unknown>)
-    | undefined;
+    Record<string, unknown> | (() => Record<string, unknown>) | undefined;
   const makeItemDefaults = (): Record<string, unknown> =>
     typeof itemDefaultsProp === "function"
       ? itemDefaultsProp()
@@ -1377,8 +1375,7 @@ export function ObjectListRenderer({
   const addLabel = (componentProps?.addLabel as string) ?? "Add";
   const variant = (componentProps?.variant as string | undefined) ?? "";
   const rowLabel = componentProps?.rowLabel as
-    | ((row: Record<string, unknown>, i: number) => string)
-    | undefined;
+    ((row: Record<string, unknown>, i: number) => string) | undefined;
   const renderNestedFields = componentProps?.renderNestedFields as
     | ((args: {
         config: import("./config/fieldConfig").ItemFieldConfig<
@@ -1393,8 +1390,7 @@ export function ObjectListRenderer({
       }) => React.ReactNode)
     | undefined;
   const nestedGroupLabels = componentProps?.groupLabels as
-    | GroupLabels
-    | undefined;
+    GroupLabels | undefined;
 
   const rows = useMemo(
     () => (value as Record<string, unknown>[]) ?? [],
@@ -1402,8 +1398,7 @@ export function ObjectListRenderer({
   );
   const isBehaviorCard = variant === "behavior-card";
   const initialExpandedIndex = componentProps?.initialExpandedIndex as
-    | number
-    | undefined;
+    number | undefined;
   const [expandedRows, setExpandedRows] = useState<Record<number, boolean>>(
     () =>
       initialExpandedIndex !== undefined

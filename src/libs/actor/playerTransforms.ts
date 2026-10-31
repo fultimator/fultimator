@@ -780,8 +780,7 @@ function unifyPlayerWeaponSchema(player: TypePlayer): TypePlayer {
     ) {
       const damageObj = w.damage as Record<string, unknown>;
       const secondDamageObj = w.secondDamage as
-        | Record<string, unknown>
-        | undefined;
+        Record<string, unknown> | undefined;
       const rare = (w.rare as Record<string, unknown> | undefined) ?? {};
       const modifiers =
         (w.modifiers as Record<string, unknown> | undefined) ?? {};
@@ -865,13 +864,11 @@ function unifyPlayerWeaponSchema(player: TypePlayer): TypePlayer {
           overrideAccuracyAttr1:
             (rare.overrideAccuracyAttr1 as string | undefined) ??
             ((w.accuracy as Record<string, unknown> | undefined)?.attr1 as
-              | string
-              | undefined),
+              string | undefined),
           overrideAccuracyAttr2:
             (rare.overrideAccuracyAttr2 as string | undefined) ??
             ((w.accuracy as Record<string, unknown> | undefined)?.attr2 as
-              | string
-              | undefined),
+              string | undefined),
         },
         ...(w.secondSelectedCategory
           ? {

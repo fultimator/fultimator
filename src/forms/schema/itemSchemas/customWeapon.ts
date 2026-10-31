@@ -370,8 +370,7 @@ export function buildCustomWeaponSavePayload(
     | { attr1: string; attr2: string; value: number; defense: string }
     | undefined;
   let secondDamage:
-    | { value: number; type: string; hrZero: boolean }
-    | undefined;
+    { value: number; type: string; hrZero: boolean } | undefined;
   if (formState.hasTransforming) {
     const { precision: s2prec, damage: s2dmg } = calculateCustomWeaponStats(
       {

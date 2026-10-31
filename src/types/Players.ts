@@ -253,11 +253,7 @@ export interface PlayerEquipment {
 }
 
 export type AnyEquipmentItem =
-  | Weapons
-  | CustomWeapons
-  | Armor
-  | Shields
-  | Accessories;
+  Weapons | CustomWeapons | Armor | Shields | Accessories;
 
 export interface Martials {
   armor: boolean;
@@ -333,11 +329,7 @@ export interface TypePlayer {
 export type PlayerCanonical = PlayerPersistedSchemaType;
 
 export type EquipmentSource =
-  | "weapons"
-  | "customWeapons"
-  | "shields"
-  | "armor"
-  | "accessories";
+  "weapons" | "customWeapons" | "shields" | "armor" | "accessories";
 
 /** Points to a player inventory item by its array name + item display name.
  *  `index` disambiguates when two items share the same name. */

@@ -67,10 +67,7 @@ export interface QueryRef {
   _type: "query";
   collection: CollectionRef;
   constraints: (
-    | WhereConstraint
-    | OrderByConstraint
-    | LimitConstraint
-    | StartAfterConstraint
+    WhereConstraint | OrderByConstraint | LimitConstraint | StartAfterConstraint
   )[];
 }
 
@@ -117,10 +114,7 @@ export function startAfter(snapshot: unknown): StartAfterConstraint {
 export function query(
   ref: CollectionRef,
   ...constraints: (
-    | WhereConstraint
-    | OrderByConstraint
-    | LimitConstraint
-    | StartAfterConstraint
+    WhereConstraint | OrderByConstraint | LimitConstraint | StartAfterConstraint
   )[]
 ): QueryRef {
   return { _type: "query", collection: ref, constraints };
@@ -515,8 +509,7 @@ function getIpc(): IPC | undefined {
 /** Returns true if the user has an active Google Drive session on desktop. */
 export async function checkDriveAuth(): Promise<boolean> {
   const result = (await getIpc()?.invoke("check-auth")) as
-    | { isAuthenticated: boolean }
-    | undefined;
+    { isAuthenticated: boolean } | undefined;
   return result?.isAuthenticated ?? false;
 }
 

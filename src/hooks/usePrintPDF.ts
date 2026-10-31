@@ -558,8 +558,7 @@ function buildFieldMap(player: TypePlayer): Record<string, string | boolean> {
   // HP / MP / IP
   type RuntimeStat = { base: number; current: number; max?: number };
   const stats = player.stats as
-    | { hp: RuntimeStat; mp: RuntimeStat; ip: RuntimeStat }
-    | undefined;
+    { hp: RuntimeStat; mp: RuntimeStat; ip: RuntimeStat } | undefined;
   const hpMax = stats?.hp?.max ?? 0;
   fields["Campo testo 280"] = String(hpMax);
   fields["Campo testo 281"] = String(Math.floor(hpMax / 2));
@@ -686,8 +685,7 @@ function buildFieldMap(player: TypePlayer): Record<string, string | boolean> {
   const findEquipItem = (ref: typeof player.equippedSlots.mainHand) => {
     if (!ref || !inv) return null;
     const arr = inv[ref.source as keyof typeof inv] as
-      | { name: string }[]
-      | undefined;
+      { name: string }[] | undefined;
     if (!arr) return null;
     const matches = arr.filter((item) => item.name === ref.name);
     return matches[ref.index ?? 0] ?? matches[0] ?? null;

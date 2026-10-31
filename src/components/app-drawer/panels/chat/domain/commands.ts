@@ -256,7 +256,7 @@ export function parseActionAttackArgs(rawArg: string): {
   const overrides: AttackOverrides = {};
   if (!rest) return { weaponName, overrides };
   const tokens = rest.split(/\s+/);
-  for (let i = 0; i < tokens.length; ) {
+  for (let i = 0; i < tokens.length;) {
     const rawFlag = tokens[i];
     if (
       rawFlag?.toLowerCase() === "hr0" ||
@@ -345,7 +345,7 @@ export function parseActionSpellArgs(rawArg: string): {
   } = {};
   if (!rest) return { spellArg, overrides };
   const tokens = rest.split(/\s+/);
-  for (let i = 0; i < tokens.length; ) {
+  for (let i = 0; i < tokens.length;) {
     const rawFlag = tokens[i];
     if (
       rawFlag?.toLowerCase() === "hr0" ||
@@ -890,8 +890,7 @@ function resolveActiveBehaviorOutputs(
     if (!weaponName) return [];
     const options = resolveAttackOptions(context.playerDoc);
     const weapon = options.find((o) => o.name === weaponName) as
-      | ((typeof options)[number] & { behaviors?: Behavior[] })
-      | undefined;
+      ((typeof options)[number] & { behaviors?: Behavior[] }) | undefined;
     if (!weapon) return [];
     return collectActiveBehaviorOutputs(
       weapon.behaviors,
