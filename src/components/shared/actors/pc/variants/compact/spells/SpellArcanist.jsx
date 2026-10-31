@@ -14,6 +14,8 @@ import { ArrowForward } from "@mui/icons-material";
 import { styled } from "@mui/system";
 import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
+import rehypeSanitize from "rehype-sanitize";
+import { markdownSanitizeSchema } from "/src/utility/markdownSanitizeSchema";
 import { useTranslate } from "/src/translation/translate";
 import { useCustomTheme } from "/src/hooks/useCustomTheme";
 import { sendDisplayMessage } from "/src/hooks/useRollToChat";
@@ -45,7 +47,7 @@ const StyledMarkdown = ({ children, ...props }) => {
     >
       <ReactMarkdown
         {...props}
-        rehypePlugins={[rehypeRaw]}
+        rehypePlugins={[rehypeRaw, [rehypeSanitize, markdownSanitizeSchema]]}
         components={{
           p: (props) => (
             <p
@@ -186,7 +188,10 @@ export default function SpellArcanist({
                 t("No Description")
               ) : (
                 <ReactMarkdown
-                  rehypePlugins={[rehypeRaw]}
+                  rehypePlugins={[
+                    rehypeRaw,
+                    [rehypeSanitize, markdownSanitizeSchema],
+                  ]}
                   allowedElements={["strong", "em", "mark"]}
                   unwrapDisallowed={true}
                   components={{
