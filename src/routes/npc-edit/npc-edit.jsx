@@ -147,17 +147,16 @@ export default function NpcEdit() {
   const isOwner = isLocalNpc || Boolean(user && npc && user.uid === npc.uid);
 
   const [isUpdated, setIsUpdated] = useState(false); // State for unsaved changes
+  const isUpdatedRef = useRef(false);
   const [npcTemp, setNpcTemp] = useState(() =>
     npc ? applyNpcPostLoadTransforms(JSON.parse(JSON.stringify(npc))) : npc,
   ); // Temporary NPC state
 
-  // Effect to update temporary NPC state when NPC data changes.
-  // Apply post-load transforms so migrations are reflected in the editor.
+  // Sync incoming changes only when there are no unsaved local edits
   useEffect(() => {
-    if (npc) {
-      setNpcTemp(applyNpcPostLoadTransforms(JSON.parse(JSON.stringify(npc))));
-      setIsUpdated(false);
-    }
+    if (!npc || isUpdatedRef.current) return;
+    setNpcTemp(applyNpcPostLoadTransforms(JSON.parse(JSON.stringify(npc))));
+    setIsUpdated(false);
   }, [npc]);
 
   useEffect(() => {
@@ -166,6 +165,10 @@ export default function NpcEdit() {
       : npc;
     setIsUpdated(!deepEqual(npcTemp, baseline));
   }, [npcTemp, npc]);
+
+  useEffect(() => {
+    isUpdatedRef.current = isUpdated;
+  }, [isUpdated]);
 
   const appDrawerOpen = useThemeStore((s) => s.drawerOpen);
   const [savedSnackbarOpen, setSavedSnackbarOpen] = useState(false);

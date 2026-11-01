@@ -192,6 +192,10 @@ export default function PlayerEdit() {
   const playerError = isUsingLocalDb ? localError : cloudError;
 
   const [isUpdated, setIsUpdated] = useState(false); // State for unsaved changes
+  const isUpdatedRef = useRef(false);
+  useEffect(() => {
+    isUpdatedRef.current = isUpdated;
+  }, [isUpdated]);
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [playerTemp, setPlayerTemp] = useState(() =>
     player
@@ -289,15 +293,15 @@ export default function PlayerEdit() {
     return () => window.removeEventListener("resize", onResize);
   }, []);
 
+  // Sync incoming changes only when there are no unsaved local edits
   useEffect(() => {
-    if (player) {
-      const updatedPlayerTemp = applyPostLoadTransforms(
-        JSON.parse(JSON.stringify(player)),
-      );
-      setPlayerTemp(updatedPlayerTemp);
-      setIsUpdated(false);
-      setCompactView(updatedPlayerTemp?.settings?.defaultView === "compact");
-    }
+    if (!player || isUpdatedRef.current) return;
+    const updatedPlayerTemp = applyPostLoadTransforms(
+      JSON.parse(JSON.stringify(player)),
+    );
+    setPlayerTemp(updatedPlayerTemp);
+    setIsUpdated(false);
+    setCompactView(updatedPlayerTemp?.settings?.defaultView === "compact");
   }, [player]);
 
   useEffect(() => {
