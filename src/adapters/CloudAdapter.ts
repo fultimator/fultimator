@@ -23,8 +23,16 @@ import {
   useCollectionData as useCollectionDataFirestore,
   useDocumentData as useDocumentDataFirestore,
 } from "react-firebase-hooks/firestore";
-import { firestore } from "../firebase";
-import { STORES, getDb } from "../platform/idb";
+import { auth, firestore } from "../firebase";
+
+// User-owned collections included in cloud exports
+const CLOUD_EXPORT_STORES = [
+  "npc-personal",
+  "player-personal",
+  "encounters",
+  "rolls",
+  "rolls-prepared",
+] as const;
 import type {
   DatabaseAdapter,
   DbError,
@@ -171,12 +179,20 @@ export const CloudAdapter: DatabaseAdapter = {
   },
 
   async exportAll() {
-    // Export from local IDB (mirrors what Drive sync does today).
-    // A future migrateToMode utility should use Firestore getDocs per collection instead.
-    const db = await getDb();
+    const uid = auth.currentUser?.uid;
+    if (!uid) {
+      throw { code: "permission-denied", message: "Not authenticated" };
+    }
     const result: Record<string, unknown[]> = {};
-    for (const store of STORES) {
-      result[store] = await db.getAll(store);
+    try {
+      for (const store of CLOUD_EXPORT_STORES) {
+        const snap = await fsGetDocs(
+          query(collection(firestore, store), where("uid", "==", uid)),
+        );
+        result[store] = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      }
+    } catch (err) {
+      throw normalizeFirestoreError(err);
     }
     return result;
   },
