@@ -66,7 +66,7 @@ export function calcHP(npc) {
   let hp = 2 * lvl + 5 * might;
 
   // Skill Extra HP
-  const hpBonus = npc.resources?.hp.bonus ?? npc.extra?.hp ?? 0;
+  const hpBonus = npc.resources?.hp?.bonus ?? npc.extra?.hp ?? 0;
   if (hpBonus) {
     hp += parseInt(hpBonus);
   }
@@ -100,7 +100,7 @@ export function calcHP(npc) {
     const sl = npc.companionlvl || 1;
     const lvl = npc.companionpclvl || 5;
     const extraHP =
-      npc.resources?.hp.bonus ?? (npc.extra?.hp ? parseInt(npc.extra.hp) : 0);
+      npc.resources?.hp?.bonus ?? (npc.extra?.hp ? parseInt(npc.extra.hp) : 0);
     hp = sl * might + Math.floor(lvl / 2) + extraHP;
   }
 
@@ -117,7 +117,7 @@ export function calcMP(npc) {
   const lvl = Number(npc.lvl) || 1;
   let mp = lvl + 5 * will;
   // Skill Extra MP
-  const mpBonus = npc.resources?.mp.bonus ?? npc.extra?.mp ?? 0;
+  const mpBonus = npc.resources?.mp?.bonus ?? npc.extra?.mp ?? 0;
   if (mpBonus) {
     mp += parseInt(mpBonus);
   }
@@ -143,7 +143,7 @@ export function calcInit(npc) {
   let init = (dexterity + insight) / 2;
 
   // Skill Extra Init
-  const initBonus = npc.derived?.init.bonus ?? npc.extra?.extrainit ?? 0;
+  const initBonus = npc.derived?.init?.bonus ?? npc.extra?.extrainit ?? 0;
   let flatinit = Number(initBonus);
   if (!isNaN(flatinit)) {
     init += flatinit;
@@ -350,28 +350,28 @@ export function calcAvailableSkillsFromLevel(npc) {
 
 export function calcAvailableSkillsFromVulnerabilities(npc) {
   let sum = 0;
-  Object.entries(npc.affinities).forEach((el) => {
+  Object.entries(npc.affinities ?? {}).forEach((el) => {
     if (el[1] === "vu") {
       sum++;
     }
   });
 
-  if (npc.affinities.physical === "vu") {
+  if (npc.affinities?.physical === "vu") {
     sum++;
   }
 
   // Undeads are vulnerable to light
-  if (npc.species === "Undead" && npc.affinities.light === "vu") {
+  if (npc.species === "Undead" && npc.affinities?.light === "vu") {
     sum = sum - 1;
   }
 
   // Plants have a free vulnerability
   if (
     npc.species === "Plant" &&
-    (npc.affinities.fire ||
-      npc.affinities.air ||
-      npc.affinities.ice ||
-      npc.affinities.bolt)
+    (npc.affinities?.fire ||
+      npc.affinities?.air ||
+      npc.affinities?.ice ||
+      npc.affinities?.bolt)
   ) {
     sum = sum - 1;
   }
@@ -517,7 +517,7 @@ export function calcUsedSkillsFromExtraMagic(npc) {
 
 export function calcUsedSkillsFromResistances(npc) {
   let sum = 0;
-  Object.entries(npc.affinities).forEach((el) => {
+  Object.entries(npc.affinities ?? {}).forEach((el) => {
     if (el[1] === "rs") {
       // Don't count earth for Construct
       if (npc.species === "Construct" && el[0] === "earth") {
@@ -542,7 +542,7 @@ export function calcUsedSkillsFromResistances(npc) {
 
 export function calcUsedSkillsFromImmunities(npc) {
   let sum = 0;
-  Object.entries(npc.affinities).forEach((el) => {
+  Object.entries(npc.affinities ?? {}).forEach((el) => {
     if (el[1] === "im") {
       // Don't count poison for Construct, Elemental, Non Mortto
       if (
@@ -577,7 +577,7 @@ export function calcUsedSkillsFromImmunities(npc) {
 
 export function calcUsedSkillsFromAbsorbs(npc) {
   let sum = 0;
-  Object.entries(npc.affinities).forEach((el) => {
+  Object.entries(npc.affinities ?? {}).forEach((el) => {
     if (el[1] === "ab") {
       sum++;
     }
