@@ -943,6 +943,11 @@ export default function usePrintPDF() {
     const response = await fetch(
       "/pdf/Fabula-Ultima-Sheets-Quirks-Optional.pdf",
     );
+    if (!response.ok) {
+      throw new Error(
+        `PDF template not found (${response.status} ${response.statusText})`,
+      );
+    }
     const pdf = await PDF.load(new Uint8Array(await response.arrayBuffer()));
     const form = pdf.getForm();
     if (!form) {
