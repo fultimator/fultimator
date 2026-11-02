@@ -366,13 +366,10 @@ export function calcAvailableSkillsFromVulnerabilities(npc) {
   }
 
   // Plants have a free vulnerability
-  if (
-    npc.species === "Plant" &&
-    (npc.affinities?.fire ||
-      npc.affinities?.air ||
-      npc.affinities?.ice ||
-      npc.affinities?.bolt)
-  ) {
+  const isPlantVulnerable = ["fire", "air", "ice", "bolt"].some(
+    (el) => npc.affinities?.[el] === "vu",
+  );
+  if (npc.species === "Plant" && isPlantVulnerable) {
     sum = sum - 1;
   }
   if (sum < 0) {
