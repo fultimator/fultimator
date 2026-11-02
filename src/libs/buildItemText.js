@@ -371,7 +371,9 @@ function buildPcText(player, md) {
   }
 
   // Equipment summary
-  const equip = player.equipment ?? {};
+  const equip = Array.isArray(player.equipment)
+    ? (player.equipment[0] ?? {})
+    : (player.equipment ?? {});
   const equipLines = [];
   if (equip.weapons?.length) {
     for (const w of equip.weapons) {
