@@ -76,7 +76,7 @@ class ErrorBoundary extends Component {
     }));
 
     // Prepare error report content
-    const reportContent = `Error Report:\n\n${truncatedErrors
+    const fullReportContent = `Error Report:\n\n${truncatedErrors
       .map(
         (errorDetail, index) =>
           `Error ${index + 1}: ${errorDetail.error.message}\nStack Trace: ${
@@ -86,6 +86,13 @@ class ErrorBoundary extends Component {
       .join(
         "\n\n",
       )}\n\nUser Message: ${truncatedMessage}\n\nContact Info: ${contact}`;
+
+    // Discord enforces a hard 2000-character limit on `content`.
+    const DISCORD_CONTENT_LIMIT = 2000;
+    const reportContent =
+      fullReportContent.length > DISCORD_CONTENT_LIMIT
+        ? `${fullReportContent.slice(0, DISCORD_CONTENT_LIMIT - 1)}…`
+        : fullReportContent;
 
     // Send a message to a Discord webhook
     axios
