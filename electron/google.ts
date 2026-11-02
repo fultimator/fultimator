@@ -1,5 +1,6 @@
 // electron/google.ts
 import { google } from "googleapis";
+import { ClientAuthentication, CodeChallengeMethod } from "google-auth-library";
 import Store from "electron-store";
 import fs from "fs";
 import path from "node:path";
@@ -8,17 +9,19 @@ import { Readable } from "node:stream";
 import { app, BrowserWindow } from "electron";
 
 const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
-const clientSecret = import.meta.env.VITE_GOOGLE_CLIENT_SECRET;
 
-// No redirect URI in constructor - we pass it dynamically per-login (local server port)
-const OAuth2 = new google.auth.OAuth2(clientId, clientSecret);
+// Desktop OAuth2 client with PKCE (redirect URI assigned per-login)
+const OAuth2 = new google.auth.OAuth2({
+  clientId,
+  clientAuthentication: ClientAuthentication.None,
+});
 
 const store = new Store();
 
 function validateCredentials() {
-  if (!clientId || !clientSecret) {
+  if (!clientId) {
     throw new Error(
-      "Missing required parameter: VITE_GOOGLE_CLIENT_ID or VITE_GOOGLE_CLIENT_SECRET for desktop app. Please check your .env file.",
+      "Missing required parameter: VITE_GOOGLE_CLIENT_ID for desktop app. Please check your .env file.",
     );
   }
 }
@@ -29,6 +32,8 @@ function validateCredentials() {
 // for "Desktop app" OAuth clients without registering each port.
 export async function loginGoogle() {
   validateCredentials();
+  const { codeVerifier, codeChallenge } =
+    await OAuth2.generateCodeVerifierAsync();
   return new Promise((resolve, reject) => {
     const server = http.createServer();
 
@@ -39,6 +44,8 @@ export async function loginGoogle() {
       const authUrl = OAuth2.generateAuthUrl({
         access_type: "offline",
         redirect_uri: redirectUri,
+        code_challenge: codeChallenge,
+        code_challenge_method: CodeChallengeMethod.S256,
         scope: [
           "https://www.googleapis.com/auth/drive.file",
           "openid",
@@ -81,6 +88,7 @@ export async function loginGoogle() {
         try {
           const { tokens } = await OAuth2.getToken({
             code,
+            codeVerifier,
             redirect_uri: redirectUri,
           });
           OAuth2.setCredentials(tokens);
