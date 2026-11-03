@@ -40,6 +40,7 @@ function hydrateTargetsSnapshot(message: ChatMessage): ChatMessage {
     },
   };
 }
+const MAX_MESSAGES = 100;
 
 export const useChatMessagesStore = create<ChatMessagesStore>()(
   persist(
@@ -47,22 +48,27 @@ export const useChatMessagesStore = create<ChatMessagesStore>()(
       messages: [],
       addMessage: (message) =>
         set((state) => ({
-          messages: [...state.messages, hydrateTargetsSnapshot(message)],
+          messages: [...state.messages, hydrateTargetsSnapshot(message)].slice(
+            -MAX_MESSAGES,
+          ),
         })),
       deleteMessage: (id) =>
         set((state) => ({
           messages: state.messages.filter((m) => m.id !== id),
         })),
       clearAll: () => set({ messages: [] }),
-      setMessages: (messages) => set({ messages }),
+      setMessages: (messages) =>
+        set({ messages: messages.slice(-MAX_MESSAGES) }),
     }),
     {
       name: LOCAL_CHAT_KEY,
-      partialize: (state) => ({ messages: state.messages }),
+      partialize: (state) => ({
+        messages: state.messages.slice(-MAX_MESSAGES),
+      }),
       merge: (persisted, current) => {
         const p = persisted as Partial<ChatMessagesStore>;
         const valid = (p.messages ?? []).filter(isValidChatMessage);
-        return { ...current, messages: valid };
+        return { ...current, messages: valid.slice(-MAX_MESSAGES) };
       },
     },
   ),

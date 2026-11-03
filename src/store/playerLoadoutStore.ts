@@ -30,6 +30,7 @@ interface LoadoutStore {
    *   useEffect(() => store.init(setPlayer), [setPlayer]);
    */
   init: (setPlayer: SetPlayerFn) => void;
+  clear: () => void;
 
   // Item equip / unequip
   equipItem: (slot: string, candidate: PickerCandidate) => void;
@@ -72,6 +73,10 @@ export const useLoadoutStore = create<LoadoutStore>((set, get) => ({
     if (get()._setPlayer !== setPlayer) {
       set({ _setPlayer: setPlayer });
     }
+  },
+
+  clear: () => {
+    set({ _setPlayer: null });
   },
 
   // Item equip / unequip
