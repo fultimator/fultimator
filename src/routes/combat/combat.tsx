@@ -16,7 +16,7 @@ import {
   Stack,
 } from "@mui/material";
 import { Cloud as CloudIcon, Download, AddCircle } from "@mui/icons-material";
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useDatabaseContext } from "../../context/useDatabaseContext";
 import { useDatabase } from "../../hooks/useDatabase";
 
@@ -97,6 +97,10 @@ function AuthCombat() {
   }, [db]);
 
   const [npcs, setNpcs] = useState<TypeNpc[]>([]);
+  const personalListWithLabels = useMemo(
+    () => (personalList ?? []).map((npc) => ({ ...npc, label: npc.name })),
+    [personalList],
+  );
 
   if (loading) {
     return null;
@@ -122,11 +126,6 @@ function AuthCombat() {
 
   const npcCounts = getNpcCounts();
 
-  // Add label
-  personalList?.forEach((npc) => {
-    npc.label = npc.name;
-  });
-
   console.debug(npcs);
 
   return (
@@ -136,7 +135,7 @@ function AuthCombat() {
           size="small"
           disablePortal
           id="combo-box-demo"
-          options={personalList || []}
+          options={personalListWithLabels}
           sx={{ width: 300, mb: 2 }}
           onChange={addNpc}
           renderInput={(params) => (
