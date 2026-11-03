@@ -35,16 +35,17 @@ import { useTranslate } from "../../translation/translate";
 export default function Combat() {
   const { t } = useTranslate();
   const { authLoading, dbMode, cloudUser } = useDatabaseContext();
+  const canAccess = dbMode === "local" || Boolean(cloudUser);
 
   return (
     <Layout>
       <Typography variant="h4">{t("Combat")}</Typography>
       {authLoading && <Skeleton />}
 
-      {!authLoading && !cloudUser && (
+      {!authLoading && dbMode === "cloud" && !cloudUser && (
         <Paper
-          elevation={dbMode === "cloud" ? 3 : 0}
-          variant={dbMode === "cloud" ? "elevation" : "outlined"}
+          elevation={3}
+          variant="elevation"
           sx={{
             p: 2,
             mb: 2,
@@ -55,10 +56,10 @@ export default function Combat() {
             flexWrap: "wrap",
           }}
         >
-          <CloudIcon color={dbMode === "cloud" ? "primary" : "disabled"} />
+          <CloudIcon color="primary" />
           <Typography
             variant="body2"
-            color={dbMode === "cloud" ? "text.primary" : "text.secondary"}
+            color="text.primary"
             sx={{ flex: 1, minWidth: 200 }}
           >
             {t("You have to be logged in to access this feature")}
@@ -67,27 +68,21 @@ export default function Combat() {
         </Paper>
       )}
 
-      {cloudUser && <AuthCombat />}
+      {!authLoading && canAccess && <AuthCombat />}
     </Layout>
   );
 }
 
 function AuthCombat() {
   const { t } = useTranslate();
-  const { cloudUser } = useDatabaseContext();
-  const db = useDatabase("cloud");
+  const db = useDatabase();
 
   const [personalList, setPersonalList] = useState<TypeNpc[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!cloudUser) {
-      setLoading(false);
-      return;
-    }
     const q = db.query(
       db.collection("npc-personal"),
-      db.where("uid", "==", cloudUser.uid),
       db.orderBy("lvl", "asc"),
       db.orderBy("name", "asc"),
     );
@@ -99,7 +94,7 @@ function AuthCombat() {
       )
       .catch((e) => console.error("Error loading NPCs:", e))
       .finally(() => setLoading(false));
-  }, [db, cloudUser]);
+  }, [db]);
 
   const [npcs, setNpcs] = useState<TypeNpc[]>([]);
 
