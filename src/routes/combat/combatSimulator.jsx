@@ -21,7 +21,7 @@ import { useTheme } from "@mui/material/styles";
 import BattleHeader from "../../components/combatSim/BattleHeader";
 import PCDetail from "../../components/combatSim/PCDetail";
 import { calcHP, calcMP } from "../../libs/npcs";
-import { clamp } from "../../libs/playerCalculations";
+import { clamp, calcMaxHp, calcMaxMp } from "../../libs/playerCalculations";
 import SelectedActors from "../../components/combatSim/SelectedActors";
 import useDownloadImage from "../../hooks/useDownloadImage";
 import NPCDetail from "../../components/combatSim/NPCDetail";
@@ -902,6 +902,8 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
     (player) => {
       if (selectedNPCs.length + selectedPCs.length < 30) {
         const normalizedPlayer = applyPlayerPostLoadTransforms(player);
+        const maxHp = calcMaxHp(normalizedPlayer);
+        const maxMp = calcMaxMp(normalizedPlayer);
         setSelectedPCs((prev) => [
           ...prev,
           {
@@ -911,10 +913,10 @@ const CombatSim = ({ user, setIsDirty, isDirty }) => {
             sourceCollection: "player-personal",
             combatId: `${player.id}-${Date.now()}`,
             combatStats: {
-              currentHp: normalizedPlayer.stats?.hp?.max ?? 0,
-              maxHp: normalizedPlayer.stats?.hp?.max ?? 0,
-              currentMp: normalizedPlayer.stats?.mp?.max ?? 0,
-              maxMp: normalizedPlayer.stats?.mp?.max ?? 0,
+              currentHp: normalizedPlayer.stats?.hp?.current ?? maxHp,
+              maxHp,
+              currentMp: normalizedPlayer.stats?.mp?.current ?? maxMp,
+              maxMp,
               turns: [false],
               statusEffects: [],
               combatNotes: "",

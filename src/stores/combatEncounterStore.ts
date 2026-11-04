@@ -21,6 +21,14 @@ import { devLog } from "../utils/devLog";
 
 type ActorDoc = Record<string, unknown>;
 
+function resolveMaxHp(doc: ActorDoc | null): number {
+  if (!doc) return Number.POSITIVE_INFINITY;
+  const combatStats =
+    (doc.combatStats as Record<string, unknown> | undefined) ?? {};
+  const max = Number(combatStats.maxHp);
+  return Number.isFinite(max) && max > 0 ? max : Number.POSITIVE_INFINITY;
+}
+
 export interface TargetRef {
   combatId: string;
   name: string;
@@ -188,17 +196,6 @@ export const useCombatEncounterStore = create<CombatEncounterState>(
           state.actorDocsById[key] ??
           null;
 
-        const resolveMaxHp = (doc: ActorDoc | null): number => {
-          if (!doc) return Number.POSITIVE_INFINITY;
-          const stats =
-            (doc.stats as Record<string, unknown> | undefined) ?? {};
-          const hp = (stats.hp as Record<string, unknown> | undefined) ?? {};
-          const max = Number(hp.max);
-          return Number.isFinite(max) && max > 0
-            ? max
-            : Number.POSITIVE_INFINITY;
-        };
-
         const resolveAppliedAmount = (doc: ActorDoc | null): number => {
           const baseAmount = Math.max(0, Number(amount) || 0);
           if (!doc || !damageType || damageType === "untyped")
@@ -330,17 +327,6 @@ export const useCombatEncounterStore = create<CombatEncounterState>(
           state.selectedPCs.find((p) => String(p.combatId ?? "") === key) ??
           state.actorDocsById[key] ??
           null;
-
-        const resolveMaxHp = (doc: ActorDoc | null): number => {
-          if (!doc) return Number.POSITIVE_INFINITY;
-          const stats =
-            (doc.stats as Record<string, unknown> | undefined) ?? {};
-          const hp = (stats.hp as Record<string, unknown> | undefined) ?? {};
-          const max = Number(hp.max);
-          return Number.isFinite(max) && max > 0
-            ? max
-            : Number.POSITIVE_INFINITY;
-        };
 
         const resolveAppliedAmount = (doc: ActorDoc | null): number => {
           const baseAmount = Math.max(0, Number(amount) || 0);

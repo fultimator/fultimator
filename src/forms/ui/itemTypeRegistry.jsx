@@ -51,7 +51,6 @@ import {
   applyCustomWeaponSlotTierChange,
   getCustomWeaponSlotCostInfo,
   validateCustomWeaponPersisted,
-  normalizeCustomWeapon,
 } from "../schema/itemSchemas/customWeapon";
 import {
   buildOtherOptionalFormState,
@@ -78,7 +77,10 @@ import {
   normalizeQuirkOptional,
 } from "../schema/itemSchemas/quirkOptional";
 import { normalizeDefensiveItem } from "../../libs/equipmentDefensiveNormalization";
-import { normalizeWeaponLike } from "../../libs/weaponNormalization";
+import {
+  normalizeWeaponLike,
+  normalizeCustomWeaponLike,
+} from "../../libs/weaponNormalization";
 import allQualities from "../../libs/qualities";
 import groupBy from "../../libs/groupby";
 import {
@@ -228,7 +230,7 @@ export const ITEM_TYPE_REGISTRY = {
     normalizeUpload: (raw) => {
       if (raw?.dataType !== "weapon") return null;
       try {
-        return normalizeCustomWeapon(raw);
+        return normalizeCustomWeaponLike(raw);
       } catch {
         return null;
       }

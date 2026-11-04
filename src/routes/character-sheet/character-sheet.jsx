@@ -54,6 +54,7 @@ import {
   applyPostLoadTransforms,
 } from "../../libs/actor";
 import useLevelUpFlow from "../../libs/player/hooks/useLevelUpFlow";
+import { calcMaxHp, calcMaxMp, calcMaxIp } from "../../libs/playerCalculations";
 import { canLevelUpFromExp as canLevelUpFromExpCheck } from "../../libs/player/levelUpLogic";
 
 export default function CharacterSheet() {
@@ -201,79 +202,15 @@ export default function CharacterSheet() {
 
   const updateMaxStats = useCallback(() => {
     if (player) {
-      setPlayer((prevPlayer) => {
-        const lvl = Number(prevPlayer.lvl) || 0;
-        const might = Number(prevPlayer.attributes?.might?.base) || 0;
-        const willpower = Number(prevPlayer.attributes?.willpower?.base) || 0;
-
-        const baseMaxHP = lvl + might * 5;
-        const baseMaxMP = lvl + willpower * 5;
-
-        let hpBonus = 0;
-        let mpBonus = 0;
-        let ipBonus = 0;
-
-        const innateClassesCS1 =
-          prevPlayer.settings?.optionalRules?.innateClasses ?? [];
-        const isTechnospheresCS1 =
-          prevPlayer.settings?.optionalRules?.technospheres ?? false;
-        const technospheresVariantCS1 =
-          prevPlayer.settings?.optionalRules?.technospheresVariant ??
-          "standard";
-        const usesInnateClassRulesCS1 =
-          isTechnospheresCS1 && technospheresVariantCS1 !== "hoplospheres";
-        prevPlayer.classes.forEach((cls) => {
-          if (!cls.benefits) return;
-          if (usesInnateClassRulesCS1 && !innateClassesCS1.includes(cls.name))
-            return;
-          hpBonus += cls.benefits.hpplus || 0;
-          mpBonus += cls.benefits.mpplus || 0;
-          ipBonus += cls.benefits.ipplus || 0;
-        });
-
-        if (
-          isTechnospheresCS1 &&
-          (technospheresVariantCS1 === "standard" ||
-            technospheresVariantCS1 === "mnemospheres")
-        ) {
-          hpBonus += 5;
-          mpBonus += 5;
-        }
-
-        if (prevPlayer.modifiers) {
-          hpBonus +=
-            prevPlayer.resources?.hp.bonus ?? prevPlayer.modifiers.hp ?? 0;
-          mpBonus +=
-            prevPlayer.resources?.mp.bonus ?? prevPlayer.modifiers.mp ?? 0;
-          ipBonus += prevPlayer.modifiers.ip || 0;
-        }
-
-        const fortressBonus = prevPlayer.classes
-          .flatMap((cls) => cls.skills || [])
-          .filter((skill) => skill.specialSkill === "Fortress")
-          .reduce((acc, skill) => acc + Number(skill.currentLvl) * 3, 0);
-        hpBonus += fortressBonus;
-
-        const focusedBonus = prevPlayer.classes
-          .flatMap((cls) => cls.skills || [])
-          .filter((skill) => skill.specialSkill === "Focused")
-          .reduce((acc, skill) => acc + Number(skill.currentLvl) * 3, 0);
-        mpBonus += focusedBonus;
-
-        const maxHP = baseMaxHP + hpBonus;
-        const maxMP = baseMaxMP + mpBonus;
-        const maxIP = 6 + ipBonus;
-
-        return {
-          ...prevPlayer,
-          stats: {
-            ...prevPlayer.stats,
-            hp: { ...prevPlayer.stats.hp, max: maxHP },
-            mp: { ...prevPlayer.stats.mp, max: maxMP },
-            ip: { ...prevPlayer.stats.ip, max: maxIP },
-          },
-        };
-      });
+      setPlayer((prevPlayer) => ({
+        ...prevPlayer,
+        stats: {
+          ...prevPlayer.stats,
+          hp: { ...prevPlayer.stats.hp, max: calcMaxHp(prevPlayer) },
+          mp: { ...prevPlayer.stats.mp, max: calcMaxMp(prevPlayer) },
+          ip: { ...prevPlayer.stats.ip, max: calcMaxIp(prevPlayer) },
+        },
+      }));
     }
   }, [player]);
 
