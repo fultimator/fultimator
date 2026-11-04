@@ -67,6 +67,7 @@ import { useCallback, useEffect, useRef, useState, useMemo } from "react";
 import useDownloadImage from "../../hooks/useDownloadImage";
 import Export from "../../components/Export";
 import { buildItemText } from "../../libs/buildItemText";
+import { createUniqueFilenameTracker } from "../../utility/sanitizeFilename";
 import { useTranslate } from "../../translation/translate";
 import { validateNpc } from "../../utility/validateJson";
 import ExportAllNPCs from "../../components/common/ExportAllNPCs";
@@ -589,10 +590,11 @@ function Personal() {
   const exportSelectedAsJSON = async () => {
     const selected = filteredList.filter((npc) => selectedIds.has(npc.id));
     const zip = new JSZip();
+    const uniqueFilename = createUniqueFilenameTracker();
     selected.forEach((npc) => {
       const canonical = canonicalizeForExport("npc", npc);
       zip.file(
-        `${npc.name.replace(/\s/g, "_").toLowerCase()}.json`,
+        `${uniqueFilename(npc.name)}.json`,
         JSON.stringify(canonical, null, 2),
       );
     });
@@ -623,13 +625,14 @@ function Personal() {
     const selected = filteredList.filter((npc) => selectedIds.has(npc.id));
     const ext = fmt === "plain" ? "txt" : "md";
     const zip = new JSZip();
+    const uniqueFilename = createUniqueFilenameTracker();
     selected.forEach((npc) => {
       const text = buildItemText(
         "npc",
         canonicalizeForTransfer("npc", npc),
         fmt,
       );
-      zip.file(`${npc.name.replace(/\s+/g, "_").toLowerCase()}.${ext}`, text);
+      zip.file(`${uniqueFilename(npc.name)}.${ext}`, text);
     });
     const blob = await zip.generateAsync({ type: "blob" });
     const url = URL.createObjectURL(blob);
