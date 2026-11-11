@@ -143,7 +143,7 @@ const NPCDetail = ({
     dexterity: calcAttr("Slow", "Enraged", "dexterity", selectedNPC),
     insight: calcAttr("Dazed", "Enraged", "insight", selectedNPC),
     might: calcAttr("Weak", "Poisoned", "might", selectedNPC),
-    will: calcAttr("Shaken", "Poisoned", "will", selectedNPC),
+    willpower: calcAttr("Shaken", "Poisoned", "willpower", selectedNPC),
   };
 
   const npcSpeaker =
@@ -167,7 +167,8 @@ const NPCDetail = ({
     if (key === "dex" || key === "dexterity") return "dexterity";
     if (key === "ins" || key === "insight") return "insight";
     if (key === "mig" || key === "might") return "might";
-    if (key === "wlp" || key === "will" || key === "willpower") return "will";
+    if (key === "wlp" || key === "will" || key === "willpower")
+      return "willpower";
     return null;
   };
 
@@ -185,8 +186,8 @@ const NPCDetail = ({
           ? npcAttrs.insight
           : key === "might"
             ? npcAttrs.might
-            : key === "will"
-              ? (npcAttrs.will ?? npcAttrs.willpower)
+            : key === "willpower"
+              ? npcAttrs.willpower
               : undefined;
     const fallback =
       rawFallback && typeof rawFallback === "object"

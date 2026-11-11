@@ -4,6 +4,11 @@ export const RESTRICTED_ONE_HANDED_CATEGORIES = [
   "Thrown",
 ];
 
+function normalizeAttr(attr, fallback) {
+  if (attr === "will" || attr === "wlp") return "willpower";
+  return attr ?? fallback;
+}
+
 export function calcWeaponCost({
   base,
   type,
@@ -129,8 +134,8 @@ export function normalizeWeaponLike(item = {}) {
     range: normalizeRange(item),
     martial: item.martial ?? isMartial ?? false,
     accuracy: {
-      attr1: accuracy.attr1 ?? attr1 ?? att1 ?? "dexterity",
-      attr2: accuracy.attr2 ?? attr2 ?? att2 ?? "might",
+      attr1: normalizeAttr(accuracy.attr1 ?? attr1 ?? att1, "dexterity"),
+      attr2: normalizeAttr(accuracy.attr2 ?? attr2 ?? att2, "might"),
       value: accuracy.value ?? prec ?? 0,
       defense: accuracy.defense ?? "def",
     },
@@ -213,13 +218,14 @@ export function normalizeCustomWeaponLike(item = {}) {
           : 2,
     martial: item.martial ?? false,
     accuracy: {
-      attr1:
-        accuracy.attr1 ??
-        accuracyCheck.attr1 ??
-        accuracyCheck.att1 ??
+      attr1: normalizeAttr(
+        accuracy.attr1 ?? accuracyCheck.attr1 ?? accuracyCheck.att1,
         "dexterity",
-      attr2:
-        accuracy.attr2 ?? accuracyCheck.attr2 ?? accuracyCheck.att2 ?? "might",
+      ),
+      attr2: normalizeAttr(
+        accuracy.attr2 ?? accuracyCheck.attr2 ?? accuracyCheck.att2,
+        "might",
+      ),
       value: accuracy.value ?? precModifier ?? 0,
       defense: accuracy.defense ?? categoryDefense(primaryCategory),
     },
@@ -258,16 +264,20 @@ export function normalizeCustomWeaponLike(item = {}) {
         customDamageType ??
         damage.type ??
         type,
-      overrideAccuracyAttr1:
+      overrideAccuracyAttr1: normalizeAttr(
         item.rare?.overrideAccuracyAttr1 ??
-        accuracy.attr1 ??
-        accuracyCheck.attr1 ??
-        accuracyCheck.att1,
-      overrideAccuracyAttr2:
+          accuracy.attr1 ??
+          accuracyCheck.attr1 ??
+          accuracyCheck.att1,
+        undefined,
+      ),
+      overrideAccuracyAttr2: normalizeAttr(
         item.rare?.overrideAccuracyAttr2 ??
-        accuracy.attr2 ??
-        accuracyCheck.attr2 ??
-        accuracyCheck.att2,
+          accuracy.attr2 ??
+          accuracyCheck.attr2 ??
+          accuracyCheck.att2,
+        undefined,
+      ),
     },
   };
 
@@ -282,14 +292,18 @@ export function normalizeCustomWeaponLike(item = {}) {
       secondSelectedCategory ?? primaryCategory,
     );
     next.secondAccuracy = item.secondAccuracy ?? {
-      attr1:
+      attr1: normalizeAttr(
         secondAccuracyCheck.attr1 ??
-        secondAccuracyCheck.att1 ??
-        next.accuracy.attr1,
-      attr2:
+          secondAccuracyCheck.att1 ??
+          next.accuracy.attr1,
+        "dexterity",
+      ),
+      attr2: normalizeAttr(
         secondAccuracyCheck.attr2 ??
-        secondAccuracyCheck.att2 ??
-        next.accuracy.attr2,
+          secondAccuracyCheck.att2 ??
+          next.accuracy.attr2,
+        "might",
+      ),
       value: secondPrecModifier ?? 0,
       defense: categoryDefense(secondaryCategory),
     };

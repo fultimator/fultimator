@@ -363,7 +363,7 @@ export default function SpellEntropistGambleModal({
               <Select
                 labelId="attr-label"
                 label={t("Attribute")}
-                value={editedGamble.attr || "will"}
+                value={editedGamble.attr || "willpower"}
                 onChange={(e) => handleChange("attr", e.target.value)}
               >
                 {Object.keys(attributes).map((key) => (

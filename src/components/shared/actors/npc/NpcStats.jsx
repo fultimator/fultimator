@@ -138,7 +138,7 @@ export function NpcStats({ npc }) {
             },
           }}
         >
-          {t("WLP")} d{npc.attributes?.will?.base}
+          {t("WLP")} d{npc.attributes?.willpower?.base}
         </Box>
         <Box
           sx={{

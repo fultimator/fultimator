@@ -18,6 +18,10 @@ const AttributeValues = Object.values(Attributes) as [
   Attributes,
   ...Attributes[],
 ];
+const AttributeValueSchema = z.preprocess(
+  (val) => (val === "will" || val === "wlp" ? "willpower" : val),
+  z.enum(AttributeValues),
+);
 const ElementValues = Object.values(Elements) as [Elements, ...Elements[]];
 const SlotTierValues = ["alpha", "beta", "gamma", "delta"] as const;
 
@@ -34,8 +38,8 @@ export const CustomWeaponRareSchema = z.object({
   overrideDamageType: z.boolean().default(false),
   overrideAccuracyAttributes: z.boolean().default(false),
   overrideDamageTypeValue: z.enum(ElementValues).optional(),
-  overrideAccuracyAttr1: z.enum(AttributeValues).optional(),
-  overrideAccuracyAttr2: z.enum(AttributeValues).optional(),
+  overrideAccuracyAttr1: AttributeValueSchema.optional(),
+  overrideAccuracyAttr2: AttributeValueSchema.optional(),
 });
 
 export const CustomWeaponSchema = z.object({
@@ -108,13 +112,17 @@ function normalizeAccuracyCheck(
 ) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const v = value as any;
-  const attr1 = Array.isArray(v)
+  const rawAttr1 = Array.isArray(v)
     ? v[0]
     : (v?.accuracy?.attr1 ?? v?.attr1 ?? v?.att1 ?? v?.accuracy?.att1);
-  const attr2 = Array.isArray(v)
+  const rawAttr2 = Array.isArray(v)
     ? v[1]
     : (v?.accuracy?.attr2 ?? v?.attr2 ?? v?.att2 ?? v?.accuracy?.att2);
-  const validAttrs = ["dexterity", "insight", "might", "will"];
+  const attr1 =
+    rawAttr1 === "will" || rawAttr1 === "wlp" ? "willpower" : rawAttr1;
+  const attr2 =
+    rawAttr2 === "will" || rawAttr2 === "wlp" ? "willpower" : rawAttr2;
+  const validAttrs = ["dexterity", "insight", "might", "willpower"];
   if (validAttrs.includes(attr1) && validAttrs.includes(attr2))
     return { attr1, attr2 };
   return fallback;

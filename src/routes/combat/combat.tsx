@@ -209,7 +209,13 @@ function NpcCombatant({ npc }: NpcProps) {
     poisoned: false,
   });
 
-  const originalAttributes = npc.attributes;
+  const originalAttributes = {
+    ...npc.attributes,
+    willpower: npc.attributes.willpower ??
+      (npc.attributes as unknown as { will?: { base: number } })?.will ?? {
+        base: 8,
+      },
+  };
 
   const changeHp = (value: number) => {
     return () => {
@@ -253,19 +259,19 @@ function NpcCombatant({ npc }: NpcProps) {
           : poisoned || weak
             ? adjustAttribute(originalAttributes.might, -2)
             : originalAttributes.might,
-      will:
+      willpower:
         poisoned && shaken
-          ? adjustAttribute(originalAttributes.will, -4)
+          ? adjustAttribute(originalAttributes.willpower, -4)
           : poisoned || shaken
-            ? adjustAttribute(originalAttributes.will, -2)
-            : originalAttributes.will,
+            ? adjustAttribute(originalAttributes.willpower, -2)
+            : originalAttributes.willpower,
     });
   }, [
     statusEffects,
     originalAttributes.dexterity,
     originalAttributes.insight,
     originalAttributes.might,
-    originalAttributes.will,
+    originalAttributes.willpower,
   ]);
 
   const toggleStatus = (status = "", hasStatus = false) => {
@@ -439,7 +445,7 @@ function NpcCombatant({ npc }: NpcProps) {
         dexterity: "DEX",
         insight: "INS",
         might: "MIG",
-        will: "WLP",
+        willpower: "WLP",
       };
 
       translatedAttribute1 = `${t(attributeMap[attr1])} d${attributes[attr1]?.base ?? attributes[attr1]}`;
@@ -454,7 +460,7 @@ function NpcCombatant({ npc }: NpcProps) {
         dexterity: "DEX",
         insight: "INS",
         might: "MIG",
-        will: "WLP",
+        willpower: "WLP",
       };
 
       translatedAttribute1 = `${t(attributeMap[attr1])} d${attributes[attr1]?.base ?? attributes[attr1]}`;
@@ -469,7 +475,7 @@ function NpcCombatant({ npc }: NpcProps) {
         dexterity: "DEX",
         insight: "INS",
         might: "MIG",
-        will: "WLP",
+        willpower: "WLP",
       };
 
       translatedAttribute1 = `${t(attributeMap[attr1])} d${attributes[attr1]?.base ?? attributes[attr1]}`;
@@ -608,7 +614,13 @@ function NpcCombatant({ npc }: NpcProps) {
             </Grid>
             <Grid size="grow">
               <Typography variant="h5">
-                {t("WIL:")} d{attributes.will?.base}
+                {t("WIL:")} d
+                {attributes.willpower?.base ??
+                  (
+                    attributes as unknown as {
+                      will?: { base: number };
+                    }
+                  )?.will?.base}
               </Typography>
             </Grid>
           </Grid>

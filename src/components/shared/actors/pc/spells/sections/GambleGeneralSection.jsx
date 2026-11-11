@@ -262,7 +262,7 @@ export default function GambleGeneralSection({ formState, setFormState, t }) {
         <FormControl fullWidth>
           <InputLabel>{t("Attribute")}</InputLabel>
           <Select
-            value={formState.attr || "will"}
+            value={formState.attr || "willpower"}
             label={t("Attribute")}
             onChange={(e) => updateField("attr", e.target.value)}
           >

@@ -39,7 +39,7 @@ const RollsTab = ({
       dexterity: "DEX",
       insight: "INS",
       might: "MIG",
-      will: "WLP",
+      willpower: "WLP",
     };
 
     // Determine the source and correct attribute keys

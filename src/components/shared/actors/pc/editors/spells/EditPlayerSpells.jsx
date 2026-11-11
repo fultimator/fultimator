@@ -348,7 +348,7 @@ export default function EditPlayerSpells({
         isOffensive: spell.isOffensive,
         accuracy: spell.accuracy ?? {
           attr1: spell.attr1 || "insight",
-          attr2: spell.attr2 || "will",
+          attr2: spell.attr2 || "willpower",
           value: 0,
           defense: "mdef",
         },
@@ -497,7 +497,7 @@ export default function EditPlayerSpells({
         maxTargets: 2,
         targetDescription: "Special",
         duration: "Instantaneous",
-        attr: "will",
+        attr: "willpower",
         targets: [
           {
             rangeFrom: 1,
@@ -590,7 +590,7 @@ export default function EditPlayerSpells({
                   isOffensive: false,
                   accuracy: {
                     attr1: "insight",
-                    attr2: "will",
+                    attr2: "willpower",
                     value: 0,
                     defense: "mdef",
                   },
@@ -747,7 +747,7 @@ export default function EditPlayerSpells({
                   maxTargets: 2,
                   targetDescription: "Special",
                   duration: "Instantaneous",
-                  attr: "will",
+                  attr: "willpower",
                   targets: [
                     {
                       rangeFrom: 1,
@@ -1084,7 +1084,7 @@ export default function EditPlayerSpells({
               isOffensive: spell.isOffensive,
               accuracy: spell.accuracy ?? {
                 attr1: "insight",
-                attr2: "will",
+                attr2: "willpower",
                 value: 0,
                 defense: "mdef",
               },

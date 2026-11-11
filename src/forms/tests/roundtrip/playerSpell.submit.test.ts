@@ -23,7 +23,7 @@ describe("player-spell submit payloads", () => {
     targetDescription: "One creature",
     duration: "Instantaneous",
     "accuracy.attr1": "insight",
-    "accuracy.attr2": "will",
+    "accuracy.attr2": "willpower",
     "damage.value": 0,
     "damage.type": "physical",
     "damage.hrZero": false,

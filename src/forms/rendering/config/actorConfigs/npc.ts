@@ -238,7 +238,7 @@ export const npcFieldConfig: ItemFieldConfig<NpcFormState> = [
     componentProps: ATTR_SLIDER,
   },
   {
-    key: "attributes.will.base",
+    key: "attributes.willpower.base",
     kind: "editable",
     label: "WLP",
     component: "npc-attr-slider",

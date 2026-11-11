@@ -16,7 +16,7 @@ const CompendiumHandler = ({ setNpc, typeName, open, onClose }) => {
                 name: selectedItem.name,
                 accuracy: selectedItem.accuracy ?? {
                   attr1: selectedItem.attr1 || "insight",
-                  attr2: selectedItem.attr2 || "will",
+                  attr2: selectedItem.attr2 || "willpower",
                   value: 0,
                   defense: "mdef",
                 },

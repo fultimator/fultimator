@@ -10,7 +10,7 @@ const BASE_SPELL = {
   range: "ranged" as const,
   accuracy: {
     attr1: "insight",
-    attr2: "will",
+    attr2: "willpower",
     value: 0,
     defense: "mdef" as const,
   },

@@ -395,6 +395,9 @@ describe("Player v0 transform compatibility", () => {
     expect(findSpell("cooking")?.cookbook).toBeDefined();
     expect(findSpell("cooking")?.cookbookEffects).toBeUndefined();
     expect(findSpell("deck")).toBeDefined();
+    expect(
+      (findSpell("default")?.accuracy as Record<string, unknown>)?.attr2,
+    ).toBe("willpower");
     expect(findSpell("gamble")).toBeDefined();
     expect(findSpell("arcanist")).toBeDefined();
     expect(findSpell("arcanist-rework")).toBeDefined();

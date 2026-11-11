@@ -587,12 +587,17 @@ export function TypeSelectRenderer({
   );
 }
 
-const ATTRIBUTE_OPTIONS = ["dexterity", "insight", "might", "will"] as const;
+const ATTRIBUTE_OPTIONS = [
+  "dexterity",
+  "insight",
+  "might",
+  "willpower",
+] as const;
 const ATTRIBUTE_LABELS: Record<string, string> = {
   dexterity: "DEX",
   insight: "INS",
   might: "MIG",
-  will: "WLP",
+  willpower: "WLP",
 };
 
 // Free-pick pair of attribute selects for override accuracy. Value is {attr1, attr2}.

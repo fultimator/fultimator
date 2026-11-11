@@ -58,7 +58,7 @@ export function createBlankSpellForType(spellType) {
       maxTargets: 2,
       targetDescription: "Special",
       duration: "Instantaneous",
-      attr: "will",
+      attr: "willpower",
       targets: [
         {
           rangeFrom: 1,

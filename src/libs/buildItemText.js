@@ -20,8 +20,15 @@ const ATTR_SHORT = {
   dexterity: "DEX",
   insight: "INS",
   might: "MIG",
-  will: "WLP",
+  willpower: "WLP",
 };
+
+function getAttrVal(attr, fallback = 6) {
+  if (attr && typeof attr === "object") {
+    return attr.base ?? fallback;
+  }
+  return attr ?? fallback;
+}
 
 const DAMAGE_TYPE_LABEL = {
   physical: "Physical",
@@ -126,7 +133,7 @@ function buildNpcText(npc, md) {
   // Attributes
   const a = npc.attributes ?? {};
   parts.push(
-    `${b("DEX")} d${a.dexterity}  ${b("INS")} d${a.insight}  ${b("MIG")} d${a.might}  ${b("WLP")} d${a.will}`,
+    `${b("DEX")} d${getAttrVal(a.dexterity)}  ${b("INS")} d${getAttrVal(a.insight)}  ${b("MIG")} d${getAttrVal(a.might)}  ${b("WLP")} d${getAttrVal(a.willpower ?? a.will)}`,
   );
 
   // Derived stats
@@ -207,10 +214,10 @@ function buildNpcObsidian(npc) {
     );
   if (npc.traits) lines.push(`traits: "${npc.traits.replace(/"/g, '\\"')}"`);
 
-  lines.push(`\nDEX: ${a.dexterity ?? 6}`);
-  lines.push(`INS: ${a.insight ?? 6}`);
-  lines.push(`MIG: ${a.might ?? 6}`);
-  lines.push(`WLP: ${a.will ?? 6}`);
+  lines.push(`\nDEX: ${getAttrVal(a.dexterity)}`);
+  lines.push(`INS: ${getAttrVal(a.insight)}`);
+  lines.push(`MIG: ${getAttrVal(a.might)}`);
+  lines.push(`WLP: ${getAttrVal(a.willpower ?? a.will)}`);
 
   lines.push(`\nHP: ${calcHP(npc)}`);
   lines.push(`MP: ${calcMP(npc)}`);
@@ -328,7 +335,7 @@ function buildPcText(player, md) {
   // Attributes
   const a = player.attributes ?? {};
   parts.push(
-    `${b("DEX")} d${a.dexterity}  ${b("INS")} d${a.insight}  ${b("MIG")} d${a.might}  ${b("WLP")} d${a.will}`,
+    `${b("DEX")} d${getAttrVal(a.dexterity)}  ${b("INS")} d${getAttrVal(a.insight)}  ${b("MIG")} d${getAttrVal(a.might)}  ${b("WLP")} d${getAttrVal(a.willpower ?? a.will)}`,
   );
 
   // Stats

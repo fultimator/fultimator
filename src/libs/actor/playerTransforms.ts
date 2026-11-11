@@ -12,6 +12,7 @@ import {
 import { normalizeDefensiveList } from "../../libs/equipmentDefensiveNormalization";
 import { availableModules } from "../../libs/pilotVehicleData";
 import { backfillIds } from "./itemIds";
+import { renameWillAttrValueDeep } from "./renameWillAttrValue";
 
 type PlayerTransform = (player: TypePlayer) => TypePlayer;
 
@@ -1372,6 +1373,11 @@ const POST_LOAD_TRANSFORMS: VersionedTransform[] = [
     label:
       "Spell v11: sub-item name->key on container types; invocation tracker grouping; cooking cookbook namespace; pilot-vehicle slots reconstruction",
     fn: migratePlayerSpellsV11,
+  },
+  {
+    version: 12,
+    label: "Rename attr1/attr2/att1/att2 value 'will' to 'willpower'",
+    fn: renameWillAttrValueDeep,
   },
 ];
 

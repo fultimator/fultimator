@@ -17,9 +17,14 @@ import {
 const AttributeValues = Object.values(Attributes) as [string, ...string[]];
 const ElementValues = Object.values(Elements) as [string, ...string[]];
 
+const WeaponAttributeValueSchema = z.preprocess(
+  (val) => (val === "will" || val === "wlp" ? "willpower" : val),
+  z.enum(AttributeValues as [Attributes, ...Attributes[]]),
+);
+
 export const WeaponAccuracySchema = z.object({
-  attr1: z.enum(AttributeValues as [Attributes, ...Attributes[]]),
-  attr2: z.enum(AttributeValues as [Attributes, ...Attributes[]]),
+  attr1: WeaponAttributeValueSchema,
+  attr2: WeaponAttributeValueSchema,
   value: z.number().int(),
   defense: z.enum(["def", "mdef"]).default("def"),
 });

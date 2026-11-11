@@ -1006,7 +1006,7 @@ export const officialEffects = [
     trigger: { kind: "passive" },
     transfer: false,
     applicableTypes: ["npcSpell"],
-    changes: [{ key: "attr1", mode: 0, value: "will" }],
+    changes: [{ key: "attr1", mode: 0, value: "willpower" }],
     meta: { book: "core", isOfficial: true },
   },
   {

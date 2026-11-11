@@ -22,6 +22,6 @@ export const PlayerSpellGambleSchema = PlayerSpellNonStaticBaseSchema.extend({
   maxTargets: z.number().int().default(2),
   targetDescription: z.string().default("Special"),
   duration: z.string().default("Instantaneous"),
-  attr: z.string().default("will"),
+  attr: z.string().default("willpower"),
   targets: z.array(GambleTargetSchema).default([]),
 });

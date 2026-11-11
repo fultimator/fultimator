@@ -673,7 +673,7 @@ const schemaEntries: Partial<Record<CompendiumItemType, ItemFormDefinition>> = {
           maxTargets: s.maxTargets ?? 2,
           targetDescription: s.targetDescription.trim() || "Special",
           duration: s.duration.trim() || "Instantaneous",
-          attr: gambleAccuracy.attr2 || "will",
+          attr: gambleAccuracy.attr2 || "willpower",
           targets: [],
         };
       }

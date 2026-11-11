@@ -16,7 +16,7 @@ const attributes = {
     shortcaps: t("MIG", true),
     long: t("Might", true),
   },
-  will: {
+  willpower: {
     short: t("wil", true),
     shortcaps: t("WLP", true),
     long: t("Willpower", true),
@@ -24,16 +24,16 @@ const attributes = {
 };
 
 Object.defineProperties(attributes, {
-  willpower: {
+  will: {
     get() {
-      return this.will;
+      return this.willpower;
     },
     enumerable: false,
     configurable: true,
   },
   wlp: {
     get() {
-      return this.will;
+      return this.willpower;
     },
     enumerable: false,
     configurable: true,

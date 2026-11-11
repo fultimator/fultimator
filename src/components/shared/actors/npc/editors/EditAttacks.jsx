@@ -54,14 +54,14 @@ const ATTR_SHORT = {
   dexterity: "DEX",
   insight: "INS",
   might: "MIG",
-  will: "WLP",
+  willpower: "WLP",
 };
 
 const ATTR_ROLL = {
   dexterity: "dex",
   insight: "ins",
   might: "mig",
-  will: "wlp",
+  willpower: "wlp",
 };
 
 const SUMMARY_META_SX = {

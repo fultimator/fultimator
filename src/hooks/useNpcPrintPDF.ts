@@ -155,7 +155,7 @@ function buildFieldMap(npc: TypeNpc): Record<string, string> {
   fields["Campo testo 2033"] = String(attrs.dexterity?.base ?? "");
   fields["Campo testo 2034"] = String(attrs.insight?.base ?? "");
   fields["Campo testo 2035"] = String(attrs.might?.base ?? "");
-  fields["Campo testo 2036"] = String(attrs.will?.base ?? "");
+  fields["Campo testo 2036"] = String(attrs.willpower?.base ?? "");
 
   const hp = calcHP(npc);
   fields["Campo testo 2039"] = String(hp);

@@ -56,7 +56,7 @@ const ATTR_SHORT = {
   dexterity: "DEX",
   insight: "INS",
   might: "MIG",
-  will: "WLP",
+  willpower: "WLP",
 };
 
 const SUMMARY_META_SX = {
@@ -288,7 +288,7 @@ export default function EditSpells({ npc, setNpc }) {
             range: "ranged",
             accuracy: {
               attr1: "insight",
-              attr2: "will",
+              attr2: "willpower",
               value: 0,
               defense: "mdef",
             },
@@ -420,7 +420,7 @@ export default function EditSpells({ npc, setNpc }) {
                 dexterity: "dex",
                 insight: "ins",
                 might: "mig",
-                will: "wlp",
+                willpower: "wlp",
               };
               const dieSizes = {
                 primary: npc.attributes?.[spell.accuracy?.attr1]?.base ?? 6,
@@ -590,7 +590,7 @@ export default function EditSpells({ npc, setNpc }) {
                   name: item.name,
                   accuracy: item.accuracy ?? {
                     attr1: item.attr1 || "insight",
-                    attr2: item.attr2 || "will",
+                    attr2: item.attr2 || "willpower",
                     value: 0,
                     defense: "mdef",
                   },
