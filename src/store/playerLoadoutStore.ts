@@ -76,7 +76,9 @@ export const useLoadoutStore = create<LoadoutStore>((set, get) => ({
   },
 
   clear: () => {
-    set({ _setPlayer: null });
+    if (get()._setPlayer !== null) {
+      set({ _setPlayer: null });
+    }
   },
 
   // Item equip / unequip

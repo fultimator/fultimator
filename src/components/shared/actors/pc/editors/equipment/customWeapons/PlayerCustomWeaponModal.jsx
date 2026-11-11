@@ -324,7 +324,7 @@ export default function PlayerCustomWeaponModal({
     overrideAccuracyAttributes,
     rareAccuracyBonus,
     hasTransforming,
-    _secondSelectedCategory,
+    secondSelectedCategory,
     slots,
     slotted,
     primaryHrZero,
@@ -334,7 +334,7 @@ export default function PlayerCustomWeaponModal({
     precModifier,
     secondSelectedAccuracyCheck,
     secondaryHrZero,
-    _secondOverrideDamageType,
+    secondOverrideDamageType,
     secondCustomDamageType,
     secondDamageModifier,
     secondPrecModifier,
@@ -411,7 +411,7 @@ export default function PlayerCustomWeaponModal({
     if (hasTransforming) {
       const { precision: s2prec, damage: s2dmg } = calculateCustomWeaponStats(
         {
-          secondSelectedCategory: formState._secondSelectedCategory,
+          secondSelectedCategory: secondSelectedCategory,
           secondCurrentCustomizations: secondCustomizations,
           rareAccuracyBonus,
           rareDamageBonus: formState.rareDamageBonus,
@@ -473,7 +473,7 @@ export default function PlayerCustomWeaponModal({
       martial: formState.martial,
       isEquipped: editCustomWeaponIndex !== null ? formState.isEquipped : false,
       secondName: formState.secondWeaponName,
-      secondCategory: formState._secondSelectedCategory,
+      secondCategory: secondSelectedCategory,
       secondRange: formState.secondSelectedRange,
       secondCustomizations: secondCustomizations ?? [],
       secondModifiers: {
@@ -582,7 +582,7 @@ export default function PlayerCustomWeaponModal({
   const { precision: s2Prec, damage: s2Dmg } = hasTransforming
     ? calculateCustomWeaponStats(
         {
-          secondSelectedCategory: formState._secondSelectedCategory,
+          secondSelectedCategory: secondSelectedCategory,
           secondCurrentCustomizations: secondCustomizations,
           rareAccuracyBonus,
           rareDamageBonus: formState.rareDamageBonus,
@@ -742,7 +742,7 @@ export default function PlayerCustomWeaponModal({
                 slotted,
                 // Second form fields read by buildSecondWeaponItem inside the card.
                 secondWeaponName: formState.secondWeaponName,
-                secondSelectedCategory: formState._secondSelectedCategory,
+                secondSelectedCategory: secondSelectedCategory,
                 secondSelectedRange: formState.secondSelectedRange,
                 secondAccuracy: hasTransforming
                   ? {

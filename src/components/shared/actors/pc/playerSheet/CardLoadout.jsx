@@ -106,10 +106,8 @@ export default function CardLoadout({
   const addMessage = useAddChatMessage();
   useEffect(() => {
     store.init(setPlayer);
-  }, [setPlayer, store]);
-  useEffect(() => {
     return () => store.clear();
-  }, [store]);
+  }, [setPlayer, store]);
 
   const activeVehicle = getActiveVehicle(player);
   const { mainHandLocked, offHandLocked } = getSlotLocks(player);

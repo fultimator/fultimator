@@ -18,6 +18,7 @@ import {
 } from "../../icons.jsx";
 import Diamond from "../../Diamond.jsx";
 import { calcPrecision, calcDamage, calcMagic } from "../../../libs/npcs.js";
+import { damageTypeLabels } from "../../../components/shared/actors/npc/npcShared.js";
 import { t } from "../../../translation/translate.jsx";
 import { useCombatSimSettingsStore } from "../../../stores/combatSimSettingsStore.js";
 
@@ -63,18 +64,6 @@ const RollsTab = ({
     }`;
 
     return `【${translatedAttribute1} + ${translatedAttribute2}】`;
-  };
-
-  const damageTypeLabels = {
-    physical: "physical_damage",
-    air: "air_damage",
-    bolt: "bolt_damage",
-    dark: "dark_damage",
-    earth: "earth_damage",
-    fire: "fire_damage",
-    ice: "ice_damage",
-    light: "light_damage",
-    poison: "poison_damage",
   };
 
   const resolveAttackDamageType = (item, rowType) => {
