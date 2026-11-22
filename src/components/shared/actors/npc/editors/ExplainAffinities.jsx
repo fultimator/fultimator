@@ -259,7 +259,7 @@ export default function ExplainAffinities({ npc, setNpc }) {
           <Typography>
             <ReactMarkdown allowedElements={["strong"]} unwrapDisallowed={true}>
               {t(
-                "  **Plants** are Vulnerable to (choose one: **air**, **bolt**, **fire**, **ice**) damage.",
+                "**Plants** are Vulnerable to (choose one: **air**, **bolt**, **fire**, **ice**) damage.",
                 true,
               )}
             </ReactMarkdown>

@@ -635,7 +635,7 @@ function Personal({ user }) {
                     marginBottom: 4,
                   }}
                 >
-                  {t(" No more adversaries found.")}
+                  {t("No more adversaries found.")}
                 </Typography>
                 {prevLastItem.length ? (
                   <Button
