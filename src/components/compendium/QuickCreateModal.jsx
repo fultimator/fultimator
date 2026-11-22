@@ -921,7 +921,7 @@ function PlayerSpellPanel() {
       ),
       duration: t(String(imported.duration ?? "Instantaneous")),
       "accuracy.attr1": String(imported.accuracy?.attr1 ?? "insight"),
-      "accuracy.attr2": String(imported.accuracy?.attr2 ?? "will"),
+      "accuracy.attr2": String(imported.accuracy?.attr2 ?? "willpower"),
       "accuracy.value": 0,
       "accuracy.defense": "mdef",
       "damage.value": imported.damage?.value ?? 0,
@@ -1481,7 +1481,7 @@ function PlayerSpellPanel() {
                             { value: "dexterity", label: "DEX" },
                             { value: "insight", label: "INS" },
                             { value: "might", label: "MIG" },
-                            { value: "will", label: "WLP" },
+                            { value: "willpower", label: "WLP" },
                           ].map((a) => (
                             <MenuItem key={a.value} value={a.value}>
                               {t(a.label)}
@@ -1502,7 +1502,7 @@ function PlayerSpellPanel() {
                             { value: "dexterity", label: "DEX" },
                             { value: "insight", label: "INS" },
                             { value: "might", label: "MIG" },
-                            { value: "will", label: "WLP" },
+                            { value: "willpower", label: "WLP" },
                           ].map((a) => (
                             <MenuItem key={a.value} value={a.value}>
                               {t(a.label)}

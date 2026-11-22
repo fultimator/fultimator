@@ -387,8 +387,7 @@ export const appliesEffectRowFields: ItemFieldConfig<Record<string, unknown>> =
       componentProps: { options: EFFECT_TRACKING_OPTIONS },
       dependencies: (s) => {
         const ae = s.appliesEffect as
-          | { duration?: { event?: string } }
-          | undefined;
+          { duration?: { event?: string } } | undefined;
         const event = ae?.duration?.event;
         return (
           event === "start-of-turn" ||

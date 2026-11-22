@@ -32,21 +32,43 @@ function buildUidProxy(adapter: DatabaseAdapter, uid: string): DatabaseAdapter {
       }
       return adapter.addDoc(ref, data);
     },
+
+    async setDoc(ref: unknown, data: Record<string, unknown>) {
+      const storeName = extractStoreName(ref);
+      if (storeName && USER_SCOPED_COLLECTIONS.has(storeName)) {
+        return adapter.setDoc(ref, { ...data, uid });
+      }
+      return adapter.setDoc(ref, data);
+    },
+
+    writeBatch() {
+      const batch = adapter.writeBatch();
+      return {
+        ...batch,
+        set(ref: unknown, data: Record<string, unknown>) {
+          const storeName = extractStoreName(ref);
+          if (storeName && USER_SCOPED_COLLECTIONS.has(storeName)) {
+            batch.set(ref, { ...data, uid });
+          } else {
+            batch.set(ref, data);
+          }
+        },
+      };
+    },
   };
 }
 
-// Extracts the collection/store name from a Firestore CollectionRef or an IDB CollectionRef.
-// Firestore refs have a .path property like "npc-personal" or "users/uid/npc-personal".
-// IDB CollectionRef has a .storeName property.
 function extractStoreName(ref: unknown): string | null {
   if (!ref || typeof ref !== "object") return null;
   const r = ref as Record<string, unknown>;
-  // IDB CollectionRef shape
   if (typeof r["storeName"] === "string") return r["storeName"];
-  // Firestore CollectionReference - last segment of the path
   if (typeof r["path"] === "string") {
     const parts = (r["path"] as string).split("/");
-    return parts[parts.length - 1] ?? null;
+    const isDocumentPath = parts.length % 2 === 0;
+    return (
+      (isDocumentPath ? parts[parts.length - 2] : parts[parts.length - 1]) ??
+      null
+    );
   }
   return null;
 }

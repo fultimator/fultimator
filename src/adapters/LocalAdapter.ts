@@ -16,6 +16,7 @@ import {
   getDocs as idbGetDocs,
   useCollectionData as idbUseCollectionData,
   useDocumentData as idbUseDocumentData,
+  notifyListeners,
 } from "../platform/desktop/db";
 import { getDb, STORES, usePendingSync } from "../platform/idb";
 import type { DatabaseAdapter, DbError, WriteBatch } from "../types/Database";
@@ -109,27 +110,38 @@ export const LocalAdapter: DatabaseAdapter = {
   writeBatch(): WriteBatch {
     const ops: Array<{
       type: "set" | "delete";
-      ref: unknown;
+      ref: { storeName: string; id: string };
       data?: Record<string, unknown>;
     }> = [];
     return {
       set(ref, data) {
-        ops.push({ type: "set", ref, data: data as Record<string, unknown> });
+        ops.push({
+          type: "set",
+          ref: ref as { storeName: string; id: string },
+          data: data as Record<string, unknown>,
+        });
       },
       delete(ref) {
-        ops.push({ type: "delete", ref });
+        ops.push({
+          type: "delete",
+          ref: ref as { storeName: string; id: string },
+        });
       },
       async commit() {
+        if (ops.length === 0) return;
+        const db = await getDb();
+        const storeNames = [...new Set(ops.map((op) => op.ref.storeName))];
+        const tx = db.transaction(storeNames, "readwrite");
         for (const op of ops) {
+          const store = tx.objectStore(op.ref.storeName);
           if (op.type === "set") {
-            await idbSetDoc(
-              op.ref as Parameters<typeof idbSetDoc>[0],
-              op.data!,
-            );
+            await store.put({ ...op.data, id: op.ref.id });
           } else {
-            await idbDeleteDoc(op.ref as Parameters<typeof idbDeleteDoc>[0]);
+            await store.delete(op.ref.id);
           }
         }
+        await tx.done;
+        for (const storeName of storeNames) notifyListeners(storeName);
       },
     };
   },

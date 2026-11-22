@@ -94,6 +94,7 @@ import SettingRow from "../../components/common/SettingRow";
 import classList from "../../libs/classes";
 import defaultConsumables from "../../libs/consumables";
 import { buildItemText } from "../../libs/buildItemText";
+import { createUniqueFilenameTracker } from "../../utility/sanitizeFilename";
 import MnemosphereCreateDialog from "/src/libs/player/MnemosphereCreateDialog";
 import {
   canonicalizeForTransfer,
@@ -516,10 +517,11 @@ function Personal() {
     const selected = filteredList.filter((p) => selectedIds.has(p.id));
     if (!selected.length) return;
     const zip = new JSZip();
+    const uniqueFilename = createUniqueFilenameTracker();
     selected.forEach((p) => {
       const canonical = canonicalizeForTransfer("pc", p);
       zip.file(
-        `${p.name.replace(/\s/g, "_").toLowerCase()}.json`,
+        `${uniqueFilename(p.name)}.json`,
         JSON.stringify(canonical, null, 2),
       );
     });

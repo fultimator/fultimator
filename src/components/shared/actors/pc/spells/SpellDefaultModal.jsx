@@ -50,7 +50,7 @@ export default function SpellDefaultModal({
         damage: { value: 0, type: "physical", hrZero: false },
         accuracy: {
           attr1: "insight",
-          attr2: "will",
+          attr2: "willpower",
           value: 0,
           defense: "mdef",
         },

@@ -39,7 +39,7 @@ const StandardRollsSection = ({ selectedNPC, calcAttr, handleRoll }) => {
       },
       {
         label: "WLP",
-        value: calcAttr("Shaken", "Poisoned", "will", selectedNPC),
+        value: calcAttr("Shaken", "Poisoned", "willpower", selectedNPC),
       },
     ],
     [calcAttr, selectedNPC],

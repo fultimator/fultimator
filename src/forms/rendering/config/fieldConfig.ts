@@ -70,8 +70,7 @@ export interface FieldConfig<TFormState extends Record<string, unknown>> {
   group?: string;
   order: number;
   componentProps?:
-    | Record<string, unknown>
-    | ((state: TFormState) => Record<string, unknown>);
+    Record<string, unknown> | ((state: TFormState) => Record<string, unknown>);
   parse?: (raw: unknown) => unknown;
   format?: (value: unknown) => unknown;
   dependencies?: DependencyPredicate<TFormState>;

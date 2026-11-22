@@ -106,6 +106,7 @@ export default function CardLoadout({
   const addMessage = useAddChatMessage();
   useEffect(() => {
     store.init(setPlayer);
+    return () => store.clear();
   }, [setPlayer, store]);
 
   const activeVehicle = getActiveVehicle(player);

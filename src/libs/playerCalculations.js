@@ -5,6 +5,87 @@ export function clamp(value, min, max) {
   return Math.min(Math.max(value, min), max);
 }
 
+function classBenefitBonuses(player) {
+  let hpBonus = 0;
+  let mpBonus = 0;
+  let ipBonus = 0;
+
+  const innateClasses = player.settings?.optionalRules?.innateClasses ?? [];
+  const isTechnospheres =
+    player.settings?.optionalRules?.technospheres ?? false;
+  const technospheresVariant =
+    player.settings?.optionalRules?.technospheresVariant ?? "standard";
+  const usesInnateClassRules =
+    isTechnospheres && technospheresVariant !== "hoplospheres";
+
+  (player.classes ?? []).forEach((cls) => {
+    if (!cls.benefits) return;
+    if (usesInnateClassRules && !innateClasses.includes(cls.name)) return;
+    hpBonus += cls.benefits.hpplus || 0;
+    mpBonus += cls.benefits.mpplus || 0;
+    ipBonus += cls.benefits.ipplus || 0;
+  });
+
+  if (
+    isTechnospheres &&
+    (technospheresVariant === "standard" ||
+      technospheresVariant === "mnemospheres")
+  ) {
+    hpBonus += 5;
+    mpBonus += 5;
+  }
+
+  return { hpBonus, mpBonus, ipBonus };
+}
+
+export function calcMaxHp(player) {
+  const lvl = Number(player.lvl) || 0;
+  const might = Number(player.attributes?.might?.base) || 0;
+  const baseMaxHP = lvl + might * 5;
+
+  let hpBonus = classBenefitBonuses(player).hpBonus;
+
+  if (player.modifiers) {
+    hpBonus += player.resources?.hp?.bonus ?? player.modifiers.hp ?? 0;
+  }
+
+  const fortressBonus = (player.classes ?? [])
+    .flatMap((cls) => cls.skills || [])
+    .filter((skill) => skill.specialSkill === "Fortress")
+    .reduce((acc, skill) => acc + Number(skill.currentLvl) * 3, 0);
+  hpBonus += fortressBonus;
+
+  return baseMaxHP + hpBonus;
+}
+
+export function calcMaxMp(player) {
+  const lvl = Number(player.lvl) || 0;
+  const willpower = Number(player.attributes?.willpower?.base) || 0;
+  const baseMaxMP = lvl + willpower * 5;
+
+  let mpBonus = classBenefitBonuses(player).mpBonus;
+
+  if (player.modifiers) {
+    mpBonus += player.resources?.mp?.bonus ?? player.modifiers.mp ?? 0;
+  }
+
+  const focusedBonus = (player.classes ?? [])
+    .flatMap((cls) => cls.skills || [])
+    .filter((skill) => skill.specialSkill === "Focused")
+    .reduce((acc, skill) => acc + Number(skill.currentLvl) * 3, 0);
+  mpBonus += focusedBonus;
+
+  return baseMaxMP + mpBonus;
+}
+
+export function calcMaxIp(player) {
+  let ipBonus = classBenefitBonuses(player).ipBonus;
+  if (player.modifiers) {
+    ipBonus += player.modifiers.ip || 0;
+  }
+  return 6 + ipBonus;
+}
+
 /**
  * Calculates the effective attribute die value for a player, applying active
  * debuff and buff statuses, then clamping to [min, max].

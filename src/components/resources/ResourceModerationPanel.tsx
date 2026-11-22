@@ -33,8 +33,6 @@ interface PendingSubmission {
   uses_ai_content: boolean;
   additional_notes: string;
   discord_account: string;
-  requester_email: string;
-  requester_uuid: string;
   requester_display_name: string;
   terms_accepted: boolean;
   contact_consent: boolean;
@@ -75,7 +73,9 @@ const ResourceModerationPanel: React.FC<ResourceModerationPanelProps> = ({
       setLoading(true);
       const { data, error } = await supabase
         .from("submissions")
-        .select("*")
+        .select(
+          "id, title, descr_short, url, type, language, author, pricing_type, uses_ai_content, additional_notes, discord_account, requester_display_name, terms_accepted, contact_consent, license_accepted, status, created_at, updated_at, reviewed_by, reviewed_at, rejection_reason",
+        )
         .eq("status", "pending")
         .order("created_at", { ascending: false });
 

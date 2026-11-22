@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useState, useMemo } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useState,
+  useMemo,
+  useRef,
+} from "react";
 import { flushSync } from "react-dom";
 import { useLocation, useParams } from "react-router";
 import { useDatabase } from "../../hooks/useDatabase";
@@ -186,6 +192,10 @@ export default function PlayerEdit() {
   const playerError = isUsingLocalDb ? localError : cloudError;
 
   const [isUpdated, setIsUpdated] = useState(false); // State for unsaved changes
+  const isUpdatedRef = useRef(false);
+  useEffect(() => {
+    isUpdatedRef.current = isUpdated;
+  }, [isUpdated]);
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [playerTemp, setPlayerTemp] = useState(() =>
     player
@@ -205,6 +215,7 @@ export default function PlayerEdit() {
   );
   const appDrawerOpen = useThemeStore((s) => s.drawerOpen);
   const [savedSnackbarOpen, setSavedSnackbarOpen] = useState(false);
+  const [saveErrorSnackbarOpen, setSaveErrorSnackbarOpen] = useState(false);
   const [compactView, setCompactView] = useState(false);
   const [compactViewExpanded, setCompactViewExpanded] = useState(false);
 
@@ -235,8 +246,7 @@ export default function PlayerEdit() {
     isUsingLocalDb || Boolean(user && player && user.uid === player.uid);
   const isEditMode = isOwner && isSheetEditMode;
 
-  const handleSave = useCallback(() => {
-    setIsUpdated(false);
+  const handleSave = useCallback(async () => {
     const playerToSave = {
       ...playerTemp,
       settings: {
@@ -244,8 +254,14 @@ export default function PlayerEdit() {
         defaultView: compactView ? "compact" : "normal",
       },
     };
-    activeSetDoc(ref, stampSave(applyPreSaveTransforms(playerToSave)));
-    setSavedSnackbarOpen(true);
+    try {
+      await activeSetDoc(ref, stampSave(applyPreSaveTransforms(playerToSave)));
+      setIsUpdated(false);
+      setSavedSnackbarOpen(true);
+    } catch (error) {
+      console.error("Failed to save player:", error);
+      setSaveErrorSnackbarOpen(true);
+    }
   }, [ref, playerTemp, compactView, activeSetDoc]);
 
   const handleCtrlS = useCallback(
@@ -277,15 +293,15 @@ export default function PlayerEdit() {
     return () => window.removeEventListener("resize", onResize);
   }, []);
 
+  // Sync incoming changes only when there are no unsaved local edits
   useEffect(() => {
-    if (player) {
-      const updatedPlayerTemp = applyPostLoadTransforms(
-        JSON.parse(JSON.stringify(player)),
-      );
-      setPlayerTemp(updatedPlayerTemp);
-      setIsUpdated(false);
-      setCompactView(updatedPlayerTemp?.settings?.defaultView === "compact");
-    }
+    if (!player || isUpdatedRef.current) return;
+    const updatedPlayerTemp = applyPostLoadTransforms(
+      JSON.parse(JSON.stringify(player)),
+    );
+    setPlayerTemp(updatedPlayerTemp);
+    setIsUpdated(false);
+    setCompactView(updatedPlayerTemp?.settings?.defaultView === "compact");
   }, [player]);
 
   useEffect(() => {
@@ -2063,6 +2079,21 @@ export default function PlayerEdit() {
           sx={{ width: "100%" }}
         >
           {t("Saved")}
+        </Alert>
+      </Snackbar>
+      <Snackbar
+        open={saveErrorSnackbarOpen}
+        autoHideDuration={5000}
+        onClose={() => setSaveErrorSnackbarOpen(false)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          onClose={() => setSaveErrorSnackbarOpen(false)}
+          severity="error"
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
+          {t("Failed to save. Your changes have not been saved.")}
         </Alert>
       </Snackbar>
     </Layout>

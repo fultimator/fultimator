@@ -12,6 +12,8 @@ import { useTranslate } from "/src/translation/translate";
 import { useCustomTheme } from "/src/hooks/useCustomTheme";
 import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
+import rehypeSanitize from "rehype-sanitize";
+import { markdownSanitizeSchema } from "/src/utility/markdownSanitizeSchema";
 import { availableFrames } from "/src/libs/pilotVehicleData";
 import { Martial } from "/src/components/icons";
 import { OpenBracket, CloseBracket } from "/src/components/Bracket";
@@ -38,7 +40,7 @@ const StyledMarkdown = ({ children, ...props }) => {
     >
       <ReactMarkdown
         {...props}
-        rehypePlugins={[rehypeRaw]}
+        rehypePlugins={[rehypeRaw, [rehypeSanitize, markdownSanitizeSchema]]}
         components={{
           p: (props) => (
             <p

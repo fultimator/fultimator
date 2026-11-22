@@ -36,7 +36,7 @@ export const ATTR_OPTIONS = [
   { value: "dexterity", label: "DEX" },
   { value: "insight", label: "INS" },
   { value: "might", label: "MIG" },
-  { value: "will", label: "WLP" },
+  { value: "willpower", label: "WLP" },
 ];
 
 export const DURATION_OPTIONS = [

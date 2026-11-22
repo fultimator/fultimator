@@ -8,22 +8,14 @@ import { auth, driveAuthProvider } from "../../firebase";
 import { getDb, STORES, notifyAllListeners, clearPendingSync } from "../idb";
 import { IS_CAPACITOR } from "../index";
 
-export const DRIVE_TOKEN_KEY = "fultimator_drive_token";
+let accessToken: string | null = null;
 
 function getStoredToken(): string | null {
-  try {
-    return sessionStorage.getItem(DRIVE_TOKEN_KEY);
-  } catch {
-    return null;
-  }
+  return accessToken;
 }
 
 export function storeAccessToken(token: string): void {
-  try {
-    sessionStorage.setItem(DRIVE_TOKEN_KEY, token);
-  } catch {
-    // sessionStorage not available
-  }
+  accessToken = token;
 }
 
 /** Re-sign-in with Google to obtain a fresh access token (includes drive.file scope). */
@@ -128,6 +120,15 @@ export async function restoreFromDrive(): Promise<void> {
   );
   if (!res.ok) throw new Error(`Drive download failed: ${res.status}`);
   const snapshot = (await res.json()) as Record<string, unknown[]>;
+
+  for (const [storeName, records] of Object.entries(snapshot)) {
+    if (!(STORES as readonly string[]).includes(storeName)) continue;
+    if (!Array.isArray(records)) {
+      throw new Error(
+        `Backup is corrupted: "${storeName}" is not a valid record list`,
+      );
+    }
+  }
 
   const db = await getDb();
   for (const [storeName, records] of Object.entries(snapshot)) {

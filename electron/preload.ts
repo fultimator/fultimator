@@ -1,29 +1,25 @@
 import { ipcRenderer, contextBridge } from "electron";
 import { safeOpenExternal } from "./urlGuard";
 
-// --------- Expose some API to the Renderer process ---------
-contextBridge.exposeInMainWorld("ipcRenderer", {
-  on(...args: Parameters<typeof ipcRenderer.on>) {
-    const [channel, listener] = args;
-    return ipcRenderer.on(channel, (event, ...args) =>
-      listener(event, ...args),
-    );
-  },
-  off(...args: Parameters<typeof ipcRenderer.off>) {
-    const [channel, ...omit] = args;
-    return ipcRenderer.off(channel, ...omit);
-  },
-  send(...args: Parameters<typeof ipcRenderer.send>) {
-    const [channel, ...omit] = args;
-    return ipcRenderer.send(channel, ...omit);
-  },
-  invoke(...args: Parameters<typeof ipcRenderer.invoke>) {
-    const [channel, ...omit] = args;
-    return ipcRenderer.invoke(channel, ...omit);
-  },
+const ALLOWED_INVOKE_CHANNELS = new Set<string>([
+  "login-google",
+  "check-auth",
+  "logoutGoogle",
+  "get-google-tokens",
+  "list-files",
+  "download-from-google-drive",
+  "upload-to-google-drive",
+  "upload-buffer-to-google-drive",
+  "read-file",
+]);
 
-  // You can expose other APTs you need here.
-  // ...
+contextBridge.exposeInMainWorld("ipcRenderer", {
+  invoke(channel: string, ...args: unknown[]) {
+    if (!ALLOWED_INVOKE_CHANNELS.has(channel)) {
+      return Promise.reject(new Error(`Blocked IPC channel: ${channel}`));
+    }
+    return ipcRenderer.invoke(channel, ...args);
+  },
 });
 
 // Expose the Electron API to the renderer process

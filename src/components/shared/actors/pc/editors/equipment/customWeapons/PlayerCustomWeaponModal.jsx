@@ -54,19 +54,23 @@ function normalizeAccuracyCheck(
   value,
   fallback = { attr1: accuracyChecks[0].att1, attr2: accuracyChecks[0].att2 },
 ) {
-  const attr1 = Array.isArray(value)
+  const rawAttr1 = Array.isArray(value)
     ? value[0]
     : (value?.accuracy?.attr1 ??
       value?.attr1 ??
       value?.att1 ??
       value?.accuracy?.att1);
-  const attr2 = Array.isArray(value)
+  const rawAttr2 = Array.isArray(value)
     ? value[1]
     : (value?.accuracy?.attr2 ??
       value?.attr2 ??
       value?.att2 ??
       value?.accuracy?.att2);
-  const validAttrs = ["dexterity", "insight", "might", "will"];
+  const attr1 =
+    rawAttr1 === "will" || rawAttr1 === "wlp" ? "willpower" : rawAttr1;
+  const attr2 =
+    rawAttr2 === "will" || rawAttr2 === "wlp" ? "willpower" : rawAttr2;
+  const validAttrs = ["dexterity", "insight", "might", "willpower"];
   if (validAttrs.includes(attr1) && validAttrs.includes(attr2)) {
     return { attr1, attr2 };
   }
@@ -320,7 +324,7 @@ export default function PlayerCustomWeaponModal({
     overrideAccuracyAttributes,
     rareAccuracyBonus,
     hasTransforming,
-    _secondSelectedCategory,
+    secondSelectedCategory,
     slots,
     slotted,
     primaryHrZero,
@@ -330,7 +334,7 @@ export default function PlayerCustomWeaponModal({
     precModifier,
     secondSelectedAccuracyCheck,
     secondaryHrZero,
-    _secondOverrideDamageType,
+    secondOverrideDamageType,
     secondCustomDamageType,
     secondDamageModifier,
     secondPrecModifier,
@@ -407,7 +411,7 @@ export default function PlayerCustomWeaponModal({
     if (hasTransforming) {
       const { precision: s2prec, damage: s2dmg } = calculateCustomWeaponStats(
         {
-          secondSelectedCategory: formState._secondSelectedCategory,
+          secondSelectedCategory: secondSelectedCategory,
           secondCurrentCustomizations: secondCustomizations,
           rareAccuracyBonus,
           rareDamageBonus: formState.rareDamageBonus,
@@ -469,7 +473,7 @@ export default function PlayerCustomWeaponModal({
       martial: formState.martial,
       isEquipped: editCustomWeaponIndex !== null ? formState.isEquipped : false,
       secondName: formState.secondWeaponName,
-      secondCategory: formState._secondSelectedCategory,
+      secondCategory: secondSelectedCategory,
       secondRange: formState.secondSelectedRange,
       secondCustomizations: secondCustomizations ?? [],
       secondModifiers: {
@@ -578,7 +582,7 @@ export default function PlayerCustomWeaponModal({
   const { precision: s2Prec, damage: s2Dmg } = hasTransforming
     ? calculateCustomWeaponStats(
         {
-          secondSelectedCategory: formState._secondSelectedCategory,
+          secondSelectedCategory: secondSelectedCategory,
           secondCurrentCustomizations: secondCustomizations,
           rareAccuracyBonus,
           rareDamageBonus: formState.rareDamageBonus,
@@ -738,7 +742,7 @@ export default function PlayerCustomWeaponModal({
                 slotted,
                 // Second form fields read by buildSecondWeaponItem inside the card.
                 secondWeaponName: formState.secondWeaponName,
-                secondSelectedCategory: formState._secondSelectedCategory,
+                secondSelectedCategory: secondSelectedCategory,
                 secondSelectedRange: formState.secondSelectedRange,
                 secondAccuracy: hasTransforming
                   ? {

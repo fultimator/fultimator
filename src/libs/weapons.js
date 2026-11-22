@@ -18,7 +18,12 @@ const weapons = [
     category: "Arcane",
     name: "Staff",
     cost: 100,
-    accuracy: { attr1: "will", attr2: "will", value: 0, defense: "def" },
+    accuracy: {
+      attr1: "willpower",
+      attr2: "willpower",
+      value: 0,
+      defense: "def",
+    },
     damage: { value: 6, type: "physical", hrZero: false },
     hands: 2,
     range: "melee",

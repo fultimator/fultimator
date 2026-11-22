@@ -10,7 +10,7 @@ export enum Attributes {
   Might = "might",
   Dexterity = "dexterity",
   Insight = "insight",
-  Willpower = "will",
+  Willpower = "willpower",
 }
 
 export enum Elements {

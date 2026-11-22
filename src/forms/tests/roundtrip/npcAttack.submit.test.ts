@@ -36,7 +36,12 @@ describe("npc-attack schema roundtrip", () => {
   it("attack with mdef defense passes schema", () => {
     const result = NpcAttackSchema.safeParse({
       ...BASE_ATTACK,
-      accuracy: { attr1: "insight", attr2: "will", value: 2, defense: "mdef" },
+      accuracy: {
+        attr1: "insight",
+        attr2: "willpower",
+        value: 2,
+        defense: "mdef",
+      },
     });
     expect(result.success, JSON.stringify(result)).toBe(true);
   });

@@ -119,7 +119,12 @@ export const availableModules = {
       cost: 500,
       range: "Melee",
       qualityCost: 0,
-      accuracy: { attr1: "dexterity", attr2: "will", value: 0, defense: "def" },
+      accuracy: {
+        attr1: "dexterity",
+        attr2: "willpower",
+        value: 0,
+        defense: "def",
+      },
       damage: { value: 8, type: "physical", hrZero: false },
     },
     {
@@ -241,7 +246,12 @@ export const availableModules = {
       cost: 500,
       range: "Melee",
       qualityCost: 0,
-      accuracy: { attr1: "dexterity", attr2: "will", value: 0, defense: "def" },
+      accuracy: {
+        attr1: "dexterity",
+        attr2: "willpower",
+        value: 0,
+        defense: "def",
+      },
       damage: { value: 12, type: "physical", hrZero: false },
     },
     {

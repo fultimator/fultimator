@@ -57,9 +57,7 @@ export const TextEffectsAccordion = React.memo(function TextEffectsAccordion({
                   onChange={(e) =>
                     setCustomization({
                       textEffectType: e.target.value as
-                        | "shadow"
-                        | "glow"
-                        | "outline",
+                        "shadow" | "glow" | "outline",
                     })
                   }
                 >

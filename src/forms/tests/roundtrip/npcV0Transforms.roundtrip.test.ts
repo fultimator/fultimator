@@ -96,7 +96,12 @@ describe("NPC v0 transform compatibility", () => {
     const parsed = validateNpcPersisted(migrated);
 
     expect(parsed.success, JSON.stringify(parsed, null, 2)).toBe(true);
-    expect(migrated.schemaVersion).toBeGreaterThanOrEqual(10);
+    expect(migrated.schemaVersion).toBeGreaterThanOrEqual(14);
+    expect(migrated.attributes.willpower.base).toBe(7);
+    expect(
+      (migrated.attributes as unknown as Record<string, unknown>).will,
+    ).toBeUndefined();
+    expect(migrated.spells?.[0]?.accuracy?.attr2).toBe("willpower");
     expect(migrated.attacks?.[0]?.damage?.type).toBe("air");
     expect(migrated.weaponattacks?.[0]?.damage?.type).toBe("air");
     expect(migrated.spells?.[0]?.damage?.type).toBe("air");

@@ -110,7 +110,7 @@ describe("itemFormRegistry", () => {
         targetDescription: "One creature",
         duration: "Instantaneous",
         "accuracy.attr1": "insight",
-        "accuracy.attr2": "will",
+        "accuracy.attr2": "willpower",
       };
       const payload = entry.buildPayload?.(state, {
         compendiumClasses: [],

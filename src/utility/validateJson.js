@@ -61,7 +61,7 @@ export const validateCharacter = (character) => {
   }
 
   // Validate 'attributes' object
-  const attributeProps = ["dexterity", "insight", "might", "willpower"];
+  const attributeProps = ["dexterity", "insight", "might"];
   if (
     typeof character.attributes !== "object" ||
     Array.isArray(character.attributes) ||
@@ -78,6 +78,15 @@ export const validateCharacter = (character) => {
       ) {
         errors.push(`Missing or invalid: ${prop} in attributes`);
       }
+    }
+    // Modern exports key this as `willpower`; older exports used `will`.
+    const willpowerValue =
+      character.attributes.willpower?.base ??
+      character.attributes.willpower ??
+      character.attributes.will?.base ??
+      character.attributes.will;
+    if (typeof willpowerValue !== "number") {
+      errors.push("Missing or invalid: willpower in attributes");
     }
   }
 
@@ -97,17 +106,12 @@ export const validateCharacter = (character) => {
       ) {
         errors.push(`Missing: ${stat} in stats`);
       } else {
-        const subProps = ["max", "current"];
-        for (const prop of subProps) {
-          if (
-            !Object.prototype.hasOwnProperty.call(
-              character.stats[stat],
-              prop,
-            ) ||
-            typeof character.stats[stat][prop] !== "number"
-          ) {
-            errors.push(`Missing or invalid: ${stat} ${prop} in stats`);
-          }
+        const cap = character.stats[stat].base ?? character.stats[stat].max;
+        if (typeof cap !== "number") {
+          errors.push(`Missing or invalid: ${stat} base/max in stats`);
+        }
+        if (typeof character.stats[stat].current !== "number") {
+          errors.push(`Missing or invalid: ${stat} current in stats`);
         }
       }
     }
@@ -121,10 +125,6 @@ export const validateCharacter = (character) => {
     "weak",
     "shaken",
     "poisoned",
-    "dexUp",
-    "insUp",
-    "migUp",
-    "wlpUp",
   ];
   if (
     typeof character.statuses !== "object" ||
@@ -243,7 +243,7 @@ export const validateNpc = (npc) => {
   }
 
   // Validate 'attributes' object
-  const attributeProps = ["dexterity", "might", "will", "insight"];
+  const attributeProps = ["dexterity", "might", "insight"];
   if (
     typeof npc.attributes !== "object" ||
     Array.isArray(npc.attributes) ||
@@ -258,6 +258,15 @@ export const validateNpc = (npc) => {
       ) {
         errors.push(`Missing or invalid: ${prop} in attributes`);
       }
+    }
+    // Modern exports key this as `willpower`; older exports used `will`.
+    const willpowerValue =
+      npc.attributes.willpower?.base ??
+      npc.attributes.willpower ??
+      npc.attributes.will?.base ??
+      npc.attributes.will;
+    if (typeof willpowerValue !== "number") {
+      errors.push("Missing or invalid: willpower in attributes");
     }
   }
 

@@ -49,7 +49,7 @@ import {
   Report,
   KeyboardArrowUp,
 } from "@mui/icons-material";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 
 import allToken from "/images/routes/icons/species/All-token.webp";
@@ -130,7 +130,10 @@ function Personal({ user }) {
   const [collapse, setCollapse] = useState(true);
   const [lastItem, setLastItem] = useState(undefined);
   const [prevLastItem, setPrevLastItem] = useState([]);
-  const personalRef = collection(cloudFirestore, "npc-personal");
+  const personalRef = useMemo(
+    () => collection(cloudFirestore, "npc-personal"),
+    [],
+  );
   const [selectedType, setSelectedType] = useState("All");
   const [name, setName] = useState("");
   const [rank, setRank] = useState("");
@@ -145,48 +148,50 @@ function Personal({ user }) {
     language: "en",
   });
 
-  const constraints = [where("published", "==", true)];
+  const personalQuery = useMemo(() => {
+    const constraints = [where("published", "==", true)];
 
-  if (searchParams.level[0] !== 5 || searchParams.level[1] !== 60) {
-    constraints.push(where("lvl", ">=", searchParams.level[0]));
-    constraints.push(where("lvl", "<=", searchParams.level[1]));
-    constraints.push(orderBy("lvl", "asc"));
-  }
-
-  if (searchParams.name !== "") {
-    constraints.push(
-      where("searchString", "array-contains-any", [
-        ...searchParams.name
-          .replace(/[\W_]+/g, " ")
-          .toLowerCase()
-          .split(" "),
-      ]),
-    );
-  }
-
-  if (searchParams.rank !== "") {
-    constraints.push(where("rank", "==", searchParams.rank));
-  }
-
-  if (searchParams.type !== "All") {
-    constraints.push(where("species", "==", searchParams.type));
-  }
-
-  constraints.push(where("language", "==", searchParams.language));
-
-  constraints.push(orderBy("publishedAt", "desc"));
-
-  if (lastItem) {
     if (searchParams.level[0] !== 5 || searchParams.level[1] !== 60) {
-      constraints.push(startAfter(lastItem.lvl, lastItem.publishedAt));
-    } else {
-      constraints.push(startAfter(lastItem.publishedAt));
+      constraints.push(where("lvl", ">=", searchParams.level[0]));
+      constraints.push(where("lvl", "<=", searchParams.level[1]));
+      constraints.push(orderBy("lvl", "asc"));
     }
-  }
 
-  constraints.push(limit(6));
+    if (searchParams.name !== "") {
+      constraints.push(
+        where("searchString", "array-contains-any", [
+          ...searchParams.name
+            .replace(/[\W_]+/g, " ")
+            .toLowerCase()
+            .split(" "),
+        ]),
+      );
+    }
 
-  const personalQuery = query(personalRef, ...constraints);
+    if (searchParams.rank !== "") {
+      constraints.push(where("rank", "==", searchParams.rank));
+    }
+
+    if (searchParams.type !== "All") {
+      constraints.push(where("species", "==", searchParams.type));
+    }
+
+    constraints.push(where("language", "==", searchParams.language));
+
+    constraints.push(orderBy("publishedAt", "desc"));
+
+    if (lastItem) {
+      if (searchParams.level[0] !== 5 || searchParams.level[1] !== 60) {
+        constraints.push(startAfter(lastItem.lvl, lastItem.publishedAt));
+      } else {
+        constraints.push(startAfter(lastItem.publishedAt));
+      }
+    }
+
+    constraints.push(limit(6));
+
+    return query(personalRef, ...constraints);
+  }, [personalRef, searchParams, lastItem]);
   const [personalList, loading, err] = useCollectionDataCloud(personalQuery);
 
   if (err) {

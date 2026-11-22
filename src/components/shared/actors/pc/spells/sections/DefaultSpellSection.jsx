@@ -289,8 +289,8 @@ export default function DefaultSpellSection({ formState, setFormState, t }) {
                 <MenuItem value={"might"}>
                   {attributes["might"].shortcaps}
                 </MenuItem>
-                <MenuItem value={"will"}>
-                  {attributes["will"].shortcaps}
+                <MenuItem value={"willpower"}>
+                  {attributes["willpower"].shortcaps}
                 </MenuItem>
               </Select>
             </FormControl>
@@ -327,8 +327,8 @@ export default function DefaultSpellSection({ formState, setFormState, t }) {
                 <MenuItem value={"might"}>
                   {attributes["might"].shortcaps}
                 </MenuItem>
-                <MenuItem value={"will"}>
-                  {attributes["will"].shortcaps}
+                <MenuItem value={"willpower"}>
+                  {attributes["willpower"].shortcaps}
                 </MenuItem>
               </Select>
             </FormControl>

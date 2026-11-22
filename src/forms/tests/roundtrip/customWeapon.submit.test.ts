@@ -262,7 +262,7 @@ describe("customWeapon submit roundtrip", () => {
       modifiers: { damage: 4, accuracy: 2, def: 0, mdef: 0 },
     });
     const result = validateCustomWeaponPersisted(payload);
-    expect(result.success).toBe(true);
+    expect(result.success, JSON.stringify(result, null, 2)).toBe(true);
     if (result.success) {
       expect(result.data.modifiers?.accuracy).toBe(2);
       expect(result.data.modifiers?.damage).toBe(4);
@@ -277,6 +277,22 @@ describe("customWeapon submit roundtrip", () => {
     expect(result.success, JSON.stringify(result)).toBe(true);
     if (result.success) {
       expect(typeof result.data.qualityCost).toBe("number");
+    }
+  });
+
+  it("normalizes legacy 'will' in accuracy attributes to 'willpower'", () => {
+    const payload = buildCustomWeaponPayload({
+      accuracy: {
+        attr1: "dexterity",
+        attr2: "will",
+        value: 0,
+        defense: "def",
+      },
+    });
+    const result = validateCustomWeaponPersisted(payload);
+    expect(result.success, JSON.stringify(result, null, 2)).toBe(true);
+    if (result.success) {
+      expect(result.data.accuracy?.attr2).toBe("willpower");
     }
   });
 });

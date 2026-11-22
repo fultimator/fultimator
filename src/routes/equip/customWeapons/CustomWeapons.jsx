@@ -47,13 +47,17 @@ function normalizeAccuracyCheck(
   value,
   fallback = { attr1: accuracyChecks[0].att1, attr2: accuracyChecks[0].att2 },
 ) {
-  const attr1 = Array.isArray(value)
+  const rawAttr1 = Array.isArray(value)
     ? value[0]
     : (value?.accuracy?.attr1 ?? value?.attr1 ?? value?.att1);
-  const attr2 = Array.isArray(value)
+  const rawAttr2 = Array.isArray(value)
     ? value[1]
     : (value?.accuracy?.attr2 ?? value?.attr2 ?? value?.att2);
-  const validAttrs = ["dexterity", "insight", "might", "will"];
+  const attr1 =
+    rawAttr1 === "will" || rawAttr1 === "wlp" ? "willpower" : rawAttr1;
+  const attr2 =
+    rawAttr2 === "will" || rawAttr2 === "wlp" ? "willpower" : rawAttr2;
+  const validAttrs = ["dexterity", "insight", "might", "willpower"];
   if (validAttrs.includes(attr1) && validAttrs.includes(attr2)) {
     return { attr1, attr2 };
   }

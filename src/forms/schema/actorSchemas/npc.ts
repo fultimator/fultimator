@@ -29,7 +29,7 @@ const NpcAttributesSchema = z.object({
   dexterity: NpcAttributeValueSchema,
   insight: NpcAttributeValueSchema,
   might: NpcAttributeValueSchema,
-  will: NpcAttributeValueSchema,
+  willpower: NpcAttributeValueSchema,
 });
 
 const NpcImmunitiesSchema = z.object({

@@ -1293,8 +1293,7 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                                           ? {
                                               ...prev,
                                               range: e.target.value as
-                                                | "melee"
-                                                | "ranged",
+                                                "melee" | "ranged",
                                             }
                                           : prev,
                                       )
@@ -1314,8 +1313,7 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                                           ? {
                                               ...prev,
                                               defense: e.target.value as
-                                                | "def"
-                                                | "mdef",
+                                                "def" | "mdef",
                                             }
                                           : prev,
                                       )

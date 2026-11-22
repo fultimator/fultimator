@@ -125,7 +125,7 @@ export const defaultFields: ItemFieldConfig<PlayerSpellFormState> = [
     kind: "editable",
     label: "shared.accuracy.attr2",
     component: "select",
-    defaultValue: "will",
+    defaultValue: "willpower",
     group: "accuracy",
     order: 41,
     gridSize: { xs: 6, sm: 3 },

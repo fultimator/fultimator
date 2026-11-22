@@ -1,7 +1,7 @@
 // Role seeds an NPC's four attribute dice from a level-based lookup; the NPC calc
 // then derives HP/MP/init/accuracy/damage from attributes + level + rank.
 
-const ATTRS = ["dexterity", "insight", "might", "will"];
+const ATTRS = ["dexterity", "insight", "might", "willpower"];
 
 export const QA_ROLES = {
   brute: [
@@ -77,7 +77,7 @@ export function clampQuickAssemblyLevel(level) {
   );
 }
 
-// Attribute dice { dexterity, insight, might, will } for a role/level, or null.
+// Attribute dice { dexterity, insight, might, willpower } for a role/level, or null.
 export function getRoleAttributesForLevel(role, level) {
   const steps = QA_ROLES[role];
   if (!steps) return null;
@@ -99,7 +99,7 @@ const ATTR_SHORT = {
   dexterity: "DEX",
   insight: "INS",
   might: "MIG",
-  will: "WLP",
+  willpower: "WLP",
 };
 
 // Mirrors calcHP/calcMP in libs/npcs.js for a base-rank NPC.
@@ -107,7 +107,7 @@ function roleHp(role, attrs, level) {
   return 2 * Number(level) + 5 * attrs.might + getRoleHpBonus(role, level);
 }
 function roleMp(attrs, level) {
-  return Number(level) + 5 * attrs.will;
+  return Number(level) + 5 * attrs.willpower;
 }
 
 // e.g. "INS d10; WLP d10" for attributes raised above their level-5 base.

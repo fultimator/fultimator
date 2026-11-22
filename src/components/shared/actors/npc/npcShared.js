@@ -2,7 +2,7 @@ export const ATTR_SHORT = {
   dexterity: "dex",
   insight: "ins",
   might: "mig",
-  will: "wlp",
+  willpower: "wlp",
 };
 
 export const damageTypeLabels = {

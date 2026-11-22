@@ -36,7 +36,7 @@ function buildInitialState() {
     targetDescription: "",
     duration: "",
     "accuracy.attr1": "insight",
-    "accuracy.attr2": "will",
+    "accuracy.attr2": "willpower",
     "accuracy.value": 0,
     "accuracy.defense": "mdef",
     "damage.value": 0,

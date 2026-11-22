@@ -1,5 +1,5 @@
 import { useParams } from "react-router";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   addDoc,
   collection,
@@ -209,12 +209,15 @@ function RollerScopedAuthenticated({ user }) {
 
 function PreparedRolls({ user, scope, createRoll }) {
   const { t } = useTranslate();
-  const preparedRollsRef = collection(firestore, "rolls-prepared");
-  const preparedRollsQuery = query(
-    preparedRollsRef,
-    where("uid", "==", user.uid),
-    where("scope", "==", scope),
-    orderBy("timestamp", "desc"),
+  const preparedRollsQuery = useMemo(
+    () =>
+      query(
+        collection(firestore, "rolls-prepared"),
+        where("uid", "==", user.uid),
+        where("scope", "==", scope),
+        orderBy("timestamp", "desc"),
+      ),
+    [user.uid, scope],
   );
 
   const deletePreparedRoll = (id) => {
@@ -253,11 +256,14 @@ function PreparedRolls({ user, scope, createRoll }) {
 }
 
 function RollList({ scope, saveRoll, user }) {
-  const rollsRef = collection(firestore, "rolls");
-  const rollsQuery = query(
-    rollsRef,
-    where("scope", "==", scope),
-    orderBy("timestamp", "desc"),
+  const rollsQuery = useMemo(
+    () =>
+      query(
+        collection(firestore, "rolls"),
+        where("scope", "==", scope),
+        orderBy("timestamp", "desc"),
+      ),
+    [scope],
   );
 
   const [rolls] = useCollectionData(rollsQuery, {

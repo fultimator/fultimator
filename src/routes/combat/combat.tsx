@@ -16,7 +16,7 @@ import {
   Stack,
 } from "@mui/material";
 import { Cloud as CloudIcon, Download, AddCircle } from "@mui/icons-material";
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useDatabaseContext } from "../../context/useDatabaseContext";
 import { useDatabase } from "../../hooks/useDatabase";
 
@@ -35,16 +35,17 @@ import { useTranslate } from "../../translation/translate";
 export default function Combat() {
   const { t } = useTranslate();
   const { authLoading, dbMode, cloudUser } = useDatabaseContext();
+  const canAccess = dbMode === "local" || Boolean(cloudUser);
 
   return (
     <Layout>
       <Typography variant="h4">{t("Combat")}</Typography>
       {authLoading && <Skeleton />}
 
-      {!authLoading && !cloudUser && (
+      {!authLoading && dbMode === "cloud" && !cloudUser && (
         <Paper
-          elevation={dbMode === "cloud" ? 3 : 0}
-          variant={dbMode === "cloud" ? "elevation" : "outlined"}
+          elevation={3}
+          variant="elevation"
           sx={{
             p: 2,
             mb: 2,
@@ -55,10 +56,10 @@ export default function Combat() {
             flexWrap: "wrap",
           }}
         >
-          <CloudIcon color={dbMode === "cloud" ? "primary" : "disabled"} />
+          <CloudIcon color="primary" />
           <Typography
             variant="body2"
-            color={dbMode === "cloud" ? "text.primary" : "text.secondary"}
+            color="text.primary"
             sx={{ flex: 1, minWidth: 200 }}
           >
             {t("You have to be logged in to access this feature")}
@@ -67,27 +68,21 @@ export default function Combat() {
         </Paper>
       )}
 
-      {cloudUser && <AuthCombat />}
+      {!authLoading && canAccess && <AuthCombat />}
     </Layout>
   );
 }
 
 function AuthCombat() {
   const { t } = useTranslate();
-  const { cloudUser } = useDatabaseContext();
-  const db = useDatabase("cloud");
+  const db = useDatabase();
 
   const [personalList, setPersonalList] = useState<TypeNpc[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!cloudUser) {
-      setLoading(false);
-      return;
-    }
     const q = db.query(
       db.collection("npc-personal"),
-      db.where("uid", "==", cloudUser.uid),
       db.orderBy("lvl", "asc"),
       db.orderBy("name", "asc"),
     );
@@ -99,9 +94,13 @@ function AuthCombat() {
       )
       .catch((e) => console.error("Error loading NPCs:", e))
       .finally(() => setLoading(false));
-  }, [db, cloudUser]);
+  }, [db]);
 
   const [npcs, setNpcs] = useState<TypeNpc[]>([]);
+  const personalListWithLabels = useMemo(
+    () => (personalList ?? []).map((npc) => ({ ...npc, label: npc.name })),
+    [personalList],
+  );
 
   if (loading) {
     return null;
@@ -127,11 +126,6 @@ function AuthCombat() {
 
   const npcCounts = getNpcCounts();
 
-  // Add label
-  personalList?.forEach((npc) => {
-    npc.label = npc.name;
-  });
-
   console.debug(npcs);
 
   return (
@@ -141,7 +135,7 @@ function AuthCombat() {
           size="small"
           disablePortal
           id="combo-box-demo"
-          options={personalList || []}
+          options={personalListWithLabels}
           sx={{ width: 300, mb: 2 }}
           onChange={addNpc}
           renderInput={(params) => (
@@ -215,7 +209,13 @@ function NpcCombatant({ npc }: NpcProps) {
     poisoned: false,
   });
 
-  const originalAttributes = npc.attributes;
+  const originalAttributes = {
+    ...npc.attributes,
+    willpower: npc.attributes.willpower ??
+      (npc.attributes as unknown as { will?: { base: number } })?.will ?? {
+        base: 8,
+      },
+  };
 
   const changeHp = (value: number) => {
     return () => {
@@ -259,19 +259,19 @@ function NpcCombatant({ npc }: NpcProps) {
           : poisoned || weak
             ? adjustAttribute(originalAttributes.might, -2)
             : originalAttributes.might,
-      will:
+      willpower:
         poisoned && shaken
-          ? adjustAttribute(originalAttributes.will, -4)
+          ? adjustAttribute(originalAttributes.willpower, -4)
           : poisoned || shaken
-            ? adjustAttribute(originalAttributes.will, -2)
-            : originalAttributes.will,
+            ? adjustAttribute(originalAttributes.willpower, -2)
+            : originalAttributes.willpower,
     });
   }, [
     statusEffects,
     originalAttributes.dexterity,
     originalAttributes.insight,
     originalAttributes.might,
-    originalAttributes.will,
+    originalAttributes.willpower,
   ]);
 
   const toggleStatus = (status = "", hasStatus = false) => {
@@ -445,7 +445,7 @@ function NpcCombatant({ npc }: NpcProps) {
         dexterity: "DEX",
         insight: "INS",
         might: "MIG",
-        will: "WLP",
+        willpower: "WLP",
       };
 
       translatedAttribute1 = `${t(attributeMap[attr1])} d${attributes[attr1]?.base ?? attributes[attr1]}`;
@@ -460,7 +460,7 @@ function NpcCombatant({ npc }: NpcProps) {
         dexterity: "DEX",
         insight: "INS",
         might: "MIG",
-        will: "WLP",
+        willpower: "WLP",
       };
 
       translatedAttribute1 = `${t(attributeMap[attr1])} d${attributes[attr1]?.base ?? attributes[attr1]}`;
@@ -475,7 +475,7 @@ function NpcCombatant({ npc }: NpcProps) {
         dexterity: "DEX",
         insight: "INS",
         might: "MIG",
-        will: "WLP",
+        willpower: "WLP",
       };
 
       translatedAttribute1 = `${t(attributeMap[attr1])} d${attributes[attr1]?.base ?? attributes[attr1]}`;
@@ -614,7 +614,13 @@ function NpcCombatant({ npc }: NpcProps) {
             </Grid>
             <Grid size="grow">
               <Typography variant="h5">
-                {t("WIL:")} d{attributes.will?.base}
+                {t("WIL:")} d
+                {attributes.willpower?.base ??
+                  (
+                    attributes as unknown as {
+                      will?: { base: number };
+                    }
+                  )?.will?.base}
               </Typography>
             </Grid>
           </Grid>

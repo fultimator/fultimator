@@ -147,17 +147,16 @@ export default function NpcEdit() {
   const isOwner = isLocalNpc || Boolean(user && npc && user.uid === npc.uid);
 
   const [isUpdated, setIsUpdated] = useState(false); // State for unsaved changes
+  const isUpdatedRef = useRef(false);
   const [npcTemp, setNpcTemp] = useState(() =>
     npc ? applyNpcPostLoadTransforms(JSON.parse(JSON.stringify(npc))) : npc,
   ); // Temporary NPC state
 
-  // Effect to update temporary NPC state when NPC data changes.
-  // Apply post-load transforms so migrations are reflected in the editor.
+  // Sync incoming changes only when there are no unsaved local edits
   useEffect(() => {
-    if (npc) {
-      setNpcTemp(applyNpcPostLoadTransforms(JSON.parse(JSON.stringify(npc))));
-      setIsUpdated(false);
-    }
+    if (!npc || isUpdatedRef.current) return;
+    setNpcTemp(applyNpcPostLoadTransforms(JSON.parse(JSON.stringify(npc))));
+    setIsUpdated(false);
   }, [npc]);
 
   useEffect(() => {
@@ -167,17 +166,27 @@ export default function NpcEdit() {
     setIsUpdated(!deepEqual(npcTemp, baseline));
   }, [npcTemp, npc]);
 
+  useEffect(() => {
+    isUpdatedRef.current = isUpdated;
+  }, [isUpdated]);
+
   const appDrawerOpen = useThemeStore((s) => s.drawerOpen);
   const [savedSnackbarOpen, setSavedSnackbarOpen] = useState(false);
+  const [saveErrorSnackbarOpen, setSaveErrorSnackbarOpen] = useState(false);
   const isDesktop = useMediaQuery("(min-width: 769px)");
 
-  const handleSave = useCallback(() => {
-    setIsUpdated(false);
-    activeSetDoc(
-      ref,
-      stampSave(applyNpcPreSaveTransforms(npcTemp), npcTemp.publishedAt),
-    );
-    setSavedSnackbarOpen(true);
+  const handleSave = useCallback(async () => {
+    try {
+      await activeSetDoc(
+        ref,
+        stampSave(applyNpcPreSaveTransforms(npcTemp), npcTemp.publishedAt),
+      );
+      setIsUpdated(false);
+      setSavedSnackbarOpen(true);
+    } catch (error) {
+      console.error("Failed to save NPC:", error);
+      setSaveErrorSnackbarOpen(true);
+    }
   }, [ref, npcTemp, activeSetDoc]);
 
   useDrawerSave({ canSave: isOwner && isUpdated, onSave: handleSave });
@@ -673,6 +682,21 @@ export default function NpcEdit() {
             sx={{ width: "100%" }}
           >
             {t("Saved")}
+          </Alert>
+        </Snackbar>
+        <Snackbar
+          open={saveErrorSnackbarOpen}
+          autoHideDuration={5000}
+          onClose={() => setSaveErrorSnackbarOpen(false)}
+          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        >
+          <Alert
+            onClose={() => setSaveErrorSnackbarOpen(false)}
+            severity="error"
+            variant="filled"
+            sx={{ width: "100%" }}
+          >
+            {t("Failed to save. Your changes have not been saved.")}
           </Alert>
         </Snackbar>
         {isSmallScreen && (

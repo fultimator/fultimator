@@ -12,6 +12,7 @@ import {
 import { normalizeDefensiveList } from "../../libs/equipmentDefensiveNormalization";
 import { availableModules } from "../../libs/pilotVehicleData";
 import { backfillIds } from "./itemIds";
+import { renameWillAttrValueDeep } from "./renameWillAttrValue";
 
 type PlayerTransform = (player: TypePlayer) => TypePlayer;
 
@@ -780,8 +781,7 @@ function unifyPlayerWeaponSchema(player: TypePlayer): TypePlayer {
     ) {
       const damageObj = w.damage as Record<string, unknown>;
       const secondDamageObj = w.secondDamage as
-        | Record<string, unknown>
-        | undefined;
+        Record<string, unknown> | undefined;
       const rare = (w.rare as Record<string, unknown> | undefined) ?? {};
       const modifiers =
         (w.modifiers as Record<string, unknown> | undefined) ?? {};
@@ -865,13 +865,11 @@ function unifyPlayerWeaponSchema(player: TypePlayer): TypePlayer {
           overrideAccuracyAttr1:
             (rare.overrideAccuracyAttr1 as string | undefined) ??
             ((w.accuracy as Record<string, unknown> | undefined)?.attr1 as
-              | string
-              | undefined),
+              string | undefined),
           overrideAccuracyAttr2:
             (rare.overrideAccuracyAttr2 as string | undefined) ??
             ((w.accuracy as Record<string, unknown> | undefined)?.attr2 as
-              | string
-              | undefined),
+              string | undefined),
         },
         ...(w.secondSelectedCategory
           ? {
@@ -1375,6 +1373,11 @@ const POST_LOAD_TRANSFORMS: VersionedTransform[] = [
     label:
       "Spell v11: sub-item name->key on container types; invocation tracker grouping; cooking cookbook namespace; pilot-vehicle slots reconstruction",
     fn: migratePlayerSpellsV11,
+  },
+  {
+    version: 12,
+    label: "Rename attr1/attr2/att1/att2 value 'will' to 'willpower'",
+    fn: renameWillAttrValueDeep,
   },
 ];
 

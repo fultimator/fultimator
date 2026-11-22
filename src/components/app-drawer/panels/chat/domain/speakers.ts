@@ -692,7 +692,7 @@ export function resolveAttackOptions(
 const ATTRIBUTE_KEY: Record<Attribute, string> = {
   mig: "might",
   ins: "insight",
-  wlp: "will",
+  wlp: "willpower",
   dex: "dexterity",
 };
 

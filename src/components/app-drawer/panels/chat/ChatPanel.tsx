@@ -697,8 +697,7 @@ export const ChatPanel: React.FC = () => {
       const docId = activeActorDoc.id as string;
       const db = UUID_RE.test(docId) ? localDb : cloudDb;
       const sourceCollection = activeActorDoc.sourceCollection as
-        | string
-        | undefined;
+        string | undefined;
       const isNpc = sourceCollection
         ? sourceCollection === "npc-personal"
         : isCombatSim
@@ -803,8 +802,7 @@ export const ChatPanel: React.FC = () => {
       if (useRuntimeIp) {
         updateRuntimeActor(combatId!, (actor) => {
           const stats = activeActorDoc.stats as
-            | Record<string, { max?: number }>
-            | undefined;
+            Record<string, { max?: number }> | undefined;
           const maxIp = stats?.ip?.max ?? Number.POSITIVE_INFINITY;
           return {
             ...actor,
@@ -892,8 +890,7 @@ export const ChatPanel: React.FC = () => {
       if (isCombatSim && event.resource === "ip" && combatId) {
         updateRuntimeActor(combatId, (actor) => {
           const stats = activeActorDoc.stats as
-            | Record<string, { max?: number }>
-            | undefined;
+            Record<string, { max?: number }> | undefined;
           const maxIp = stats?.ip?.max ?? Number.POSITIVE_INFINITY;
           return {
             ...actor,

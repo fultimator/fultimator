@@ -490,7 +490,8 @@ function PlayerSpellForm({ packId, onClose, editData, editItemId }) {
       "cost.perTarget": editData?.cost?.perTarget ?? true,
       "accuracy.attr1":
         editData?.accuracy?.attr1 ?? editData?.attr1 ?? "insight",
-      "accuracy.attr2": editData?.accuracy?.attr2 ?? editData?.attr2 ?? "will",
+      "accuracy.attr2":
+        editData?.accuracy?.attr2 ?? editData?.attr2 ?? "willpower",
       "accuracy.value": editData?.accuracy?.value ?? 0,
       "accuracy.defense": editData?.accuracy?.defense ?? "mdef",
     }),

@@ -9,6 +9,7 @@ import { Affinities, Elements } from "../../types/Misc";
 import { normalizeDefensiveItem } from "../../libs/equipmentDefensiveNormalization";
 import { calcHP, calcMP, ensureSpeciesGrants } from "../../libs/npcs";
 import { ensureId, backfillIds } from "./itemIds";
+import { renameWillAttrValueDeep } from "./renameWillAttrValue";
 
 type NpcTransform = (npc: TypeNpc) => TypeNpc;
 
@@ -411,8 +412,10 @@ function actorAlignmentV10(npc: TypeNpc): TypeNpc {
         (rawAttrs.insight as number | undefined) ??
         8,
     },
-    will: {
+    willpower: {
       base:
+        (rawAttrs.willpower as { base?: number } | undefined)?.base ??
+        (rawAttrs.willpower as number | undefined) ??
         (rawAttrs.will as { base?: number } | undefined)?.base ??
         (rawAttrs.will as number | undefined) ??
         8,
@@ -533,6 +536,27 @@ function renameWindToAir(npc: TypeNpc): TypeNpc {
     weaponattacks: weaponattacks as TypeNpc["weaponattacks"],
     spells: spells as TypeNpc["spells"],
   };
+}
+
+function renameWillToWillpower(npc: TypeNpc): TypeNpc {
+  const attributes = {
+    ...(npc.attributes as unknown as Record<string, unknown>),
+  };
+  if ("will" in attributes) {
+    if (attributes["willpower"] === undefined) {
+      attributes["willpower"] = attributes["will"];
+    }
+    delete attributes["will"];
+  }
+
+  return {
+    ...npc,
+    attributes: attributes as unknown as TypeNpc["attributes"],
+  };
+}
+
+function renameWillAccuracyValue(npc: TypeNpc): TypeNpc {
+  return renameWillAttrValueDeep(npc);
 }
 
 /**
@@ -695,6 +719,16 @@ const POST_LOAD_TRANSFORMS: VersionedTransform[] = [
     label:
       "Species Grants: auto-detect and populate speciesGrants (affinities & immunities) from species defaults",
     fn: ensureSpeciesGrants,
+  },
+  {
+    version: 14,
+    label: "Rename attributes.will to attributes.willpower",
+    fn: renameWillToWillpower,
+  },
+  {
+    version: 15,
+    label: "Rename attr1/attr2/att1/att2 value 'will' to 'willpower'",
+    fn: renameWillAccuracyValue,
   },
 ];
 

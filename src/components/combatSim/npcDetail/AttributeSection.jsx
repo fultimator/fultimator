@@ -38,8 +38,8 @@ const ATTRS = [
   {
     label: "WLP",
     Icon: WlpAttributeIcon,
-    calcArgs: ["Shaken", "Poisoned", "will"],
-    baseKey: "will",
+    calcArgs: ["Shaken", "Poisoned", "willpower"],
+    baseKey: "willpower",
     colorKey: "warning",
   },
 ];
@@ -156,9 +156,7 @@ const AttributeSection = ({ selectedNPC, calcAttr }) => {
     >
       {ATTRS.map(({ label, Icon, calcArgs, baseKey, colorKey }) => {
         const value = calcAttr(...calcArgs, selectedNPC);
-        const raw =
-          selectedNPC?.attributes?.[baseKey] ??
-          (baseKey === "will" ? selectedNPC?.attributes?.willpower : undefined);
+        const raw = selectedNPC?.attributes?.[baseKey];
         const base = raw && typeof raw === "object" ? raw.base : raw;
         const diff = base != null ? value - base : 0;
         const color = theme.palette[colorKey].main;
