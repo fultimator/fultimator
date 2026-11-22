@@ -37,7 +37,11 @@ export type ThemeValue =
   | "MidnightBlue";
 
 export type StyleProfileValue =
-  "ThemeDefault" | "Flat" | "Regalia" | "Dystopian" | "Noir";
+  | "ThemeDefault"
+  | "Flat"
+  | "Regalia"
+  | "Dystopian"
+  | "Noir";
 
 interface ThemeStore {
   selectedTheme: ThemeValue;
@@ -57,12 +61,48 @@ interface ThemeStore {
   setUnsavedChanges: (unsaved: boolean) => void;
 }
 
+const THEME_VALUES: readonly ThemeValue[] = [
+  "Fabula",
+  "High",
+  "Techno",
+  "Natural",
+  "Bravely",
+  "Obscura",
+  "Noir",
+  "ClearBlue",
+  "MidnightBlue",
+];
+
+function readLegacyThemePrefs(): {
+  selectedTheme: ThemeValue;
+  isDarkMode: boolean;
+} {
+  let selectedTheme: ThemeValue = "Fabula";
+  let isDarkMode = false;
+  try {
+    const storedTheme = localStorage.getItem("selectedTheme");
+    if (
+      storedTheme &&
+      (THEME_VALUES as readonly string[]).includes(storedTheme)
+    ) {
+      selectedTheme = storedTheme as ThemeValue;
+    }
+    const storedDark = localStorage.getItem("isDarkMode");
+    if (storedDark) isDarkMode = JSON.parse(storedDark) === true;
+  } catch {
+    // Storage unavailable or value malformed; keep defaults.
+  }
+  return { selectedTheme, isDarkMode };
+}
+
+const legacyThemePrefs = readLegacyThemePrefs();
+
 export const useThemeStore = create<ThemeStore>()(
   persist(
     (set) => ({
-      selectedTheme: "Fabula",
+      selectedTheme: legacyThemePrefs.selectedTheme,
       selectedStyleProfile: "ThemeDefault",
-      isDarkMode: false,
+      isDarkMode: legacyThemePrefs.isDarkMode,
       customization: DEFAULT_CUSTOMIZATION,
       drawerOpen: false,
       unsavedChanges: false,
