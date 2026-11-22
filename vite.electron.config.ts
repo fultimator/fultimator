@@ -37,6 +37,10 @@ export default defineConfig({
       buffer: "buffer",
       process: "process/browser",
       stream: "stream-browserify",
+      "virtual:pwa-register": path.resolve(
+        __dirname,
+        "src/pwa/registerSW.noop.js",
+      ),
     },
     extensions: [".js", ".jsx", ".ts", ".tsx"],
   },

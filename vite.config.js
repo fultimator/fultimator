@@ -35,6 +35,7 @@ export default defineConfig({
       },
     }),
     VitePWA({
+      injectRegister: false, // registered in src/pwa/registerSW.js
       manifest: false,
       includeAssets: ["**/*"],
       workbox: {
