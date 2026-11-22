@@ -79,6 +79,40 @@ npm run build
 
 This will help you visualize and test your changes locally.
 
+## Android
+
+The Android app wraps the web build with [Capacitor](https://capacitorjs.com/).
+
+**Requirements:** JDK 21, Android SDK (platform `android-36`, build-tools `36.0.0`), `adb`, and a `.env` with the `VITE_FIREBASE_*` values.
+
+```bash
+npm run android:build   # build the debug APK
+npm run android:run     # build and install on the connected device
+```
+
+The APK ends up in `android/app/build/outputs/apk/debug/`.
+
+### Troubleshooting
+
+- _Java home is invalid:_ `android/gradle.properties` pins a Debian/Ubuntu JDK path. Override it in `~/.gradle/gradle.properties` with `org.gradle.java.home=/path/to/jdk-21`.
+- _`INSTALL_FAILED_UPDATE_INCOMPATIBLE`:_ the installed app uses a different signing key. Run `adb uninstall com.fultimator.app` first.
+
+### Google sign-in
+
+Sign-in only works if the APK's signing key is registered in Firebase. Local builds use your machine's debug key, so if you need sign-in, send your SHA-1 to a maintainer in `#development`:
+
+```bash
+keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android | grep SHA1
+```
+
+### Release signing (maintainers)
+
+CI signs APKs with the release keystore from these repository secrets: `ANDROID_KEYSTORE_BASE64` (the `.jks`, base64-encoded), `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS` and `ANDROID_KEY_PASSWORD`. Pull requests from forks don't get secrets, so their APKs use a temporary key and sign-in won't work.
+
+To sign locally with the release key, set the same values as environment variables, with `ANDROID_KEYSTORE_PATH` pointing to the `.jks` file instead of the base64 secret.
+
+Never commit the keystore or its password. If they're lost, create a new keystore, update the four secrets, and replace the fingerprints in Firebase.
+
 ## Deploy
 
 The app is hosted by firebase.
