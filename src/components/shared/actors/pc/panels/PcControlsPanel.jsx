@@ -843,7 +843,7 @@ export default function PcControlsPanel({
       const currentValue = prev.stats[resourceKey].current ?? 0;
       const maxValue = prev.stats[resourceKey].max ?? 0;
 
-      let delta = 0;
+      let delta;
 
       if (resourceKey === "hp" && payload.mode === "damage") {
         const effectiveAffinities = payload.isGuarding

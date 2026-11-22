@@ -70,7 +70,7 @@ const EditCompendiumModal = ({ open, onClose, typeName, onSave }) => {
   // Effect to set the correct official type list
   useEffect(() => {
     if (source !== "official") return;
-    let newType = [];
+    let newType;
     switch (selectedType) {
       case "spell":
         newType = npcSpells;

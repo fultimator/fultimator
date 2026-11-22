@@ -166,7 +166,7 @@ export function NpcSelector({
 
   const filteredNpcList = npcList.filter((npc) => {
     if (filterText === "") return true;
-    let value = "";
+    let value;
     if (filterField === "tags") {
       value = (npc.tags || [])
         .map((tag) => tag.name)

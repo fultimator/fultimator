@@ -168,7 +168,7 @@ export function setupIpcHandlers(mainWindow: BrowserWindow) {
       return fileContent;
     } catch (error) {
       console.error("Failed to read file", error);
-      throw new Error("Failed to read file");
+      throw new Error("Failed to read file", { cause: error });
     }
   });
 
@@ -192,7 +192,7 @@ export function setupIpcHandlers(mainWindow: BrowserWindow) {
       return true;
     } catch (error) {
       console.error("Failed to open file", error);
-      throw new Error("Failed to open file");
+      throw new Error("Failed to open file", { cause: error });
     }
   });
 

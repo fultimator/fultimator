@@ -22,9 +22,9 @@ function findMuiIconImports(dir) {
   }
   return icons;
 }
-const muiIconDeps = [...findMuiIconImports(path.resolve(__dirname, "src"))].map(
-  (icon) => `@mui/icons-material/${icon}`,
-);
+const muiIconDeps = [
+  ...findMuiIconImports(path.resolve(import.meta.dirname, "src")),
+].map((icon) => `@mui/icons-material/${icon}`);
 
 export default defineConfig({
   plugins: [
@@ -64,18 +64,14 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      "@routes": path.resolve(__dirname, "src/routes"),
-      "@platform/cloud": path.resolve(__dirname, "src/platform/web/db"),
-      "@platform": path.resolve(__dirname, "src/platform/web"),
+      "@routes": path.resolve(import.meta.dirname, "src/routes"),
+      "@platform/cloud": path.resolve(
+        import.meta.dirname,
+        "src/platform/web/db",
+      ),
+      "@platform": path.resolve(import.meta.dirname, "src/platform/web"),
     },
     extensions: [".js", ".jsx", ".ts", ".tsx"],
-  },
-  css: {
-    preprocessorOptions: {
-      sass: {
-        api: "modern",
-      },
-    },
   },
   build: {
     chunkSizeWarningLimit: 500,

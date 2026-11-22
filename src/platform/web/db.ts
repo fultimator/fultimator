@@ -26,10 +26,7 @@ export {
 } from "firebase/auth";
 export type { User, UserCredential } from "firebase/auth";
 
-export {
-  useCollectionData,
-  useDocumentData,
-} from "react-firebase-hooks/firestore";
+export { useCollectionData, useDocumentData } from "./firestoreHooks";
 export { useAuthState } from "react-firebase-hooks/auth";
 
 export {

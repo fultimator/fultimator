@@ -231,8 +231,8 @@ export function parseActionAttackArgs(rawArg: string): {
   const trimmed = rawArg.trim();
   if (!trimmed) return { weaponName: undefined, overrides: {} };
 
-  let weaponName = "";
-  let rest = "";
+  let weaponName: string;
+  let rest: string;
   if (trimmed.startsWith('"')) {
     const endQuote = trimmed.indexOf('"', 1);
     if (endQuote !== -1) {
@@ -312,7 +312,7 @@ export function parseActionSpellArgs(rawArg: string): {
   const trimmed = rawArg.trim();
   if (!trimmed) return { overrides: {} };
 
-  let spellArg = "";
+  let spellArg: string;
   let rest = "";
   if (trimmed.startsWith('"')) {
     const endQuote = trimmed.indexOf('"', 1);

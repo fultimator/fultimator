@@ -93,7 +93,7 @@ const CustomTextarea: React.FC<CustomTextareaProps> = ({
       const start = textarea.selectionStart;
       const end = textarea.selectionEnd;
       const selectedText = value.substring(start, end);
-      let formattedText = "";
+      let formattedText: string;
       let cursorOffset = 0;
 
       switch (format) {

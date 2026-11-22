@@ -843,7 +843,9 @@ export function useCompendiumPacks() {
         }
       } catch (e) {
         if (e instanceof Error && e.message.startsWith("downloadUrl")) throw e;
-        throw new Error("Manifest contains an invalid downloadUrl");
+        throw new Error("Manifest contains an invalid downloadUrl", {
+          cause: e,
+        });
       }
 
       const packResp = await fetch(manifest.downloadUrl);
