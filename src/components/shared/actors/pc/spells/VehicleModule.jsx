@@ -36,7 +36,7 @@ import {
 } from "/src/components/app-drawer/panels/chat/domain/effect-modifiers";
 import { sendRollMessage, sendDisplayMessage } from "/src/hooks/useRollToChat";
 import { useTranslate } from "/src/translation/translate";
-import ReactMarkdown from "react-markdown";
+import ReactMarkdown from "/src/components/common/Markdown";
 import { useDeleteConfirmation } from "/src/hooks/useDeleteConfirmation";
 import DeleteConfirmationDialog from "/src/components/common/DeleteConfirmationDialog";
 import { useCustomTheme } from "/src/hooks/useCustomTheme";

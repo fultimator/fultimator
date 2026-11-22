@@ -1,5 +1,5 @@
 import { useState } from "react";
-import ReactMarkdown from "react-markdown";
+import ReactMarkdown from "/src/components/common/Markdown";
 
 export function SpanMarkdown({ children }) {
   return (

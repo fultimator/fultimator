@@ -19,7 +19,7 @@ import {
 import { Delete, ExpandMore, ContentCopy } from "@mui/icons-material";
 import { useTranslate } from "/src/translation/translate";
 import CustomTextarea from "/src/components/common/CustomTextarea";
-import ReactMarkdown from "react-markdown";
+import ReactMarkdown from "/src/components/common/Markdown";
 import { magiseeds, magiseedTypes } from "/src/libs/floralistMagiseedData";
 import { useDeleteConfirmation } from "/src/hooks/useDeleteConfirmation";
 import DeleteConfirmationDialog from "/src/components/common/DeleteConfirmationDialog";

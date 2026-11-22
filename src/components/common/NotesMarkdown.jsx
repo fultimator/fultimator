@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import ReactMarkdown from "react-markdown";
+import ReactMarkdown from "/src/components/common/Markdown";
 import { Typography, Box, Link } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import remarkGfm from "remark-gfm"; // GitHub-flavored markdown
@@ -435,32 +435,27 @@ const NotesMarkdown = ({
         ),
 
         // Custom styling for code blocks
-        code: ({ inline, children, ...props }) => {
-          if (inline) {
-            return (
-              <Box
-                component="code"
-                sx={{
-                  fontFamily: "monospace",
-                  backgroundColor: isDark
-                    ? theme.palette.grey[800]
-                    : theme.palette.grey[200],
-                  color: isDark
-                    ? theme.palette.secondary.light
-                    : theme.palette.primary.dark,
-                  padding: "0.1em 0.4em",
-                  borderRadius: "4px",
-                  fontSize: "0.875em",
-                }}
-                {...props}
-              >
-                {children}
-              </Box>
-            );
-          }
-          // Let fenced code blocks be handled by `pre`
-          return <code {...props}>{children}</code>;
-        },
+        // Inline style; `pre` resets it for fenced blocks
+        code: ({ children, ...props }) => (
+          <Box
+            component="code"
+            sx={{
+              fontFamily: "monospace",
+              backgroundColor: isDark
+                ? theme.palette.grey[800]
+                : theme.palette.grey[200],
+              color: isDark
+                ? theme.palette.secondary.light
+                : theme.palette.primary.dark,
+              padding: "0.1em 0.4em",
+              borderRadius: "4px",
+              fontSize: "0.875em",
+            }}
+            {...props}
+          >
+            {children}
+          </Box>
+        ),
 
         // Custom styling for fenced code blocks
         pre: ({ children, ...props }) => (
@@ -476,6 +471,12 @@ const NotesMarkdown = ({
               borderRadius: 2,
               overflowX: "auto",
               marginY: 2,
+              "& code": {
+                backgroundColor: "transparent",
+                color: "inherit",
+                padding: 0,
+                fontSize: "inherit",
+              },
             }}
             {...props}
           >

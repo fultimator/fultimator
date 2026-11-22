@@ -17,7 +17,7 @@ import {
 } from "@mui/material";
 import { Delete, Edit } from "@mui/icons-material";
 import { IconButton, Tooltip } from "@mui/material";
-import ReactMarkdown from "react-markdown";
+import ReactMarkdown from "/src/components/common/Markdown";
 import CustomTextarea from "/src/components/common/CustomTextarea";
 import ItemRowCard from "/src/components/shared/common/ItemRowCard";
 import {

@@ -1,7 +1,7 @@
 import React from "react";
 import { TableCell } from "@mui/material";
 import { styled } from "@mui/system";
-import ReactMarkdown from "react-markdown";
+import ReactMarkdown from "/src/components/common/Markdown";
 import { useMarkdown } from "/src/hooks/useMarkdown";
 
 export const StyledTableCell = styled(TableCell)({

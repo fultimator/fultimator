@@ -11229,7 +11229,19 @@
     "es": "Efecto",
     "pt-BR": "Efeito",
     "zh": "效果",
-    "ru": "Effect"
+    "ru": "Эффект"
+  },
+  {
+    "key": "Effects",
+    "en": "Effects",
+    "it": "Effett",
+    "de": "Effekte",
+    "pl": "Efekty",
+    "fr": "Effets",
+    "es": "Efectos",
+    "pt-BR": "Efeitos",
+    "zh": "效果",
+    "ru": "Эффекты"
   },
   {
     "key": "Report a Bug",
@@ -16081,7 +16093,7 @@
   },
   {
     "key": "Set the bond name and sentiments.",
-    "en": "",
+    "en": "Set the bond name and sentiments.",
     "it": "Imposta il nome del legame e i sentimenti.",
     "de": "Lege den Namen der Bindung und die Gefühle fest.",
     "pl": "Ustaw nazwę więzi i uczucia.",
@@ -16090,6 +16102,126 @@
     "pt-BR": "Establece el nombre del vínculo y los sentimientos.",
     "zh": "设置羁绊名称和情感。",
     "ru": "Задайте название связи и чувства."
+  },
+  {
+    "key": "Backpack",
+    "en": "Backpack",
+    "it": "Backpack",
+    "de": "Backpack",
+    "pl": "Backpack",
+    "fr": "Backpack",
+    "es": "Backpack",
+    "pt-BR": "Backpack",
+    "zh": "Backpack",
+    "ru": "Backpack"
+  },
+  {
+    "key": "This item type is not covered under the third party license and has no official data.",
+    "en": "This item type is not covered under the third party license and has no official data.",
+    "it": "This item type is not covered under the third party license and has no official data.",
+    "de": "This item type is not covered under the third party license and has no official data.",
+    "pl": "This item type is not covered under the third party license and has no official data.",
+    "fr": "This item type is not covered under the third party license and has no official data.",
+    "es": "This item type is not covered under the third party license and has no official data.",
+    "pt-BR": "This item type is not covered under the third party license and has no official data.",
+    "zh": "This item type is not covered under the third party license and has no official data.",
+    "ru": "This item type is not covered under the third party license and has no official data."
+  },
+  {
+    "key": "You can create custom items by switching to your personal compendium.",
+    "en": "You can create custom items by switching to your personal compendium.",
+    "it": "You can create custom items by switching to your personal compendium.",
+    "de": "You can create custom items by switching to your personal compendium.",
+    "pl": "You can create custom items by switching to your personal compendium.",
+    "fr": "You can create custom items by switching to your personal compendium.",
+    "es": "You can create custom items by switching to your personal compendium.",
+    "pt-BR": "You can create custom items by switching to your personal compendium.",
+    "zh": "You can create custom items by switching to your personal compendium.",
+    "ru": "You can create custom items by switching to your personal compendium."
+  },
+  {
+    "key": "Compendium",
+    "en": "Compendium",
+    "it": "Compendium",
+    "de": "Compendium",
+    "pl": "Compendium",
+    "fr": "Compendium",
+    "es": "Compendium",
+    "pt-BR": "Compendium",
+    "zh": "Compendium",
+    "ru": "Compendium"
+  },
+  {
+    "key": "Optionals",
+    "en": "Optionals",
+    "it": "Optionals",
+    "de": "Optionals",
+    "pl": "Optionals",
+    "fr": "Optionals",
+    "es": "Optionals",
+    "pt-BR": "Optionals",
+    "zh": "Optionals",
+    "ru": "Optionals"
+  },
+  {
+    "key": "Other",
+    "en": "Other",
+    "it": "Other",
+    "de": "Other",
+    "pl": "Other",
+    "fr": "Other",
+    "es": "Other",
+    "pt-BR": "Other",
+    "zh": "Other",
+    "ru": "Other"
+  },
+  {
+    "key": "Personal",
+    "en": "Personal",
+    "it": "Personal",
+    "de": "Personal",
+    "pl": "Personal",
+    "fr": "Personal",
+    "es": "Personal",
+    "pt-BR": "Personal",
+    "zh": "Personal",
+    "ru": "Personal"
+  },
+  {
+    "key": "For personal use only; do not share exported data on official channels.",
+    "en": "For personal use only; do not share exported data on official channels.",
+    "it": "For personal use only; do not share exported data on official channels.",
+    "de": "For personal use only; do not share exported data on official channels.",
+    "pl": "For personal use only; do not share exported data on official channels.",
+    "fr": "For personal use only; do not share exported data on official channels.",
+    "es": "For personal use only; do not share exported data on official channels.",
+    "pt-BR": "For personal use only; do not share exported data on official channels.",
+    "zh": "For personal use only; do not share exported data on official channels.",
+    "ru": "For personal use only; do not share exported data on official channels."
+  },
+  {
+    "key": "Disclaimer",
+    "en": "Disclaimer",
+    "it": "Disclaimer",
+    "de": "Disclaimer",
+    "pl": "Disclaimer",
+    "fr": "Disclaimer",
+    "es": "Disclaimer",
+    "pt-BR": "Disclaimer",
+    "zh": "Disclaimer",
+    "ru": "Disclaimer"
+  },
+  {
+    "key": "Total Invested Levels",
+    "en": "Total Invested Levels",
+    "it": "Total Invested Levels",
+    "de": "Total Invested Levels",
+    "pl": "Total Invested Levels",
+    "fr": "Total Invested Levels",
+    "es": "Total Invested Levels",
+    "pt-BR": "Total Invested Levels",
+    "zh": "Total Invested Levels",
+    "ru": "Total Invested Levels"
   },
   {
     "key": "shared.fuid",

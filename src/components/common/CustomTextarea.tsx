@@ -1,6 +1,6 @@
 import React, { useRef, useCallback, useState, useEffect } from "react";
 import { TextField, Button, Box } from "@mui/material";
-import ReactMarkdown from "react-markdown";
+import ReactMarkdown from "/src/components/common/Markdown";
 import { useCustomTheme } from "../../hooks/useCustomTheme";
 
 interface CustomTextareaProps {

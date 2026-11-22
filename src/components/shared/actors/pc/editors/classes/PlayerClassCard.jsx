@@ -11,7 +11,7 @@ import {
   Divider,
   Alert,
 } from "@mui/material";
-import ReactMarkdown from "react-markdown";
+import ReactMarkdown from "/src/components/common/Markdown";
 import { styled } from "@mui/system";
 import { useTranslate } from "/src/translation/translate";
 import CustomHeaderClasses from "/src/components/common/CustomHeaderClasses";

@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import { Close } from "@mui/icons-material";
 import { TypeIcon } from "/src/components/types";
-import ReactMarkdown from "react-markdown";
+import ReactMarkdown from "/src/components/common/Markdown";
 import { sendDisplayMessage } from "/src/hooks/useRollToChat";
 import { substituteKeyValues, volumes } from "./magichantVerseUtils";
 

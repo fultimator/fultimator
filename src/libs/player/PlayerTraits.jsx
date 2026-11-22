@@ -2,7 +2,7 @@ import React from "react";
 import { Paper, Grid, Typography, Divider } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "../../translation/translate";
-import ReactMarkdown from "react-markdown";
+import ReactMarkdown from "/src/components/common/Markdown";
 import { styled } from "@mui/system";
 import { useCustomTheme } from "../../hooks/useCustomTheme";
 

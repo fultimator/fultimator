@@ -1,7 +1,7 @@
 import { useEffect, useRef, useMemo } from "react";
 import { Card, Chip, Typography, Box, Divider } from "@mui/material";
 import { useTranslate } from "/src/translation/translate";
-import ReactMarkdown from "react-markdown";
+import ReactMarkdown from "/src/components/common/Markdown";
 import { useCustomTheme } from "/src/hooks/useCustomTheme";
 import { DAMAGE_TYPES } from "/src/libs/quickAssembly/constants";
 

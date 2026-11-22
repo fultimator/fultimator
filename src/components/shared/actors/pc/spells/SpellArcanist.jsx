@@ -16,7 +16,7 @@ import {
   RadioButtonUnchecked,
   VisibilityOff,
 } from "@mui/icons-material";
-import ReactMarkdown from "react-markdown";
+import ReactMarkdown from "/src/components/common/Markdown";
 import { styled } from "@mui/system";
 import ItemRowCard from "/src/components/shared/common/ItemRowCard";
 import { useTranslate } from "/src/translation/translate";

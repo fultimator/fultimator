@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import CasinoIcon from "@mui/icons-material/Casino";
-import ReactMarkdown from "react-markdown";
+import ReactMarkdown from "/src/components/common/Markdown";
 import {
   DistanceIcon,
   MeleeIcon,

@@ -14,7 +14,7 @@ import {
 } from "@mui/material";
 import { EditAttributes } from "./EditAttributes";
 import EditQuickAssembly from "./EditQuickAssembly";
-import ReactMarkdown from "react-markdown";
+import ReactMarkdown from "/src/components/common/Markdown";
 import { useTranslate } from "/src/translation/translate";
 import SectionCard from "/src/components/shared/actors/common/SectionCard";
 import { useCustomTheme } from "/src/hooks/useCustomTheme";

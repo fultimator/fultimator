@@ -17,7 +17,7 @@ import {
   Box,
 } from "@mui/material";
 import { useTranslate } from "/src/translation/translate";
-import ReactMarkdown from "react-markdown";
+import ReactMarkdown from "/src/components/common/Markdown";
 import { Close } from "@mui/icons-material";
 import Diamond from "/src/components/Diamond";
 import { OffensiveSpellIcon } from "/src/components/icons";
@@ -413,9 +413,11 @@ const EditCompendiumModal = ({ open, onClose, typeName, onSave }) => {
               sm: "auto",
             }}
           >
-            <Typography variant="body2">
-              <strong>Disclaimer:</strong> For personal use only; do not share
-              exported data on official channels.
+            <Typography variant="body2" sx={{ color: "text.secondary" }}>
+              <strong>{t("Disclaimer")}:</strong>{" "}
+              {t(
+                "For personal use only; do not share exported data on official channels.",
+              )}
             </Typography>
           </Grid>
           <Grid

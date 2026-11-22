@@ -20,7 +20,7 @@ import {
   Casino,
 } from "@mui/icons-material";
 import { useTranslate } from "/src/translation/translate";
-import ReactMarkdown from "react-markdown";
+import ReactMarkdown from "/src/components/common/Markdown";
 import { useCustomTheme } from "/src/hooks/useCustomTheme";
 import { magiseeds } from "/src/libs/floralistMagiseedData";
 import Clock from "/src/components/shared/actors/pc/playerSheet/Clock";

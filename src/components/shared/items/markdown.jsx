@@ -1,4 +1,4 @@
-import ReactMarkdown from "react-markdown";
+import ReactMarkdown from "/src/components/common/Markdown";
 import remarkBreaks from "remark-breaks";
 import { styled } from "@mui/system";
 
