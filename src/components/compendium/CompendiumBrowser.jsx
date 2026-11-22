@@ -40,7 +40,6 @@ import CodeIcon from "@mui/icons-material/Code";
 import StarIcon from "@mui/icons-material/Star";
 import CollectionsBookmarkIcon from "@mui/icons-material/CollectionsBookmark";
 
-import html2canvas from "html2canvas";
 import JSZip from "jszip";
 import { useTranslate } from "../../translation/translate";
 import { useCustomTheme } from "../../hooks/useCustomTheme";
@@ -184,6 +183,7 @@ const CompendiumBrowser = React.memo(function CompendiumBrowser({
     let failed = 0;
 
     setBulkImageProgress({ done: 0, total: indices.length });
+    const { default: html2canvas } = await import("html2canvas");
     for (let i = 0; i < indices.length; i++) {
       const idx = indices[i];
       const item = filteredItems[idx];

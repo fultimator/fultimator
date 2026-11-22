@@ -2,6 +2,7 @@ import { defineConfig } from "vitest/config";
 import react from "@vitejs/plugin-react";
 import svgr from "vite-plugin-svgr";
 import { VitePWA } from "vite-plugin-pwa";
+import translations from "./scripts/vite-plugin-translations.mjs";
 import path from "path";
 import { readFileSync, readdirSync } from "fs";
 const pkg = JSON.parse(readFileSync("./package.json", "utf-8"));
@@ -28,6 +29,7 @@ const muiIconDeps = [
 
 export default defineConfig({
   plugins: [
+    translations(),
     react(),
     svgr({
       svgrOptions: {

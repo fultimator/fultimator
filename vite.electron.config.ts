@@ -3,6 +3,7 @@ import path from "node:path";
 import electron from "vite-plugin-electron/simple";
 import react from "@vitejs/plugin-react";
 import svgr from "vite-plugin-svgr";
+import translations from "./scripts/vite-plugin-translations.mjs";
 import { readFileSync } from "fs";
 const pkg = JSON.parse(readFileSync("./package.json", "utf-8"));
 
@@ -10,6 +11,7 @@ const pkg = JSON.parse(readFileSync("./package.json", "utf-8"));
 export default defineConfig({
   cacheDir: "node_modules/.vite-electron",
   plugins: [
+    translations(),
     react(),
     svgr({
       svgrOptions: { icon: true },

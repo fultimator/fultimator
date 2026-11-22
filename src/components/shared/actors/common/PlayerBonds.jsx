@@ -170,9 +170,7 @@ export default function PlayerBonds({
       onClose={closeModal}
       onConfirm={saveBond}
       title={isCreatingBond ? t("Add Bond") : t("Edit Bond")}
-      subtitle={t(
-        "Set the bond name and sentiments. Opposed sentiments auto-exclude each other.",
-      )}
+      subtitle={t("Set the bond name and sentiments.")}
       maxWidth="sm"
       actions={
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>

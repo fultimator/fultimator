@@ -14,7 +14,7 @@ import {
 import MenuOption from "./MenuOption";
 import { useNpc } from "/src/components/shared/actors/npc/context";
 import ExplainSkillsSimplified from "/src/components/shared/actors/npc/editors/ExplainSkillsSimplified";
-import CompendiumViewerModal from "../compendium/CompendiumViewerModal";
+import CompendiumViewerModal from "../compendium/LazyCompendiumViewerModal";
 import { t } from "../../translation/translate";
 
 const NpcEditAppBar = ({
