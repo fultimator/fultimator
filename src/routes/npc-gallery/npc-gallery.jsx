@@ -125,12 +125,12 @@ const CREATE_NPC_SPECIES_OPTIONS = [
 const CREATE_NPC_RANK_OPTIONS = [
   { value: "soldier", label: "Soldier" },
   { value: "elite", label: "Elite" },
-  { value: "champion1", label: "Champion(1)" },
-  { value: "champion2", label: "Champion(2)" },
-  { value: "champion3", label: "Champion(3)" },
-  { value: "champion4", label: "Champion(4)" },
-  { value: "champion5", label: "Champion(5)" },
-  { value: "champion6", label: "Champion(6)" },
+  { value: "champion1", label: "Champion (1)" },
+  { value: "champion2", label: "Champion (2)" },
+  { value: "champion3", label: "Champion (3)" },
+  { value: "champion4", label: "Champion (4)" },
+  { value: "champion5", label: "Champion (5)" },
+  { value: "champion6", label: "Champion (6)" },
   { value: "companion", label: "Companion" },
   { value: "groupvehicle", label: "Group Vehicle" },
 ];
@@ -868,12 +868,12 @@ function Personal() {
                   <MenuItem value={""}>{t("All")}</MenuItem>
                   <MenuItem value={"soldier"}>{t("Soldier")}</MenuItem>
                   <MenuItem value={"elite"}>{t("Elite")}</MenuItem>
-                  <MenuItem value={"champion1"}>{t("Champion(1)")}</MenuItem>
-                  <MenuItem value={"champion2"}>{t("Champion(2)")}</MenuItem>
-                  <MenuItem value={"champion3"}>{t("Champion(3)")}</MenuItem>
-                  <MenuItem value={"champion4"}>{t("Champion(4)")}</MenuItem>
-                  <MenuItem value={"champion5"}>{t("Champion(5)")}</MenuItem>
-                  <MenuItem value={"champion6"}>{t("Champion(6)")}</MenuItem>
+                  <MenuItem value={"champion1"}>{t("Champion (1)")}</MenuItem>
+                  <MenuItem value={"champion2"}>{t("Champion (2)")}</MenuItem>
+                  <MenuItem value={"champion3"}>{t("Champion (3)")}</MenuItem>
+                  <MenuItem value={"champion4"}>{t("Champion (4)")}</MenuItem>
+                  <MenuItem value={"champion5"}>{t("Champion (5)")}</MenuItem>
+                  <MenuItem value={"champion6"}>{t("Champion (6)")}</MenuItem>
                   <MenuItem value={"companion"}>{t("Companion")}</MenuItem>
                   <MenuItem value={"groupvehicle"}>
                     {t("Group Vehicle")}

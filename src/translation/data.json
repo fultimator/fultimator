@@ -4176,6 +4176,66 @@
     "ru": "Hunter"
   },
   {
+    "key": "Brute",
+    "en": "Brute",
+    "it": "Brute",
+    "de": "Brute",
+    "pl": "Brute",
+    "fr": "Brute",
+    "es": "Brute",
+    "pt-BR": "Brute",
+    "zh": "Brute",
+    "ru": "Brute"
+  },
+  {
+    "key": "Mage",
+    "en": "Mage",
+    "it": "Mage",
+    "de": "Mage",
+    "pl": "Mage",
+    "fr": "Mage",
+    "es": "Mage",
+    "pt-BR": "Mage",
+    "zh": "Mage",
+    "ru": "Mage"
+  },
+  {
+    "key": "Saboteur",
+    "en": "Saboteur",
+    "it": "Saboteur",
+    "de": "Saboteur",
+    "pl": "Saboteur",
+    "fr": "Saboteur",
+    "es": "Saboteur",
+    "pt-BR": "Saboteur",
+    "zh": "Saboteur",
+    "ru": "Saboteur"
+  },
+  {
+    "key": "Sentinel",
+    "en": "Sentinel",
+    "it": "Sentinel",
+    "de": "Sentinel",
+    "pl": "Sentinel",
+    "fr": "Sentinel",
+    "es": "Sentinel",
+    "pt-BR": "Sentinel",
+    "zh": "Sentinel",
+    "ru": "Sentinel"
+  },
+  {
+    "key": "Support",
+    "en": "Support",
+    "it": "Support",
+    "de": "Support",
+    "pl": "Support",
+    "fr": "Support",
+    "es": "Support",
+    "pt-BR": "Support",
+    "zh": "Support",
+    "ru": "Support"
+  },
+  {
     "key": "ice",
     "en": "ice",
     "it": "ghiaccio",
