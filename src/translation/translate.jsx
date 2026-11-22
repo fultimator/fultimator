@@ -8,7 +8,7 @@ export const languageOptions = [
   { code: "pl", label: "Polski (Polish)" },
   { code: "fr", label: "Française (French)" },
   { code: "pt-BR", label: "Português (Brasil)" },
-  // Continue?
+  { code: "zh", label: "简体中文 (Chinese)" },
 ];
 
 /*

@@ -80,25 +80,8 @@ const LanguageMenu = () => {
   );
 };
 
-const getLanguageName = (languageCode: string): string => {
-  switch (languageCode) {
-    case "en":
-      return "English";
-    case "it":
-      return "Italiano (Italian)";
-    case "es":
-      return "Español (Spanish)";
-    case "de":
-      return "Deutsch (German)";
-    case "pl":
-      return "Polski (Polish)";
-    case "fr":
-      return "Française (French)";
-    case "pt-BR":
-      return "Português (Brasil)";
-    default:
-      return languageCode;
-  }
-};
+const getLanguageName = (languageCode: string): string =>
+  languageOptions.find((option) => option.code === languageCode)?.label ??
+  languageCode;
 
 export default LanguageMenu;

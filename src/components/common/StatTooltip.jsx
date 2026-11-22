@@ -1,5 +1,6 @@
 import React, { useState, useRef } from "react";
 import { Box, Divider, Popover, Tooltip, Typography } from "@mui/material";
+import { useTranslate } from "/src/translation/translate";
 
 function BreakdownRow({ label, value, signed, bold, dim, delta }) {
   const display =
@@ -58,6 +59,7 @@ function affinityDelta(base, current) {
 }
 
 function TooltipContent({ title, formula, breakdown, total, base, current }) {
+  const { t } = useTranslate();
   const isAffinityMode = base !== undefined || current !== undefined;
   return (
     <Box sx={{ width: isAffinityMode ? 180 : 260, p: 1.5 }}>
@@ -91,10 +93,10 @@ function TooltipContent({ title, formula, breakdown, total, base, current }) {
         <>
           <Divider sx={{ mb: 0.75 }} />
           <Box sx={{ display: "flex", flexDirection: "column", gap: 0.35 }}>
-            <BreakdownRow label="Base" value={affinityLabel(base)} />
+            <BreakdownRow label={t("Base")} value={t(affinityLabel(base))} />
             <BreakdownRow
-              label="Current"
-              value={affinityLabel(current ?? base)}
+              label={t("Current")}
+              value={t(affinityLabel(current ?? base))}
               bold
               delta={affinityDelta(base, current ?? base)}
             />
@@ -121,7 +123,7 @@ function TooltipContent({ title, formula, breakdown, total, base, current }) {
             {total !== undefined && (
               <>
                 <Divider sx={{ my: 0.5 }} />
-                <BreakdownRow label="Total" value={total} bold />
+                <BreakdownRow label={t("Total")} value={total} bold />
               </>
             )}
           </Box>

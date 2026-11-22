@@ -85,7 +85,7 @@ export function TypeAffinity({
   if (!editable) {
     return (
       <StatTooltip
-        title={type.charAt(0).toUpperCase() + type.slice(1)}
+        title={t(type.charAt(0).toUpperCase() + type.slice(1))}
         base={normalizedAffinity}
         current={normalizedCurrent}
         display="flex"
@@ -111,7 +111,7 @@ export function TypeAffinity({
                 letterSpacing: "0.03em",
               }}
             >
-              {normalizedAffinity}
+              {t(normalizedAffinity.toUpperCase())}
             </Typography>
           )}
         </Box>
@@ -121,7 +121,7 @@ export function TypeAffinity({
 
   return (
     <StatTooltip
-      title={type.charAt(0).toUpperCase() + type.slice(1)}
+      title={t(type.charAt(0).toUpperCase() + type.slice(1))}
       base={normalizedAffinity}
       current={normalizedCurrent}
       display="flex"
@@ -175,7 +175,7 @@ export function TypeAffinity({
               letterSpacing: "0.03em",
             }}
           >
-            {value ? value.toUpperCase() : ""}
+            {value ? t(value.toUpperCase()) : ""}
           </Typography>
           {showDropdownArrow && (
             <KeyboardArrowDownIcon
