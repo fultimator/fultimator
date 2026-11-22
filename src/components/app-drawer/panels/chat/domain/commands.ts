@@ -41,6 +41,7 @@ import type {
 } from "../types";
 import type { AppliedEffect, Behavior } from "../../../../../types/Effects";
 import { materializeAppliedEffect } from "../../../../../libs/appliedEffects";
+import { t } from "../../../../../translation/translate";
 
 export interface ActiveBehaviorOutput {
   speaker: string;
@@ -201,12 +202,14 @@ const rollCommand: Command = {
   ],
   execute(args, context) {
     if (!args.trim()) {
-      return { error: "Usage: /roll <dice>  e.g. /roll 2d6+1d8+2" };
+      return { error: t("Usage: /roll <dice>  e.g. /roll 2d6+1d8+2") };
     }
     const parsed = parseDiceNotation(args);
     if (!parsed) {
       return {
-        error: `"${args.trim()}" is not valid dice notation. Example: 2d6+1d8+2`,
+        error: t("{0} is not valid dice notation. Example: 2d6+1d8+2", [
+          `"${args.trim()}"`,
+        ]),
       };
     }
     return [
@@ -394,26 +397,34 @@ function parseCheckArgs(args: string):
   | { error: string } {
   const parts = args.trim().toLowerCase().split(/\s+/);
   if (parts.length < 2 || !parts[0] || !parts[1]) {
-    return { error: "Usage: <attr1> <attr2> [modifier] [difficulty]" };
+    return { error: t("Usage: <attr1> <attr2> [modifier] [difficulty]") };
   }
   const [a1, a2, modPart] = parts;
   if (!VALID_ATTRIBUTES.has(a1)) {
-    return { error: `Unknown attribute "${a1}". Valid: dex, ins, mig, wlp` };
+    return {
+      error: t('Unknown attribute "{0}". Valid: dex, ins, mig, wlp', [a1]),
+    };
   }
   if (!VALID_ATTRIBUTES.has(a2)) {
-    return { error: `Unknown attribute "${a2}". Valid: dex, ins, mig, wlp` };
+    return {
+      error: t('Unknown attribute "{0}". Valid: dex, ins, mig, wlp', [a2]),
+    };
   }
   const modifier = modPart ? parseInt(modPart, 10) : 0;
   if (modPart && Number.isNaN(modifier)) {
     return {
-      error: `Invalid modifier "${modPart}". Must be a number, e.g. +2 or -1`,
+      error: t('Invalid modifier "{0}". Must be a number, e.g. +2 or -1', [
+        modPart,
+      ]),
     };
   }
   const dlPart = parts[3];
   const difficulty = dlPart ? parseInt(dlPart, 10) : undefined;
   if (dlPart && (Number.isNaN(difficulty!) || difficulty! < 1)) {
     return {
-      error: `Invalid difficulty "${dlPart}". Must be a positive number, e.g. 10`,
+      error: t('Invalid difficulty "{0}". Must be a positive number, e.g. 10', [
+        dlPart,
+      ]),
     };
   }
   return {
@@ -487,7 +498,7 @@ const checkCommand: Command = {
   ],
   execute(args, context) {
     if (!context.playerDoc) {
-      return { error: "Switch to a character speaker to roll a check." };
+      return { error: t("Switch to a character speaker to roll a check.") };
     }
     const trimmed = args.trim();
     const firstWord = trimmed.split(/\s+/)[0]?.toLowerCase() ?? "";
@@ -500,8 +511,9 @@ const checkCommand: Command = {
     const parsed = parseCheckArgs(rest);
     if ("error" in parsed) {
       return {
-        error:
+        error: t(
           "Usage: /check [open|attribute] <attr1> <attr2> [modifier] [difficulty]  e.g. /check open dex ins",
+        ),
       };
     }
     return runCheckFromParams(context, {
@@ -544,7 +556,7 @@ const actionCommand: Command = {
   execute(args, context) {
     const action = args.trim();
     if (!action) {
-      return { error: "Usage: /action <action>  e.g. /action attack" };
+      return { error: t("Usage: /action <action>  e.g. /action attack") };
     }
 
     const spaceIdx = action.indexOf(" ");
@@ -558,7 +570,7 @@ const actionCommand: Command = {
       const options = resolveAttackOptions(context.playerDoc);
       const weapon = options.find((o) => o.name === weaponArg);
       if (!weapon) {
-        return { error: `Unknown weapon "${weaponArg}".` };
+        return { error: t('Unknown weapon "{0}".', [weaponArg]) };
       }
       const baseAccuracyBonus = weapon.accuracyBonus ?? 0;
       const requestedAccuracyDelta = overrides.accuracyDelta ?? 0;
@@ -661,7 +673,7 @@ const actionCommand: Command = {
         return unquoted === effectiveArg;
       });
       if (!spell) {
-        return { error: `Unknown spell "${effectiveArg}".` };
+        return { error: t('Unknown spell "{0}".', [effectiveArg]) };
       }
       if (!spell.isOffensive) {
         return [
@@ -745,7 +757,7 @@ const actionCommand: Command = {
 
     if (subAction.toLowerCase() === "hinder") {
       if (!context.playerDoc) {
-        return { error: "Switch to a character speaker to roll a check." };
+        return { error: t("Switch to a character speaker to roll a check.") };
       }
       if (!rawArg) {
         return runCheckFromParams(context, {
@@ -763,8 +775,9 @@ const actionCommand: Command = {
       const parsed = parseCheckArgs(rawArg);
       if ("error" in parsed) {
         return {
-          error:
+          error: t(
             "Usage: /action hinder [attr1 attr2 [modifier]]  e.g. /action hinder ins wlp +1",
+          ),
         };
       }
       return runCheckFromParams(context, {
@@ -779,7 +792,7 @@ const actionCommand: Command = {
 
     if (subAction.toLowerCase() === "study") {
       if (!context.playerDoc) {
-        return { error: "Switch to a character speaker to roll a check." };
+        return { error: t("Switch to a character speaker to roll a check.") };
       }
       if (!rawArg) {
         return runCheckFromParams(context, {
@@ -792,8 +805,9 @@ const actionCommand: Command = {
       const parsed = parseCheckArgs(rawArg);
       if ("error" in parsed) {
         return {
-          error:
+          error: t(
             "Usage: /action study [attr1 attr2 [modifier]]  e.g. /action study ins wlp +1",
+          ),
         };
       }
       return runCheckFromParams(context, {
@@ -860,7 +874,7 @@ export function executeCommand(
   const rawName = spaceIdx === -1 ? input.slice(1) : input.slice(1, spaceIdx);
   const name = rawName.toLowerCase();
   const cmd = BY_NAME.get(name);
-  if (!cmd) return { ok: false, error: `Unknown command: /${name}` };
+  if (!cmd) return { ok: false, error: t("Unknown command: /{0}", [name]) };
   const args = spaceIdx === -1 ? "" : input.slice(spaceIdx + 1);
   const result = cmd.execute(args, context);
   if ("error" in result) return { ok: false, error: result.error };

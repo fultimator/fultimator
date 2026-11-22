@@ -6,6 +6,7 @@ import {
   scanForTrigger,
   type TriggerMatch,
 } from "../../../../../pipelines/triggerScanner";
+import { t } from "../../../../../translation/translate";
 
 // Guard zone: surfaces chat-action trigger items on the guard message.
 // guardVariant "cover" -> Bodyguard-style; "no-cover" -> Withstand-style.
@@ -72,7 +73,9 @@ export const ChatActionZone: React.FC<ChatActionZoneProps> = ({
             color: "text.secondary",
           }}
         >
-          {guardVariant === "cover" ? "Cover abilities" : "No-cover abilities"}
+          {guardVariant === "cover"
+            ? t("Cover abilities")
+            : t("No-cover abilities")}
         </Typography>
       </Box>
       {matches.map((match, i) => (
@@ -102,7 +105,7 @@ const ChatActionRow: React.FC<{ match: TriggerMatch }> = ({ match }) => {
           sx={{ fontWeight: 700, fontSize: "0.8rem" }}
           noWrap
         >
-          {match.itemName}
+          {t(match.itemName)}
         </Typography>
         <Typography
           variant="caption"
@@ -111,7 +114,7 @@ const ChatActionRow: React.FC<{ match: TriggerMatch }> = ({ match }) => {
           {match.actorName}
         </Typography>
       </Box>
-      <Tooltip title="Activate this ability">
+      <Tooltip title={t("Activate this ability")}>
         <Button
           size="small"
           variant="outlined"
@@ -125,7 +128,7 @@ const ChatActionRow: React.FC<{ match: TriggerMatch }> = ({ match }) => {
             letterSpacing: "0.05em",
           }}
         >
-          Use
+          {t("Use")}
         </Button>
       </Tooltip>
     </Box>
@@ -196,7 +199,7 @@ export const ReactiveInterruptZone: React.FC<ReactiveInterruptZoneProps> = ({
             color: "warning.main",
           }}
         >
-          Interrupts available
+          {t("Interrupts available")}
         </Typography>
       </Box>
       {matches.map((match, i) => (
@@ -217,7 +220,7 @@ export const ReactiveInterruptZone: React.FC<ReactiveInterruptZoneProps> = ({
                 sx={{ fontWeight: 700, fontSize: "0.8rem" }}
                 noWrap
               >
-                {match.itemName}
+                {t(match.itemName)}
               </Typography>
               <Typography
                 variant="caption"
@@ -226,7 +229,7 @@ export const ReactiveInterruptZone: React.FC<ReactiveInterruptZoneProps> = ({
                 {match.actorName}
               </Typography>
             </Box>
-            <Tooltip title="Substitute this actor as the damage target">
+            <Tooltip title={t("Substitute this actor as the damage target")}>
               <Button
                 size="small"
                 color="warning"
@@ -242,7 +245,7 @@ export const ReactiveInterruptZone: React.FC<ReactiveInterruptZoneProps> = ({
                   letterSpacing: "0.05em",
                 }}
               >
-                Protect
+                {t("Protect")}
               </Button>
             </Tooltip>
           </Box>
@@ -334,7 +337,7 @@ export const OnHitZone: React.FC<OnHitZoneProps> = ({
             color: "text.secondary",
           }}
         >
-          On-hit abilities
+          {t("On-hit abilities")}
         </Typography>
       </Box>
       {matches.map((match, i) => (

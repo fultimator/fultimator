@@ -19,6 +19,7 @@ import {
   getActionIconSrc,
 } from "../../../../actionIconSrc";
 import { useChatActions } from "../ChatActionsContext.shared";
+import { t } from "../../../../../translation/translate";
 
 interface DisplayMessageTemplateProps {
   message: DisplayMessage;
@@ -33,8 +34,8 @@ export const DisplayMessageTemplate: React.FC<DisplayMessageTemplateProps> = ({
   );
   const [costEditValue, setCostEditValue] = useState("");
   const [insufficientWarning, setInsufficientWarning] = useState(false);
-  const tags = message.tags.map((t) =>
-    t === "default" ? formatSpellType(t) : t,
+  const tags = message.tags.map((tag) =>
+    tag === "default" ? formatSpellType(tag) : tag,
   );
   const iconInfo = getActionIconSrc(message.itemType);
   const iconSrc =
@@ -122,7 +123,7 @@ export const DisplayMessageTemplate: React.FC<DisplayMessageTemplateProps> = ({
             fontWeight: 700,
           }}
         >
-          {message.itemType} <Diamond color="inherit" /> {message.name}
+          {t(message.itemType)} <Diamond color="inherit" /> {t(message.name)}
         </Typography>
       </Box>
       <Box sx={{ mt: 0.5 }}>
@@ -159,7 +160,7 @@ export const DisplayMessageTemplate: React.FC<DisplayMessageTemplateProps> = ({
                   color: "text.secondary",
                 }}
               >
-                Description
+                {t("Description")}
               </Typography>
               <NotesMarkdown sx={{ fontSize: "0.85rem", m: 0 }}>
                 {message.description}
@@ -187,7 +188,7 @@ export const DisplayMessageTemplate: React.FC<DisplayMessageTemplateProps> = ({
                   color: "text.secondary",
                 }}
               >
-                Effect
+                {t("Effect")}
               </Typography>
               <NotesMarkdown sx={{ fontSize: "0.85rem", m: 0 }}>
                 {message.effect}
@@ -230,7 +231,7 @@ export const DisplayMessageTemplate: React.FC<DisplayMessageTemplateProps> = ({
                         fontWeight: 700,
                       }}
                     >
-                      {clock.name || "Clock"}
+                      {clock.name || t("Clock")}
                     </Typography>
                     <Typography
                       sx={{
@@ -271,7 +272,10 @@ export const DisplayMessageTemplate: React.FC<DisplayMessageTemplateProps> = ({
               }}
               sx={{ textTransform: "none", fontWeight: 600 }}
             >
-              Spend {message.cost.amount} {message.cost.resource.toUpperCase()}
+              {t("Spend {0} {1}", [
+                message.cost.amount,
+                t(message.cost.resource.toUpperCase()),
+              ])}
             </Button>
             {onUpdateCost && (
               <IconButton
@@ -298,7 +302,9 @@ export const DisplayMessageTemplate: React.FC<DisplayMessageTemplateProps> = ({
                 autoFocus
                 type="number"
                 size="small"
-                label={`Spend ${message.cost?.resource.toUpperCase()}`}
+                label={t("Spend {0}", [
+                  t(message.cost?.resource.toUpperCase() ?? ""),
+                ])}
                 value={costEditValue}
                 onChange={(e) => setCostEditValue(e.target.value)}
                 slotProps={{ htmlInput: { min: 0 } }}
@@ -322,7 +328,7 @@ export const DisplayMessageTemplate: React.FC<DisplayMessageTemplateProps> = ({
                   setCostEditAnchor(null);
                 }}
               >
-                Spend
+                {t("Spend")}
               </Button>
             </Popover>
           </Box>
@@ -331,7 +337,7 @@ export const DisplayMessageTemplate: React.FC<DisplayMessageTemplateProps> = ({
               variant="caption"
               sx={{ display: "block", mt: 0.4, color: "error.main" }}
             >
-              Insufficient {message.cost.resource.toUpperCase()}
+              {t("Insufficient {0}", [t(message.cost.resource.toUpperCase())])}
             </Typography>
           )}
         </Box>

@@ -23,6 +23,7 @@ import {
 } from "@mui/icons-material";
 import { GiDeathSkull } from "react-icons/gi";
 import type { CombatLogEvent } from "../types";
+import { t } from "../../../../../translation/translate";
 
 function EventIcon({ event }: { event: CombatLogEvent }) {
   const sx = { fontSize: 15, color: "text.secondary", flexShrink: 0 };
@@ -109,241 +110,179 @@ function muted(text: string) {
   );
 }
 
+// Translates a sentence key, rendering {0}, {1}... as the given nodes and the
+// rest as muted text, so translators can reorder words.
+function sentence(key: string, parts: React.ReactNode[]) {
+  return t(key, undefined, true)
+    .split(/\{(\d+)\}/)
+    .map((chunk: string, i: number) => (
+      <React.Fragment key={i}>
+        {i % 2 ? parts[Number(chunk)] : chunk && muted(chunk)}
+      </React.Fragment>
+    ));
+}
+
+const AFFINITY_SUFFIX: Record<string, string> = {
+  vu: "(vulnerable)",
+  rs: "(resistant)",
+  im: "(immune)",
+  ab: "(absorbed)",
+};
+
+function rollFlag(event: { isCrit?: boolean; isFumble?: boolean }) {
+  if (event.isCrit) return <> {val(t("CRIT"))}</>;
+  if (event.isFumble) return <> {muted(t("fumble"))}</>;
+  return null;
+}
+
 function EventText({ event }: { event: CombatLogEvent }) {
   switch (event.type) {
     case "round-change":
       if (event.direction === "new")
-        return (
-          <>
-            {muted("New round")} {val(event.round)}
-            {muted(" started")}
-          </>
-        );
+        return sentence("New round {0} started", [val(event.round)]);
       if (event.direction === "up")
-        return (
-          <>
-            {muted("Round")} {val(event.round)}
-          </>
-        );
-      return (
-        <>
-          {muted("Round decreased to")} {val(event.round)}
-        </>
-      );
+        return sentence("Round {0}", [val(event.round)]);
+      return sentence("Round decreased to {0}", [val(event.round)]);
 
     case "actor-added":
-      return (
-        <>
-          {actor(event.name)}
-          {muted(" joined the encounter")}
-        </>
-      );
+      return sentence("{0} joined the encounter", [actor(event.name)]);
 
     case "actor-removed":
-      return (
-        <>
-          {actor(event.name)}
-          {muted(" left the encounter")}
-        </>
-      );
+      return sentence("{0} left the encounter", [actor(event.name)]);
 
     case "fainted":
-      return (
-        <>
-          {actor(event.targetName)}
-          {muted(" fainted")}
-        </>
-      );
+      return sentence("{0} fainted", [actor(event.targetName)]);
 
     case "turn-checked":
-      return (
-        <>
-          {actor(event.actorName)}
-          {muted("'s turn marked done")}
-        </>
-      );
+      return sentence("{0}'s turn marked done", [actor(event.actorName)]);
 
-    case "damage":
+    case "damage": {
+      const typed = event.damageType !== "untyped";
       return (
         <>
-          {actor(event.targetName)}
-          {muted(" took ")}
-          {val(event.amount)}
-          {muted(
-            ` ${event.damageType !== "untyped" ? event.damageType : ""} damage`,
-          )}
-          {event.affinity === "vu" && muted(" (vulnerable)")}
-          {event.affinity === "rs" && muted(" (resistant)")}
-          {event.affinity === "im" && muted(" (immune)")}
-          {event.affinity === "ab" && muted(" (absorbed)")}
+          {sentence(typed ? "{0} took {1} {2} damage" : "{0} took {1} damage", [
+            actor(event.targetName),
+            val(event.amount),
+            typed ? muted(t(event.damageType)) : null,
+          ])}
+          {AFFINITY_SUFFIX[event.affinity ?? ""] &&
+            muted(` ${t(AFFINITY_SUFFIX[event.affinity ?? ""])}`)}
         </>
       );
+    }
 
     case "heal":
-      return (
-        <>
-          {actor(event.targetName)}
-          {muted(" recovered ")}
-          {val(event.amount)}
-          {muted(` ${event.resource.toUpperCase()}`)}
-        </>
-      );
+      return sentence("{0} recovered {1} {2}", [
+        actor(event.targetName),
+        val(event.amount),
+        muted(t(event.resource.toUpperCase())),
+      ]);
 
     case "resource-loss":
-      return (
-        <>
-          {actor(event.targetName)}
-          {muted(" lost ")}
-          {val(event.amount)}
-          {muted(` ${event.resource.toUpperCase()}`)}
-        </>
-      );
+      return sentence("{0} lost {1} {2}", [
+        actor(event.targetName),
+        val(event.amount),
+        muted(t(event.resource.toUpperCase())),
+      ]);
 
     case "expenditure":
-      return (
-        <>
-          {actor(event.actorName)}
-          {muted(" spent ")}
-          {val(event.amount)}
-          {muted(` ${event.resource.toUpperCase()}`)}
-        </>
-      );
+      return sentence("{0} spent {1} {2}", [
+        actor(event.actorName),
+        val(event.amount),
+        muted(t(event.resource.toUpperCase())),
+      ]);
 
     case "resource-application":
       return (
         <>
-          {actor(event.actorName)}
-          {muted(event.direction === "loss" ? " spent " : " gained ")}
-          {val(event.amount)}
-          {muted(` ${event.resource.toUpperCase()}`)}
-          {event.status === "unavailable" && muted(" was not applied")}
+          {sentence(
+            event.direction === "loss"
+              ? "{0} spent {1} {2}"
+              : "{0} gained {1} {2}",
+            [
+              actor(event.actorName),
+              val(event.amount),
+              muted(t(event.resource.toUpperCase())),
+            ],
+          )}
+          {event.status === "unavailable" && muted(` ${t("(not applied)")}`)}
         </>
       );
 
     case "ultima-used":
-      return (
-        <>
-          {actor(event.actorName)}
-          {muted(" used an Ultima Point")}
-        </>
-      );
+      return sentence("{0} used an Ultima Point", [actor(event.actorName)]);
 
     case "status-added":
-      return (
-        <>
-          {actor(event.targetName)}
-          {muted(" gained ")}
-          {actor(event.status)}
-        </>
-      );
+      return sentence("{0} gained {1}", [
+        actor(event.targetName),
+        actor(t(event.status)),
+      ]);
 
     case "status-removed":
-      return (
-        <>
-          {actor(event.targetName)}
-          {muted(" lost ")}
-          {actor(event.status)}
-        </>
-      );
+      return sentence("{0} lost {1}", [
+        actor(event.targetName),
+        actor(t(event.status)),
+      ]);
 
     case "accuracy-check":
       return (
         <>
-          {actor(event.actorName)}
-          {muted(" attacked with ")}
-          {actor(event.weaponName)}
-          {event.isCrit && <> {val("CRIT")}</>}
-          {event.isFumble && <> {muted("fumble")}</>}
+          {sentence("{0} attacked with {1}", [
+            actor(event.actorName),
+            actor(t(event.weaponName)),
+          ])}
+          {rollFlag(event)}
         </>
       );
 
     case "magic-check":
       return (
         <>
-          {actor(event.actorName)}
-          {muted(" cast ")}
-          {actor(event.spellName)}
-          {event.isCrit && <> {val("CRIT")}</>}
-          {event.isFumble && <> {muted("fumble")}</>}
+          {sentence("{0} cast {1}", [
+            actor(event.actorName),
+            actor(t(event.spellName)),
+          ])}
+          {rollFlag(event)}
         </>
       );
 
     case "spell-use":
-      return (
-        <>
-          {actor(event.actorName)}
-          {muted(" used ")}
-          {actor(event.spellName)}
-        </>
-      );
+      return sentence("{0} used {1}", [
+        actor(event.actorName),
+        actor(t(event.spellName)),
+      ]);
 
     case "generic-roll":
-      return (
-        <>
-          {actor(event.actorName)}
-          {muted(" rolled ")}
-          {actor(event.label)}
-        </>
-      );
+      return sentence("{0} rolled {1}", [
+        actor(event.actorName),
+        actor(t(event.label)),
+      ]);
 
     case "crit-success":
-      return (
-        <>
-          {actor(event.actorName)}
-          {muted(" - ")}
-          {"Critical Success"}
-        </>
-      );
+      return sentence("{0} - Critical Success", [actor(event.actorName)]);
 
     case "crit-failure":
-      return (
-        <>
-          {actor(event.actorName)}
-          {muted(" - ")}
-          {"Critical Failure"}
-        </>
-      );
+      return sentence("{0} - Critical Failure", [actor(event.actorName)]);
 
     case "clock-added":
-      return (
-        <>
-          {muted("Clock ")} {actor(event.clockName)} {muted("added")}
-        </>
-      );
+      return sentence("Clock {0} added", [actor(event.clockName)]);
 
     case "clock-removed":
-      return (
-        <>
-          {muted("Clock ")} {actor(event.clockName)} {muted("removed")}
-        </>
-      );
+      return sentence("Clock {0} removed", [actor(event.clockName)]);
 
     case "clock-reset":
-      return (
-        <>
-          {muted("Clock ")} {actor(event.clockName)} {muted("reset")}
-        </>
-      );
+      return sentence("Clock {0} reset", [actor(event.clockName)]);
 
     case "clock-updated":
     case "clock-state":
-      return (
-        <>
-          {muted("Clock ")}
-          {actor(event.clockName)}
-          {muted(": ")}
-          {val(event.progress)}
-          {muted("/")}
-          {val(event.max)}
-        </>
-      );
+      return sentence("Clock {0}: {1}/{2}", [
+        actor(event.clockName),
+        val(event.progress),
+        val(event.max),
+      ]);
 
     case "encounter-renamed":
-      return (
-        <>
-          {muted("Encounter renamed to ")} {actor(event.newName)}
-        </>
-      );
+      return sentence("Encounter renamed to {0}", [actor(event.newName)]);
 
     case "text":
       return (

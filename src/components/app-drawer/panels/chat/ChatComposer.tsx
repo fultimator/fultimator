@@ -30,7 +30,7 @@ import {
   Lock as LockIcon,
   ArrowBack as ArrowBackIcon,
 } from "@mui/icons-material";
-import { DICE_OPTIONS } from "./constants";
+import { DICE_OPTIONS, isBuiltinSpeaker } from "./constants";
 import {
   getActiveCommand,
   matchCommands,
@@ -59,6 +59,9 @@ import {
   CheckOpposedIcon,
 } from "../../../icons";
 import { ACTION_ICON_SRC_BY_KEY } from "../../../actionIconSrc";
+
+const speakerLabel = (name: string) =>
+  isBuiltinSpeaker(name) ? t(name) : name;
 
 const ATTRIBUTES: { id: Attribute; label: string }[] = [
   { id: "dex", label: "DEX" },
@@ -622,10 +625,10 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
           mb: 1,
         }}
       >
-        <Tooltip title={`Speaker: ${selectedSpeaker}`}>
+        <Tooltip title={t("Speaker: {0}", [speakerLabel(selectedSpeaker)])}>
           <IconButton
             size="small"
-            aria-label="Select speaker"
+            aria-label={t("Select speaker")}
             onClick={(e) => setSpeakerMenuAnchor(e.currentTarget)}
             sx={(theme) => ({
               borderRadius: 1,
@@ -663,11 +666,11 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
             },
           }}
         >
-          {selectedSpeaker}
+          {speakerLabel(selectedSpeaker)}
         </Button>
         <IconButton
           size="small"
-          aria-label="Export chat logs as JSON"
+          aria-label={t("Export chat logs as JSON")}
           onClick={onExport}
           disabled={!hasMessages}
           sx={(theme) => ({
@@ -686,7 +689,7 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
         </IconButton>
         <IconButton
           size="small"
-          aria-label="Clear chat logs"
+          aria-label={t("Clear chat logs")}
           onClick={onClearRequest}
           disabled={!hasMessages}
           sx={(theme) => ({
@@ -721,7 +724,7 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
               setSpeakerMenuAnchor(null);
             }}
           >
-            {speaker}
+            {speakerLabel(speaker)}
           </MenuItem>
         ))}
       </Menu>
@@ -828,8 +831,8 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                       }
                       secondary={
                         cmd.params[0]?.description
-                          ? `${cmd.description}: ${cmd.params[0].description}`
-                          : cmd.description
+                          ? `${t(cmd.description)}: ${t(cmd.params[0].description)}`
+                          : t(cmd.description)
                       }
                       slotProps={{ secondary: { variant: "caption" } }}
                     />
@@ -883,24 +886,26 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                         }
                         secondary={
                           activeCommand.params[0]?.description
-                            ? `e.g. ${activeCommand.params[0].description}`
-                            : activeCommand.description
+                            ? t("e.g. {0}", [
+                                t(activeCommand.params[0].description),
+                              ])
+                            : t(activeCommand.description)
                         }
                         slotProps={{ secondary: { variant: "caption" } }}
                       />
                       <Tooltip
                         title={
                           isInCommandParameterPart()
-                            ? "Back one step"
-                            : "Clear command"
+                            ? t("Back one step")
+                            : t("Clear command")
                         }
                       >
                         <IconButton
                           size="small"
                           aria-label={
                             isInCommandParameterPart()
-                              ? "Back one step"
-                              : "Clear command"
+                              ? t("Back one step")
+                              : t("Clear command")
                           }
                           onMouseDown={(e) => e.preventDefault()}
                           onClick={goBackCommandStep}
@@ -1053,7 +1058,7 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                                 textTransform: "none",
                               }}
                             >
-                              {option.label}
+                              {t(option.label)}
                             </Button>
                             <IconButton
                               size="small"
@@ -1116,7 +1121,7 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                     >
                       {attackOptions.length === 0 ? (
                         <Typography variant="caption" color="text.secondary">
-                          No weapons equipped
+                          {t("No weapons equipped")}
                         </Typography>
                       ) : (
                         attackOptions.map((opt) => (
@@ -1156,7 +1161,7 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                                   textTransform: "none",
                                 }}
                               >
-                                <span>{opt.name}</span>
+                                <span>{t(opt.name)}</span>
                                 {opt.slot && (
                                   <Typography
                                     component="span"
@@ -1164,7 +1169,7 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                                     color="text.secondary"
                                     sx={{ fontFamily: "monospace" }}
                                   >
-                                    {opt.slot}
+                                    {t(opt.slot)}
                                   </Typography>
                                 )}
                               </Button>
@@ -1199,7 +1204,7 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                                   <TextField
                                     select
                                     size="small"
-                                    label="Attr1"
+                                    label={t("Attr1")}
                                     value={attackOverrideDraft.attr1}
                                     onChange={(e) =>
                                       setAttackOverrideDraft((prev) =>
@@ -1215,14 +1220,14 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                                   >
                                     {ATTRIBUTES.map((attr) => (
                                       <MenuItem key={attr.id} value={attr.id}>
-                                        {attr.label}
+                                        {t(attr.label)}
                                       </MenuItem>
                                     ))}
                                   </TextField>
                                   <TextField
                                     select
                                     size="small"
-                                    label="Attr2"
+                                    label={t("Attr2")}
                                     value={attackOverrideDraft.attr2}
                                     onChange={(e) =>
                                       setAttackOverrideDraft((prev) =>
@@ -1238,14 +1243,14 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                                   >
                                     {ATTRIBUTES.map((attr) => (
                                       <MenuItem key={attr.id} value={attr.id}>
-                                        {attr.label}
+                                        {t(attr.label)}
                                       </MenuItem>
                                     ))}
                                   </TextField>
                                   <TextField
                                     size="small"
                                     type="number"
-                                    label="Acc Δ"
+                                    label={t("Acc Δ")}
                                     value={attackOverrideDraft.accuracyDelta}
                                     onChange={(e) =>
                                       setAttackOverrideDraft((prev) =>
@@ -1265,7 +1270,7 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                                   <TextField
                                     size="small"
                                     type="number"
-                                    label="Dmg Δ"
+                                    label={t("Dmg Δ")}
                                     value={attackOverrideDraft.damageDelta}
                                     onChange={(e) =>
                                       setAttackOverrideDraft((prev) =>
@@ -1285,7 +1290,7 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                                   <TextField
                                     select
                                     size="small"
-                                    label="Range"
+                                    label={t("Range")}
                                     value={attackOverrideDraft.range}
                                     onChange={(e) =>
                                       setAttackOverrideDraft((prev) =>
@@ -1299,13 +1304,17 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                                       )
                                     }
                                   >
-                                    <MenuItem value="melee">Melee</MenuItem>
-                                    <MenuItem value="ranged">Ranged</MenuItem>
+                                    <MenuItem value="melee">
+                                      {t("Melee")}
+                                    </MenuItem>
+                                    <MenuItem value="ranged">
+                                      {t("Ranged")}
+                                    </MenuItem>
                                   </TextField>
                                   <TextField
                                     select
                                     size="small"
-                                    label="Defense"
+                                    label={t("Defense")}
                                     value={attackOverrideDraft.defense}
                                     onChange={(e) =>
                                       setAttackOverrideDraft((prev) =>
@@ -1319,8 +1328,10 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                                       )
                                     }
                                   >
-                                    <MenuItem value="def">DEF</MenuItem>
-                                    <MenuItem value="mdef">MDEF</MenuItem>
+                                    <MenuItem value="def">{t("DEF")}</MenuItem>
+                                    <MenuItem value="mdef">
+                                      {t("M.DEF")}
+                                    </MenuItem>
                                   </TextField>
                                   <Button
                                     size="small"
@@ -1342,8 +1353,10 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                                       textTransform: "none",
                                     }}
                                   >
-                                    HR0{" "}
-                                    {attackOverrideDraft.hrZero ? "On" : "Off"}
+                                    {t("HR0")}{" "}
+                                    {attackOverrideDraft.hrZero
+                                      ? t("On")
+                                      : t("Off")}
                                   </Button>
                                   <Box
                                     sx={{
@@ -1364,7 +1377,7 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                                       }}
                                       sx={{ flex: 1, textTransform: "none" }}
                                     >
-                                      Apply
+                                      {t("Apply")}
                                     </Button>
                                     <Button
                                       size="small"
@@ -1376,7 +1389,7 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                                       }}
                                       sx={{ textTransform: "none" }}
                                     >
-                                      Cancel
+                                      {t("Cancel")}
                                     </Button>
                                   </Box>
                                 </Box>
@@ -1399,7 +1412,7 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                     >
                       {spellOptions.length === 0 ? (
                         <Typography variant="caption" color="text.secondary">
-                          No spells available
+                          {t("No spells available")}
                         </Typography>
                       ) : (
                         <>
@@ -1432,7 +1445,7 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                                     letterSpacing: "0.06em",
                                   }}
                                 >
-                                  {section.label}
+                                  {t(section.label)}
                                 </Typography>
                                 {Object.entries(
                                   section.items.reduce<
@@ -1492,7 +1505,7 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                                                 textTransform: "none",
                                               }}
                                             >
-                                              <span>{opt.name}</span>
+                                              <span>{t(opt.name)}</span>
                                               <Typography
                                                 component="span"
                                                 variant="caption"
@@ -1553,7 +1566,7 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                                                 <TextField
                                                   select
                                                   size="small"
-                                                  label="Attr1"
+                                                  label={t("Attr1")}
                                                   value={
                                                     spellOverrideDraft.attr1
                                                   }
@@ -1575,14 +1588,14 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                                                       key={attr.id}
                                                       value={attr.id}
                                                     >
-                                                      {attr.label}
+                                                      {t(attr.label)}
                                                     </MenuItem>
                                                   ))}
                                                 </TextField>
                                                 <TextField
                                                   select
                                                   size="small"
-                                                  label="Attr2"
+                                                  label={t("Attr2")}
                                                   value={
                                                     spellOverrideDraft.attr2
                                                   }
@@ -1604,14 +1617,14 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                                                       key={attr.id}
                                                       value={attr.id}
                                                     >
-                                                      {attr.label}
+                                                      {t(attr.label)}
                                                     </MenuItem>
                                                   ))}
                                                 </TextField>
                                                 <TextField
                                                   size="small"
                                                   type="number"
-                                                  label="Acc Δ"
+                                                  label={t("Acc Δ")}
                                                   value={
                                                     spellOverrideDraft.accuracyDelta
                                                   }
@@ -1636,7 +1649,7 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                                                 <TextField
                                                   size="small"
                                                   type="number"
-                                                  label="Dmg Δ"
+                                                  label={t("Dmg Δ")}
                                                   value={
                                                     spellOverrideDraft.damageDelta
                                                   }
@@ -1685,10 +1698,10 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                                                     textTransform: "none",
                                                   }}
                                                 >
-                                                  HR0{" "}
+                                                  {t("HR0")}{" "}
                                                   {spellOverrideDraft.hrZero
-                                                    ? "On"
-                                                    : "Off"}
+                                                    ? t("On")
+                                                    : t("Off")}
                                                 </Button>
                                                 <Box
                                                   sx={{
@@ -1714,7 +1727,7 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                                                       textTransform: "none",
                                                     }}
                                                   >
-                                                    Apply
+                                                    {t("Apply")}
                                                   </Button>
                                                   <Button
                                                     size="small"
@@ -1734,7 +1747,7 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                                                       textTransform: "none",
                                                     }}
                                                   >
-                                                    Cancel
+                                                    {t("Cancel")}
                                                   </Button>
                                                 </Box>
                                               </Box>
@@ -1759,7 +1772,7 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                                             textTransform: "none",
                                           }}
                                         >
-                                          <span>{opt.name}</span>
+                                          <span>{t(opt.name)}</span>
                                           <Typography
                                             component="span"
                                             variant="caption"
@@ -1795,7 +1808,7 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                     >
                       {equipmentSlots.length === 0 ? (
                         <Typography variant="caption" color="text.secondary">
-                          No equipment to adjust
+                          {t("No equipment to adjust")}
                         </Typography>
                       ) : (
                         (() => {
@@ -1868,7 +1881,7 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                                         fontFamily: "monospace",
                                       }}
                                     >
-                                      {slot.label}
+                                      {t(slot.label)}
                                     </Typography>
                                     {slot.isLocked && (
                                       <LockIcon
@@ -2121,7 +2134,7 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                               textTransform: "none",
                             }}
                           >
-                            Use default (INS + INS)
+                            {t("Use default (INS + INS)")}
                           </Button>
                         )}
                     </Box>
@@ -2162,7 +2175,7 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                         <InputBase
                           inputRef={customModRef}
                           size="small"
-                          placeholder="custom mod"
+                          placeholder={t("custom mod")}
                           inputProps={{
                             inputMode: "numeric",
                             style: {
@@ -2260,7 +2273,7 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                           textTransform: "none",
                         }}
                       >
-                        Roll without mod
+                        {t("Roll without mod")}
                       </Button>
                     </Box>
                   </ListItem>
@@ -2278,7 +2291,7 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                         }}
                       >
                         <Typography variant="caption" color="text.secondary">
-                          Difficulty
+                          {t("Difficulty")}
                         </Typography>
                         {DIFFICULTY_PRESETS.map(({ value, label }) => (
                           <Button
@@ -2297,14 +2310,14 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                             }}
                           >
                             <span>{value}</span>
-                            <span>{label}</span>
+                            <span>{t(label)}</span>
                           </Button>
                         ))}
                         <Box sx={{ display: "flex", gap: 0.5 }}>
                           <InputBase
                             inputRef={customDlRef}
                             size="small"
-                            placeholder="custom DL"
+                            placeholder={t("custom DL")}
                             inputProps={{
                               inputMode: "numeric",
                               style: {
@@ -2351,7 +2364,7 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                               px: 1,
                             }}
                           >
-                            roll
+                            {t("roll")}
                           </Button>
                           <Button
                             size="small"
@@ -2366,7 +2379,7 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                               color: "text.secondary",
                             }}
                           >
-                            open
+                            {t("open")}
                           </Button>
                         </Box>
                       </Box>
@@ -2381,7 +2394,7 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
             multiline
             minRows={2}
             maxRows={6}
-            placeholder="Write to chat... (/ for commands)"
+            placeholder={t("Write to chat... (/ for commands)")}
             value={input}
             onChange={(e) => handleInputChange(e.target.value)}
             onKeyDown={handleKeyDown}
@@ -2406,7 +2419,7 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
               color="error"
               sx={{ mt: 0.75, display: "block", px: 0.5 }}
             >
-              Switch to a character speaker to roll a check.
+              {t("Switch to a character speaker to roll a check.")}
             </Typography>
           )}
         </Box>
@@ -2414,7 +2427,7 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
           size="small"
           onClick={handleSend}
           disabled={!canSend}
-          aria-label="Send message"
+          aria-label={t("Send message")}
           sx={(theme) => ({
             borderRadius: 1,
             color: "primary.contrastText",
@@ -2516,7 +2529,7 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
             if (!Number.isNaN(next)) store.setModifier(next);
           }}
           inputProps={{
-            "aria-label": "Roll modifier",
+            "aria-label": t("Roll modifier"),
             inputMode: "numeric",
             style: { textAlign: "center" },
           }}
@@ -2550,7 +2563,7 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
           type="button"
           onClick={() => store.clearPendingRoll()}
           disabled={!store.hasPendingState}
-          aria-label="Clear pending roll"
+          aria-label={t("Clear pending roll")}
           sx={{
             flex: 1,
             minHeight: 30,
@@ -2567,7 +2580,7 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
           type="button"
           onClick={insertTrayIntoInput}
           disabled={!store.hasPendingRoll}
-          aria-label="Insert roll into text"
+          aria-label={t("Insert roll into text")}
           sx={{
             flex: 1,
             minHeight: 30,

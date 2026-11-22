@@ -6,6 +6,7 @@ import { MdTune } from "react-icons/md";
 import type { CheckResult } from "../types";
 import Diamond from "../../../../Diamond";
 import { CheckAttributeIcon } from "../../../../icons";
+import { t } from "../../../../../translation/translate";
 
 const ATTR_LABEL: Record<string, string> = {
   dex: "DEX",
@@ -50,7 +51,7 @@ export const AttributeCheckMessageTemplate: React.FC<
     typeof check.additionalData?.originAction === "string"
       ? check.additionalData.originAction
       : undefined;
-  const originLabel = originAction === "hinder" ? "Hinder" : undefined;
+  const originLabel = originAction === "hinder" ? t("Hinder") : undefined;
 
   const isSuccess = check.passed === true && !check.critical && !check.fumble;
   const isFailure = check.passed === false && !check.critical && !check.fumble;
@@ -103,7 +104,7 @@ export const AttributeCheckMessageTemplate: React.FC<
             fontWeight: 700,
           }}
         >
-          Attribute Check
+          {t("Attribute Check")}
           {originLabel && (
             <>
               {" "}
@@ -113,7 +114,7 @@ export const AttributeCheckMessageTemplate: React.FC<
           {check.intent.difficulty != null && (
             <>
               {" "}
-              <Diamond color="inherit" /> DL {check.intent.difficulty}
+              <Diamond color="inherit" /> {t("DL")} {check.intent.difficulty}
             </>
           )}
         </Typography>
@@ -145,7 +146,7 @@ export const AttributeCheckMessageTemplate: React.FC<
               color="text.secondary"
               sx={{ fontWeight: 700, lineHeight: 1.2 }}
             >
-              {ATTR_LABEL[die.attribute]} d{die.die}
+              {t(ATTR_LABEL[die.attribute])} d{die.die}
             </Typography>
             <Typography variant="body1" sx={{ fontWeight: 700, lineHeight: 1 }}>
               {die.result}
@@ -163,7 +164,7 @@ export const AttributeCheckMessageTemplate: React.FC<
               color="text.secondary"
               sx={{ fontWeight: 700, lineHeight: 1.2 }}
             >
-              Mod
+              {t("Mod")}
             </Typography>
             <Typography variant="body1" sx={{ fontWeight: 700, lineHeight: 1 }}>
               {check.modifierTotal > 0
@@ -227,14 +228,14 @@ export const AttributeCheckMessageTemplate: React.FC<
             }}
           >
             {check.critical
-              ? "Critical"
+              ? t("Critical")
               : check.fumble
-                ? "Fumble!"
+                ? t("Fumble!")
                 : check.passed == null
-                  ? "Result"
+                  ? t("Result")
                   : check.passed
-                    ? "Success"
-                    : "Failure"}
+                    ? t("Success")
+                    : t("Failure")}
           </Typography>
           <Box />
         </Box>
@@ -264,7 +265,7 @@ export const AttributeCheckMessageTemplate: React.FC<
             "&:hover": { borderColor: "text.primary", color: "text.primary" },
           }}
         >
-          Oppose
+          {t("Oppose")}
         </Typography>
       )}
     </>

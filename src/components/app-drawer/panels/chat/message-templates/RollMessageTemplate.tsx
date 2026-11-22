@@ -4,6 +4,7 @@ import { useTheme, alpha } from "@mui/material/styles";
 import { GiDiceEightFacesEight } from "react-icons/gi";
 import { MdTune } from "react-icons/md";
 import type { RollData } from "../types";
+import { t } from "../../../../../translation/translate";
 
 const dieCellSx = {
   display: "flex",
@@ -46,7 +47,7 @@ export const RollMessageTemplate: React.FC<RollMessageTemplateProps> = ({
         color="text.secondary"
         sx={{ textTransform: "uppercase", letterSpacing: "0.04em" }}
       >
-        Roll Check
+        {t("Roll Check")}
       </Typography>
       <Stack
         direction="row"
@@ -85,7 +86,7 @@ export const RollMessageTemplate: React.FC<RollMessageTemplateProps> = ({
               color="text.secondary"
               sx={{ fontWeight: 700, lineHeight: 1.2 }}
             >
-              Mod
+              {t("Mod")}
             </Typography>
             <Typography variant="body1" sx={{ fontWeight: 700, lineHeight: 1 }}>
               {roll.modifier > 0 ? `+${roll.modifier}` : roll.modifier}
@@ -142,7 +143,7 @@ export const RollMessageTemplate: React.FC<RollMessageTemplateProps> = ({
                 "-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000",
             }}
           >
-            Total
+            {t("Total")}
           </Typography>
           <Box />
         </Box>

@@ -7,6 +7,7 @@ import type { OpposedCheckResult } from "../types";
 import Diamond from "../../../../Diamond";
 import { CheckOpposedIcon } from "../../../../icons";
 import { isOpposedTied } from "../domain/checks";
+import { t } from "../../../../../translation/translate";
 
 const ATTR_LABEL: Record<string, string> = {
   dex: "DEX",
@@ -78,14 +79,14 @@ export const OpposedCheckMessageTemplate: React.FC<
           : "linear-gradient(to bottom, #d99689, #880012)";
 
   const outcomeLabel = check.critical
-    ? "Critical"
+    ? t("Critical")
     : check.fumble
-      ? "Fumble!"
+      ? t("Fumble!")
       : won
-        ? "Victory"
+        ? t("Victory")
         : tied
-          ? "Tied"
-          : "Defeated";
+          ? t("Tied")
+          : t("Defeated");
 
   return (
     <>
@@ -117,11 +118,11 @@ export const OpposedCheckMessageTemplate: React.FC<
             fontWeight: 700,
           }}
         >
-          Opposed Check
+          {t("Opposed Check")}
           {check.opposedToSpeaker && (
             <>
               {" "}
-              <Diamond color="inherit" /> vs {check.opposedToSpeaker}
+              <Diamond color="inherit" /> {t("vs")} {check.opposedToSpeaker}
             </>
           )}
         </Typography>
@@ -153,7 +154,7 @@ export const OpposedCheckMessageTemplate: React.FC<
               color="text.secondary"
               sx={{ fontWeight: 700, lineHeight: 1.2 }}
             >
-              {ATTR_LABEL[die.attribute]} d{die.die}
+              {t(ATTR_LABEL[die.attribute])} d{die.die}
             </Typography>
             <Typography variant="body1" sx={{ fontWeight: 700, lineHeight: 1 }}>
               {die.result}
@@ -171,7 +172,7 @@ export const OpposedCheckMessageTemplate: React.FC<
               color="text.secondary"
               sx={{ fontWeight: 700, lineHeight: 1.2 }}
             >
-              Mod
+              {t("Mod")}
             </Typography>
             <Typography variant="body1" sx={{ fontWeight: 700, lineHeight: 1 }}>
               {check.modifierTotal > 0
@@ -251,7 +252,7 @@ export const OpposedCheckMessageTemplate: React.FC<
           }}
         >
           <Typography variant="caption" color="text.secondary">
-            vs
+            {t("vs")}
           </Typography>
           <Typography
             variant="caption"
@@ -292,7 +293,7 @@ export const OpposedCheckMessageTemplate: React.FC<
             "&:hover": { borderColor: "text.primary", color: "text.primary" },
           }}
         >
-          Tied - Reroll
+          {t("Tied - Reroll")}
         </Typography>
       )}
       {tied && !onReroll && (
@@ -301,7 +302,7 @@ export const OpposedCheckMessageTemplate: React.FC<
           color="text.secondary"
           sx={{ mt: 0.75, display: "block", textAlign: "center" }}
         >
-          Tied - awaiting reroll
+          {t("Tied - awaiting reroll")}
         </Typography>
       )}
     </>

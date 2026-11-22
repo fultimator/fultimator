@@ -21,6 +21,7 @@ import { useCompendiumPacks } from "../../../hooks/useCompendiumPacks";
 import { useDeleteConfirmation } from "../../../hooks/useDeleteConfirmation";
 import DeleteConfirmationDialog from "../../common/DeleteConfirmationDialog";
 import type { PackTheme, CompendiumPack } from "../../../types/CompendiumPack";
+import { t } from "../../../translation/translate";
 
 interface FlatTheme {
   theme: PackTheme;
@@ -46,9 +47,9 @@ function ThemeRowMenu({
   const doDelete = async () => {
     try {
       await onDelete(flat.pack.id, flat.theme.id);
-      onSnackbar(`"${flat.theme.name}" deleted`);
+      onSnackbar(t("{0} deleted", [`"${flat.theme.name}"`]));
     } catch (e) {
-      onSnackbar(e instanceof Error ? e.message : "Failed to delete theme");
+      onSnackbar(e instanceof Error ? e.message : t("Failed to delete theme"));
     }
   };
 
@@ -65,9 +66,9 @@ function ThemeRowMenu({
     setApplying(true);
     try {
       await onApply(flat.pack.id, flat.theme.id);
-      onSnackbar("Theme applied");
+      onSnackbar(t("Theme applied"));
     } catch (e) {
-      onSnackbar(e instanceof Error ? e.message : "Failed to apply theme");
+      onSnackbar(e instanceof Error ? e.message : t("Failed to apply theme"));
     } finally {
       setApplying(false);
     }
@@ -126,11 +127,11 @@ function ThemeRowMenu({
       >
         <MenuItem onClick={handleApply} dense>
           <CheckIcon fontSize="small" sx={{ mr: 1 }} />
-          Apply
+          {t("Apply")}
         </MenuItem>
         <MenuItem onClick={handleExportJSON} dense>
           <FileDownloadIcon fontSize="small" sx={{ mr: 1 }} />
-          Export JSON
+          {t("Export JSON")}
         </MenuItem>
         <MenuItem
           onClick={handleDeleteClick}
@@ -139,7 +140,7 @@ function ThemeRowMenu({
           sx={{ color: flat.pack.locked ? undefined : "error.main" }}
         >
           <DeleteIcon fontSize="small" sx={{ mr: 1 }} />
-          Delete
+          {t("Delete")}
         </MenuItem>
       </Menu>
 
@@ -147,8 +148,8 @@ function ThemeRowMenu({
         open={deleteOpen}
         onClose={closeDialog}
         onConfirm={doDelete}
-        title="Delete Theme"
-        message={`Delete "${flat.theme.name}"?`}
+        title={t("Delete Theme")}
+        message={t("Delete {0}?", [`"${flat.theme.name}"`])}
         enableCtrlBypass={false}
       />
     </>
@@ -194,7 +195,7 @@ function PackGroup({
             color: "text.secondary",
           }}
         >
-          {pack.isPersonal ? "Personal" : pack.name}
+          {pack.isPersonal ? t("Personal") : pack.name}
         </Typography>
         {!pack.isPersonal && pack.version && (
           <Typography
@@ -281,8 +282,13 @@ export const SavedThemesPanel: React.FC = () => {
     return (
       <Box sx={{ p: 2 }}>
         <Typography variant="body2" color="text.secondary">
-          No saved themes yet. Use <strong>Save Theme</strong> in the Customizer
-          tab to save your current customization.
+          {t(
+            "No saved themes yet. Use {0} in the Customizer tab to save your current customization.",
+          )
+            .split("{0}")
+            .flatMap((part: string, i: number) =>
+              i ? [<strong key={i}>{t("Save Theme")}</strong>, part] : [part],
+            )}
         </Typography>
       </Box>
     );

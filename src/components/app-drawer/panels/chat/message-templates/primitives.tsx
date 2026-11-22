@@ -2,6 +2,7 @@ import React from "react";
 import { Box, Chip, Stack, Typography } from "@mui/material";
 import { GiDiceEightFacesEight } from "react-icons/gi";
 import { ATTR_LABEL } from "./primitives-utils";
+import { t } from "../../../../../translation/translate";
 
 export function TagRow({ tags }: { tags: string[] }) {
   if (tags.length === 0) return null;
@@ -20,7 +21,7 @@ export function TagRow({ tags }: { tags: string[] }) {
         <Chip
           key={`${tag}-${i}`}
           size="small"
-          label={tag}
+          label={t(tag)}
           sx={{
             textTransform: "uppercase",
             height: 22,
@@ -76,7 +77,7 @@ export function DiceRow({
             color="text.secondary"
             sx={{ fontWeight: 700, lineHeight: 1.2 }}
           >
-            {ATTR_LABEL[die.attribute]} d{die.die}
+            {t(ATTR_LABEL[die.attribute])} d{die.die}
           </Typography>
           <Typography variant="body1" sx={{ fontWeight: 700, lineHeight: 1 }}>
             {die.result}
@@ -116,7 +117,7 @@ export function BreakdownRow({
         color={bold ? "text.primary" : "text.secondary"}
         sx={{ fontWeight: bold ? 700 : 400 }}
       >
-        {label}
+        {t(label)}
       </Typography>
       <Typography
         variant="body2"
