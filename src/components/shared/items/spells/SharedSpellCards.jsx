@@ -116,12 +116,12 @@ export const SharedSpellCard = React.memo(function SharedSpellCard({
               </Grid>
               <Grid size={3}>
                 <Typography sx={{ textAlign: "center" }}>
-                  {t("Duration")}
+                  {t("Target")}
                 </Typography>
               </Grid>
               <Grid size={3}>
                 <Typography sx={{ textAlign: "center" }}>
-                  {t("Target")}
+                  {t("Duration")}
                 </Typography>
               </Grid>
             </Grid>
@@ -177,13 +177,21 @@ export const SharedSpellCard = React.memo(function SharedSpellCard({
             </Typography>
           </Grid>
           <Grid size={3}>
-            <Typography sx={{ textAlign: "center", fontSize: scale.body }}>
-              {item.duration}
+            <Typography
+              component="div"
+              sx={{ textAlign: "center", fontSize: scale.body }}
+            >
+              <StyledMarkdown
+                allowedElements={["strong", "em"]}
+                unwrapDisallowed
+              >
+                {t(targetText)}
+              </StyledMarkdown>
             </Typography>
           </Grid>
           <Grid size={3}>
             <Typography sx={{ textAlign: "center", fontSize: scale.body }}>
-              {t(targetText)}
+              {item.duration}
             </Typography>
           </Grid>
         </Grid>
@@ -336,12 +344,12 @@ export const SharedPlayerSpellCard = React.memo(function SharedPlayerSpellCard({
               </Grid>
               <Grid size={3}>
                 <Typography sx={{ textAlign: "center" }}>
-                  {t("Duration")}
+                  {t("Target")}
                 </Typography>
               </Grid>
               <Grid size={3}>
                 <Typography sx={{ textAlign: "center" }}>
-                  {t("Target")}
+                  {t("Duration")}
                 </Typography>
               </Grid>
             </Grid>
@@ -395,13 +403,21 @@ export const SharedPlayerSpellCard = React.memo(function SharedPlayerSpellCard({
             </Typography>
           </Grid>
           <Grid size={3}>
-            <Typography sx={{ textAlign: "center", fontSize: scale.body }}>
-              {t(item.duration)}
+            <Typography
+              component="div"
+              sx={{ textAlign: "center", fontSize: scale.body }}
+            >
+              <StyledMarkdown
+                allowedElements={["strong", "em"]}
+                unwrapDisallowed
+              >
+                {t(item.targetDescription)}
+              </StyledMarkdown>
             </Typography>
           </Grid>
           <Grid size={3}>
             <Typography sx={{ textAlign: "center", fontSize: scale.body }}>
-              {t(item.targetDescription)}
+              {t(item.duration)}
             </Typography>
           </Grid>
         </Grid>

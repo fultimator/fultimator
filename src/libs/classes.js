@@ -2334,10 +2334,10 @@ export const spellList = [
     name: "Vortex",
     description: "Vortex_desc",
     isOffensive: false,
-    cost: { resource: "mp", amount: 10, perTarget: false },
+    cost: { resource: "mp", amount: 20, perTarget: false },
     maxTargets: 1,
-    targetDescription: "Self",
-    duration: "Scene",
+    targetDescription: "One creature",
+    duration: "Instantaneous",
     accuracy: {
       attr1: "insight",
       attr2: "willpower",
