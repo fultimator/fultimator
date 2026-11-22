@@ -447,12 +447,12 @@ function Personal({ user }) {
                 <MenuItem value={""}>{t("All")}</MenuItem>
                 <MenuItem value={"soldier"}>{t("Soldier")}</MenuItem>
                 <MenuItem value={"elite"}>{t("Elite")}</MenuItem>
-                <MenuItem value={"champion1"}>{t("Champion(1)")}</MenuItem>
-                <MenuItem value={"champion2"}>{t("Champion(2)")}</MenuItem>
-                <MenuItem value={"champion3"}>{t("Champion(3)")}</MenuItem>
-                <MenuItem value={"champion4"}>{t("Champion(4)")}</MenuItem>
-                <MenuItem value={"champion5"}>{t("Champion(5)")}</MenuItem>
-                <MenuItem value={"champion6"}>{t("Champion(6)")}</MenuItem>
+                <MenuItem value={"champion1"}>{t("Champion (1)")}</MenuItem>
+                <MenuItem value={"champion2"}>{t("Champion (2)")}</MenuItem>
+                <MenuItem value={"champion3"}>{t("Champion (3)")}</MenuItem>
+                <MenuItem value={"champion4"}>{t("Champion (4)")}</MenuItem>
+                <MenuItem value={"champion5"}>{t("Champion (5)")}</MenuItem>
+                <MenuItem value={"champion6"}>{t("Champion (6)")}</MenuItem>
                 <MenuItem value={"companion"}>{t("Companion")}</MenuItem>
                 <MenuItem value={"groupvehicle"}>{t("Group Vehicle")}</MenuItem>
               </Select>
@@ -635,7 +635,7 @@ function Personal({ user }) {
                     marginBottom: 4,
                   }}
                 >
-                  {t(" No more adversaries found.")}
+                  {t("No more adversaries found.")}
                 </Typography>
                 {prevLastItem.length ? (
                   <Button

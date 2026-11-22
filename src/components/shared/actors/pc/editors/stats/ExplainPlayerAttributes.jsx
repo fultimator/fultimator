@@ -1,7 +1,7 @@
 import React from "react";
 import { useTranslate } from "/src/translation/translate";
 import { Grid, Card, Typography, Divider } from "@mui/material";
-import ReactMarkdown from "react-markdown";
+import ReactMarkdown from "/src/components/common/Markdown";
 import { useCustomTheme } from "/src/hooks/useCustomTheme";
 
 export default function ExplainPlayerAttributes() {

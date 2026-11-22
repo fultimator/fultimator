@@ -3,6 +3,7 @@ import path from "node:path";
 import electron from "vite-plugin-electron/simple";
 import react from "@vitejs/plugin-react";
 import svgr from "vite-plugin-svgr";
+import translations from "./scripts/vite-plugin-translations.mjs";
 import { readFileSync } from "fs";
 const pkg = JSON.parse(readFileSync("./package.json", "utf-8"));
 
@@ -10,6 +11,7 @@ const pkg = JSON.parse(readFileSync("./package.json", "utf-8"));
 export default defineConfig({
   cacheDir: "node_modules/.vite-electron",
   plugins: [
+    translations(),
     react(),
     svgr({
       svgrOptions: { icon: true },
@@ -19,7 +21,7 @@ export default defineConfig({
         entry: "electron/main.ts",
       },
       preload: {
-        input: path.join(__dirname, "electron/preload.ts"),
+        input: path.join(import.meta.dirname, "electron/preload.ts"),
       },
       renderer: process.env.NODE_ENV === "test" ? undefined : {},
     }),
@@ -30,15 +32,18 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      "@routes": path.resolve(__dirname, "src/routes"),
-      "@platform/cloud": path.resolve(__dirname, "src/platform/web/db"),
-      "@platform": path.resolve(__dirname, "src/platform/desktop"),
+      "@routes": path.resolve(import.meta.dirname, "src/routes"),
+      "@platform/cloud": path.resolve(
+        import.meta.dirname,
+        "src/platform/web/db",
+      ),
+      "@platform": path.resolve(import.meta.dirname, "src/platform/desktop"),
       crypto: "crypto-browserify",
       buffer: "buffer",
       process: "process/browser",
       stream: "stream-browserify",
       "virtual:pwa-register": path.resolve(
-        __dirname,
+        import.meta.dirname,
         "src/pwa/registerSW.noop.js",
       ),
     },

@@ -29,7 +29,7 @@ import { Add, Casino, ExpandMore, MenuBook, Remove } from "@mui/icons-material";
 import OutdoorGrillIcon from "@mui/icons-material/OutdoorGrill";
 import RadioButtonCheckedIcon from "@mui/icons-material/RadioButtonChecked";
 import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
-import ReactMarkdown from "react-markdown";
+import ReactMarkdown from "/src/components/common/Markdown";
 import { useTranslate } from "/src/translation/translate";
 import { sendDisplayMessage } from "/src/hooks/useRollToChat";
 import {

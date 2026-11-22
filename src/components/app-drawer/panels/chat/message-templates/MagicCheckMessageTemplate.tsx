@@ -10,10 +10,12 @@ import { CheckMagicIcon } from "../../../../icons";
 import { BreakdownRow, DiceRow, TagRow } from "./primitives";
 import {
   ATTR_LABEL,
+  defenseLabel,
   formatSpellType,
   normalizeDamageType,
 } from "./primitives-utils";
 import { DamagePipelineTargets } from "./DamagePipelineTargets";
+import { t } from "../../../../../translation/translate";
 
 const gridSx = {
   px: 0.75,
@@ -90,7 +92,8 @@ export const MagicCheckMessageTemplate: React.FC<
             fontWeight: 700,
           }}
         >
-          Magic Check <Diamond color="inherit" /> {check.intent.spellName}
+          {t("Magic Check")} <Diamond color="inherit" />{" "}
+          {t(check.intent.spellName)}
         </Typography>
       </Box>
       <TagRow tags={tags} />
@@ -173,10 +176,12 @@ export const MagicCheckMessageTemplate: React.FC<
             }}
           >
             {check.critical
-              ? "Critical"
+              ? t("Critical")
               : check.fumble
-                ? "Fumble!"
-                : `Magic vs ${(check.intent.defense ?? "mdef").toUpperCase()}`}
+                ? t("Fumble!")
+                : t("Magic vs {0}", [
+                    t(defenseLabel(check.intent.defense ?? "mdef")),
+                  ])}
           </Typography>
           <IconButton
             size="small"
@@ -238,7 +243,7 @@ export const MagicCheckMessageTemplate: React.FC<
               fontSize: "0.8rem",
             }}
           >
-            {check.intent.damageType}
+            {t(check.intent.damageType)}
           </Typography>
           <Box />
         </Box>
@@ -256,11 +261,11 @@ export const MagicCheckMessageTemplate: React.FC<
             }}
           >
             <BreakdownRow
-              label={`HR · ${ATTR_LABEL[check.primary.result >= check.secondary.result ? check.primary.attribute : check.secondary.attribute]} d${check.primary.result >= check.secondary.result ? check.primary.die : check.secondary.die}`}
+              label={`${t("HR")} · ${t(ATTR_LABEL[check.primary.result >= check.secondary.result ? check.primary.attribute : check.secondary.attribute])} d${check.primary.result >= check.secondary.result ? check.primary.die : check.secondary.die}`}
               value={check.highRoll}
             />
             <BreakdownRow
-              label={`LR · ${ATTR_LABEL[check.primary.result < check.secondary.result ? check.primary.attribute : check.secondary.attribute]} d${check.primary.result < check.secondary.result ? check.primary.die : check.secondary.die}`}
+              label={`${t("LR")} · ${t(ATTR_LABEL[check.primary.result < check.secondary.result ? check.primary.attribute : check.secondary.attribute])} d${check.primary.result < check.secondary.result ? check.primary.die : check.secondary.die}`}
               value={lowRoll}
             />
             {check.intent.modifiers.map((mod, i) => (
@@ -283,7 +288,7 @@ export const MagicCheckMessageTemplate: React.FC<
               value={check.intent.hrZero ? "HR0" : check.damageHighRoll}
             />
             <BreakdownRow
-              label={`Base Damage · ${check.intent.spellName}`}
+              label={`${t("Base Damage")} · ${t(check.intent.spellName)}`}
               value={check.intent.baseDamage}
               signed
             />

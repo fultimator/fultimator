@@ -13,6 +13,8 @@ import {
   Menu as MenuIcon,
   RestartAlt as RestartAltIcon,
 } from "@mui/icons-material";
+import { isBuiltinSpeaker } from "../constants";
+import { t } from "../../../../../translation/translate";
 
 interface BaseMessageTemplateProps {
   speaker: string;
@@ -78,7 +80,7 @@ export const BaseMessageTemplate: React.FC<BaseMessageTemplateProps> = ({
         }}
       >
         <Typography variant="body2" sx={{ fontWeight: 700 }}>
-          {speaker}
+          {isBuiltinSpeaker(speaker) ? t(speaker) : speaker}
         </Typography>
         <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
           <Typography variant="caption" color="text.secondary">
@@ -86,7 +88,7 @@ export const BaseMessageTemplate: React.FC<BaseMessageTemplateProps> = ({
           </Typography>
           <IconButton
             size="small"
-            aria-label="Message options"
+            aria-label={t("Message options")}
             onClick={handleMenuOpen}
             sx={{ color: "text.secondary" }}
           >
@@ -122,14 +124,14 @@ export const BaseMessageTemplate: React.FC<BaseMessageTemplateProps> = ({
                 <ListItemIcon>
                   <RestartAltIcon fontSize="small" />
                 </ListItemIcon>
-                <ListItemText>Retarget Actors</ListItemText>
+                <ListItemText>{t("Retarget Actors")}</ListItemText>
               </MenuItem>
             )}
             <MenuItem onClick={handleDelete}>
               <ListItemIcon>
                 <DeleteOutlineIcon fontSize="small" />
               </ListItemIcon>
-              <ListItemText>Delete Message</ListItemText>
+              <ListItemText>{t("Delete Message")}</ListItemText>
             </MenuItem>
           </Menu>
         </Box>

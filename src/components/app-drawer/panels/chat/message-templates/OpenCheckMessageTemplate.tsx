@@ -12,6 +12,7 @@ import {
   dieCellSx,
   gridSx,
 } from "./openCheckTemplate.constants";
+import { t } from "../../../../../translation/translate";
 
 interface OpenCheckMessageTemplateProps {
   check: CheckResult;
@@ -73,11 +74,11 @@ export const OpenCheckMessageTemplate: React.FC<
             fontWeight: 700,
           }}
         >
-          Open Check
+          {t("Open Check")}
           {isStudy && (
             <>
               {" "}
-              <Diamond color="inherit" /> Study
+              <Diamond color="inherit" /> {t("Study")}
             </>
           )}
         </Typography>
@@ -109,7 +110,7 @@ export const OpenCheckMessageTemplate: React.FC<
               color="text.secondary"
               sx={{ fontWeight: 700, lineHeight: 1.2 }}
             >
-              {ATTR_LABEL[die.attribute]} d{die.die}
+              {t(ATTR_LABEL[die.attribute])} d{die.die}
             </Typography>
             <Typography variant="body1" sx={{ fontWeight: 700, lineHeight: 1 }}>
               {die.result}
@@ -127,7 +128,7 @@ export const OpenCheckMessageTemplate: React.FC<
               color="text.secondary"
               sx={{ fontWeight: 700, lineHeight: 1.2 }}
             >
-              Mod
+              {t("Mod")}
             </Typography>
             <Typography variant="body1" sx={{ fontWeight: 700, lineHeight: 1 }}>
               {check.modifierTotal > 0
@@ -190,7 +191,11 @@ export const OpenCheckMessageTemplate: React.FC<
                 "-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000",
             }}
           >
-            {check.critical ? "Critical" : check.fumble ? "Fumble!" : "Result"}
+            {check.critical
+              ? t("Critical")
+              : check.fumble
+                ? t("Fumble!")
+                : t("Result")}
           </Typography>
           <Box />
         </Box>
@@ -237,7 +242,7 @@ export const OpenCheckMessageTemplate: React.FC<
                       textAlign: "right",
                     }}
                   >
-                    {tier.label}
+                    {t(tier.label)}
                   </Typography>
                 </Box>
               );
@@ -270,7 +275,7 @@ export const OpenCheckMessageTemplate: React.FC<
             "&:hover": { borderColor: "text.primary", color: "text.primary" },
           }}
         >
-          Oppose
+          {t("Oppose")}
         </Typography>
       )}
     </>

@@ -7,7 +7,7 @@ import {
   Tooltip,
 } from "@mui/material";
 import { Add, Search } from "@mui/icons-material";
-import ReactMarkdown from "react-markdown";
+import ReactMarkdown from "/src/components/common/Markdown";
 
 /**
  * ContentSection - Reusable base component for managing spell sub-items (gifts, dances, magiseeds, etc.)

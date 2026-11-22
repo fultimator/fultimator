@@ -13,7 +13,7 @@ import { Message } from "@mui/icons-material";
 import { styled } from "@mui/system";
 import { useTranslate } from "/src/translation/translate";
 import { useCustomTheme } from "/src/hooks/useCustomTheme";
-import ReactMarkdown from "react-markdown";
+import ReactMarkdown from "/src/components/common/Markdown";
 import { buildInvokerAvailableInvocations } from "/src/libs/player/invokerUtils";
 import { sendDisplayMessage } from "/src/hooks/useRollToChat";
 

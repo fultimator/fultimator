@@ -15,6 +15,7 @@ import { devLog } from "../../../../../utils/devLog";
 import type { DamagePipelineTarget } from "../types";
 import { TypeIcon } from "../../../../types";
 import { normalizeDamageType } from "./primitives-utils";
+import { t } from "../../../../../translation/translate";
 
 interface DamagePipelineTargetsProps {
   messageId: string;
@@ -96,7 +97,7 @@ export const DamagePipelineTargets: React.FC<DamagePipelineTargetsProps> = ({
     });
     if (!success) {
       setErrorMsg(
-        `Could not apply damage to ${nameOf(id)} (no longer in combat).`,
+        t("Could not apply damage to {0} (no longer in combat).", [nameOf(id)]),
       );
       return;
     }
@@ -116,7 +117,9 @@ export const DamagePipelineTargets: React.FC<DamagePipelineTargetsProps> = ({
     });
     if (!success) {
       setErrorMsg(
-        `Could not revert damage on ${nameOf(id)} (no longer in combat).`,
+        t("Could not revert damage on {0} (no longer in combat).", [
+          nameOf(id),
+        ]),
       );
       return;
     }
@@ -132,24 +135,26 @@ export const DamagePipelineTargets: React.FC<DamagePipelineTargetsProps> = ({
     });
     const next = { ...appliedMap };
     const failed: string[] = [];
-    targets.forEach((t) => {
-      if (hitMap[t.combatId] && !appliedMap[t.combatId]) {
-        const success = applyHpDamage(t.combatId, damage, normalizedType);
+    targets.forEach((target) => {
+      if (hitMap[target.combatId] && !appliedMap[target.combatId]) {
+        const success = applyHpDamage(target.combatId, damage, normalizedType);
         devLog("[DamagePipelineTargets] applyHits target", {
-          combatId: t.combatId,
+          combatId: target.combatId,
           success,
         });
         if (success) {
-          next[t.combatId] = true;
+          next[target.combatId] = true;
         } else {
-          failed.push(t.name);
+          failed.push(target.name);
         }
       }
     });
     commitAppliedMap(next);
     if (failed.length > 0) {
       setErrorMsg(
-        `Could not apply damage to ${failed.join(", ")} (no longer in combat).`,
+        t("Could not apply damage to {0} (no longer in combat).", [
+          failed.join(", "),
+        ]),
       );
     }
   };
@@ -222,7 +227,11 @@ export const DamagePipelineTargets: React.FC<DamagePipelineTargetsProps> = ({
 
                 <Tooltip
                   title={
-                    isApplied ? "" : isHit ? "Mark as Miss" : "Mark as Hit"
+                    isApplied
+                      ? ""
+                      : isHit
+                        ? t("Mark as Miss")
+                        : t("Mark as Hit")
                   }
                 >
                   <Box
@@ -256,7 +265,7 @@ export const DamagePipelineTargets: React.FC<DamagePipelineTargetsProps> = ({
                         lineHeight: 1,
                       }}
                     >
-                      {isHit ? "Hit" : "Miss"}
+                      {isHit ? t("Hit") : t("Miss")}
                     </Typography>
                   </Box>
                 </Tooltip>
@@ -264,10 +273,10 @@ export const DamagePipelineTargets: React.FC<DamagePipelineTargetsProps> = ({
                 <Tooltip
                   title={
                     isApplied
-                      ? "Revert damage"
+                      ? t("Revert damage")
                       : isHit
-                        ? "Apply damage"
-                        : "No damage (miss)"
+                        ? t("Apply damage")
+                        : t("No damage (miss)")
                   }
                 >
                   <span>
@@ -342,7 +351,7 @@ export const DamagePipelineTargets: React.FC<DamagePipelineTargetsProps> = ({
               color: "text.secondary",
             }}
           >
-            {damage} {damageType} damage
+            {t("{0} {1} damage", [damage, t(damageType)])}
           </Typography>
           <Box sx={{ flex: 1 }} />
           <Typography
@@ -353,7 +362,7 @@ export const DamagePipelineTargets: React.FC<DamagePipelineTargetsProps> = ({
               color: "text.secondary",
             }}
           >
-            {hitTargets.length}/{targets.length} hit
+            {t("{0}/{1} hit", [hitTargets.length, targets.length])}
           </Typography>
         </Box>
 
@@ -386,7 +395,7 @@ export const DamagePipelineTargets: React.FC<DamagePipelineTargetsProps> = ({
             },
           }}
         >
-          Apply Damage
+          {t("Apply Damage")}
         </Button>
       </Box>
       <Snackbar

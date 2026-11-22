@@ -6,7 +6,7 @@ import {
   AccordionSummary,
   AccordionDetails,
 } from "@mui/material";
-import ReactMarkdown from "react-markdown";
+import ReactMarkdown from "/src/components/common/Markdown";
 import { useTranslate } from "/src/translation/translate";
 import { Info, ExpandMore } from "@mui/icons-material";
 

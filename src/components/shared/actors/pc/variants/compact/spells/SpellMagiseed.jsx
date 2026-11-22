@@ -16,7 +16,7 @@ import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
 import { styled } from "@mui/system";
 import { useTranslate } from "/src/translation/translate";
 import { useCustomTheme } from "/src/hooks/useCustomTheme";
-import ReactMarkdown from "react-markdown";
+import ReactMarkdown from "/src/components/common/Markdown";
 import { magiseeds } from "/src/libs/floralistMagiseedData";
 import { setNestedActivation } from "/src/components/shared/actors/pc/spells/spellActivationPolicies";
 

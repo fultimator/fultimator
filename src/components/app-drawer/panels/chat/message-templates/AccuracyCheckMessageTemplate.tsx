@@ -8,10 +8,15 @@ import Diamond from "../../../../Diamond";
 import NotesMarkdown from "../../../../common/NotesMarkdown";
 import { CheckAccuracyIcon } from "../../../../icons";
 import { BreakdownRow, DiceRow, TagRow } from "./primitives";
-import { ATTR_LABEL, normalizeDamageType } from "./primitives-utils";
+import {
+  ATTR_LABEL,
+  defenseLabel,
+  normalizeDamageType,
+} from "./primitives-utils";
 import { DamagePipelineTargets } from "./DamagePipelineTargets";
 import { ReactiveInterruptZone, OnHitZone } from "./ChatActionZone";
 import type { DamagePipelineTarget } from "../types";
+import { t } from "../../../../../translation/translate";
 
 const gridSx = {
   px: 0.75,
@@ -28,8 +33,11 @@ function formatCategory(category: string): string {
     .replace(/^weapon_category_/, "")
     .replace(/_/g, " ")
     .trim();
-  if (!clean) return "Unknown";
-  return clean.replace(/\b\w/g, (m) => m.toUpperCase());
+  if (!clean) return t("Unknown");
+  const translated = t(category, undefined, true);
+  return translated !== category
+    ? translated
+    : clean.replace(/\b\w/g, (m) => m.toUpperCase());
 }
 
 function formatRange(range: string): string {
@@ -77,13 +85,13 @@ export const AccuracyCheckMessageTemplate: React.FC<
       ? check.primary.result
       : check.secondary.result;
   const tags: string[] = [];
-  if (check.intent.isWeaponModule) tags.push("Weapon Module");
+  if (check.intent.isWeaponModule) tags.push(t("Weapon Module"));
   if (check.intent.category) tags.push(formatCategory(check.intent.category));
   if (check.intent.range) tags.push(formatRange(check.intent.range));
   if (check.intent.hands === 2) tags.push("Two-handed");
   else if (check.intent.hands === 1) tags.push("One-handed");
   if (check.intent.defense)
-    tags.push(String(check.intent.defense).toUpperCase());
+    tags.push(defenseLabel(String(check.intent.defense)));
   if (check.intent.extraTags) tags.push(...check.intent.extraTags);
   if (check.intent.hrZero) tags.push("HR0");
   if (check.critical) tags.push("Critical");
@@ -119,7 +127,8 @@ export const AccuracyCheckMessageTemplate: React.FC<
             fontWeight: 700,
           }}
         >
-          Accuracy Check <Diamond color="inherit" /> {check.intent.weaponName}
+          {t("Accuracy Check")} <Diamond color="inherit" />{" "}
+          {t(check.intent.weaponName)}
         </Typography>
       </Box>
       <TagRow tags={tags} />
@@ -202,10 +211,10 @@ export const AccuracyCheckMessageTemplate: React.FC<
             }}
           >
             {check.critical
-              ? "Critical"
+              ? t("Critical")
               : check.fumble
-                ? "Fumble!"
-                : `Accuracy vs ${(check.intent.defense ?? "def").toUpperCase()}`}
+                ? t("Fumble!")
+                : t("Accuracy vs {0}", [t(defenseLabel(check.intent.defense))])}
           </Typography>
           <IconButton
             size="small"
@@ -266,7 +275,7 @@ export const AccuracyCheckMessageTemplate: React.FC<
               fontWeight: 700,
             }}
           >
-            {check.intent.damageType}
+            {t(check.intent.damageType)}
           </Typography>
           <Box />
         </Box>
@@ -284,11 +293,11 @@ export const AccuracyCheckMessageTemplate: React.FC<
             }}
           >
             <BreakdownRow
-              label={`HR · ${ATTR_LABEL[check.primary.result >= check.secondary.result ? check.primary.attribute : check.secondary.attribute]} d${check.primary.result >= check.secondary.result ? check.primary.die : check.secondary.die}`}
+              label={`${t("HR")} · ${t(ATTR_LABEL[check.primary.result >= check.secondary.result ? check.primary.attribute : check.secondary.attribute])} d${check.primary.result >= check.secondary.result ? check.primary.die : check.secondary.die}`}
               value={check.highRoll}
             />
             <BreakdownRow
-              label={`LR · ${ATTR_LABEL[check.primary.result < check.secondary.result ? check.primary.attribute : check.secondary.attribute]} d${check.primary.result < check.secondary.result ? check.primary.die : check.secondary.die}`}
+              label={`${t("LR")} · ${t(ATTR_LABEL[check.primary.result < check.secondary.result ? check.primary.attribute : check.secondary.attribute])} d${check.primary.result < check.secondary.result ? check.primary.die : check.secondary.die}`}
               value={lowRoll}
             />
             {check.intent.modifiers.map((mod, i) => (
@@ -311,7 +320,7 @@ export const AccuracyCheckMessageTemplate: React.FC<
               value={check.intent.hrZero ? "HR0" : check.damageHighRoll}
             />
             <BreakdownRow
-              label={`Base Damage · ${check.intent.weaponName}`}
+              label={`${t("Base Damage")} · ${t(check.intent.weaponName)}`}
               value={check.intent.baseDamage}
               signed
             />

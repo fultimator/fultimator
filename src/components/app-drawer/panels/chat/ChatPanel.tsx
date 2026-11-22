@@ -81,7 +81,7 @@ import {
   toggleActiveVehicle,
 } from "../../../../libs/player/slots/loadoutActions";
 import { getActiveVehicle } from "../../../../libs/player/slots/equipmentSlots";
-import { useTranslate } from "../../../../translation/translate";
+import { t, useTranslate } from "../../../../translation/translate";
 
 const isRetargetableMessage = (
   message: ChatMessage,
@@ -168,8 +168,8 @@ const buildEquipmentChangeMessage = ({
   afterItem: string | null;
 }): ChatMessage => {
   const slotLabel = SLOT_LABELS[slot];
-  const previousLabel = beforeItem ?? "Empty";
-  const nextLabel = afterItem ?? "Empty";
+  const previousLabel = beforeItem ?? t("Empty");
+  const nextLabel = afterItem ?? t("Empty");
   const isChange = previousLabel !== nextLabel;
 
   return {
@@ -178,9 +178,9 @@ const buildEquipmentChangeMessage = ({
     speaker,
     kind: "display",
     itemType: "equipment",
-    name: `${slotLabel} ${isChange ? "Changed" : "Confirmed"}`,
+    name: t(isChange ? "{0} Changed" : "{0} Confirmed", [t(slotLabel)]),
     tags: ["Equipment", slotLabel, isChange ? "Updated" : "No Change"],
-    description: `**Before:** ${previousLabel}\n\n**After:** ${nextLabel}`,
+    description: `**${t("Before")}:** ${previousLabel}\n\n**${t("After")}:** ${nextLabel}`,
   };
 };
 
@@ -309,7 +309,7 @@ const LogMessageMenu: React.FC<{ onDelete: () => void }> = ({ onDelete }) => {
     <>
       <IconButton
         size="small"
-        aria-label="Message options"
+        aria-label={t("Message options")}
         onClick={(e) => setAnchorEl(e.currentTarget)}
         sx={{ color: "text.secondary", flexShrink: 0 }}
       >
@@ -329,7 +329,7 @@ const LogMessageMenu: React.FC<{ onDelete: () => void }> = ({ onDelete }) => {
           <ListItemIcon>
             <DeleteOutlineIcon fontSize="small" />
           </ListItemIcon>
-          <ListItemText>Delete Message</ListItemText>
+          <ListItemText>{t("Delete Message")}</ListItemText>
         </MenuItem>
       </Menu>
     </>
@@ -768,7 +768,7 @@ export const ChatPanel: React.FC = () => {
       direction: "loss" | "gain",
     ) => {
       const actorName =
-        message.speaker || selectedSpeaker || contextActorName || "No actor";
+        message.speaker || selectedSpeaker || contextActorName || t("No actor");
       if (!activeActorDoc) {
         addMessage(
           buildResourceApplicationLog({
@@ -835,6 +835,7 @@ export const ChatPanel: React.FC = () => {
       contextActorName,
       getRuntimeActor,
       isCombatSim,
+      t,
       updateRuntimeActor,
       selectedSpeaker,
       setActiveActorDoc,
@@ -1042,7 +1043,7 @@ export const ChatPanel: React.FC = () => {
             >
               {activeMessages.length === 0 && (
                 <Typography variant="body2" color="text.secondary">
-                  Start chatting or roll from the dice tray below.
+                  {t("Start chatting or roll from the dice tray below.")}
                 </Typography>
               )}
               {activeMessages.map((message) => {
@@ -1215,8 +1216,10 @@ export const ChatPanel: React.FC = () => {
           store.clearAll();
           clearEncounterMessages();
         }}
-        title="Clear Chat Logs"
-        message="Are you sure you want to delete all chat messages and roll history?"
+        title={t("Clear Chat Logs")}
+        message={t(
+          "Are you sure you want to delete all chat messages and roll history?",
+        )}
         enableCtrlBypass={false}
       />
 

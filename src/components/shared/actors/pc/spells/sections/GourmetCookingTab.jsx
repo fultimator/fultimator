@@ -36,7 +36,7 @@ import {
   ShoppingCart,
 } from "@mui/icons-material";
 import OutdoorGrillIcon from "@mui/icons-material/OutdoorGrill";
-import ReactMarkdown from "react-markdown";
+import ReactMarkdown from "/src/components/common/Markdown";
 import {
   getDelicacyEffects,
   getIngredientTastes,

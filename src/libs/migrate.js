@@ -5,6 +5,9 @@ import {
   resolveRefMeta,
 } from "../utils/compendiumRefs";
 import skills from "./skills";
+import { t } from "../translation/translate";
+
+const tr = (key, params) => t(key, params, true);
 
 function clamp(value, max) {
   return Math.min(value, max);
@@ -23,28 +26,35 @@ export function diffItem(instance, source, type) {
     case "mnemosphere":
     case "class": {
       if (changed(instance.name, source.name))
-        diffs.push(`Name: "${instance.name}" -> "${source.name}"`);
+        diffs.push(tr('Name: "{0}" -> "{1}"', [instance.name, source.name]));
       if (source.fuid && !instance.fuid)
-        diffs.push(`ID: missing -> "${source.fuid}"`);
+        diffs.push(tr('ID: missing -> "{0}"', [source.fuid]));
 
       const instSkills = instance.skills ?? [];
       const srcSkills = source.skills ?? [];
       srcSkills.forEach((srcSkill, i) => {
         const instSkill = instSkills[i];
         if (!instSkill) {
-          diffs.push(`Skill ${i + 1}: added "${srcSkill.name}"`);
+          diffs.push(tr('Skill {0}: added "{1}"', [i + 1, srcSkill.name]));
           return;
         }
         if (changed(instSkill.name, srcSkill.name))
-          diffs.push(`Skill "${instSkill.name}": name -> "${srcSkill.name}"`);
+          diffs.push(
+            tr('Skill "{0}": name -> "{1}"', [instSkill.name, srcSkill.name]),
+          );
         if (changed(instSkill.description, srcSkill.description))
-          diffs.push(`Skill "${srcSkill.name}": description changed`);
+          diffs.push(tr('Skill "{0}": description changed', [srcSkill.name]));
         if (instSkill.maxLvl !== srcSkill.maxLvl) {
           const wouldClamp = (instSkill.currentLvl ?? 0) > srcSkill.maxLvl;
           diffs.push(
-            `Skill "${srcSkill.name}": maxLvl ${instSkill.maxLvl} -> ${srcSkill.maxLvl}` +
+            tr('Skill "{0}": maxLvl {1} -> {2}', [
+              srcSkill.name,
+              instSkill.maxLvl,
+              srcSkill.maxLvl,
+            ]) +
               (wouldClamp
-                ? ` (your level will be reduced to ${srcSkill.maxLvl})`
+                ? " " +
+                  tr("(your level will be reduced to {0})", [srcSkill.maxLvl])
                 : ""),
           );
         }
@@ -53,24 +63,28 @@ export function diffItem(instance, source, type) {
           const expectedFuid =
             srcSkill.fuid ?? skills.find((s) => s.name === skillName)?.fuid;
           if (expectedFuid)
-            diffs.push(`Skill "${skillName}": ID missing -> "${expectedFuid}"`);
+            diffs.push(
+              tr('Skill "{0}": ID missing -> "{1}"', [skillName, expectedFuid]),
+            );
         }
       });
       if (instSkills.length > srcSkills.length)
         diffs.push(
-          `${instSkills.length - srcSkills.length} skill(s) removed from source`,
+          tr("{0} skill(s) removed from source", [
+            instSkills.length - srcSkills.length,
+          ]),
         );
 
       if (
         source.heroic !== undefined &&
         changed(instance.heroic, source.heroic)
       )
-        diffs.push("Heroic skill(s) changed");
+        diffs.push(tr("Heroic skill(s) changed"));
       if (
         source.spells !== undefined &&
         changed(instance.spells, source.spells)
       )
-        diffs.push("Spell list changed");
+        diffs.push(tr("Spell list changed"));
 
       if (source.benefits !== undefined) {
         const srcB = source.benefits;
@@ -82,52 +96,60 @@ export function diffItem(instance, source, type) {
         );
         if (missingSpellClasses.length > 0)
           diffs.push(
-            `Benefits: spell types added (${missingSpellClasses.join(", ")})`,
+            tr("Benefits: spell types added ({0})", [
+              missingSpellClasses.join(", "),
+            ]),
           );
         const srcCustom = srcB.custom ?? [];
         const instCustom = instB.custom ?? [];
         const missingCustom = srcCustom.filter((c) => !instCustom.includes(c));
         if (missingCustom.length > 0)
           diffs.push(
-            `Benefits: ${missingCustom.length} custom benefit(s) added`,
+            tr("Benefits: {0} custom benefit(s) added", [missingCustom.length]),
           );
         if (changed(srcB.martials, instB.martials))
-          diffs.push("Benefits: martial proficiencies changed");
+          diffs.push(tr("Benefits: martial proficiencies changed"));
         if (changed(srcB.rituals, instB.rituals))
-          diffs.push("Benefits: ritual access changed");
+          diffs.push(tr("Benefits: ritual access changed"));
       }
       break;
     }
 
     case "hoplosphere": {
       if (changed(instance.name, source.name))
-        diffs.push(`Name: "${instance.name}" -> "${source.name}"`);
+        diffs.push(tr('Name: "{0}" -> "{1}"', [instance.name, source.name]));
       if (source.fuid && !instance.fuid)
-        diffs.push(`ID: missing -> "${source.fuid}"`);
+        diffs.push(tr('ID: missing -> "{0}"', [source.fuid]));
       if (changed(instance.description, source.description))
-        diffs.push("Description changed");
+        diffs.push(tr("Description changed"));
       if (changed(instance.cost, source.cost))
-        diffs.push(`Cost: ${instance.cost}z -> ${source.cost}z`);
+        diffs.push(tr("Cost: {0}z -> {1}z", [instance.cost, source.cost]));
       if (changed(instance.requiredSlots, source.requiredSlots))
         diffs.push(
-          `Required slots: ${instance.requiredSlots} -> ${source.requiredSlots}`,
+          tr("Required slots: {0} -> {1}", [
+            instance.requiredSlots,
+            source.requiredSlots,
+          ]),
         );
       if (changed(instance.socketable, source.socketable))
         diffs.push(
-          `Socketable: ${instance.socketable} -> ${source.socketable}`,
+          tr("Socketable: {0} -> {1}", [
+            instance.socketable,
+            source.socketable,
+          ]),
         );
       if (changed(instance.coagEffects, source.coagEffects))
-        diffs.push("Coagulation effects changed");
+        diffs.push(tr("Coagulation effects changed"));
       break;
     }
 
     case "heroic": {
       if (changed(instance.name, source.name))
-        diffs.push(`Name: "${instance.name}" -> "${source.name}"`);
+        diffs.push(tr('Name: "{0}" -> "{1}"', [instance.name, source.name]));
       if (source.fuid && !instance.fuid)
-        diffs.push(`ID: missing -> "${source.fuid}"`);
+        diffs.push(tr('ID: missing -> "{0}"', [source.fuid]));
       if (changed(instance.description, source.description))
-        diffs.push("Description changed");
+        diffs.push(tr("Description changed"));
       break;
     }
 
@@ -145,10 +167,11 @@ export function diffItem(instance, source, type) {
         "quality",
       ];
       for (const f of fields) {
-        if (changed(instance[f], source[f])) diffs.push(`${f}: changed`);
+        if (changed(instance[f], source[f]))
+          diffs.push(tr("{0}: changed", [f]));
       }
       if (source.fuid && !instance.fuid)
-        diffs.push(`ID: missing -> "${source.fuid}"`);
+        diffs.push(tr('ID: missing -> "{0}"', [source.fuid]));
       break;
     }
 
@@ -165,10 +188,11 @@ export function diffItem(instance, source, type) {
         "special",
       ];
       for (const f of fields) {
-        if (changed(instance[f], source[f])) diffs.push(`${f}: changed`);
+        if (changed(instance[f], source[f]))
+          diffs.push(tr("{0}: changed", [f]));
       }
       if (source.fuid && !instance.fuid)
-        diffs.push(`ID: missing -> "${source.fuid}"`);
+        diffs.push(tr('ID: missing -> "{0}"', [source.fuid]));
       break;
     }
 

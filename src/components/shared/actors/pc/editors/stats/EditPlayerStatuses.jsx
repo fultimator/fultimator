@@ -8,7 +8,7 @@ import {
 } from "@mui/material";
 import { useTranslate } from "/src/translation/translate";
 import SectionCard from "/src/components/shared/actors/common/SectionCard";
-import ReactMarkdown from "react-markdown";
+import ReactMarkdown from "/src/components/common/Markdown";
 
 export default function EditPlayerStatuses({ player, setPlayer, isEditMode }) {
   const { t } = useTranslate();

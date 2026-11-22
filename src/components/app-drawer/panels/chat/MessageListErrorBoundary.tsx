@@ -1,5 +1,6 @@
 import React from "react";
 import { Box, Typography } from "@mui/material";
+import { t } from "../../../../translation/translate";
 
 interface State {
   hasError: boolean;
@@ -23,7 +24,7 @@ export class MessageListErrorBoundary extends React.Component<
       return (
         <Box sx={{ p: 2 }}>
           <Typography variant="body2" color="error">
-            Chat failed to render. Try clearing the chat log.
+            {t("Chat failed to render. Try clearing the chat log.")}
           </Typography>
         </Box>
       );

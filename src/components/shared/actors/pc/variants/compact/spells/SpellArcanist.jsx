@@ -12,7 +12,7 @@ import {
 } from "@mui/material";
 import { ArrowForward } from "@mui/icons-material";
 import { styled } from "@mui/system";
-import ReactMarkdown from "react-markdown";
+import ReactMarkdown from "/src/components/common/Markdown";
 import rehypeRaw from "rehype-raw";
 import rehypeSanitize from "rehype-sanitize";
 import { markdownSanitizeSchema } from "/src/utility/markdownSanitizeSchema";

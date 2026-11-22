@@ -9,7 +9,8 @@
 /coverage
 /data
 /docs
-/scripts
+/scripts/*
+!/scripts/vite-plugin-translations.mjs
 
 # ide
 .idea

@@ -463,7 +463,7 @@ export default function EditExtra({ npc, setNpc }) {
                     color: "text.primary",
                   }}
                 >
-                  Species Immunities (Free)
+                  {t("Species Immunities (Free)")}
                 </Typography>
                 <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.75 }}>
                   {Object.entries(freeImmunities).map(([status, isFree]) =>
@@ -471,7 +471,11 @@ export default function EditExtra({ npc, setNpc }) {
                       <Chip
                         key={status}
                         size="small"
-                        label={t(status, undefined, true)}
+                        label={t(
+                          status.charAt(0).toUpperCase() + status.slice(1),
+                          undefined,
+                          true,
+                        )}
                         color={npc.immunities?.[status] ? "primary" : "default"}
                         variant={
                           npc.immunities?.[status] ? "filled" : "outlined"

@@ -1,6 +1,6 @@
 import React, { useRef, useCallback, useState, useEffect } from "react";
 import { TextField, Button, Box } from "@mui/material";
-import ReactMarkdown from "react-markdown";
+import ReactMarkdown from "/src/components/common/Markdown";
 import { useCustomTheme } from "../../hooks/useCustomTheme";
 
 interface CustomTextareaProps {
@@ -93,7 +93,7 @@ const CustomTextarea: React.FC<CustomTextareaProps> = ({
       const start = textarea.selectionStart;
       const end = textarea.selectionEnd;
       const selectedText = value.substring(start, end);
-      let formattedText = "";
+      let formattedText: string;
       let cursorOffset = 0;
 
       switch (format) {

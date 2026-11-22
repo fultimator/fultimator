@@ -22,7 +22,7 @@ import {
 import {
   useCollectionData as useCollectionDataFirestore,
   useDocumentData as useDocumentDataFirestore,
-} from "react-firebase-hooks/firestore";
+} from "../platform/web/firestoreHooks";
 import { auth, firestore } from "../firebase";
 
 // User-owned collections included in cloud exports

@@ -13,7 +13,7 @@ import { Casino } from "@mui/icons-material";
 import { styled } from "@mui/system";
 import { useTranslate } from "/src/translation/translate";
 import { useCustomTheme } from "/src/hooks/useCustomTheme";
-import ReactMarkdown from "react-markdown";
+import ReactMarkdown from "/src/components/common/Markdown";
 import { StyledMarkdown } from "/src/components/shared/actors/pc/variants/compact/spells/StyledSpellComponents";
 import { AlchemyRollDialog } from "/src/components/shared/actors/pc/spells/SpellTinkererAlchemy";
 import { sendDisplayMessage } from "/src/hooks/useRollToChat";

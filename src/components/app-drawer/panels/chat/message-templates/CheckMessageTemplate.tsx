@@ -5,6 +5,7 @@ import { GiDiceEightFacesEight } from "react-icons/gi";
 import { MdTune } from "react-icons/md";
 import type { CheckResult } from "../types";
 import Diamond from "../../../../Diamond";
+import { t } from "../../../../../translation/translate";
 
 const ATTR_LABEL: Record<string, string> = {
   dex: "DEX",
@@ -50,9 +51,9 @@ export const CheckMessageTemplate: React.FC<CheckMessageTemplateProps> = ({
       : undefined;
   const originLabel =
     originAction === "hinder"
-      ? "Hinder"
+      ? t("Hinder")
       : originAction === "study"
-        ? "Study"
+        ? t("Study")
         : undefined;
   const isSuccess = check.passed === true && !check.critical && !check.fumble;
   const isFailure = check.passed === false && !check.critical && !check.fumble;
@@ -82,7 +83,7 @@ export const CheckMessageTemplate: React.FC<CheckMessageTemplateProps> = ({
         color="text.secondary"
         sx={{ textTransform: "uppercase", letterSpacing: "0.04em" }}
       >
-        Attribute Check
+        {t("Attribute Check")}
         {originLabel && (
           <>
             {" "}
@@ -92,7 +93,7 @@ export const CheckMessageTemplate: React.FC<CheckMessageTemplateProps> = ({
         {check.intent.difficulty != null && (
           <>
             {" "}
-            <Diamond color="inherit" /> DL {check.intent.difficulty}
+            <Diamond color="inherit" /> {t("DL")} {check.intent.difficulty}
           </>
         )}
       </Typography>
@@ -123,7 +124,7 @@ export const CheckMessageTemplate: React.FC<CheckMessageTemplateProps> = ({
               color="text.secondary"
               sx={{ fontWeight: 700, lineHeight: 1.2 }}
             >
-              {ATTR_LABEL[die.attribute]} d{die.die}
+              {t(ATTR_LABEL[die.attribute])} d{die.die}
             </Typography>
             <Typography variant="body1" sx={{ fontWeight: 700, lineHeight: 1 }}>
               {die.result}
@@ -141,7 +142,7 @@ export const CheckMessageTemplate: React.FC<CheckMessageTemplateProps> = ({
               color="text.secondary"
               sx={{ fontWeight: 700, lineHeight: 1.2 }}
             >
-              Mod
+              {t("Mod")}
             </Typography>
             <Typography variant="body1" sx={{ fontWeight: 700, lineHeight: 1 }}>
               {check.modifierTotal > 0
@@ -209,14 +210,14 @@ export const CheckMessageTemplate: React.FC<CheckMessageTemplateProps> = ({
             }}
           >
             {check.critical
-              ? "Critical"
+              ? t("Critical")
               : check.fumble
-                ? "Fumble!"
+                ? t("Fumble!")
                 : check.passed == null
-                  ? "Result"
+                  ? t("Result")
                   : check.passed
-                    ? "Success"
-                    : "Failure"}
+                    ? t("Success")
+                    : t("Failure")}
           </Typography>
           <Box />
         </Box>

@@ -7,7 +7,7 @@ import {
   Slider,
 } from "@mui/material";
 import CustomTextarea from "/src/components/common/CustomTextarea";
-import ReactMarkdown from "react-markdown";
+import ReactMarkdown from "/src/components/common/Markdown";
 
 /**
  * GeneralSection - Reusable base component for spell settings (showInPlayerSheet + custom fields)

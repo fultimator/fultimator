@@ -34,3 +34,9 @@ export function formatSpellType(spellType: string | undefined): string {
   if (!clean) return "Default";
   return clean.replace(/\b\w/g, (m) => m.toUpperCase());
 }
+
+// "def" / "mdef" as the existing translation keys ("DEF", "M.DEF").
+export function defenseLabel(defense: string | undefined): string {
+  const d = String(defense || "def").toLowerCase();
+  return d === "mdef" ? "M.DEF" : d.toUpperCase();
+}

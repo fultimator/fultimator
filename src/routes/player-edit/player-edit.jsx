@@ -1387,8 +1387,8 @@ export default function PlayerEdit() {
                               value={`${opt.source}:${opt.index}`}
                             >
                               {opt.name === "Unarmed Strike"
-                                ? `★ ${opt.name}`
-                                : opt.name}
+                                ? `★ ${t(opt.name)}`
+                                : t(opt.name)}
                             </MenuItem>
                           ))}
                         </Select>
@@ -1770,7 +1770,7 @@ export default function PlayerEdit() {
                 return (
                   <SettingRow
                     key={skillName}
-                    label={skillName}
+                    label={t(skillName)}
                     hint={
                       isActive
                         ? `${t("Active in")}: ${activeSkill.classList.join(", ")} • ${t("Highest Level")}: ${activeSkill.level}`

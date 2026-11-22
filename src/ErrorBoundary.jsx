@@ -10,6 +10,7 @@ import {
   Box,
 } from "@mui/material";
 import axios from "axios";
+import { isStaleChunkError, reloadForNewBuild } from "./pwa/staleBuild";
 
 class ErrorBoundary extends Component {
   constructor(props) {
@@ -28,6 +29,7 @@ class ErrorBoundary extends Component {
   }
 
   componentDidCatch(error, errorInfo) {
+    if (isStaleChunkError(error) && reloadForNewBuild()) return;
     console.error("Error caught by Error Boundary:", error, errorInfo);
     this.setState((prevState) => ({
       errorList: [...prevState.errorList, { error, errorInfo }],

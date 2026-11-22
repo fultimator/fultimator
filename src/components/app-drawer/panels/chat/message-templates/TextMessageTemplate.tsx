@@ -1,5 +1,6 @@
 import React from "react";
 import { Box, Typography } from "@mui/material";
+import { t } from "../../../../../translation/translate";
 
 interface TextMessageTemplateProps {
   text: string;
@@ -15,7 +16,7 @@ export const TextMessageTemplate: React.FC<TextMessageTemplateProps> = ({
         color="text.secondary"
         sx={{ textTransform: "uppercase", letterSpacing: "0.04em" }}
       >
-        Message
+        {t("Message")}
       </Typography>
       <Box
         sx={{

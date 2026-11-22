@@ -15,7 +15,7 @@ import {
   Casino,
   Message,
 } from "@mui/icons-material";
-import ReactMarkdown from "react-markdown";
+import ReactMarkdown from "/src/components/common/Markdown";
 import { styled } from "@mui/system";
 import { OffensiveSpellIcon } from "/src/components/icons"; // Ensure this path is correct
 import attributes from "/src/libs/attributes";

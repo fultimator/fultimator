@@ -298,7 +298,9 @@ export default function MigrateFromCompendiumDialog({
                             </ListItemIcon>
                             <ListItemText
                               primary={t(label)}
-                              secondary={`${migration.diffs.length} change(s)`}
+                              secondary={t("{0} change(s)", [
+                                migration.diffs.length,
+                              ])}
                             />
                           </ListItem>
                           <Collapse in={isExpanded} unmountOnExit>

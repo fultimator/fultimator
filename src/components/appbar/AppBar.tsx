@@ -17,7 +17,7 @@ import {
   ChatBubbleOutlineOutlined as ChatBubbleOutlineIcon,
 } from "@mui/icons-material";
 import MenuOption from "./MenuOption";
-import CompendiumViewerModal from "../compendium/CompendiumViewerModal";
+import CompendiumViewerModal from "../compendium/LazyCompendiumViewerModal";
 import type { ThemeValue, StyleProfileValue } from "../../store/themeStore";
 
 const logo929 = "/assets/branding/logo_929.webp";

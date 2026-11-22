@@ -11,7 +11,7 @@ import {
 import { Edit, VisibilityOff } from "@mui/icons-material";
 import OutdoorGrillIcon from "@mui/icons-material/OutdoorGrill";
 import { useTranslate } from "/src/translation/translate";
-import ReactMarkdown from "react-markdown";
+import ReactMarkdown from "/src/components/common/Markdown";
 import { useCustomTheme } from "/src/hooks/useCustomTheme";
 import {
   getStatusEffects,

@@ -24,7 +24,7 @@ import DeleteConfirmationDialog from "/src/components/common/DeleteConfirmationD
 import CompendiumViewerModal from "/src/components/compendium/CompendiumViewerModal";
 import VehicleModule from "/src/components/shared/actors/pc/spells/VehicleModule";
 import { availableFrames, availableModules } from "/src/libs/pilotVehicleData";
-import ReactMarkdown from "react-markdown";
+import ReactMarkdown from "/src/components/common/Markdown";
 import { TabbedSchemaFormRenderer } from "/src/forms/rendering/TabbedSchemaFormRenderer";
 import {
   pilotVehicleItemFields,

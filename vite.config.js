@@ -2,6 +2,7 @@ import { defineConfig } from "vitest/config";
 import react from "@vitejs/plugin-react";
 import svgr from "vite-plugin-svgr";
 import { VitePWA } from "vite-plugin-pwa";
+import translations from "./scripts/vite-plugin-translations.mjs";
 import path from "path";
 import { readFileSync, readdirSync } from "fs";
 const pkg = JSON.parse(readFileSync("./package.json", "utf-8"));
@@ -22,12 +23,13 @@ function findMuiIconImports(dir) {
   }
   return icons;
 }
-const muiIconDeps = [...findMuiIconImports(path.resolve(__dirname, "src"))].map(
-  (icon) => `@mui/icons-material/${icon}`,
-);
+const muiIconDeps = [
+  ...findMuiIconImports(path.resolve(import.meta.dirname, "src")),
+].map((icon) => `@mui/icons-material/${icon}`);
 
 export default defineConfig({
   plugins: [
+    translations(),
     react(),
     svgr({
       svgrOptions: {
@@ -64,18 +66,14 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      "@routes": path.resolve(__dirname, "src/routes"),
-      "@platform/cloud": path.resolve(__dirname, "src/platform/web/db"),
-      "@platform": path.resolve(__dirname, "src/platform/web"),
+      "@routes": path.resolve(import.meta.dirname, "src/routes"),
+      "@platform/cloud": path.resolve(
+        import.meta.dirname,
+        "src/platform/web/db",
+      ),
+      "@platform": path.resolve(import.meta.dirname, "src/platform/web"),
     },
     extensions: [".js", ".jsx", ".ts", ".tsx"],
-  },
-  css: {
-    preprocessorOptions: {
-      sass: {
-        api: "modern",
-      },
-    },
   },
   build: {
     chunkSizeWarningLimit: 500,

@@ -995,7 +995,7 @@ export function NpcArmorSelectRenderer({
       >
         {items.map((item) => (
           <MenuItem key={item.name} value={item.name}>
-            {item.name}
+            {t(item.name)}
           </MenuItem>
         ))}
       </Select>

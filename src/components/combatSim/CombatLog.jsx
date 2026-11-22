@@ -23,7 +23,7 @@ import { GiDeathSkull } from "react-icons/gi";
 import DeleteSweepIcon from "@mui/icons-material/DeleteSweep";
 import { t } from "../../translation/translate";
 import { ExpandLess, ExpandMore } from "@mui/icons-material";
-import ReactMarkdown from "react-markdown";
+import ReactMarkdown from "/src/components/common/Markdown";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import DeleteConfirmationDialog from "../common/DeleteConfirmationDialog";
 

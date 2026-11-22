@@ -1,7 +1,7 @@
 import { useEffect, useRef, useMemo } from "react";
 import { Card, Chip, Typography, Box, Divider } from "@mui/material";
 import { useTranslate } from "/src/translation/translate";
-import ReactMarkdown from "react-markdown";
+import ReactMarkdown from "/src/components/common/Markdown";
 import { useCustomTheme } from "/src/hooks/useCustomTheme";
 import { DAMAGE_TYPES } from "/src/libs/quickAssembly/constants";
 
@@ -259,7 +259,7 @@ export default function ExplainAffinities({ npc, setNpc }) {
           <Typography>
             <ReactMarkdown allowedElements={["strong"]} unwrapDisallowed={true}>
               {t(
-                "  **Plants** are Vulnerable to (choose one: **air**, **bolt**, **fire**, **ice**) damage.",
+                "**Plants** are Vulnerable to (choose one: **air**, **bolt**, **fire**, **ice**) damage.",
                 true,
               )}
             </ReactMarkdown>

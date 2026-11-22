@@ -42,12 +42,12 @@ const SPECIES_OPTIONS = [
 const RANK_OPTIONS = [
   { value: "soldier", label: "Soldier" },
   { value: "elite", label: "Elite" },
-  { value: "champion1", label: "Champion(1)" },
-  { value: "champion2", label: "Champion(2)" },
-  { value: "champion3", label: "Champion(3)" },
-  { value: "champion4", label: "Champion(4)" },
-  { value: "champion5", label: "Champion(5)" },
-  { value: "champion6", label: "Champion(6)" },
+  { value: "champion1", label: "Champion (1)" },
+  { value: "champion2", label: "Champion (2)" },
+  { value: "champion3", label: "Champion (3)" },
+  { value: "champion4", label: "Champion (4)" },
+  { value: "champion5", label: "Champion (5)" },
+  { value: "champion6", label: "Champion (6)" },
   { value: "companion", label: "Companion" },
   { value: "groupvehicle", label: "Group Vehicle" },
 ];
