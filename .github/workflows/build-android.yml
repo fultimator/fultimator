@@ -57,9 +57,24 @@ jobs:
       - name: Remove machine-specific JDK pin (CI provides JDK 21)
         run: sed -i '/^org.gradle.java.home=/d' android/gradle.properties
 
+      - name: Decode Android signing keystore
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          if [ -n "$ANDROID_KEYSTORE_BASE64" ]; then
+            echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/fultimator.jks"
+            echo "ANDROID_KEYSTORE_PATH=$RUNNER_TEMP/fultimator.jks" >> "$GITHUB_ENV"
+          else
+            echo "::warning::ANDROID_KEYSTORE_BASE64 not set; using a temporary debug key (Google sign-in will not work)."
+          fi
+
       - name: Build debug APK
         run: ./gradlew assembleDebug
         working-directory: android
+        env:
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4

@@ -16,8 +16,30 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    // Sign with a fixed key so the SHA-1 matches Firebase (needed for Google sign-in).
+    // Falls back to the default debug key when ANDROID_KEYSTORE_PATH is unset.
+    def keystorePath = System.getenv("ANDROID_KEYSTORE_PATH")
+    def hasSigningKey = keystorePath && file(keystorePath).exists()
+    signingConfigs {
+        if (hasSigningKey) {
+            fultimator {
+                storeFile file(keystorePath)
+                storePassword System.getenv("ANDROID_KEYSTORE_PASSWORD")
+                keyAlias System.getenv("ANDROID_KEY_ALIAS")
+                keyPassword System.getenv("ANDROID_KEY_PASSWORD")
+            }
+        }
+    }
     buildTypes {
+        debug {
+            if (hasSigningKey) {
+                signingConfig signingConfigs.fultimator
+            }
+        }
         release {
+            if (hasSigningKey) {
+                signingConfig signingConfigs.fultimator
+            }
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }

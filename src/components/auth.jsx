@@ -7,8 +7,13 @@ export function SignIn() {
     if (IS_CAPACITOR) {
       // Web OAuth popup/redirect does not work in the Capacitor WebView; use the
       // native Google sign-in plugin instead.
-      const { signInWithGoogleNative } = await import("../nativeAuth");
-      await signInWithGoogleNative();
+      try {
+        const { signInWithGoogleNative } = await import("../nativeAuth");
+        await signInWithGoogleNative();
+      } catch (error) {
+        console.error(error);
+        alert(`Sign-in failed: ${error?.message ?? error}`);
+      }
       return;
     }
     signInWithPopup(auth, googleAuthProvider);
