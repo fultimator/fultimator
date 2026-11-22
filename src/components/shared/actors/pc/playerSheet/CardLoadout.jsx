@@ -102,12 +102,13 @@ export default function CardLoadout({
   const [slotImportOpen, setSlotImportOpen] = useState(false);
   const [slotImportType, setSlotImportType] = useState("weapons");
 
-  const store = useLoadoutStore();
+  const store = useLoadoutStore.getState();
   const addMessage = useAddChatMessage();
   useEffect(() => {
-    store.init(setPlayer);
-    return () => store.clear();
-  }, [setPlayer, store]);
+    const { init, clear } = useLoadoutStore.getState();
+    init(setPlayer);
+    return clear;
+  }, [setPlayer]);
 
   const activeVehicle = getActiveVehicle(player);
   const { mainHandLocked, offHandLocked } = getSlotLocks(player);

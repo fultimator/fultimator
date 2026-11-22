@@ -62,7 +62,7 @@ interface LoadoutStore {
  * operate on the latest player state  -  no stale-closure risk.
  *
  * Usage in a component:
- *   const store = useLoadoutStore();
+ *   const store = useLoadoutStore.getState(); // don't subscribe: init/clear would loop
  *   useEffect(() => store.init(setPlayer), [setPlayer]);
  *   // then: store.equipItem(slot, candidate), store.toggleVehicle(), …
  */
