@@ -14,19 +14,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "384266567864-bf3rjdidpkfuhlbh8qmo03hma2441riu.apps.googleusercontent.com",
+          "client_id": "384266567864-ugvhj4ioa70itfnhh1mf5kth9d5lnbt1.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.fultimator.app",
-            "certificate_hash": "643dd0d1ff88e666e8a8ce702f7ebef44fc5660d"
-          }
-        },
-        {
-          "client_id": "384266567864-soi7p1kuhjbri1d4j86qdba6t3nc54jb.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.fultimator.app",
-            "certificate_hash": "ec6d24eeb7a3d78376857c34700442dd94302f23"
+            "certificate_hash": "835192c12896f8edd34faa1030696cd0ca7c2121"
           }
         },
         {
