@@ -5,7 +5,9 @@ import { loadLanguage, t, useTranslate } from "./translate";
 type Entry = { key: string } & Record<string, string | undefined>;
 const entries = data as Entry[];
 const languages = [
-  ...new Set(entries.flatMap((e) => Object.keys(e).filter((k) => k !== "key"))),
+  ...new Set(
+    entries.flatMap((e) => Object.keys(e).filter((k) => k && k !== "key")),
+  ),
 ];
 
 // The pre-split lookup: first entry with the key, its text or the key itself.

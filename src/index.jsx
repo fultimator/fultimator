@@ -16,7 +16,12 @@ if (IS_CAPACITOR) {
 
 function savedLanguage() {
   try {
-    return localStorage.getItem("selectedLanguage") || "en";
+    const saved = localStorage.getItem("selectedLanguage") || "en";
+    if (saved === "zh") {
+      localStorage.setItem("selectedLanguage", "zh-CN"); // renamed code
+      return "zh-CN";
+    }
+    return saved;
   } catch {
     return "en";
   }

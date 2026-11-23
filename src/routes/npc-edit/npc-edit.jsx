@@ -5,6 +5,7 @@ import { useDatabaseContext } from "../../context/useDatabaseContext";
 import {
   useDrawerScrollTop,
   useDrawerSave,
+  useDrawerBottomInset,
 } from "../../hooks/useDrawerActions";
 import { useThemeStore } from "../../store/themeStore";
 import {
@@ -171,6 +172,7 @@ export default function NpcEdit() {
   }, [isUpdated]);
 
   const appDrawerOpen = useThemeStore((s) => s.drawerOpen);
+  const bottomNavRef = useDrawerBottomInset();
   const [savedSnackbarOpen, setSavedSnackbarOpen] = useState(false);
   const [saveErrorSnackbarOpen, setSaveErrorSnackbarOpen] = useState(false);
   const isDesktop = useMediaQuery("(min-width: 769px)");
@@ -701,6 +703,7 @@ export default function NpcEdit() {
         </Snackbar>
         {isSmallScreen && (
           <Paper
+            ref={bottomNavRef}
             elevation={6}
             sx={{
               position: "fixed",

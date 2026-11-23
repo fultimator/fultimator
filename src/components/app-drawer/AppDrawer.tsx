@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useLocation } from "react-router";
 import {
   Box,
   Divider,
@@ -26,6 +27,23 @@ import {
   AccessTime as AccessTimeIcon,
 } from "@mui/icons-material";
 import { APP_DRAWER_WIDTH, TAB_RAIL_WIDTH } from "./constants";
+
+function useAppBarHeight(appBarVariant?: string): number {
+  const { pathname } = useLocation();
+  const [height, setHeight] = useState(56);
+
+  useEffect(() => {
+    const appBar = document.querySelector<HTMLElement>("header.MuiAppBar-root");
+    if (!appBar) return;
+    const update = () => setHeight(appBar.offsetHeight);
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(appBar);
+    return () => observer.disconnect();
+  }, [pathname, appBarVariant]);
+
+  return height;
+}
 import { ChatPanel } from "./panels/chat";
 import { CustomizerPanel } from "./panels/CustomizerPanel";
 import { SavedThemesPanel } from "./panels/SavedThemesPanel";
@@ -217,14 +235,18 @@ interface AppDrawerProps {
   open: boolean;
   onClose: () => void;
   onOpen: () => void;
+  appBarVariant?: string;
 }
 
 export const AppDrawer: React.FC<AppDrawerProps> = ({
   open,
   onClose,
   onOpen,
+  appBarVariant,
 }) => {
   const isMobile = useMediaQuery("(max-width: 768px)");
+  const appBarHeight = useAppBarHeight(appBarVariant);
+  const bottomInset = useAppDrawerStore((s) => s.bottomInset);
   const activeTab = useAppDrawerStore((s) => s.activeTab);
   const setActiveTab = useAppDrawerStore((s) => s.setActiveTab);
   const drawerBottomActions = useAppDrawerStore((s) => s.drawerBottomActions);
@@ -288,11 +310,7 @@ export const AppDrawer: React.FC<AppDrawerProps> = ({
             : {
                 zIndex: theme.zIndex.appBar - 1,
                 top: 0,
-                height: "100%",
-                paddingTop: `${theme.mixins.toolbar.minHeight ?? 56}px`,
-                "@media (min-width:600px)": {
-                  paddingTop: "64px",
-                },
+                height: bottomInset ? `calc(100% - ${bottomInset}px)` : "100%",
               }),
           overflow: "hidden",
           backgroundColor: "background.paper",
@@ -324,7 +342,8 @@ export const AppDrawer: React.FC<AppDrawerProps> = ({
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            py: 1,
+            pb: 1,
+            pt: isMobile ? 1 : `${appBarHeight + 8}px`,
             gap: 1,
           }}
         >
@@ -422,6 +441,7 @@ export const AppDrawer: React.FC<AppDrawerProps> = ({
             display: isMobile ? "flex" : open ? "flex" : "none",
             flexDirection: "column",
             overflow: "hidden",
+            pt: isMobile ? 0 : `${appBarHeight}px`,
           }}
         >
           {activeTab === "chat" && <ChatPanelHeader />}

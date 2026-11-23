@@ -490,7 +490,7 @@ export default function CardLoadout({
         </IconButton>
       </Tooltip>
     ) : canSendToChat ? (
-      <Tooltip title={t("Send to chat")}>
+      <Tooltip title={t("Send to Chat")}>
         <IconButton
           size="small"
           onClick={(e) => {

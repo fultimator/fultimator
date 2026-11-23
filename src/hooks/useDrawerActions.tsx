@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import { KeyboardArrowUp, Save } from "@mui/icons-material";
 import { useAppDrawerStore } from "../store/appDrawerStore";
 import { useTranslate } from "../translation/translate";
@@ -65,4 +65,27 @@ export function useDrawerSave(options: {
       setDrawerBottomActions((prev) => prev.filter((a) => a.id !== "save"));
     };
   }, [setDrawerBottomActions]);
+}
+
+export function useDrawerBottomInset() {
+  const setBottomInset = useAppDrawerStore((s) => s.setBottomInset);
+  const observerRef = useRef<ResizeObserver | null>(null);
+
+  useEffect(() => () => setBottomInset(0), [setBottomInset]);
+
+  return useCallback(
+    (el: HTMLElement | null) => {
+      observerRef.current?.disconnect();
+      observerRef.current = null;
+      if (!el) {
+        setBottomInset(0);
+        return;
+      }
+      const update = () => setBottomInset(el.offsetHeight);
+      update();
+      observerRef.current = new ResizeObserver(update);
+      observerRef.current.observe(el);
+    },
+    [setBottomInset],
+  );
 }

@@ -61,7 +61,7 @@ function OtherItem({
 
   const actions = (
     <>
-      <Tooltip title={t("Send to chat")} arrow>
+      <Tooltip title={t("Send to Chat")} arrow>
         <IconButton size="small" onClick={handleSendToChat}>
           <ChatOutlined />
         </IconButton>

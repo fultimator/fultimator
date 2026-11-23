@@ -200,6 +200,7 @@ const Layout: React.FC<LayoutProps> = ({
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
         onOpen={toggleDrawer}
+        appBarVariant={usesCompactHeader ? "compact" : "full"}
       />
 
       <ChatToastOverlay />

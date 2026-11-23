@@ -8,7 +8,7 @@ export const languageOptions = [
   { code: "pl", label: "Polski (Polish)" },
   { code: "fr", label: "Française (French)" },
   { code: "pt-BR", label: "Português (Brasil)" },
-  { code: "zh", label: "简体中文 (Chinese)" },
+  { code: "zh-CN", label: "简体中文 (Chinese)" },
 ];
 
 /*
@@ -36,14 +36,19 @@ const loaders = {
   fr: () => import("virtual:translations/fr"),
   es: () => import("virtual:translations/es"),
   "pt-BR": () => import("virtual:translations/pt-BR"),
-  zh: () => import("virtual:translations/zh"),
+  "zh-CN": () => import("virtual:translations/zh-CN"),
   ru: () => import("virtual:translations/ru"),
 };
 const dictionaries = { en };
 let currentLanguage = "en";
 
+// Language codes that were renamed; saved preferences may still use them.
+const legacyLanguageCodes = { zh: "zh-CN" };
+
 export async function loadLanguage(language) {
-  if (language !== "en" && loaders[language]) {
+  language = legacyLanguageCodes[language] ?? language;
+  if (language !== "en" && !loaders[language]) language = "en";
+  if (language !== "en") {
     try {
       dictionaries[language] = (await loaders[language]()).default;
     } catch (error) {

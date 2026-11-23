@@ -20,6 +20,7 @@ interface AppDrawerStore {
   chatActorDocOverride: Record<string, unknown> | null;
   chatComposerPrefill: string | null;
   drawerBottomActions: DrawerBottomAction[];
+  bottomInset: number;
   setActiveTab: (tab: DrawerTab) => void;
   setIsOpen: (open: boolean) => void;
   setChatActorDocOverride: (doc: Record<string, unknown> | null) => void;
@@ -29,6 +30,7 @@ interface AppDrawerStore {
       | DrawerBottomAction[]
       | ((prev: DrawerBottomAction[]) => DrawerBottomAction[]),
   ) => void;
+  setBottomInset: (px: number) => void;
 }
 
 export const useAppDrawerStore = create<AppDrawerStore>()(
@@ -39,6 +41,7 @@ export const useAppDrawerStore = create<AppDrawerStore>()(
       chatActorDocOverride: null,
       chatComposerPrefill: null,
       drawerBottomActions: [],
+      bottomInset: 0,
       setActiveTab: (tab) => set({ activeTab: tab }),
       setIsOpen: (open) => set({ isOpen: open }),
       setChatActorDocOverride: (doc) => set({ chatActorDocOverride: doc }),
@@ -50,6 +53,7 @@ export const useAppDrawerStore = create<AppDrawerStore>()(
               ? actions(s.drawerBottomActions)
               : actions,
         })),
+      setBottomInset: (px) => set({ bottomInset: px }),
     }),
     {
       name: "app-drawer-store",

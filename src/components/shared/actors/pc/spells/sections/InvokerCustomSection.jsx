@@ -224,7 +224,7 @@ function WellspringRow({
       onClick={() => setOpen((v) => !v)}
       actions={
         <>
-          <Tooltip title={t("Send to chat")} arrow>
+          <Tooltip title={t("Send to Chat")} arrow>
             <IconButton size="small" onClick={handleSendToChat}>
               <ChatOutlined />
             </IconButton>
@@ -372,7 +372,7 @@ function InvocationRow({
       paperSx={isOrphaned ? { borderColor: "error.main" } : undefined}
       actions={
         <>
-          <Tooltip title={t("Send to chat")} arrow>
+          <Tooltip title={t("Send to Chat")} arrow>
             <IconButton size="small" onClick={handleSendToChat}>
               <ChatOutlined />
             </IconButton>

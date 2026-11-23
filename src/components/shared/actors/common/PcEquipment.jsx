@@ -987,7 +987,7 @@ const FullItemRow = memo(function FullItemRow({
             </Tooltip>
           )}
           {!isWeapon && (
-            <Tooltip title={t("Send to chat")}>
+            <Tooltip title={t("Send to Chat")}>
               <IconButton
                 size="small"
                 onClick={(e) => {

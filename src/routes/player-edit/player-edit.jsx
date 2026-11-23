@@ -18,6 +18,7 @@ import {
 import {
   useDrawerScrollTop,
   useDrawerSave,
+  useDrawerBottomInset,
 } from "../../hooks/useDrawerActions";
 import { useDatabaseContext } from "../../context/useDatabaseContext";
 import { useTheme, useMediaQuery } from "@mui/material";
@@ -214,6 +215,7 @@ export default function PlayerEdit() {
     (s) => s.setChatActorDocOverride,
   );
   const appDrawerOpen = useThemeStore((s) => s.drawerOpen);
+  const bottomNavRef = useDrawerBottomInset();
   const [savedSnackbarOpen, setSavedSnackbarOpen] = useState(false);
   const [saveErrorSnackbarOpen, setSaveErrorSnackbarOpen] = useState(false);
   const [compactView, setCompactView] = useState(false);
@@ -1471,6 +1473,7 @@ export default function PlayerEdit() {
       {/* Mobile bottom navigation */}
       {isSmallScreen && (
         <Paper
+          ref={bottomNavRef}
           elevation={6}
           sx={{
             position: "fixed",

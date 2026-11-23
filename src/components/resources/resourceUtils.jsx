@@ -123,7 +123,7 @@ export const languages = {
     lang: "Español",
     flag: "🇪🇸",
   },
-  zh: {
+  "zh-CN": {
     lang: "中文",
     flag: "🇨🇳",
   },

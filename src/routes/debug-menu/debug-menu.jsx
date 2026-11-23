@@ -99,6 +99,7 @@ import {
 } from "../../libs/player/levelUpLogic";
 import { executeCommand } from "../../components/app-drawer/panels/chat/domain/commands";
 import { useChatMessagesStore } from "../../store/chatMessagesStore";
+import { sendDisplayMessage } from "../../hooks/useRollToChat";
 // Item card sample data
 
 function buildSamples() {
@@ -607,6 +608,7 @@ function _buildSamplePc() {
 // Layout helpers
 
 function Section({ label, children, sectionRef }) {
+  const { t } = useTranslate();
   return (
     <Box ref={sectionRef}>
       <Divider sx={{ mb: 2 }}>
@@ -618,7 +620,7 @@ function Section({ label, children, sectionRef }) {
             color: "text.secondary",
           }}
         >
-          {label}
+          {t(label)}
         </Typography>
       </Divider>
       <Grid container spacing={2}>
@@ -905,6 +907,7 @@ function ActorsTab({ npc, pc, onUpdatePc, viewport }) {
 // Items tab
 
 function ItemsTab({ s, viewport, itemVariant }) {
+  const { t } = useTranslate();
   const singleColumn = viewport !== "desktop";
   const [navOpen, setNavOpen] = useState(false);
   const frameRef = React.useRef(null);
@@ -980,10 +983,21 @@ function ItemsTab({ s, viewport, itemVariant }) {
   const setItemRef = (label) => (node) => {
     itemRefs.current[label] = node;
   };
-  const interactiveActionContent =
+  const chatAction = (item, itemType = "item") =>
     itemVariant === "interactive" ? (
-      <Tooltip title="Send to chat">
-        <IconButton size="small" sx={{ color: "text.secondary" }}>
+      <Tooltip title={t("Send to Chat")}>
+        <IconButton
+          size="small"
+          sx={{ color: "text.secondary" }}
+          onClick={(e) => {
+            e.stopPropagation();
+            sendDisplayMessage(itemType, item?.name || "", {
+              description:
+                item?.description ?? item?.quality ?? item?.effect ?? "",
+              speaker: "Debug",
+            });
+          }}
+        >
           <ChatBubbleOutlineOutlinedIcon fontSize="small" />
         </IconButton>
       </Tooltip>
@@ -1065,7 +1079,7 @@ function ItemsTab({ s, viewport, itemVariant }) {
                     letterSpacing: "0.06em",
                   }}
                 >
-                  Cards
+                  {t("Cards")}
                 </Typography>
                 <List dense disablePadding>
                   {navSections.map((section) => (
@@ -1075,7 +1089,7 @@ function ItemsTab({ s, viewport, itemVariant }) {
                         sx={{ py: 0.5 }}
                       >
                         <ListItemText
-                          primary={section.label}
+                          primary={t(section.label)}
                           slotProps={{
                             primary: {
                               sx: {
@@ -1095,7 +1109,7 @@ function ItemsTab({ s, viewport, itemVariant }) {
                           sx={{ pl: 3, py: 0.25 }}
                         >
                           <ListItemText
-                            primary={label}
+                            primary={t(label)}
                             slotProps={{
                               primary: {
                                 sx: {
@@ -1140,7 +1154,7 @@ function ItemsTab({ s, viewport, itemVariant }) {
               variant={itemVariant}
               imageMode="slot"
               showImageToggle
-              actionContent={interactiveActionContent}
+              actionContent={chatAction(s.weapon, "weapon")}
             />
           </CardSlot>
           <CardSlot
@@ -1152,7 +1166,7 @@ function ItemsTab({ s, viewport, itemVariant }) {
               variant={itemVariant}
               imageMode="slot"
               showImageToggle
-              actionContent={interactiveActionContent}
+              actionContent={chatAction(s.customWeapon, "weapon")}
             />
           </CardSlot>
           <CardSlot singleColumn={singleColumn} itemRef={setItemRef("Armor")}>
@@ -1161,7 +1175,7 @@ function ItemsTab({ s, viewport, itemVariant }) {
               variant={itemVariant}
               imageMode="slot"
               showImageToggle
-              actionContent={interactiveActionContent}
+              actionContent={chatAction(s.armor)}
             />
           </CardSlot>
           <CardSlot singleColumn={singleColumn} itemRef={setItemRef("Shield")}>
@@ -1170,7 +1184,7 @@ function ItemsTab({ s, viewport, itemVariant }) {
               variant={itemVariant}
               imageMode="slot"
               showImageToggle
-              actionContent={interactiveActionContent}
+              actionContent={chatAction(s.shield)}
             />
           </CardSlot>
           <CardSlot
@@ -1182,7 +1196,7 @@ function ItemsTab({ s, viewport, itemVariant }) {
               variant={itemVariant}
               imageMode="slot"
               showImageToggle
-              actionContent={interactiveActionContent}
+              actionContent={chatAction(s.accessory)}
             />
           </CardSlot>
         </Section>
@@ -1203,7 +1217,7 @@ function ItemsTab({ s, viewport, itemVariant }) {
                 variant={itemVariant}
                 imageMode="slot"
                 showImageToggle
-                actionContent={interactiveActionContent}
+                actionContent={chatAction(s.npcSpell, "spell")}
               />
             </CardSlot>
           )}
@@ -1217,7 +1231,7 @@ function ItemsTab({ s, viewport, itemVariant }) {
                 variant={itemVariant}
                 imageMode="slot"
                 showImageToggle
-                actionContent={interactiveActionContent}
+                actionContent={chatAction(s.playerSpell, "spell")}
               />
             </CardSlot>
           )}
@@ -1231,7 +1245,7 @@ function ItemsTab({ s, viewport, itemVariant }) {
                 variant={itemVariant}
                 imageMode="slot"
                 showImageToggle
-                actionContent={interactiveActionContent}
+                actionContent={chatAction(s.gambleSpell, "spell")}
               />
             </CardSlot>
           )}
@@ -1242,7 +1256,7 @@ function ItemsTab({ s, viewport, itemVariant }) {
                 variant={itemVariant}
                 imageMode="slot"
                 showImageToggle
-                actionContent={interactiveActionContent}
+                actionContent={chatAction(s.gift)}
               />
             </CardSlot>
           )}
@@ -1253,7 +1267,7 @@ function ItemsTab({ s, viewport, itemVariant }) {
                 variant={itemVariant}
                 imageMode="slot"
                 showImageToggle
-                actionContent={interactiveActionContent}
+                actionContent={chatAction(s.dance)}
               />
             </CardSlot>
           )}
@@ -1267,7 +1281,7 @@ function ItemsTab({ s, viewport, itemVariant }) {
                 variant={itemVariant}
                 imageMode="slot"
                 showImageToggle
-                actionContent={interactiveActionContent}
+                actionContent={chatAction(s.therioform)}
               />
             </CardSlot>
           )}
@@ -1281,7 +1295,7 @@ function ItemsTab({ s, viewport, itemVariant }) {
                 variant={itemVariant}
                 imageMode="slot"
                 showImageToggle
-                actionContent={interactiveActionContent}
+                actionContent={chatAction(s.arcanum)}
               />
             </CardSlot>
           )}
@@ -1295,7 +1309,7 @@ function ItemsTab({ s, viewport, itemVariant }) {
                 variant={itemVariant}
                 imageMode="slot"
                 showImageToggle
-                actionContent={interactiveActionContent}
+                actionContent={chatAction(s.arcanumRework)}
               />
             </CardSlot>
           )}
@@ -1308,7 +1322,7 @@ function ItemsTab({ s, viewport, itemVariant }) {
               variant={itemVariant}
               imageMode="slot"
               showImageToggle
-              actionContent={interactiveActionContent}
+              actionContent={chatAction(s.pilotFrame)}
             />
           </CardSlot>
           <CardSlot
@@ -1320,7 +1334,7 @@ function ItemsTab({ s, viewport, itemVariant }) {
               variant={itemVariant}
               imageMode="slot"
               showImageToggle
-              actionContent={interactiveActionContent}
+              actionContent={chatAction(s.pilotWeapon, "weapon")}
             />
           </CardSlot>
           <CardSlot
@@ -1332,7 +1346,7 @@ function ItemsTab({ s, viewport, itemVariant }) {
               variant={itemVariant}
               imageMode="slot"
               showImageToggle
-              actionContent={interactiveActionContent}
+              actionContent={chatAction(s.vehicleModule)}
             />
           </CardSlot>
           <CardSlot
@@ -1344,7 +1358,7 @@ function ItemsTab({ s, viewport, itemVariant }) {
               variant={itemVariant}
               imageMode="slot"
               showImageToggle
-              actionContent={interactiveActionContent}
+              actionContent={chatAction(s.magichantKey)}
             />
           </CardSlot>
           <CardSlot
@@ -1356,7 +1370,7 @@ function ItemsTab({ s, viewport, itemVariant }) {
               variant={itemVariant}
               imageMode="slot"
               showImageToggle
-              actionContent={interactiveActionContent}
+              actionContent={chatAction(s.magichantTone)}
             />
           </CardSlot>
           {s.symbol && (
@@ -1369,7 +1383,7 @@ function ItemsTab({ s, viewport, itemVariant }) {
                 variant={itemVariant}
                 imageMode="slot"
                 showImageToggle
-                actionContent={interactiveActionContent}
+                actionContent={chatAction(s.symbol)}
               />
             </CardSlot>
           )}
@@ -1383,7 +1397,7 @@ function ItemsTab({ s, viewport, itemVariant }) {
                 variant={itemVariant}
                 imageMode="slot"
                 showImageToggle
-                actionContent={interactiveActionContent}
+                actionContent={chatAction(s.invocation)}
               />
             </CardSlot>
           )}
@@ -1397,7 +1411,7 @@ function ItemsTab({ s, viewport, itemVariant }) {
                 variant={itemVariant}
                 imageMode="slot"
                 showImageToggle
-                actionContent={interactiveActionContent}
+                actionContent={chatAction(s.magiseed)}
               />
             </CardSlot>
           )}
@@ -1407,7 +1421,7 @@ function ItemsTab({ s, viewport, itemVariant }) {
               variant={itemVariant}
               imageMode="slot"
               showImageToggle
-              actionContent={interactiveActionContent}
+              actionContent={chatAction(s.alchemy)}
             />
           </CardSlot>
           <CardSlot
@@ -1419,7 +1433,7 @@ function ItemsTab({ s, viewport, itemVariant }) {
               variant={itemVariant}
               imageMode="slot"
               showImageToggle
-              actionContent={interactiveActionContent}
+              actionContent={chatAction(s.infusion)}
             />
           </CardSlot>
           <CardSlot
@@ -1431,7 +1445,7 @@ function ItemsTab({ s, viewport, itemVariant }) {
               variant={itemVariant}
               imageMode="slot"
               showImageToggle
-              actionContent={interactiveActionContent}
+              actionContent={chatAction(s.magitech)}
             />
           </CardSlot>
           <CardSlot singleColumn={singleColumn} itemRef={setItemRef("Cooking")}>
@@ -1440,7 +1454,7 @@ function ItemsTab({ s, viewport, itemVariant }) {
               variant={itemVariant}
               imageMode="slot"
               showImageToggle
-              actionContent={interactiveActionContent}
+              actionContent={chatAction(s.cooking)}
             />
           </CardSlot>
         </Section>
@@ -1461,7 +1475,7 @@ function ItemsTab({ s, viewport, itemVariant }) {
                 variant={itemVariant}
                 imageMode="slot"
                 showImageToggle
-                actionContent={interactiveActionContent}
+                actionContent={chatAction(s.npcAttack)}
               />
             </CardSlot>
           )}
@@ -1474,7 +1488,7 @@ function ItemsTab({ s, viewport, itemVariant }) {
               variant={itemVariant}
               imageMode="slot"
               showImageToggle
-              actionContent={interactiveActionContent}
+              actionContent={chatAction(s.npcSpecialRule)}
             />
           </CardSlot>
           <CardSlot
@@ -1486,7 +1500,7 @@ function ItemsTab({ s, viewport, itemVariant }) {
               variant={itemVariant}
               imageMode="slot"
               showImageToggle
-              actionContent={interactiveActionContent}
+              actionContent={chatAction(s.npcAction)}
             />
           </CardSlot>
         </Section>
@@ -1504,7 +1518,7 @@ function ItemsTab({ s, viewport, itemVariant }) {
                 variant={itemVariant}
                 imageMode="slot"
                 showImageToggle
-                actionContent={interactiveActionContent}
+                actionContent={chatAction(s.cls)}
               />
             </CardSlot>
           )}
@@ -1515,7 +1529,7 @@ function ItemsTab({ s, viewport, itemVariant }) {
                 variant={itemVariant}
                 imageMode="slot"
                 showImageToggle
-                actionContent={interactiveActionContent}
+                actionContent={chatAction(s.skill)}
               />
             </CardSlot>
           )}
@@ -1529,7 +1543,7 @@ function ItemsTab({ s, viewport, itemVariant }) {
                 variant={itemVariant}
                 imageMode="slot"
                 showImageToggle
-                actionContent={interactiveActionContent}
+                actionContent={chatAction(s.heroic)}
               />
             </CardSlot>
           )}
@@ -1550,7 +1564,7 @@ function ItemsTab({ s, viewport, itemVariant }) {
               variant={itemVariant}
               imageMode="slot"
               showImageToggle
-              actionContent={interactiveActionContent}
+              actionContent={chatAction(s.optional)}
             />
           </CardSlot>
           <CardSlot
@@ -1562,7 +1576,7 @@ function ItemsTab({ s, viewport, itemVariant }) {
               variant={itemVariant}
               imageMode="slot"
               showImageToggle
-              actionContent={interactiveActionContent}
+              actionContent={chatAction(s.zeroPower)}
             />
           </CardSlot>
           <CardSlot singleColumn={singleColumn} itemRef={setItemRef("Quality")}>
@@ -1571,7 +1585,7 @@ function ItemsTab({ s, viewport, itemVariant }) {
               variant={itemVariant}
               imageMode="slot"
               showImageToggle
-              actionContent={interactiveActionContent}
+              actionContent={chatAction(s.quality)}
             />
           </CardSlot>
           <CardSlot singleColumn={singleColumn} itemRef={setItemRef("Ritual")}>
@@ -1580,7 +1594,7 @@ function ItemsTab({ s, viewport, itemVariant }) {
               variant={itemVariant}
               imageMode="slot"
               showImageToggle
-              actionContent={interactiveActionContent}
+              actionContent={chatAction(s.ritual)}
             />
           </CardSlot>
           <CardSlot singleColumn={singleColumn} itemRef={setItemRef("Project")}>
@@ -1589,7 +1603,7 @@ function ItemsTab({ s, viewport, itemVariant }) {
               variant={itemVariant}
               imageMode="slot"
               showImageToggle
-              actionContent={interactiveActionContent}
+              actionContent={chatAction(s.project)}
             />
           </CardSlot>
         </Section>
