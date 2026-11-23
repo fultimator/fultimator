@@ -1,18 +1,18 @@
 import {
+  addDoc,
+  deleteDoc,
+  doc,
+  useAuthState,
+  auth,
   query,
   orderBy,
   limit,
   collection,
   where,
-  doc,
-  addDoc,
-  deleteDoc,
   startAfter,
-} from "firebase/firestore";
-import { useAuthState } from "react-firebase-hooks/auth";
-
-import { firestore } from "../../firebase";
-import { auth } from "../../firebase";
+  useCollectionData as useCollectionDataCloud,
+  firestore as cloudFirestore,
+} from "@platform/cloud";
 
 import {
   IconButton,
@@ -31,34 +31,42 @@ import {
   Select,
   MenuItem,
   CircularProgress,
+  Fab,
+  Chip,
+  Box,
 } from "@mui/material";
 import Layout from "../../components/Layout";
 import { SignIn } from "../../components/auth";
-import NpcPretty from "../../components/npc/Pretty";
-// import NpcUgly from "../../components/npc/Ugly";
+import NpcActorCard from "../../components/shared/actors/npc/NpcActorCard";
 import {
   ArrowRight,
   ArrowLeft,
+  Cloud as CloudIcon,
   Search,
   ContentCopy,
   Share,
   Download,
   Report,
+  KeyboardArrowUp,
 } from "@mui/icons-material";
-import { useCollectionData } from "react-firebase-hooks/firestore";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate } from "react-router";
 
-import allToken from "../icons/All-token.webp";
-import beastToken from "../icons/Beast-token.webp";
-import constructToken from "../icons/Construct-token.webp";
-import demonToken from "../icons/Demon-token.webp";
-import elementalToken from "../icons/Elemental-token.webp";
-import humanToken from "../icons/Human-token.webp";
-import monsterToken from "../icons/Monster-token.webp";
-import plantToken from "../icons/Plant-token.webp";
-import undeadToken from "../icons/Undead-token.webp";
+import allToken from "/images/routes/icons/species/All-token.webp";
+import beastToken from "/images/routes/icons/species/Beast-token.webp";
+import constructToken from "/images/routes/icons/species/Construct-token.webp";
+import demonToken from "/images/routes/icons/species/Demon-token.webp";
+import elementalToken from "/images/routes/icons/species/Elemental-token.webp";
+import humanToken from "/images/routes/icons/species/Human-token.webp";
+import monsterToken from "/images/routes/icons/species/Monster-token.webp";
+import plantToken from "/images/routes/icons/species/Plant-token.webp";
+import undeadToken from "/images/routes/icons/species/Undead-token.webp";
 import useDownloadImage from "../../hooks/useDownloadImage";
 import Export from "../../components/Export";
+import {
+  NPC_CURRENT_SCHEMA_VERSION,
+  applyNpcPostLoadTransforms,
+} from "../../libs/actor";
 import { useTranslate, languageOptions } from "../../translation/translate";
 
 import ReportContentDialog from "../../components/appbar/ReportContentDialog";
@@ -70,16 +78,33 @@ export default function NpcCompedium() {
   return (
     <Layout>
       {loading && <Skeleton />}
-
       {!loading && !user && (
-        <>
-          <Typography sx={{ my: 1 }}>
+        <Paper
+          elevation={3}
+          sx={{
+            p: 2,
+            mb: 2,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 2,
+            flexWrap: "wrap",
+          }}
+        >
+          <CloudIcon color="primary" />
+          <Typography
+            variant="body2"
+            sx={{
+              color: "text.primary",
+              flex: 1,
+              minWidth: 200,
+            }}
+          >
             {t("You have to be logged in to access this feature")}
           </Typography>
           <SignIn />
-        </>
+        </Paper>
       )}
-
       {user && <Personal user={user} />}
     </Layout>
   );
@@ -87,6 +112,7 @@ export default function NpcCompedium() {
 
 function Personal({ user }) {
   const { t } = useTranslate();
+  const navigate = useNavigate();
 
   const [openReportDialog, setOpenReportDialog] = useState(false);
   const [selectedReportNpc, setSelectedReportNpc] = useState({
@@ -94,21 +120,25 @@ function Personal({ user }) {
     name: "",
     author: "",
   });
+  const [showScrollTop, setShowScrollTop] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setShowScrollTop(window.scrollY > 300);
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   const [collapse, setCollapse] = useState(true);
   const [lastItem, setLastItem] = useState(undefined);
   const [prevLastItem, setPrevLastItem] = useState([]);
-  const personalRef = collection(firestore, "npc-personal");
+  const personalRef = useMemo(
+    () => collection(cloudFirestore, "npc-personal"),
+    [],
+  );
   const [selectedType, setSelectedType] = useState("All");
   const [name, setName] = useState("");
   const [rank, setRank] = useState("");
   const [language, setLanguage] = useState("en");
   const [levels, setLevels] = useState([5, 60]);
-
-  /*
-  useEffect(() => {
-    console.log("User ID: ", user.uid);
-  }, []);
-  */
 
   const [searchParams, setSearchParams] = useState({
     type: "All",
@@ -118,54 +148,54 @@ function Personal({ user }) {
     language: "en",
   });
 
-  console.log(searchParams);
+  const personalQuery = useMemo(() => {
+    const constraints = [where("published", "==", true)];
 
-  const constraints = [where("published", "==", true)];
-
-  if (searchParams.level[0] !== 5 || searchParams.level[1] !== 60) {
-    constraints.push(where("lvl", ">=", searchParams.level[0]));
-    constraints.push(where("lvl", "<=", searchParams.level[1]));
-    constraints.push(orderBy("lvl", "asc"));
-  }
-
-  if (searchParams.name !== "") {
-    constraints.push(
-      where("searchString", "array-contains-any", [
-        ...searchParams.name
-          .replace(/[\W_]+/g, " ")
-          .toLowerCase()
-          .split(" "),
-      ])
-    );
-  }
-
-  if (searchParams.rank !== "") {
-    constraints.push(where("rank", "==", searchParams.rank));
-  }
-
-  if (searchParams.type !== "All") {
-    constraints.push(where("species", "==", searchParams.type));
-  }
-
-  constraints.push(where("language", "==", searchParams.language));
-
-  constraints.push(orderBy("publishedAt", "desc"));
-
-  if (lastItem) {
     if (searchParams.level[0] !== 5 || searchParams.level[1] !== 60) {
-      constraints.push(startAfter(lastItem.lvl, lastItem.publishedAt));
-    } else {
-      constraints.push(startAfter(lastItem.publishedAt));
+      constraints.push(where("lvl", ">=", searchParams.level[0]));
+      constraints.push(where("lvl", "<=", searchParams.level[1]));
+      constraints.push(orderBy("lvl", "asc"));
     }
-  }
 
-  constraints.push(limit(6));
+    if (searchParams.name !== "") {
+      constraints.push(
+        where("searchString", "array-contains-any", [
+          ...searchParams.name
+            .replace(/[\W_]+/g, " ")
+            .toLowerCase()
+            .split(" "),
+        ]),
+      );
+    }
 
-  const personalQuery = query(personalRef, ...constraints);
-  const [personalList, loading, err] = useCollectionData(personalQuery);
+    if (searchParams.rank !== "") {
+      constraints.push(where("rank", "==", searchParams.rank));
+    }
+
+    if (searchParams.type !== "All") {
+      constraints.push(where("species", "==", searchParams.type));
+    }
+
+    constraints.push(where("language", "==", searchParams.language));
+
+    constraints.push(orderBy("publishedAt", "desc"));
+
+    if (lastItem) {
+      if (searchParams.level[0] !== 5 || searchParams.level[1] !== 60) {
+        constraints.push(startAfter(lastItem.lvl, lastItem.publishedAt));
+      } else {
+        constraints.push(startAfter(lastItem.publishedAt));
+      }
+    }
+
+    constraints.push(limit(6));
+
+    return query(personalRef, ...constraints);
+  }, [personalRef, searchParams, lastItem]);
+  const [personalList, loading, err] = useCollectionDataCloud(personalQuery);
 
   if (err) {
-    console.log(err);
+    console.error(err);
   }
 
   const nextPage = () => {
@@ -187,16 +217,16 @@ function Personal({ user }) {
 
   const copyNpc = function (npc) {
     return async function () {
-      const data = Object.assign({}, npc);
+      const data = JSON.parse(JSON.stringify(npc));
       data.uid = user.uid;
       delete data.id;
       data.published = false;
 
-      const ref = collection(firestore, "npc-personal");
+      const ref = collection(cloudFirestore, "npc-personal");
 
       addDoc(ref, data)
         .then(function (docRef) {
-          window.location.href = `/npc-gallery/${docRef.id}`;
+          navigate(`/npc-gallery/${docRef.id}`);
         })
         .catch(function (error) {
           console.error("Error adding document: ", error);
@@ -206,7 +236,7 @@ function Personal({ user }) {
 
   const deleteNpc = function (npc) {
     return function () {
-      deleteDoc(doc(firestore, "npc-personal", npc.id));
+      deleteDoc(doc(cloudFirestore, "npc-personal", npc.id));
     };
   };
 
@@ -227,16 +257,15 @@ function Personal({ user }) {
     const isMobile = window.innerWidth < 900;
     return (
       <Grid
-        item
-        xs={4}
-        md={1.3}
-        alignItems="center"
-        justifyContent="center"
         sx={{
-          display: "flex",
-          flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
+          display: "flex",
+          flexDirection: "column",
+        }}
+        size={{
+          xs: 4,
+          md: 1.3,
         }}
       >
         <Avatar
@@ -249,16 +278,16 @@ function Personal({ user }) {
                   ? 80
                   : 130
                 : isMobile
-                ? 60
-                : 100,
+                  ? 60
+                  : 100,
             height:
               selectedType === name
                 ? isMobile
                   ? 80
                   : 130
                 : isMobile
-                ? 60
-                : 100,
+                  ? 60
+                  : 100,
             border: selectedType === name ? "6px solid purple" : "none",
             cursor: "pointer",
           }}
@@ -316,7 +345,7 @@ function Personal({ user }) {
     return (
       <Paper elevation={3} sx={{ marginBottom: 5, padding: 4 }}>
         {t(
-          "Apologies, fultimator has reached its read quota at the moment, please try again tomorrow. (Around 12-24 hours)"
+          "Apologies, fultimator has reached its read quota at the moment, please try again tomorrow. (Around 12-24 hours)",
         )}
       </Paper>
     );
@@ -325,7 +354,7 @@ function Personal({ user }) {
   return (
     <>
       <Paper elevation={3} sx={{ marginBottom: 5, padding: 4 }}>
-        <Grid container spacing={1} sx={{ py: 1 }} justifyContent="center">
+        <Grid container spacing={1} sx={{ py: 1, justifyContent: "center" }}>
           {enemyType(allToken, "All", t("All"))}
           {enemyType(beastToken, "Beast", t("Beast"))}
           {enemyType(constructToken, "Construct", t("Construct"))}
@@ -337,15 +366,18 @@ function Personal({ user }) {
           {enemyType(undeadToken, "Undead", t("Undead"))}
         </Grid>
 
-        <Grid container spacing={1} sx={{ py: 0 }} justifyContent="center">
+        <Grid container spacing={1} sx={{ py: 0, justifyContent: "center" }}>
           <Grid
-            item
-            xs={12}
-            md={3}
-            lg={4}
-            alignItems="center"
-            justifyContent="center"
-            sx={{ display: "flex" }}
+            sx={{
+              alignItems: "center",
+              justifyContent: "center",
+              display: "flex",
+            }}
+            size={{
+              xs: 12,
+              md: 3,
+              lg: 4,
+            }}
           >
             <TextField
               id="outlined-basic"
@@ -361,12 +393,17 @@ function Personal({ user }) {
           </Grid>
 
           <Grid
-            item
-            xs={12}
-            md={3}
-            alignItems="center"
-            justifyContent="center"
-            sx={{ display: "flex", marginLeft: 5, marginRight: 5 }}
+            sx={{
+              alignItems: "center",
+              justifyContent: "center",
+              display: "flex",
+              marginLeft: 5,
+              marginRight: 5,
+            }}
+            size={{
+              xs: 12,
+              md: 3,
+            }}
           >
             <Slider
               getAriaLabel={() => "Level"}
@@ -386,12 +423,15 @@ function Personal({ user }) {
             />
           </Grid>
           <Grid
-            item
-            xs={6}
-            md={2}
-            alignItems="center"
-            justifyContent="center"
-            sx={{ display: "flex" }}
+            sx={{
+              alignItems: "center",
+              justifyContent: "center",
+              display: "flex",
+            }}
+            size={{
+              xs: 6,
+              md: 2,
+            }}
           >
             <FormControl fullWidth size="small">
               <InputLabel id="rank">{t("Rank:")}</InputLabel>
@@ -400,26 +440,32 @@ function Personal({ user }) {
                 id="select-rank"
                 value={rank}
                 label={t("Rank:")}
-                onChange={(evt, val2) => {
+                onChange={(evt, _val2) => {
                   setRank(evt.target.value);
                 }}
               >
                 <MenuItem value={""}>{t("All")}</MenuItem>
                 <MenuItem value={"soldier"}>{t("Soldier")}</MenuItem>
                 <MenuItem value={"elite"}>{t("Elite")}</MenuItem>
-                <MenuItem value={"champion1"}>{t("Champion(1)")}</MenuItem>
-                <MenuItem value={"champion2"}>{t("Champion(2)")}</MenuItem>
-                <MenuItem value={"champion3"}>{t("Champion(3)")}</MenuItem>
-                <MenuItem value={"champion4"}>{t("Champion(4)")}</MenuItem>
-                <MenuItem value={"champion5"}>{t("Champion(5)")}</MenuItem>
-                <MenuItem value={"champion6"}>{t("Champion(6)")}</MenuItem>
+                <MenuItem value={"champion1"}>{t("Champion (1)")}</MenuItem>
+                <MenuItem value={"champion2"}>{t("Champion (2)")}</MenuItem>
+                <MenuItem value={"champion3"}>{t("Champion (3)")}</MenuItem>
+                <MenuItem value={"champion4"}>{t("Champion (4)")}</MenuItem>
+                <MenuItem value={"champion5"}>{t("Champion (5)")}</MenuItem>
+                <MenuItem value={"champion6"}>{t("Champion (6)")}</MenuItem>
                 <MenuItem value={"companion"}>{t("Companion")}</MenuItem>
                 <MenuItem value={"groupvehicle"}>{t("Group Vehicle")}</MenuItem>
               </Select>
             </FormControl>
           </Grid>
 
-          <Grid item xs={6} md={2} alignItems="center" sx={{ display: "flex" }}>
+          <Grid
+            sx={{ alignItems: "center", display: "flex" }}
+            size={{
+              xs: 6,
+              md: 2,
+            }}
+          >
             <FormControl fullWidth size="small">
               <InputLabel id="Language">{t("Language:")}</InputLabel>
               <Select
@@ -439,7 +485,13 @@ function Personal({ user }) {
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={6} md={2} alignItems="center" sx={{ display: "flex" }}>
+          <Grid
+            sx={{ alignItems: "center", display: "flex" }}
+            size={{
+              xs: 6,
+              md: 2,
+            }}
+          >
             <Button
               variant="outlined"
               fullWidth
@@ -451,12 +503,11 @@ function Personal({ user }) {
             </Button>
           </Grid>
           <Grid
-            item
-            xs={6}
-            md={2}
-            sx={{}}
-            alignItems="center"
-            justifyContent="center"
+            sx={{ alignItems: "center", justifyContent: "center" }}
+            size={{
+              xs: 6,
+              md: 2,
+            }}
           >
             <Button
               fullWidth
@@ -479,7 +530,6 @@ function Personal({ user }) {
           </Grid>
         </Grid>
       </Paper>
-
       {isMobile ? (
         <div>
           {personalList?.map((npc, i) => {
@@ -543,7 +593,6 @@ function Personal({ user }) {
           </div>
         </div>
       )}
-
       <div
         style={{
           display: "flex",
@@ -580,8 +629,13 @@ function Personal({ user }) {
               </>
             ) : (
               <div style={{ textAlign: "center" }}>
-                <Typography fontWeight={700} marginBottom={4}>
-                  {t(" No more adversaries found.")}
+                <Typography
+                  sx={{
+                    fontWeight: 700,
+                    marginBottom: 4,
+                  }}
+                >
+                  {t("No more adversaries found.")}
                 </Typography>
                 {prevLastItem.length ? (
                   <Button
@@ -606,14 +660,12 @@ function Personal({ user }) {
               contentName={selectedReportNpc.name}
               contentAuthor={selectedReportNpc.uid}
               contentType="NPC"
-              onSuccess={() => console.log("success")}
             />
           </>
         ) : (
           <CircularProgress />
         )}
       </div>
-
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
         open={open}
@@ -621,12 +673,25 @@ function Personal({ user }) {
         onClose={handleClose}
         message={t("Copied to Clipboard!")}
       />
+      {showScrollTop && (
+        <Tooltip title={t("Scroll to top")}>
+          <Fab
+            size="small"
+            color="primary"
+            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+            sx={{ position: "fixed", bottom: 24, right: 24, zIndex: 1200 }}
+          >
+            <KeyboardArrowUp />
+          </Fab>
+        </Tooltip>
+      )}
     </>
   );
 }
 
-function Npc({ npc, copyNpc, shareNpc, reportNpc, collapseGet }) {
+function Npc({ npc: rawNpc, copyNpc, shareNpc, reportNpc, collapseGet }) {
   const { t } = useTranslate();
+  const npc = applyNpcPostLoadTransforms(rawNpc);
   const ref = useRef();
   const [downloadImage] = useDownloadImage(npc.name, ref);
 
@@ -638,15 +703,25 @@ function Npc({ npc, copyNpc, shareNpc, reportNpc, collapseGet }) {
   const [collapse, setCollapse] = useState(false);
 
   return (
-    <Grid item xs={12} md={12} sx={{ marginBottom: 3 }}>
-      <NpcPretty
+    <Grid
+      sx={{
+        marginBottom: 3,
+        display: "flex",
+        alignItems: "center",
+        flexWrap: "wrap",
+      }}
+      size={{
+        xs: 12,
+        md: 12,
+      }}
+    >
+      <NpcActorCard
         npc={npc}
-        ref={ref}
-        npcImage={""}
+        cardRef={ref}
+        npcImage={npc.imgurl}
         collapse={collapse}
-        onClick={() => {
-          setCollapse(!collapse);
-        }}
+        variant="interactive"
+        onClick={() => setCollapse(!collapse)}
       />
       <Tooltip title={t("Copy to adversary designer")}>
         <IconButton onClick={copyNpc(npc)}>
@@ -669,9 +744,26 @@ function Npc({ npc, copyNpc, shareNpc, reportNpc, collapseGet }) {
         </IconButton>
       </Tooltip>
       <Export name={`${npc.name}`} dataType="npc" data={npc} />
-      <span style={{ fontSize: 14 }}>
-        {t("Created By:")} {npc.createdBy}
-      </span>
+      <Box sx={{ ml: "auto", display: "flex", alignItems: "center", gap: 1 }}>
+        <span style={{ fontSize: 14 }}>
+          {t("Created By:")} {npc.createdBy}
+        </span>
+        <Tooltip
+          title={`Schema version ${rawNpc.schemaVersion ?? 0} of ${NPC_CURRENT_SCHEMA_VERSION}`}
+        >
+          <Chip
+            label={
+              NPC_CURRENT_SCHEMA_VERSION > 0
+                ? `v${rawNpc.schemaVersion ?? 0}/${NPC_CURRENT_SCHEMA_VERSION}`
+                : `V${rawNpc.schemaVersion ?? 0}`
+            }
+            size="small"
+            color="default"
+            variant="outlined"
+            sx={{ fontSize: "0.85rem" }}
+          />
+        </Tooltip>
+      </Box>
     </Grid>
   );
 }

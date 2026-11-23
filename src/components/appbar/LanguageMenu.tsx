@@ -25,8 +25,8 @@ const LanguageMenu = () => {
       if (
         window.confirm(
           t(
-            "Switching language will clear out all your unsaved progress, would you like to continue?"
-          )
+            "Switching language will clear out all your unsaved progress, would you like to continue?",
+          ),
         )
       ) {
         window.location.reload();
@@ -41,7 +41,7 @@ const LanguageMenu = () => {
       <MenuItem
         onClick={handleClick}
         aria-label={`${t("Change Language to:", true)} ${getLanguageName(
-          selectedLanguage
+          selectedLanguage,
         )}`}
       >
         <ListItemIcon>
@@ -49,7 +49,7 @@ const LanguageMenu = () => {
         </ListItemIcon>
         <ListItemText
           primary={`${t("Language:", true)} ${getLanguageName(
-            selectedLanguage
+            selectedLanguage,
           )}`}
         />
       </MenuItem>
@@ -80,25 +80,8 @@ const LanguageMenu = () => {
   );
 };
 
-const getLanguageName = (languageCode: string): string => {
-  switch (languageCode) {
-    case "en":
-      return "English";
-    case "it":
-      return "Italiano (Italian)";
-    case "es":
-      return "Español (Spanish)";
-    case "de":
-      return "Deutsch (German)";
-    case "pl":
-      return "Polski (Polish)";
-    case "fr":
-      return "Française (French)";
-    case "pt-BR":
-      return "Português (Brasil)";
-    default:
-      return languageCode;
-  }
-};
+const getLanguageName = (languageCode: string): string =>
+  languageOptions.find((option) => option.code === languageCode)?.label ??
+  languageCode;
 
 export default LanguageMenu;

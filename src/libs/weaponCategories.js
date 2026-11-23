@@ -3,7 +3,7 @@ const weaponCategories = [
   "Bow",
   "Flail",
   "Firearm",
-  "spear_category",
+  "Spear",
   "Thrown",
   "Heavy",
   "Dagger",

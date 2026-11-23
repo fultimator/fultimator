@@ -14,6 +14,7 @@ const HealthBar = ({
 }) => {
   const theme = useTheme();
   const isDarkMode = theme.palette.mode === "dark";
+  const dividerColor = theme.palette.divider;
 
   const percentage = (currentValue / maxValue) * 100 || 0;
 
@@ -26,14 +27,16 @@ const HealthBar = ({
         display: "flex",
         alignItems: "center",
         width: "100%",
-        border: `2px solid ${isDarkMode ? "#444" : "#e0e0e0"}`, // Adjust border color for dark mode
+        border: `2px solid ${dividerColor}`,
       }}
     >
       {/* Label */}
       <Box
         sx={{
-          backgroundColor: isDarkMode ? "#333" : "#f4f4f4", // Adjust background color for label
-          borderRight: `1px solid ${isDarkMode ? "#444" : "#e0e0e0"}`, // Border for dark mode
+          backgroundColor: isDarkMode
+            ? theme.palette.grey[800]
+            : theme.palette.grey[200],
+          borderRight: `1px solid ${dividerColor}`,
           width: "10%",
           display: "flex",
           justifyContent: "center",
@@ -44,7 +47,7 @@ const HealthBar = ({
         <Typography
           sx={{
             fontWeight: "bold",
-            fontFamily: "'Press Start 2P', cursive",
+            fontFamily: "'PT Sans Narrow', sans-serif",
             fontSize: `calc(0.60rem + 0.25vw)`,
             color: isDarkMode ? "#fff" : bgColor, // Text color for label
           }}
@@ -61,10 +64,11 @@ const HealthBar = ({
           sx={{
             height: 25,
             borderRadius: 0,
-            backgroundColor: bgColor || (isDarkMode ? "#444" : "#e0e0e0"), // Adjust background for dark mode
+            backgroundColor:
+              bgColor || theme.palette.grey[isDarkMode ? 700 : 300],
             "& .MuiLinearProgress-bar": {
               borderRadius: 0,
-              background: gradient, // Apply the gradient
+              background: gradient,
             },
           }}
         />
@@ -78,7 +82,7 @@ const HealthBar = ({
             transform: "translate(-50%, -50%)",
             fontWeight: "bold",
             color: "#fff",
-            fontFamily: "'Press Start 2P', cursive",
+            fontFamily: "'PT Sans Narrow', sans-serif",
             letterSpacing: "3px",
             fontSize: `calc(0.60rem + 0.25vw)`,
             whiteSpace: "nowrap",
@@ -99,7 +103,7 @@ const HealthBar = ({
               transform: "translateY(-50%)",
               fontWeight: "bold",
               color: rightTextColor,
-              fontFamily: "'Press Start 2P', cursive",
+              fontFamily: "'PT Sans Narrow', sans-serif",
               letterSpacing: "2px",
               fontSize: `calc(0.60rem + 0.25vw)`,
               whiteSpace: "nowrap",

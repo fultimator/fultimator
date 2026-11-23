@@ -4,8 +4,8 @@ const types = {
   physical: {
     long: t("physical", true),
   },
-  wind: {
-    long: t("wind", true),
+  air: {
+    long: t("air", true),
   },
   bolt: {
     long: t("bolt", true),
@@ -28,11 +28,14 @@ const types = {
   poison: {
     long: t("poison", true),
   },
+  untyped: {
+    long: t("untyped", true),
+  },
 };
 
 export const typesList = [
   "physical",
-  "wind",
+  "air",
   "bolt",
   "dark",
   "earth",
@@ -40,6 +43,7 @@ export const typesList = [
   "ice",
   "light",
   "poison",
+  "untyped",
 ];
 
 export default types;

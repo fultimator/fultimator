@@ -16,12 +16,50 @@ const attributes = {
     shortcaps: t("MIG", true),
     long: t("Might", true),
   },
-  will: {
+  willpower: {
     short: t("wil", true),
     shortcaps: t("WLP", true),
     long: t("Willpower", true),
   },
 };
+
+Object.defineProperties(attributes, {
+  will: {
+    get() {
+      return this.willpower;
+    },
+    enumerable: false,
+    configurable: true,
+  },
+  wlp: {
+    get() {
+      return this.willpower;
+    },
+    enumerable: false,
+    configurable: true,
+  },
+  dex: {
+    get() {
+      return this.dexterity;
+    },
+    enumerable: false,
+    configurable: true,
+  },
+  ins: {
+    get() {
+      return this.insight;
+    },
+    enumerable: false,
+    configurable: true,
+  },
+  mig: {
+    get() {
+      return this.might;
+    },
+    enumerable: false,
+    configurable: true,
+  },
+});
 
 export default attributes;
 
@@ -47,3 +85,41 @@ export const attrNoTranslation = {
     long: "Willpower",
   },
 };
+
+Object.defineProperties(attrNoTranslation, {
+  will: {
+    get() {
+      return this.willpower;
+    },
+    enumerable: false,
+    configurable: true,
+  },
+  wlp: {
+    get() {
+      return this.willpower;
+    },
+    enumerable: false,
+    configurable: true,
+  },
+  dex: {
+    get() {
+      return this.dexterity;
+    },
+    enumerable: false,
+    configurable: true,
+  },
+  ins: {
+    get() {
+      return this.insight;
+    },
+    enumerable: false,
+    configurable: true,
+  },
+  mig: {
+    get() {
+      return this.might;
+    },
+    enumerable: false,
+    configurable: true,
+  },
+});

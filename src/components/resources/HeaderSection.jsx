@@ -1,14 +1,10 @@
 import React from "react";
-import {
-  Typography,
-  Box,
-  Paper
-} from "@mui/material";
+import { Typography, Box, Paper } from "@mui/material";
 import LanguageIcon from "@mui/icons-material/Language";
 import { useTranslate } from "../../translation/translate";
 import { useTheme } from "@mui/material/styles";
 
-export default function HeaderSection({isMobile = false}) {
+export default function HeaderSection({ isMobile = false }) {
   const { t } = useTranslate();
   const theme = useTheme();
   const isDarkMode = theme.palette.mode === "dark";
@@ -46,7 +42,7 @@ export default function HeaderSection({isMobile = false}) {
               color: isDarkMode ? "#ffb74d" : "#f57c00",
             }}
           />
-          {t("Fabula Ultima Resources")}
+          {t("resources_title")}
         </Typography>
         <Typography
           variant={isMobile ? "h6" : "h5"}
@@ -58,9 +54,7 @@ export default function HeaderSection({isMobile = false}) {
             fontWeight: 400,
           }}
         >
-          {t(
-            "Complete collection of official resources, tools, and community content for Fabula Ultima TTRPG"
-          )}
+          {t("resources_subtitle")}
         </Typography>
       </Box>
     </Paper>

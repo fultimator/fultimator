@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react";
-import data from "./data.json";
+import en from "virtual:translations/en";
 
 export const languageOptions = [
   { code: "en", label: "English" },
@@ -9,13 +8,12 @@ export const languageOptions = [
   { code: "pl", label: "Polski (Polish)" },
   { code: "fr", label: "Française (French)" },
   { code: "pt-BR", label: "Português (Brasil)" },
-  // Continue?
+  { code: "zh-CN", label: "简体中文 (Chinese)" },
 ];
 
 /*
     - Green is with key and with translated text on selected language
-    - Yellow is with key but no translated text on selected language
-    - Red is no key and no translated text
+    - Red is no translated text on selected language
 
     How to update translations:
 
@@ -28,94 +26,85 @@ export const languageOptions = [
 
 const debugMode = false;
 
-const translate = (key) => {
-  return data.find((item) => item.key === key);
+// data.json is split per language at build time (scripts/vite-plugin-translations.mjs).
+// English is bundled as the fallback; the active language is loaded by
+// loadLanguage() before the app renders. Changing language reloads the page.
+const loaders = {
+  it: () => import("virtual:translations/it"),
+  de: () => import("virtual:translations/de"),
+  pl: () => import("virtual:translations/pl"),
+  fr: () => import("virtual:translations/fr"),
+  es: () => import("virtual:translations/es"),
+  "pt-BR": () => import("virtual:translations/pt-BR"),
+  "zh-CN": () => import("virtual:translations/zh-CN"),
+  ru: () => import("virtual:translations/ru"),
 };
+const dictionaries = { en };
+let currentLanguage = "en";
+
+// Language codes that were renamed; saved preferences may still use them.
+const legacyLanguageCodes = { zh: "zh-CN" };
+
+export async function loadLanguage(language) {
+  language = legacyLanguageCodes[language] ?? language;
+  if (language !== "en" && !loaders[language]) language = "en";
+  if (language !== "en") {
+    try {
+      dictionaries[language] = (await loaders[language]()).default;
+    } catch (error) {
+      console.error(`Failed to load "${language}" translations`, error);
+      return;
+    }
+  }
+  currentLanguage = language;
+}
+
+const resolveLanguage = (allowedLanguages) =>
+  allowedLanguages?.length > 0 && !allowedLanguages.includes(currentLanguage)
+    ? "en"
+    : currentLanguage;
 
 const replaceKey = (key, noSpan, language, params) => {
-  if (debugMode) {
-    if (!translate(key) || !translate(key)[language]) {
-      if (!window.allUntranslatedKeys) {
-        window.allUntranslatedKeys = [key];
-      } else {
-        window.allUntranslatedKeys.push(key);
-      }
-    }
+  const translated = dictionaries[language]?.[key];
 
-    if (noSpan) {
-      let text = !translate(key)
-        ? key + "***NO_KEY***"
-        : !translate(key)[language]
-        ? key + "***NO_TRANSLATION**"
-        : translate(key)[language]
-        ? translate(key)[language] + "*TRANSLATED*"
-        : key;
-      
-      // Handle parameter substitution
-      if (params && Array.isArray(params)) {
-        params.forEach((param, index) => {
-          text = text.replace(new RegExp(`\\{${index}\\}`, 'g'), param);
-        });
-      }
-      return text;
-    } else {
-      return !translate(key) ? (
-        <span style={{ color: "red" }}>{key}</span>
-      ) : !translate(key)[language] ? (
-        <span style={{ color: "orange" }}>{key}</span>
-      ) : (
-        <span style={{ color: "darkgreen" }}>
-          {translate(key)[language] ? translate(key)[language] : key}
+  if (debugMode) {
+    if (!translated) {
+      (window.allUntranslatedKeys ??= []).push(key);
+    }
+    if (!noSpan) {
+      return (
+        <span style={{ color: translated ? "darkgreen" : "red" }}>
+          {translated ?? key}
         </span>
       );
     }
-  } else {
-    let text = translate(key) && translate(key)[language]
-      ? translate(key)[language]
-      : key;
-    
-    // Handle parameter substitution
-    if (params && Array.isArray(params)) {
-      params.forEach((param, index) => {
-        text = text.replace(new RegExp(`\\{${index}\\}`, 'g'), param);
-      });
-    }
-    return text;
   }
+
+  let text = translated ?? key;
+  if (debugMode) text += translated ? "*TRANSLATED*" : "***NO_TRANSLATION**";
+
+  // Handle parameter substitution
+  if (params && Array.isArray(params)) {
+    params.forEach((param, index) => {
+      text = text.replace(new RegExp(`\\{${index}\\}`, "g"), param);
+    });
+  }
+  return text;
 };
 
-export const useTranslate = (allowedLanguages) => {
-  const [language, setLanguage] = useState("en");
+// One stable `t` per language, so components and effects that depend on it
+// don't re-run every render.
+const translators = {};
+const translatorFor = (language) =>
+  (translators[language] ??= (key, params, noSpan) =>
+    replaceKey(key, noSpan, language, params));
 
-  useEffect(() => {
-    setLanguage(localStorage.getItem("selectedLanguage") || "en");
-  }, []);
+export const useTranslate = (allowedLanguages) => ({
+  t: translatorFor(resolveLanguage(allowedLanguages)),
+});
 
-  if (
-    allowedLanguages &&
-    allowedLanguages.length > 0 &&
-    !allowedLanguages.includes(language)
-  ) {
-    setLanguage("en");
-  }
-  const t = (key, params, noSpan) => {
-    return replaceKey(key, noSpan, language, params);
-  };
-
-  return { t };
-};
-
-export const t = (key, params, noSpan, allowedLanguages) => {
-  let language = localStorage.getItem("selectedLanguage") || "en";
-  if (
-    allowedLanguages &&
-    allowedLanguages.length > 0 &&
-    !allowedLanguages.includes(language)
-  ) {
-    language = "en";
-  }
-  return replaceKey(key, noSpan, language, params);
-};
+export const t = (key, params, noSpan, allowedLanguages) =>
+  replaceKey(key, noSpan, resolveLanguage(allowedLanguages), params);
 
 export const replacePlaceholders = (translatedText, replacements) => {
   let result = translatedText;
