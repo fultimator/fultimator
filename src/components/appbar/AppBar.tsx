@@ -71,14 +71,7 @@ const AppBar: React.FC<AppBarProps> = ({
   return (
     <>
       <HideOnScroll>
-        <MuiAppBar
-          position="fixed"
-          sx={(theme) => ({
-            background: isDarkMode
-              ? `linear-gradient(to bottom, ${theme.palette.secondary.dark}, ${theme.palette.primary.dark})`
-              : theme.palette.primary.main,
-          })}
-        >
+        <MuiAppBar position="fixed">
           <Container>
             <Grid
               container
