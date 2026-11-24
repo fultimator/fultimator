@@ -29094,6 +29094,42 @@
     "zh-CN": "Player not found."
   },
   {
+    "key": "Homebrew",
+    "en": "Homebrew",
+    "it": "Homebrew",
+    "de": "Homebrew",
+    "fr": "Homebrew",
+    "es": "Homebrew",
+    "pt-BR": "Homebrew",
+    "ru": "Homebrew",
+    "pl": "Homebrew",
+    "zh-CN": "Homebrew"
+  },
+  {
+    "key": "Custom species name:",
+    "en": "Custom species name:",
+    "it": "Custom species name:",
+    "de": "Custom species name:",
+    "fr": "Custom species name:",
+    "es": "Custom species name:",
+    "pt-BR": "Custom species name:",
+    "ru": "Custom species name:",
+    "pl": "Custom species name:",
+    "zh-CN": "Custom species name:"
+  },
+  {
+    "key": "Disabled for local",
+    "en": "Disabled for local",
+    "it": "Disabled for local",
+    "de": "Disabled for local",
+    "fr": "Disabled for local",
+    "es": "Disabled for local",
+    "pt-BR": "Disabled for local",
+    "ru": "Disabled for local",
+    "pl": "Disabled for local",
+    "zh-CN": "Disabled for local"
+  },
+  {
     "key": "shared.fuid",
     "en": "FUID",
     "it": "FUID",

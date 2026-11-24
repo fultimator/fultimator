@@ -1747,6 +1747,8 @@ function PlayerGalleryCardActions({
   const [expanded, setExpanded] = useState(false);
   const [actionsAnchor, setActionsAnchor] = useState(null);
   const [actionsSubmenu, setActionsSubmenu] = useState(null); // "export" | "transfer" | null
+  const [localShareSnackbarOpen, setLocalShareSnackbarOpen] = useState(false);
+  const isLocalDb = dbMode === "local";
   const isMobile = useMediaQuery("(max-width: 600px)");
   const [downloadImage] = useDownloadImage(player?.name || "player", cardRef);
   const exportData = canonicalizeForTransfer(
@@ -1896,9 +1898,13 @@ function PlayerGalleryCardActions({
             </MenuItem>,
             <MenuItem
               key="share"
-              disabled={dbMode === "local"}
+              sx={isLocalDb ? { opacity: 0.38 } : undefined}
               onClick={() => {
                 closeMenus();
+                if (isLocalDb) {
+                  setLocalShareSnackbarOpen(true);
+                  return;
+                }
                 sharePlayer(player.id);
               }}
             >
@@ -2039,16 +2045,38 @@ function PlayerGalleryCardActions({
                 <Delete />
               </IconButton>
             </Tooltip>
-            <Tooltip title={t("Share URL")}>
-              <span>
+            <Tooltip
+              title={
+                dbMode === "local" ? (
+                  <>
+                    {t("Share URL")}
+                    <br />
+                    {t("Disabled for local")}
+                  </>
+                ) : (
+                  t("Share URL")
+                )
+              }
+            >
+              <span
+                onClick={
+                  isLocalDb ? () => setLocalShareSnackbarOpen(true) : undefined
+                }
+              >
                 <IconButton
                   onClick={() => sharePlayer(player.id)}
-                  disabled={dbMode === "local"}
+                  disabled={isLocalDb}
                 >
                   <Share />
                 </IconButton>
               </span>
             </Tooltip>
+            <Snackbar
+              open={localShareSnackbarOpen}
+              autoHideDuration={2500}
+              onClose={() => setLocalShareSnackbarOpen(false)}
+              message={`${t("Share URL")}: ${t("Disabled for local")}`}
+            />
             <Tooltip title={t("Download as Image")}>
               <IconButton onClick={downloadImage}>
                 <Download />

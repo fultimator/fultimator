@@ -120,6 +120,7 @@ export default function NpcEdit() {
   const [checkedRules, setCheckedRules] = useState(false);
   const [rulesDialogOpen, setRulesDialogOpen] = useState(false);
   const [openShareSnackbar, setOpenShareSnackbar] = useState(false);
+  const [localShareSnackbarOpen, setLocalShareSnackbarOpen] = useState(false);
 
   const handleCheckboxChange = (event) => {
     setCheckedRules(event.target.checked);
@@ -490,8 +491,26 @@ export default function NpcEdit() {
                   </IconButton>
                 </Tooltip>
 
-                <Tooltip title={t("Share URL")}>
-                  <span>
+                <Tooltip
+                  title={
+                    isLocalNpc ? (
+                      <>
+                        {t("Share URL")}
+                        <br />
+                        {t("Disabled for local")}
+                      </>
+                    ) : (
+                      t("Share URL")
+                    )
+                  }
+                >
+                  <span
+                    onClick={
+                      isLocalNpc
+                        ? () => setLocalShareSnackbarOpen(true)
+                        : undefined
+                    }
+                  >
                     <IconButton
                       onClick={() => shareNpc(npc.id)}
                       disabled={isLocalNpc}
@@ -670,6 +689,12 @@ export default function NpcEdit() {
           autoHideDuration={2000}
           onClose={handleClose}
           message={t("Copied to Clipboard!")}
+        />
+        <Snackbar
+          open={localShareSnackbarOpen}
+          autoHideDuration={2500}
+          onClose={() => setLocalShareSnackbarOpen(false)}
+          message={`${t("Share URL")}: ${t("Disabled for local")}`}
         />
         <Snackbar
           open={savedSnackbarOpen}

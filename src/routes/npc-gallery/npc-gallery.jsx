@@ -1789,6 +1789,8 @@ function Npc({
   const [actionsAnchor, setActionsAnchor] = useState(null);
   const [_exportAnchor, setExportAnchor] = useState(null);
   const [actionsSubmenu, setActionsSubmenu] = useState(null); // "export" | "transfer" | null
+  const [localShareSnackbarOpen, setLocalShareSnackbarOpen] = useState(false);
+  const isLocalDb = dbMode !== "cloud";
   const exportData = canonicalizeForExport("npc", npc);
 
   const [collapse, setCollapse] = useState(false);
@@ -1951,9 +1953,13 @@ function Npc({
             </MenuItem>,
             <MenuItem
               key="share"
-              disabled={dbMode !== "cloud"}
+              sx={isLocalDb ? { opacity: 0.38 } : undefined}
               onClick={() => {
                 closeMenus();
+                if (isLocalDb) {
+                  setLocalShareSnackbarOpen(true);
+                  return;
+                }
                 shareNpc(npc.id);
               }}
             >
@@ -2155,13 +2161,35 @@ function Npc({
             <Delete />
           </IconButton>
         </Tooltip>
-        {dbMode === "cloud" && (
-          <Tooltip title={t("Share URL")}>
-            <IconButton onClick={() => shareNpc(npc.id)}>
+        <Tooltip
+          title={
+            isLocalDb ? (
+              <>
+                {t("Share URL")}
+                <br />
+                {t("Disabled for local")}
+              </>
+            ) : (
+              t("Share URL")
+            )
+          }
+        >
+          <span
+            onClick={
+              isLocalDb ? () => setLocalShareSnackbarOpen(true) : undefined
+            }
+          >
+            <IconButton onClick={() => shareNpc(npc.id)} disabled={isLocalDb}>
               <Share />
             </IconButton>
-          </Tooltip>
-        )}
+          </span>
+        </Tooltip>
+        <Snackbar
+          open={localShareSnackbarOpen}
+          autoHideDuration={2500}
+          onClose={() => setLocalShareSnackbarOpen(false)}
+          message={`${t("Share URL")}: ${t("Disabled for local")}`}
+        />
         <Tooltip title={t("Download as Image")}>
           <IconButton onClick={expandAndDownloadImage}>
             <Download />
