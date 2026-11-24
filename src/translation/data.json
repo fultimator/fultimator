@@ -1,6 +1,5 @@
 [
   {
-    "": "",
     "key": "important_announcement",
     "en": "Important Announcements",
     "it": "Important Announcements",
@@ -13,7 +12,6 @@
     "zh-CN": "重要公告"
   },
   {
-    "": "",
     "key": "important_announcement_desc",
     "en": "Our URL has been updated! Please use the new address",
     "it": "Our URL has been updated! Please use the new address",
@@ -26,7 +24,6 @@
     "zh-CN": "我们的网址已更新！请使用新地址"
   },
   {
-    "": "",
     "key": "join_fultimator_community",
     "en": "Join the Fultimator Community!",
     "it": "Unisciti alla Comunità Fultimator!",
@@ -39,7 +36,6 @@
     "zh-CN": "加入 Fultimator 社区！"
   },
   {
-    "": "",
     "key": "join_fultimator_community_desc",
     "en": "We would love to have you on board!",
     "it": "Ci piacerebbe averti a bordo!",
@@ -52,7 +48,6 @@
     "zh-CN": "欢迎你的加入！"
   },
   {
-    "": "",
     "key": "join_discord",
     "en": "Dive into the Discord Hub!",
     "it": "Tuffati nel nostro Discord!",
@@ -65,7 +60,6 @@
     "zh-CN": "加入 Discord 社区！"
   },
   {
-    "": "",
     "key": "Check for New Releases",
     "en": "Check for New Releases",
     "it": "Controlla le Nuove Versioni",
@@ -78,7 +72,6 @@
     "zh-CN": "查看新版本"
   },
   {
-    "": "",
     "key": "Check for new releases and updates here:",
     "en": "Check for new releases and updates here:",
     "it": "Controlla le nuove versioni e aggiornamenti dell'app qui:",
@@ -91,7 +84,6 @@
     "zh-CN": "在此查看新版本和更新："
   },
   {
-    "": "",
     "key": "check_for_updates",
     "en": "Check for Updates",
     "it": "Controlla aggiornamenti",
@@ -104,7 +96,6 @@
     "zh-CN": "检查更新"
   },
   {
-    "": "",
     "key": "check_for_updates_description",
     "en": "Keep your Fultimator app up to date with the latest features and improvements.",
     "it": "Mantieni Fultimator aggiornato con le ultime funzionalità e miglioramenti.",
@@ -117,7 +108,6 @@
     "zh-CN": "更新 Fultimator，体验最新功能与改进。"
   },
   {
-    "": "",
     "key": "Fultimator Desktop App Releases",
     "en": "Fultimator Desktop App Releases",
     "it": "Rilasci dell'App Fultimator Desktop",
@@ -130,7 +120,6 @@
     "zh-CN": "Fultimator 桌面应用版本"
   },
   {
-    "": "",
     "key": "download_desktop_app_header",
     "en": "Download the Fultimator Desktop App",
     "it": "Scarica l'Applicazione Fultimator Desktop",
@@ -143,20 +132,18 @@
     "zh-CN": "下载 Fultimator 桌面应用"
   },
   {
-    "": "",
     "key": "download_desktop_app_desc",
-    "en": "Fultimator is also available as a desktop app for Windows and Linux. Download it from the following link:",
-    "it": "Fultimator è disponibile anche come applicazione desktop per Windows e Linux. Scaricala dal seguente link:",
-    "de": "Fultimator ist auch als Desktop App für Windows und Linux erhältlich. Lade sie unter dem folgenden Link herunter:",
-    "fr": "Fultimator est également disponible sous forme d'application de bureau pour Windows et Linux. Téléchargez-la à partir du lien suivant :",
-    "es": "Fultimator también está disponible como una aplicación de escritorio para Windows",
-    "pt-BR": "O Fultimator também está disponível como um aplicativo de desktop para Windows e Linux. Baixe-o no seguinte link:",
-    "ru": "Fultimator также доступен в виде настольного приложения для Windows и Linux. Скачать его можно по следующей ссылке:",
-    "pl": "Fultimator is also available as a desktop app for Windows and Linux. Download it from the following link:",
-    "zh-CN": "Fultimator 还提供 Windows 和 Linux 桌面应用。请通过以下链接下载："
+    "en": "Fultimator is also available for Windows, macOS, Linux and Android.",
+    "it": "Fultimator è disponibile anche per Windows, macOS, Linux e Android.",
+    "de": "Fultimator gibt es auch für Windows, macOS, Linux und Android.",
+    "fr": "Fultimator est aussi disponible pour Windows, macOS, Linux et Android.",
+    "es": "Fultimator también está disponible para Windows, macOS, Linux y Android.",
+    "pt-BR": "O Fultimator também está disponível para Windows, macOS, Linux e Android.",
+    "ru": "Fultimator также доступен для Windows, macOS, Linux и Android.",
+    "pl": "Fultimator jest również dostępny na Windows, macOS, Linux i Androida.",
+    "zh-CN": "Fultimator 还提供 Windows、macOS、Linux 和 Android 版本。"
   },
   {
-    "": "",
     "key": "Fultimator Desktop App",
     "en": "Fultimator Desktop App",
     "it": "Fultimator Desktop App",
@@ -169,7 +156,6 @@
     "zh-CN": "Fultimator 桌面应用"
   },
   {
-    "": "",
     "key": "desktop_app_description",
     "en": "Take Fultimator offline. Download the desktop app for Windows, macOS, and Linux.",
     "it": "Usa Fultimator anche offline. Scarica l'app desktop per Windows, macOS e Linux.",
@@ -182,7 +168,6 @@
     "zh-CN": "离线使用 Fultimator。下载适用于 Windows、macOS 和 Linux 的桌面应用。"
   },
   {
-    "": "",
     "key": "download_now",
     "en": "Download Now",
     "it": "Scarica Ora",
@@ -195,7 +180,6 @@
     "zh-CN": "立即下载"
   },
   {
-    "": "",
     "key": "extra_resources",
     "en": "Extra Resources",
     "it": "Altre Risorse",
@@ -208,7 +192,6 @@
     "zh-CN": "更多资源"
   },
   {
-    "": "",
     "key": "contact_runty",
     "en": "The wonderful Fultimator Icons are made by Runty!",
     "it": "Le meravigliose icone di Fultimator sono realizzate da Runty!",
@@ -221,7 +204,6 @@
     "zh-CN": "Fultimator 的精美图标由 Runty 制作！"
   },
   {
-    "": "",
     "key": "akashics_moe_desc",
     "en": "Monster Icons are taken from:",
     "it": "Le icone dei mostri sono state prese da:",
@@ -234,7 +216,6 @@
     "zh-CN": "怪物图标来源："
   },
   {
-    "": "",
     "key": "contact_us_header",
     "en": "Contact Us",
     "it": "Contattaci",
@@ -247,7 +228,6 @@
     "zh-CN": "联系我们"
   },
   {
-    "": "",
     "key": "feedback_description",
     "en": "If you have any feedback or questions, feel free to reach out to us.",
     "it": "Se hai feedback o domande, sentiti libero di contattarci.",
@@ -260,7 +240,6 @@
     "zh-CN": "如有反馈或疑问，欢迎联系我们。"
   },
   {
-    "": "",
     "key": "google_form",
     "en": "Google Form",
     "it": "Google Form",
@@ -273,7 +252,6 @@
     "zh-CN": "Google 表单"
   },
   {
-    "": "",
     "key": "fabula_ultima_resources_header",
     "en": "Fabula Ultima Resources",
     "it": "Fabula Ultima Resources",
@@ -286,7 +264,6 @@
     "zh-CN": "最终物语资源"
   },
   {
-    "": "",
     "key": "fabula_ultima_resources_desc",
     "en": "Access the list of official and homebrew Fabula Ultima resources in multiple languages.",
     "it": "Access the list of official and homebrew Fabula Ultima resources in multiple languages.",
@@ -299,7 +276,6 @@
     "zh-CN": "查看多种语言的最终物语官方与自制资源。"
   },
   {
-    "": "",
     "key": "fabula_ultima_resources_btn",
     "en": "View All Resources",
     "it": "View All Resources",
@@ -312,7 +288,6 @@
     "zh-CN": "查看全部资源"
   },
   {
-    "": "",
     "key": "copyright_notice_header",
     "en": "Copyright Notice",
     "it": "Avviso di Copyright",
@@ -325,7 +300,6 @@
     "zh-CN": "版权声明"
   },
   {
-    "": "",
     "key": "copyright_notice_desc_1",
     "en": "Fultimator is an independent production by",
     "it": "Fultimator is an independent production by",
@@ -338,7 +312,6 @@
     "zh-CN": "Fultimator 为独立作品，制作者为"
   },
   {
-    "": "",
     "key": "copyright_notice_desc_2",
     "en": " and is not affiliated with Need Games or Rooster Games.",
     "it": " and is not affiliated with Need Games or Rooster Games.",
@@ -351,7 +324,6 @@
     "zh-CN": "与 Need Games 或 Rooster Games 无关联。"
   },
   {
-    "": "",
     "key": "copyright_notice_desc_3",
     "en": "It is published under the",
     "it": "It is published under the",
@@ -364,7 +336,6 @@
     "zh-CN": "本作品依据以下许可发布："
   },
   {
-    "": "",
     "key": "copyright_notice_desc_4",
     "en": "Fabula Ultima is a roleplaying game created by Emanuele Galletto and and published by Need Games.",
     "it": "Fabula Ultima is a roleplaying game created by Emanuele Galletto and and published by Need Games.",
@@ -377,7 +348,6 @@
     "zh-CN": "最终物语是由 Emanuele Galletto 创作、Need Games 发行的角色扮演游戏。"
   },
   {
-    "": "",
     "key": "copyright_notice_desc_5",
     "en": "Fabula Ultima is © Need Games and Rooster Games.",
     "it": "Fabula Ultima is © Need Games and Rooster Games.",
@@ -388,6 +358,114 @@
     "ru": "Fabula Ultima is © Need Games and Rooster Games.",
     "pl": "Fabula Ultima is © Need Games and Rooster Games.",
     "zh-CN": "最终物语的版权归 Need Games 和 Rooster Games 所有。"
+  },
+  {
+    "key": "credits_header",
+    "en": "Credits",
+    "it": "Credits",
+    "de": "Credits",
+    "fr": "Credits",
+    "es": "Credits",
+    "pt-BR": "Credits",
+    "ru": "Credits",
+    "pl": "Credits",
+    "zh-CN": "Credits"
+  },
+  {
+    "key": "credits_desc",
+    "en": "The artists behind Fultimator's icons, tokens and logo.",
+    "it": "Gli artisti dietro icone, token e logo di Fultimator.",
+    "de": "Die Künstler hinter Icons, Tokens und Logo von Fultimator.",
+    "fr": "Les artistes derrière les icônes, jetons et le logo de Fultimator.",
+    "es": "Los artistas detrás de los iconos, fichas y el logo de Fultimator.",
+    "pt-BR": "Os artistas por trás dos ícones, tokens e do logo do Fultimator.",
+    "ru": "Художники, создавшие иконки, токены и логотип Fultimator.",
+    "pl": "Twórcy ikon, tokenów i logo Fultimatora.",
+    "zh-CN": "Fultimator 图标、token 和徽标背后的艺术家。"
+  },
+  {
+    "key": "icon_credits",
+    "en": "Icon Credits",
+    "it": "Icon Credits",
+    "de": "Icon Credits",
+    "fr": "Icon Credits",
+    "es": "Icon Credits",
+    "pt-BR": "Icon Credits",
+    "ru": "Icon Credits",
+    "pl": "Icon Credits",
+    "zh-CN": "Icon Credits"
+  },
+  {
+    "key": "icon_credits_intro",
+    "en": "Every icon bundled with Fultimator, with the artist, license and source it comes from. Select an icon for details.",
+    "it": "Every icon bundled with Fultimator, with the artist, license and source it comes from. Select an icon for details.",
+    "de": "Every icon bundled with Fultimator, with the artist, license and source it comes from. Select an icon for details.",
+    "fr": "Every icon bundled with Fultimator, with the artist, license and source it comes from. Select an icon for details.",
+    "es": "Every icon bundled with Fultimator, with the artist, license and source it comes from. Select an icon for details.",
+    "pt-BR": "Every icon bundled with Fultimator, with the artist, license and source it comes from. Select an icon for details.",
+    "ru": "Every icon bundled with Fultimator, with the artist, license and source it comes from. Select an icon for details.",
+    "pl": "Every icon bundled with Fultimator, with the artist, license and source it comes from. Select an icon for details.",
+    "zh-CN": "Every icon bundled with Fultimator, with the artist, license and source it comes from. Select an icon for details."
+  },
+  {
+    "key": "icon_credits_artist",
+    "en": "Artist",
+    "it": "Artist",
+    "de": "Artist",
+    "fr": "Artist",
+    "es": "Artist",
+    "pt-BR": "Artist",
+    "ru": "Artist",
+    "pl": "Artist",
+    "zh-CN": "Artist"
+  },
+  {
+    "key": "icon_credits_license",
+    "en": "License",
+    "it": "License",
+    "de": "License",
+    "fr": "License",
+    "es": "License",
+    "pt-BR": "License",
+    "ru": "License",
+    "pl": "License",
+    "zh-CN": "License"
+  },
+  {
+    "key": "icon_credits_source",
+    "en": "Source",
+    "it": "Source",
+    "de": "Source",
+    "fr": "Source",
+    "es": "Source",
+    "pt-BR": "Source",
+    "ru": "Source",
+    "pl": "Source",
+    "zh-CN": "Source"
+  },
+  {
+    "key": "icon_credits_select_hint",
+    "en": "Select an icon to see its artist, license and source.",
+    "it": "Select an icon to see its artist, license and source.",
+    "de": "Select an icon to see its artist, license and source.",
+    "fr": "Select an icon to see its artist, license and source.",
+    "es": "Select an icon to see its artist, license and source.",
+    "pt-BR": "Select an icon to see its artist, license and source.",
+    "ru": "Select an icon to see its artist, license and source.",
+    "pl": "Select an icon to see its artist, license and source.",
+    "zh-CN": "Select an icon to see its artist, license and source."
+  },
+  {
+    "key": "icon_credits_empty",
+    "en": "No icons match your filters.",
+    "it": "No icons match your filters.",
+    "de": "No icons match your filters.",
+    "fr": "No icons match your filters.",
+    "es": "No icons match your filters.",
+    "pt-BR": "No icons match your filters.",
+    "ru": "No icons match your filters.",
+    "pl": "No icons match your filters.",
+    "zh-CN": "No icons match your filters."
   },
   {
     "key": "resource_request_submitted_successfully",
