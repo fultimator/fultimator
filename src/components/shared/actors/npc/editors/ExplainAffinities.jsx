@@ -57,6 +57,14 @@ const SPECIES_GRANTS_CONFIG = {
   },
 };
 
+const CHIP_SX = {
+  cursor: "pointer",
+  height: { xs: 36, sm: 24 },
+  borderRadius: { xs: "18px", sm: "12px" },
+  fontSize: { xs: "0.9rem", sm: "0.8125rem" },
+  "& .MuiChip-label": { px: { xs: 1.5, sm: 1 } },
+};
+
 export default function ExplainAffinities({ npc, setNpc }) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
@@ -295,7 +303,13 @@ export default function ExplainAffinities({ npc, setNpc }) {
                     )
                     .join(" • ")}
                 </Typography>
-                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.75 }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    gap: { xs: 1, sm: 0.75 },
+                  }}
+                >
                   {(speciesConfig.affinities.fixed || []).map((grant) => {
                     const isGranted =
                       npc.speciesGrants?.affinities?.[grant.type];
@@ -309,7 +323,7 @@ export default function ExplainAffinities({ npc, setNpc }) {
                         onClick={() =>
                           toggleSpeciesAffinity(grant.type, grant.value)
                         }
-                        sx={{ cursor: "pointer" }}
+                        sx={CHIP_SX}
                       />
                     );
                   })}
@@ -346,7 +360,11 @@ export default function ExplainAffinities({ npc, setNpc }) {
                         )}
                       </Typography>
                       <Box
-                        sx={{ display: "flex", flexWrap: "wrap", gap: 0.75 }}
+                        sx={{
+                          display: "flex",
+                          flexWrap: "wrap",
+                          gap: { xs: 1, sm: 0.75 },
+                        }}
                       >
                         {speciesConfig.affinities.optional.types.map((type) => {
                           const affinity = npc.affinities?.[type];
@@ -367,7 +385,7 @@ export default function ExplainAffinities({ npc, setNpc }) {
                                   speciesConfig.affinities.optional.value,
                                 )
                               }
-                              sx={{ cursor: "pointer" }}
+                              sx={CHIP_SX}
                             />
                           );
                         })}
@@ -388,7 +406,7 @@ export default function ExplainAffinities({ npc, setNpc }) {
                               sx={{
                                 display: "flex",
                                 flexWrap: "wrap",
-                                gap: 0.75,
+                                gap: { xs: 1, sm: 0.75 },
                               }}
                             >
                               {DAMAGE_TYPES.map((type) => {
@@ -405,7 +423,7 @@ export default function ExplainAffinities({ npc, setNpc }) {
                                     onClick={() =>
                                       toggleSpeciesAffinity(type, value)
                                     }
-                                    sx={{ cursor: "pointer" }}
+                                    sx={CHIP_SX}
                                   />
                                 );
                               })}
