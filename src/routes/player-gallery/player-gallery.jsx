@@ -2021,17 +2021,20 @@ function PlayerGalleryCardActions({
             <Edit />
           </IconButton>
         </Tooltip>
+        <Tooltip title={t("Player Sheet")}>
+          <IconButton
+            onClick={() => handleNavigation(`/character-sheet/${player.id}`)}
+          >
+            <Badge />
+          </IconButton>
+        </Tooltip>
         {!isMobile && (
           <>
-            <Tooltip title={t("Player Sheet")}>
-              <IconButton
-                onClick={() =>
-                  handleNavigation(`/character-sheet/${player.id}`)
-                }
-              >
-                <Badge />
-              </IconButton>
-            </Tooltip>
+            <Export
+              name={`${player.name}`}
+              dataType="pc"
+              data={applyPreSaveTransforms(player)}
+            />
             <PlayerTransferButton
               player={player}
               copyPlayerToLocal={copyPlayerToLocal}
@@ -2082,11 +2085,6 @@ function PlayerGalleryCardActions({
                 <Download />
               </IconButton>
             </Tooltip>
-            <Export
-              name={`${player.name}`}
-              dataType="pc"
-              data={applyPreSaveTransforms(player)}
-            />
           </>
         )}
         <Box sx={{ ml: "auto" }} />
