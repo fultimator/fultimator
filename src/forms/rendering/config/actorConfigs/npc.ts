@@ -78,7 +78,7 @@ const noDefOverride = (s: NpcFormState) =>
   s.derived?.def?.override === undefined &&
   s.derived?.mdef?.override === undefined;
 
-const ATTR_SLIDER = { min: 6, max: 12, step: 2, showMarks: false };
+const ATTR_SLIDER = { min: 6, max: 12, step: 2 };
 
 export const npcFieldConfig: ItemFieldConfig<NpcFormState> = [
   // basics
@@ -147,7 +147,7 @@ export const npcFieldConfig: ItemFieldConfig<NpcFormState> = [
     component: "select",
     group: "basics",
     order: 6,
-    gridSize: { xs: 12, sm: 9 } as unknown as number,
+    gridSize: { xs: 12, sm: 6 } as unknown as number,
     componentProps: { options: VILLAIN_OPTIONS },
     dependencies: notCompanion,
   },
@@ -183,7 +183,7 @@ export const npcFieldConfig: ItemFieldConfig<NpcFormState> = [
     component: "text",
     group: "basics",
     order: 8,
-    fullWidth: true,
+    gridSize: { xs: 12, sm: 6 } as unknown as number,
   },
   {
     key: "sizes",

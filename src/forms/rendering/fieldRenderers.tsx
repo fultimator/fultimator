@@ -892,28 +892,57 @@ export function NpcAttrSliderRenderer({
         { value: 12, label: "d12" },
       ]
     : true;
+  const die = (value as number) ?? min;
 
   return (
-    <Grid container spacing={1} sx={{ pr: 2, alignItems: "center" }}>
-      <Grid size={2}>
-        <InputLabel sx={{ fontSize: "20px", fontWeight: 400 }}>
+    <Box sx={{ display: "flex", alignItems: "center", gap: 1, pr: 0.5 }}>
+      <InputLabel
+        sx={{
+          fontSize: "20px",
+          fontWeight: 400,
+          display: "flex",
+          alignItems: "baseline",
+          gap: 0.5,
+          width: { xs: 78, sm: 92 },
+          flexShrink: 0,
+          whiteSpace: "nowrap",
+        }}
+      >
+        <Box component="span" sx={{ minWidth: "2.2em" }}>
           {t(label)}
-        </InputLabel>
-      </Grid>
-      <Grid size={10}>
-        <FormControl variant="standard" fullWidth>
-          <Slider
-            marks={marks}
-            min={min}
-            max={max}
-            step={step}
-            size="medium"
-            value={(value as number) ?? min}
-            onChange={(_e, v) => onCommit(v)}
-          />
-        </FormControl>
-      </Grid>
-    </Grid>
+        </Box>
+        <Box
+          component="span"
+          sx={{
+            opacity: 0.85,
+            minWidth: "2em",
+            fontVariantNumeric: "tabular-nums",
+          }}
+        >
+          d{die}
+        </Box>
+      </InputLabel>
+      <FormControl
+        variant="standard"
+        sx={{ flex: 1, minWidth: 0, px: 1, boxSizing: "border-box" }}
+      >
+        <Slider
+          marks={marks}
+          min={min}
+          max={max}
+          step={step}
+          size="medium"
+          value={die}
+          onChange={(_e, v) => onCommit(v)}
+          aria-label={t(label)}
+          sx={{
+            "@media (max-width:600px)": {
+              "& .MuiSlider-thumb": { width: 26, height: 26 },
+            },
+          }}
+        />
+      </FormControl>
+    </Box>
   );
 }
 
