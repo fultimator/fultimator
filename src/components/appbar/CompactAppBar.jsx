@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import {
   AppBar as MuiAppBar,
   Grid,
@@ -12,6 +12,7 @@ import {
   ChatBubbleOutlineOutlined as ChatBubbleOutlineIcon,
 } from "@mui/icons-material";
 import MenuOption from "./MenuOption";
+import { AppBarSearchSlotContext } from "./appBarSearchSlot";
 import { useNpc } from "/src/components/shared/actors/npc/context";
 import ExplainSkillsSimplified from "/src/components/shared/actors/npc/editors/ExplainSkillsSimplified";
 import CompendiumViewerModal from "../compendium/LazyCompendiumViewerModal";
@@ -98,8 +99,7 @@ const NpcEditAppBar = ({
 };
 
 const PcEditAppBar = ({
-  //isNpcEdit,
-  //isPcEdit,
+  isGallery,
   selectedTheme,
   selectedStyleProfile,
   handleSelectTheme,
@@ -110,6 +110,7 @@ const PcEditAppBar = ({
   handleNavigation,
   onOpenDrawer,
 }) => {
+  const { setSlot } = useContext(AppBarSearchSlotContext);
   const [modalOpen, setModalOpen] = useState(false);
 
   const openCompendiumModal = () => setModalOpen(true);
@@ -123,7 +124,12 @@ const PcEditAppBar = ({
           sx={{ alignItems: "center", justifyContent: "space-between" }}
         >
           <Grid
-            sx={{ textAlign: "left", display: "flex", alignItems: "center" }}
+            sx={{
+              textAlign: "left",
+              display: "flex",
+              alignItems: "center",
+              flex: { xs: "0 0 auto", sm: "0 0 112px" },
+            }}
           >
             {showGoBackButton && (
               <IconButton color="inherit" onClick={handleNavigation}>
@@ -137,11 +143,23 @@ const PcEditAppBar = ({
             </Tooltip>
           </Grid>
           <Grid sx={{ flex: 1, minWidth: 0, px: 0.5 }}>
-            <Grid container sx={{ justifyContent: "center", minWidth: 0 }}>
-              <span>{t("Character Designer")}</span>
-            </Grid>
+            {isGallery ? (
+              <div
+                ref={setSlot}
+                style={{ width: "100%", maxWidth: 960, margin: "0 auto" }}
+              />
+            ) : (
+              <Grid container sx={{ justifyContent: "center", minWidth: 0 }}>
+                <span>{t("Character Designer")}</span>
+              </Grid>
+            )}
           </Grid>
-          <Grid sx={{ textAlign: "right" }}>
+          <Grid
+            sx={{
+              textAlign: "right",
+              flex: { xs: "0 0 auto", sm: "0 0 112px" },
+            }}
+          >
             <Grid
               container
               sx={{ alignItems: "center", justifyContent: "flex-end" }}

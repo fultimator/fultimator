@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useMemo } from "react";
+import { useState, useRef, useEffect, useMemo, useDeferredValue } from "react";
 import HelpFeedbackDialog from "../../components/appbar/HelpFeedbackDialog";
 import { useDeleteConfirmation } from "../../hooks/useDeleteConfirmation";
 import DeleteConfirmationDialog from "../../components/common/DeleteConfirmationDialog";
@@ -29,12 +29,10 @@ import {
   Skeleton,
   Tooltip,
   Typography,
-  Grid,
   Snackbar,
   Paper,
   TextField,
   Button,
-  InputAdornment,
   Box,
   FormControl,
   InputLabel,
@@ -42,6 +40,7 @@ import {
   MenuItem,
   CircularProgress,
   Collapse,
+  Container,
   ToggleButtonGroup,
   ToggleButton,
   Fab,
@@ -54,6 +53,24 @@ import {
   RadioGroup,
   FormControlLabel,
 } from "@mui/material";
+import MasonryColumns from "../../components/common/MasonryColumns";
+import { usePersistentState } from "../../hooks/usePersistentState";
+import { useAppBarTop } from "../npc-gallery/listPreview/useAppBarTop";
+import MasonryCard from "../npc-gallery/listPreview/MasonryCard";
+import { scrollToCardId } from "../npc-gallery/listPreview/utils";
+import PhoneIphone from "@mui/icons-material/PhoneIphone";
+import TabletMac from "@mui/icons-material/TabletMac";
+import DesktopWindows from "@mui/icons-material/DesktopWindows";
+import MobileListBar from "../npc-gallery/listPreview/MobileListBar";
+import PreviewWidthToggle from "../npc-gallery/listPreview/PreviewWidthToggle";
+import {
+  MASONRY_WIDTHS,
+  MOBILE_LIST_BAR_HEIGHT,
+  SIDEBAR_WIDTH,
+} from "../npc-gallery/listPreview/constants";
+import NpcListPreview from "../npc-gallery/NpcListPreview";
+import NpcListDrawer from "../npc-gallery/NpcListDrawer";
+import AppBarSearch from "../../components/appbar/AppBarSearch";
 import Layout from "../../components/Layout";
 import { SignIn } from "../../components/auth";
 import {
@@ -71,16 +88,22 @@ import {
   HistoryEdu,
   Badge,
   BugReport,
+  ViewQuilt,
+  ViewList,
+  ViewSidebar,
+  UnfoldLess,
+  UnfoldMore,
   ExpandLess,
   ExpandMore,
   Menu as MenuIcon,
+  UploadFile,
+  DeleteSweep,
 } from "@mui/icons-material";
 import StorageIcon from "@mui/icons-material/Storage";
 import CloudIcon from "@mui/icons-material/Cloud";
 import { useTranslate } from "../../translation/translate";
 import PlayerCardGallery from "/src/libs/player/PlayerCardGallery";
 import Export from "../../components/Export";
-import SearchIcon from "@mui/icons-material/Search";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import { validateCharacter } from "../../utility/validateJson";
 import { SUPPORTS_LOCAL_DB, IS_ELECTRON } from "../../platform";
@@ -101,13 +124,23 @@ import {
   normalizeOwnershipForTarget,
 } from "../../libs/exportTransforms";
 
+const toolButtonSx = {
+  width: 36,
+  height: 36,
+  border: 1,
+  borderColor: "divider",
+  borderRadius: 1,
+};
+
 export default function PlayerGallery() {
   const { authLoading, dbMode } = useDatabaseContext();
 
   return (
-    <Layout>
-      {authLoading && <Skeleton />}
-      {!authLoading && <Personal key={dbMode} />}
+    <Layout fullWidth>
+      <Box sx={{ px: { xs: 2, md: 3 } }}>
+        {authLoading && <Skeleton />}
+        {!authLoading && <Personal key={dbMode} />}
+      </Box>
     </Layout>
   );
 }
@@ -131,8 +164,74 @@ function Personal() {
     },
   };
   const [name, setName] = useState("");
+  const deferredName = useDeferredValue(name);
   const [sort, setSort] = useState("name");
   const [direction, setDirection] = useState("ascending");
+  const [layout, setLayout] = usePersistentState(
+    "playerGallery.layout",
+    "masonry",
+  );
+  const [previewSize, setPreviewSize] = usePersistentState(
+    "listPreview.size",
+    "tablet",
+  );
+  const [masonrySize, setMasonrySize] = usePersistentState(
+    "masonry.size",
+    "phone",
+  );
+  const desktop = useMediaQuery("(min-width: 900px)");
+  const [sidebarOpen, setSidebarOpen] = usePersistentState(
+    "playerGallery.sidebar",
+    false,
+  );
+  const [listDrawerOpen, setListDrawerOpen] = useState(false);
+  const [toolsAnchor, setToolsAnchor] = useState(null);
+  const [expandAll, setExpandAll] = usePersistentState(
+    "playerGallery.expandAll",
+    false,
+  );
+  const [highlightId, setHighlightId] = useState(null);
+  const sidebarShifts = desktop && sidebarOpen && layout === "masonry";
+  const appBarHeight = useAppBarTop();
+  const filterWrapRef = useRef(null);
+  const [listTop, setListTop] = useState(appBarHeight + 16);
+
+  useEffect(() => {
+    const el = filterWrapRef.current;
+    if (!el || !desktop) return undefined;
+    const update = () => setListTop(appBarHeight + el.offsetHeight + 4);
+    update();
+    const observer = new window.ResizeObserver(update);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [desktop, appBarHeight]);
+
+  const playerColumns = useMemo(
+    () => [
+      {
+        field: "name",
+        headerName: t("Name"),
+        flex: 2,
+        minWidth: 160,
+        cellClassName: "npc-name-cell",
+      },
+      {
+        field: "lvl",
+        headerName: t("Lvl"),
+        type: "number",
+        width: 72,
+        headerAlign: "left",
+        align: "left",
+      },
+      {
+        field: "classNames",
+        headerName: t("Classes"),
+        flex: 2,
+        minWidth: 140,
+      },
+    ],
+    [t],
+  );
   const [open, setOpen] = useState(false);
   const [isBugDialogOpen, setIsBugDialogOpen] = useState(false);
   const [isCreatePlayerModalOpen, setIsCreatePlayerModalOpen] = useState(false);
@@ -200,6 +299,50 @@ function Personal() {
   }, [db, dbMode, cloudUser]);
   const [personalList, loading, err] = db.useCollectionData(playerQuery);
 
+  const filteredList = useMemo(
+    () =>
+      personalList
+        ? personalList
+            .map(applyPostLoadTransforms)
+            .filter((item) => {
+              if (
+                deferredName !== "" &&
+                !item.name.toLowerCase().includes(deferredName.toLowerCase())
+              )
+                return false;
+              return true;
+            })
+            .sort((item1, item2) => {
+              if (direction === "ascending") {
+                if (sort === "createdAt")
+                  return compareTimestamps(item1.createdAt, item2.createdAt);
+                else if (sort === "updatedAt")
+                  return compareTimestamps(item1.updatedAt, item2.updatedAt);
+                return item1.name.localeCompare(item2.name);
+              } else {
+                if (sort === "createdAt")
+                  return compareTimestamps(item2.createdAt, item1.createdAt);
+                else if (sort === "updatedAt")
+                  return compareTimestamps(item2.updatedAt, item1.updatedAt);
+                return item2.name.localeCompare(item1.name);
+              }
+            })
+        : [],
+    [personalList, deferredName, sort, direction],
+  );
+
+  const gridItems = useMemo(
+    () =>
+      filteredList.map((player) => ({
+        ...player,
+        classNames: (player.classes || [])
+          .filter((c) => c?.name)
+          .map((c) => c.name)
+          .join(", "),
+      })),
+    [filteredList],
+  );
+
   const [snackMsg, setSnackMsg] = useState(null);
 
   // Migration
@@ -222,34 +365,6 @@ function Personal() {
       </Layout>
     );
   }
-
-  const filteredList = personalList
-    ? personalList
-        .map(applyPostLoadTransforms)
-        .filter((item) => {
-          if (
-            name !== "" &&
-            !item.name.toLowerCase().includes(name.toLowerCase())
-          )
-            return false;
-          return true;
-        })
-        .sort((item1, item2) => {
-          if (direction === "ascending") {
-            if (sort === "createdAt")
-              return compareTimestamps(item1.createdAt, item2.createdAt);
-            else if (sort === "updatedAt")
-              return compareTimestamps(item1.updatedAt, item2.updatedAt);
-            return item1.name.localeCompare(item2.name);
-          } else {
-            if (sort === "createdAt")
-              return compareTimestamps(item2.createdAt, item1.createdAt);
-            else if (sort === "updatedAt")
-              return compareTimestamps(item2.updatedAt, item1.updatedAt);
-            return item2.name.localeCompare(item1.name);
-          }
-        })
-    : [];
 
   const addPlayer = async function (
     options = defaultCreatePlayerOptions,
@@ -513,12 +628,11 @@ function Personal() {
     return stampSave(normalized, normalized.createdAt);
   };
 
-  const exportSelectedAsJson = async () => {
-    const selected = filteredList.filter((p) => selectedIds.has(p.id));
-    if (!selected.length) return;
+  const exportPlayersAsZip = async (players, filename) => {
+    if (!players.length) return;
     const zip = new JSZip();
     const uniqueFilename = createUniqueFilenameTracker();
-    selected.forEach((p) => {
+    players.forEach((p) => {
       const canonical = canonicalizeForTransfer("pc", p);
       zip.file(
         `${uniqueFilename(p.name)}.json`,
@@ -526,8 +640,16 @@ function Personal() {
       );
     });
     const content = await zip.generateAsync({ type: "blob" });
-    download(URL.createObjectURL(content), "selected_players.zip");
+    download(URL.createObjectURL(content), filename);
   };
+
+  const exportSelectedAsJson = () =>
+    exportPlayersAsZip(
+      filteredList.filter((p) => selectedIds.has(p.id)),
+      "selected_players.zip",
+    );
+
+  const exportAllAsJson = () => exportPlayersAsZip(filteredList, "players.zip");
 
   const copyPlayerToLocal = (player) => async () => {
     try {
@@ -906,474 +1028,795 @@ function Personal() {
     navigate(path, { state: { from: "/pc-gallery", dbMode } });
   };
 
+  const renderPlayer = (player) => (
+    <Box
+      sx={{
+        marginBottom: "20px",
+        ...(selectMode
+          ? {
+              cursor: "pointer",
+              outline: selectedIds.has(player.id) ? "3px solid" : "1px dashed",
+              outlineColor: selectedIds.has(player.id)
+                ? "primary.main"
+                : "divider",
+              borderRadius: 1,
+            }
+          : {}),
+      }}
+      onClick={selectMode ? () => toggleSelectPlayer(player.id) : undefined}
+    >
+      <PlayerGalleryCardActions
+        player={player}
+        t={t}
+        dbMode={dbMode}
+        handleNavigation={handleNavigation}
+        deletePlayer={deletePlayer}
+        sharePlayer={sharePlayer}
+        copyPlayerToLocal={copyPlayerToLocal}
+        copyPlayerToCloud={copyPlayerToCloud}
+        movePlayerToLocal={movePlayerToLocal}
+        movePlayerToCloud={movePlayerToCloud}
+        expandAll={expandAll}
+      />
+    </Box>
+  );
+
+  const focusCard = (id) => {
+    scrollToCardId(id);
+    setHighlightId(id);
+  };
+
+  const cardScrollMargin = desktop
+    ? listTop
+    : appBarHeight + MOBILE_LIST_BAR_HEIGHT + 8;
+
+  const clearFilters = () => {
+    setName("");
+    setSort("name");
+    setDirection("ascending");
+  };
+
+  const activeFilters = [
+    sort !== "name" && sort,
+    direction !== "ascending" && direction,
+  ].filter(Boolean);
+
+  const filterPanel = (
+    <Box
+      sx={{
+        display: "grid",
+        gridTemplateColumns: {
+          xs: "repeat(2, minmax(0, 1fr))",
+          md: "repeat(2, minmax(0, 1fr)) auto",
+        },
+        alignItems: "center",
+        gap: 1.5,
+      }}
+    >
+      <FormControl fullWidth size="small">
+        <InputLabel id="sort">{t("Sort:")}</InputLabel>
+        <Select
+          labelId="sort"
+          id="select-sort"
+          value={sort}
+          label="Sort:"
+          onChange={(evt) => setSort(evt.target.value)}
+        >
+          <MenuItem value={"name"}>{t("Name")}</MenuItem>
+          <MenuItem value={"createdAt"}>{t("creation_date")}</MenuItem>
+          <MenuItem value={"updatedAt"}>{t("updated_date")}</MenuItem>
+        </Select>
+      </FormControl>
+      <FormControl fullWidth size="small">
+        <InputLabel id="direction">{t("Direction:")}</InputLabel>
+        <Select
+          labelId="direction"
+          id="select-direction"
+          value={direction}
+          label="direction:"
+          onChange={(evt) => setDirection(evt.target.value)}
+        >
+          <MenuItem value={"ascending"}>{t("Ascending")}</MenuItem>
+          <MenuItem value={"descending"}>{t("Descending")}</MenuItem>
+        </Select>
+      </FormControl>
+      <Button
+        variant="outlined"
+        color="warning"
+        startIcon={<DeleteSweep />}
+        disabled={!activeFilters.length && !name}
+        onClick={clearFilters}
+        sx={{ gridColumn: { xs: "1 / -1", md: "auto" } }}
+      >
+        {t("clear_search_filters")}
+      </Button>
+    </Box>
+  );
+
+  const listToggle = (sx) =>
+    layout === "masonry" && (
+      <Tooltip title={t("Players")}>
+        <IconButton
+          aria-label={t("Players")}
+          aria-pressed={desktop && sidebarOpen}
+          color={desktop && sidebarOpen ? "primary" : "default"}
+          sx={{
+            ...toolButtonSx,
+            ...(desktop &&
+              sidebarOpen && {
+                bgcolor: "action.selected",
+                borderColor: "primary.main",
+              }),
+            ...sx,
+          }}
+          onClick={() =>
+            desktop ? setSidebarOpen(!sidebarOpen) : setListDrawerOpen(true)
+          }
+        >
+          <ViewList />
+        </IconButton>
+      </Tooltip>
+    );
+
   return (
     <>
-      <div style={{ display: "flex", alignItems: "center", marginBottom: 20 }}>
-        <Paper sx={{ width: "100%", px: 2, py: 1 }}>
-          {/* Zone 1: Filters */}
-          <Grid container spacing={1} sx={{ alignItems: "center" }}>
-            <Grid
-              size={{
-                xs: 12,
-                sm: "grow",
-              }}
-            >
-              <TextField
-                label={t("Search by Player Name")}
-                variant="outlined"
-                size="small"
-                fullWidth
-                value={name}
-                onChange={(evt) => {
-                  setName(evt.target.value);
-                }}
-                slotProps={{
-                  input: {
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <SearchIcon />
-                      </InputAdornment>
-                    ),
-                  },
-
-                  htmlInput: { maxLength: 50 },
-                }}
-              />
-            </Grid>
-            <Grid
-              sx={{ minWidth: 160 }}
-              size={{
-                xs: 12,
-                sm: "auto",
-              }}
-            >
-              <FormControl fullWidth size="small">
-                <InputLabel id="sort">{t("Sort:")}</InputLabel>
-                <Select
-                  labelId="sort"
-                  id="select-sort"
-                  value={sort}
-                  label="Sort:"
-                  onChange={(evt) => {
-                    setSort(evt.target.value);
-                  }}
-                >
-                  <MenuItem value={"name"}>{t("Name")}</MenuItem>
-                  <MenuItem value={"createdAt"}>{t("creation_date")}</MenuItem>
-                  <MenuItem value={"updatedAt"}>{t("updated_date")}</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid
-              sx={{ minWidth: 160 }}
-              size={{
-                xs: 12,
-                sm: "auto",
-              }}
-            >
-              <FormControl fullWidth size="small">
-                <InputLabel id="direction">{t("Direction:")}</InputLabel>
-                <Select
-                  labelId="direction"
-                  id="select-direction"
-                  value={direction}
-                  label="direction:"
-                  onChange={(evt) => {
-                    setDirection(evt.target.value);
-                  }}
-                >
-                  <MenuItem value={"ascending"}>{t("Ascending")}</MenuItem>
-                  <MenuItem value={"descending"}>{t("Descending")}</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-          </Grid>
-
-          <Divider sx={{ my: 0.75 }} />
-
-          {/* Actions + Status (single row) */}
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              flexWrap: "wrap",
-              gap: 1,
-            }}
-          >
-            <Button
-              variant="contained"
-              startIcon={<HistoryEdu />}
-              onClick={handleOpenCreatePlayerModal}
-              disabled={dbMode === "cloud" && !cloudUser}
-            >
-              {t("create_pc")}
-            </Button>
-            {SUPPORTS_LOCAL_DB && (
-              <ToggleButtonGroup
-                value={dbMode}
-                exclusive
-                onChange={(_, val) => {
-                  if (val !== null) requestModeSwitch(val);
-                }}
-                size="small"
-              >
-                <ToggleButton value="local">
-                  <StorageIcon sx={{ mr: 0.5 }} fontSize="small" />
-                  {t("Local")}
-                </ToggleButton>
-                <ToggleButton value="cloud">
-                  <CloudIcon sx={{ mr: 0.5 }} fontSize="small" />
-                  {t("Cloud")}
-                </ToggleButton>
-              </ToggleButtonGroup>
-            )}
-            {dbMode === "local" && <DriveSync />}
-            <Box sx={{ flex: 1 }} />
-            <Button
-              variant="outlined"
-              size="small"
-              onClick={() => fileInputRef.current.click()}
-            >
-              {t("Add PC from JSON")}
-            </Button>
-            <Tooltip title={t("Add PC from Clipboard")}>
-              <IconButton size="small" onClick={handlePastePlayer}>
-                <ContentPaste />
-              </IconButton>
-            </Tooltip>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".json"
-              onChange={(e) => {
-                const file = e.target.files[0];
-                if (file) {
-                  const reader = new FileReader();
-                  reader.onload = () => {
-                    try {
-                      const result = JSON.parse(reader.result);
-                      handleFileUpload(result);
-                    } catch (err) {
-                      console.error("Error parsing JSON:", err);
-                    }
-                  };
-                  reader.readAsText(file);
-                }
-              }}
-              style={{ display: "none" }}
-            />
-            <Divider orientation="vertical" flexItem />
-            <Typography
-              variant="body1"
-              sx={{
-                fontWeight: 600,
-              }}
-            >
-              {filteredList?.length ?? 0} {t("Players")}
-            </Typography>
-            {stalePlayers.length > 0 && (
-              <Tooltip title={t("Some players need a data migration")}>
-                <Button
-                  variant="outlined"
-                  size="small"
-                  color="warning"
-                  startIcon={<SystemUpdateAltIcon />}
-                  onClick={() => setMigrationDialogOpen(true)}
-                >
-                  {t("Migrate")} ({stalePlayers.length})
-                </Button>
-              </Tooltip>
-            )}
-            <Tooltip
-              title={selectMode ? t("Exit Select Mode") : t("Select Players")}
-            >
-              <Button
-                variant={selectMode ? "contained" : "outlined"}
-                size="small"
-                startIcon={<LibraryAddCheck />}
-                onClick={toggleSelectMode}
-              >
-                {t("Select")}
-              </Button>
-            </Tooltip>
-          </Box>
-
-          {/* Select mode sub-bar */}
-          <Collapse in={selectMode}>
+      <AppBarSearch
+        value={name}
+        onChange={setName}
+        placeholder={t("Search by Player Name")}
+        maxLength={50}
+        chips={activeFilters}
+        panel={filterPanel}
+      />
+      <Box
+        ref={filterWrapRef}
+        sx={{
+          mb: 2.5,
+          position: { md: "sticky" },
+          top: { md: appBarHeight },
+          zIndex: 2,
+          mx: { md: -3 },
+          mt: { md: `calc(${appBarHeight}px - 4.5em)` },
+          pl: sidebarShifts
+            ? `clamp(0px, calc(1200px + 2 * ${SIDEBAR_WIDTH} - 100vw), ${SIDEBAR_WIDTH})`
+            : 0,
+          transition: "padding-left 0.2s ease",
+        }}
+      >
+        <Paper
+          square={desktop}
+          elevation={desktop ? 3 : 1}
+          sx={{
+            px: { xs: 2, md: 0 },
+            py: 1,
+            backgroundImage: "none",
+            backgroundColor: (theme) => theme.palette.background.paper,
+          }}
+        >
+          <Container disableGutters={!desktop}>
             <Box
               sx={{
                 display: "flex",
                 alignItems: "center",
                 flexWrap: "wrap",
-                gap: 1,
-                mt: 0.75,
-                pt: 0.75,
-                borderTop: 1,
-                borderColor: "divider",
+                gap: 1.5,
+                rowGap: 1,
+                "& .MuiToggleButton-root, & .MuiButton-root:not(.MuiToggleButton-root)":
+                  { height: 36 },
               }}
             >
-              <Typography
-                variant="body2"
+              {listToggle({ display: { xs: "none", md: "inline-flex" } })}
+              <Button
+                variant="contained"
+                startIcon={<HistoryEdu />}
+                onClick={handleOpenCreatePlayerModal}
+                disabled={dbMode === "cloud" && !cloudUser}
                 sx={{
-                  color: "text.secondary",
+                  flex: { xs: "1 1 100%", md: "none" },
+                  order: { xs: 1, md: 0 },
+                  whiteSpace: "nowrap",
                 }}
               >
-                {selectedIds.size} {t("selected")}
-              </Typography>
-              <Box sx={{ flex: 1 }} />
-              <Button
-                size="small"
-                variant="outlined"
-                onClick={(e) => setCopyAnchor(e.currentTarget)}
-                startIcon={<FileCopy />}
-              >
-                {t("Copy")}
+                {t("create_pc")}
               </Button>
-              <MuiMenu
-                anchorEl={copyAnchor}
-                open={Boolean(copyAnchor)}
-                onClose={() => setCopyAnchor(null)}
+              {SUPPORTS_LOCAL_DB && (
+                <ToggleButtonGroup
+                  value={dbMode}
+                  exclusive
+                  onChange={(_, val) => {
+                    if (val !== null) requestModeSwitch(val);
+                  }}
+                  size="small"
+                  sx={{
+                    flex: { xs: 1, md: "none" },
+                    order: { xs: 2, md: 0 },
+                    "& .MuiToggleButton-root": {
+                      flex: { xs: 1, md: "none" },
+                    },
+                  }}
+                >
+                  <ToggleButton value="local">
+                    <StorageIcon sx={{ mr: 0.5 }} fontSize="small" />
+                    {t("Local")}
+                  </ToggleButton>
+                  <ToggleButton value="cloud">
+                    <CloudIcon sx={{ mr: 0.5 }} fontSize="small" />
+                    {t("Cloud")}
+                  </ToggleButton>
+                </ToggleButtonGroup>
+              )}
+              {dbMode === "local" && (
+                <Box sx={{ order: { xs: 3, md: 0 } }}>
+                  <DriveSync />
+                </Box>
+              )}
+              <Box sx={{ flex: 1, display: { xs: "none", md: "block" } }} />
+
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 0.75,
+                  order: { xs: 4, md: 0 },
+                }}
               >
-                <MenuItem
-                  disabled={selectedIds.size === 0}
-                  onClick={() => {
-                    setCopyAnchor(null);
-                    copySelectedToLocal();
-                  }}
+                {listToggle({ display: { md: "none" } })}
+                <Tooltip title={t("More actions")}>
+                  <IconButton
+                    aria-label={t("More actions")}
+                    aria-haspopup="menu"
+                    sx={toolButtonSx}
+                    onClick={(e) => setToolsAnchor(e.currentTarget)}
+                  >
+                    <MenuIcon />
+                  </IconButton>
+                </Tooltip>
+                <MuiMenu
+                  anchorEl={toolsAnchor}
+                  open={Boolean(toolsAnchor)}
+                  onClose={() => setToolsAnchor(null)}
                 >
-                  <ListItemIcon>
-                    <StorageIcon fontSize="small" />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={`${t("Copy Selected to Local")} (${selectedIds.size})`}
-                  />
-                </MenuItem>
-                <MenuItem
-                  disabled={selectedIds.size === 0 || !cloudUser}
-                  onClick={() => {
-                    setCopyAnchor(null);
-                    copySelectedToCloud();
+                  <MenuItem
+                    onClick={() => {
+                      setToolsAnchor(null);
+                      fileInputRef.current.click();
+                    }}
+                  >
+                    <ListItemIcon>
+                      <UploadFile />
+                    </ListItemIcon>
+                    {t("Add PC from JSON")}
+                  </MenuItem>
+                  <MenuItem
+                    onClick={() => {
+                      setToolsAnchor(null);
+                      handlePastePlayer();
+                    }}
+                  >
+                    <ListItemIcon>
+                      <ContentPaste />
+                    </ListItemIcon>
+                    {t("Add PC from Clipboard")}
+                  </MenuItem>
+                  <MenuItem
+                    disabled={!filteredList.length}
+                    onClick={() => {
+                      setToolsAnchor(null);
+                      exportAllAsJson();
+                    }}
+                  >
+                    <ListItemIcon>
+                      <Download />
+                    </ListItemIcon>
+                    {t("Export all")}
+                  </MenuItem>
+                  <MenuItem
+                    onClick={() => {
+                      setToolsAnchor(null);
+                      setExpandAll(!expandAll);
+                    }}
+                  >
+                    <ListItemIcon>
+                      {expandAll ? <UnfoldLess /> : <UnfoldMore />}
+                    </ListItemIcon>
+                    {expandAll ? t("Collapse Details") : t("Expand Details")}
+                  </MenuItem>
+                  <Divider />
+                  {[
+                    ["masonry", "Masonry", <ViewQuilt key="m" />],
+                    ["list", "List + preview", <ViewSidebar key="l" />],
+                  ].map(([value, label, icon]) => (
+                    <MenuItem
+                      key={value}
+                      selected={layout === value}
+                      onClick={() => {
+                        setToolsAnchor(null);
+                        setLayout(value);
+                      }}
+                    >
+                      <ListItemIcon>{icon}</ListItemIcon>
+                      {label}
+                    </MenuItem>
+                  ))}
+                  {desktop && <Divider />}
+                  {desktop &&
+                    [
+                      ["phone", "Phone", <PhoneIphone key="p" />],
+                      ["tablet", "Tablet", <TabletMac key="t" />],
+                      ["desktop", "Full width", <DesktopWindows key="d" />],
+                    ].map(([value, label, icon]) => {
+                      const current =
+                        layout === "list" ? previewSize : masonrySize;
+                      return (
+                        <MenuItem
+                          key={value}
+                          selected={current === value}
+                          onClick={() => {
+                            setToolsAnchor(null);
+                            (layout === "list"
+                              ? setPreviewSize
+                              : setMasonrySize)(value);
+                          }}
+                        >
+                          <ListItemIcon>{icon}</ListItemIcon>
+                          {label}
+                        </MenuItem>
+                      );
+                    })}
+                </MuiMenu>
+                <Tooltip title={t("Add PC from JSON")}>
+                  <IconButton
+                    aria-label={t("Add PC from JSON")}
+                    sx={toolButtonSx}
+                    onClick={() => fileInputRef.current.click()}
+                  >
+                    <UploadFile />
+                  </IconButton>
+                </Tooltip>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".json"
+                  onChange={(e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                      const reader = new FileReader();
+                      reader.onload = () => {
+                        try {
+                          const result = JSON.parse(reader.result);
+                          handleFileUpload(result);
+                        } catch (err) {
+                          console.error("Error parsing JSON:", err);
+                        }
+                      };
+                      reader.readAsText(file);
+                    }
                   }}
+                  style={{ display: "none" }}
+                />
+                <Tooltip title={t("Add PC from Clipboard")}>
+                  <IconButton
+                    aria-label={t("Add PC from Clipboard")}
+                    sx={toolButtonSx}
+                    onClick={handlePastePlayer}
+                  >
+                    <ContentPaste />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title={t("Export all")}>
+                  <span>
+                    <IconButton
+                      aria-label={t("Export all")}
+                      sx={toolButtonSx}
+                      disabled={!filteredList.length}
+                      onClick={exportAllAsJson}
+                    >
+                      <Download />
+                    </IconButton>
+                  </span>
+                </Tooltip>
+                <Tooltip
+                  title={
+                    expandAll ? t("Collapse Details") : t("Expand Details")
+                  }
                 >
-                  <ListItemIcon>
-                    <CloudIcon fontSize="small" />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={`${t("Copy Selected to Cloud")} (${selectedIds.size})`}
-                  />
-                </MenuItem>
-                <Divider />
-                <MenuItem
-                  onClick={() => {
-                    setCopyAnchor(null);
-                    copyAllToLocal();
-                  }}
-                >
-                  <ListItemIcon>
-                    <StorageIcon fontSize="small" />
-                  </ListItemIcon>
-                  <ListItemText primary={t("Copy All to Local")} />
-                </MenuItem>
-                <MenuItem
-                  disabled={!cloudUser}
-                  onClick={() => {
-                    setCopyAnchor(null);
-                    copyAllToCloud();
-                  }}
-                >
-                  <ListItemIcon>
-                    <CloudIcon fontSize="small" />
-                  </ListItemIcon>
-                  <ListItemText primary={t("Copy All to Cloud")} />
-                </MenuItem>
-              </MuiMenu>
-              <Button
+                  <IconButton
+                    aria-label={
+                      expandAll ? t("Collapse Details") : t("Expand Details")
+                    }
+                    sx={toolButtonSx}
+                    onClick={() => setExpandAll(!expandAll)}
+                  >
+                    {expandAll ? <UnfoldLess /> : <UnfoldMore />}
+                  </IconButton>
+                </Tooltip>
+              </Box>
+
+              <Divider
+                orientation="vertical"
+                flexItem
+                sx={{ display: { xs: "none", md: "block" } }}
+              />
+              <ToggleButtonGroup
                 size="small"
-                variant="outlined"
-                onClick={(e) => setMoveAnchor(e.currentTarget)}
-                startIcon={<DriveFileMove />}
+                exclusive
+                sx={{ order: { xs: 4, md: 0 } }}
+                value={layout}
+                onChange={(_, value) => value && setLayout(value)}
+                aria-label="Layout"
               >
-                {t("Move")}
-              </Button>
-              <MuiMenu
-                anchorEl={moveAnchor}
-                open={Boolean(moveAnchor)}
-                onClose={() => setMoveAnchor(null)}
-              >
-                <MenuItem
-                  disabled={selectedIds.size === 0}
-                  onClick={() => {
-                    setMoveAnchor(null);
-                    moveSelectedToLocal();
-                  }}
-                >
-                  <ListItemIcon>
-                    <StorageIcon fontSize="small" />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={`${t("Move Selected to Local")} (${selectedIds.size})`}
+                <ToggleButton value="masonry" aria-label="Masonry layout">
+                  <Tooltip title="Masonry">
+                    <ViewQuilt fontSize="small" />
+                  </Tooltip>
+                </ToggleButton>
+                <ToggleButton value="list" aria-label="List and preview layout">
+                  <Tooltip title="List + preview">
+                    <ViewSidebar fontSize="small" />
+                  </Tooltip>
+                </ToggleButton>
+              </ToggleButtonGroup>
+              {desktop && (
+                <>
+                  <Divider orientation="vertical" flexItem />
+                  <PreviewWidthToggle
+                    value={layout === "list" ? previewSize : masonrySize}
+                    onChange={
+                      layout === "list" ? setPreviewSize : setMasonrySize
+                    }
                   />
-                </MenuItem>
-                <MenuItem
-                  disabled={selectedIds.size === 0 || !cloudUser}
-                  onClick={() => {
-                    setMoveAnchor(null);
-                    moveSelectedToCloud();
-                  }}
-                >
-                  <ListItemIcon>
-                    <CloudIcon fontSize="small" />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={`${t("Move Selected to Cloud")} (${selectedIds.size})`}
-                  />
-                </MenuItem>
-                <Divider />
-                <MenuItem
-                  onClick={() => {
-                    setMoveAnchor(null);
-                    moveAllToLocal();
-                  }}
-                >
-                  <ListItemIcon>
-                    <StorageIcon fontSize="small" />
-                  </ListItemIcon>
-                  <ListItemText primary={t("Move All to Local")} />
-                </MenuItem>
-                <MenuItem
-                  disabled={!cloudUser}
-                  onClick={() => {
-                    setMoveAnchor(null);
-                    moveAllToCloud();
-                  }}
-                >
-                  <ListItemIcon>
-                    <CloudIcon fontSize="small" />
-                  </ListItemIcon>
-                  <ListItemText primary={t("Move All to Cloud")} />
-                </MenuItem>
-              </MuiMenu>
-              <Tooltip
-                title={`${t("Export Selected as JSON")} (${selectedIds.size})`}
+                </>
+              )}
+
+              <Divider
+                orientation="vertical"
+                flexItem
+                sx={{ display: { xs: "none", md: "block" } }}
+              />
+
+              <Box
+                sx={{
+                  display: { xs: "flex", md: "contents" },
+                  alignItems: "center",
+                  gap: 1.5,
+                  flex: "1 1 100%",
+                  order: { xs: 5, md: 0 },
+                }}
               >
-                <span>
-                  <IconButton
-                    onClick={exportSelectedAsJson}
-                    disabled={selectedIds.size === 0}
-                  >
-                    <Download />
-                  </IconButton>
-                </span>
-              </Tooltip>
-              <Tooltip title={`${t("Delete Selected")} (${selectedIds.size})`}>
-                <span>
-                  <IconButton
-                    onClick={deleteSelected}
-                    disabled={selectedIds.size === 0}
-                    color="error"
-                  >
-                    <Delete />
-                  </IconButton>
-                </span>
-              </Tooltip>
-            </Box>
-          </Collapse>
-        </Paper>
-      </div>
-      {!cloudUser && (
-        <Paper
-          elevation={dbMode === "cloud" ? 3 : 0}
-          variant={dbMode === "cloud" ? "elevation" : "outlined"}
-          sx={{
-            p: 2,
-            mb: 2,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 2,
-            flexWrap: "wrap",
-          }}
-        >
-          <CloudIcon color={dbMode === "cloud" ? "primary" : "disabled"} />
-          <Typography
-            variant="body2"
-            color={dbMode === "cloud" ? "text.primary" : "text.secondary"}
-            sx={{ flex: 1, minWidth: 200 }}
-          >
-            {dbMode === "cloud"
-              ? t("You have to be logged in to access this feature")
-              : t(
-                  "Have a Google account? Sign in to sync your data between devices",
+                <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                  {filteredList?.length ?? 0} {t("Players")}
+                </Typography>
+                {stalePlayers.length > 0 && (
+                  <Tooltip title={t("Some players need a data migration")}>
+                    <Button
+                      variant="outlined"
+                      color="warning"
+                      startIcon={<SystemUpdateAltIcon />}
+                      onClick={() => setMigrationDialogOpen(true)}
+                    >
+                      {t("Migrate")} ({stalePlayers.length})
+                    </Button>
+                  </Tooltip>
                 )}
-          </Typography>
-          <SignIn />
+                <Tooltip
+                  title={
+                    selectMode ? t("Exit Select Mode") : t("Select Players")
+                  }
+                >
+                  <Button
+                    variant={selectMode ? "contained" : "outlined"}
+                    startIcon={<LibraryAddCheck />}
+                    onClick={toggleSelectMode}
+                    sx={{ ml: { xs: "auto", md: 0 } }}
+                  >
+                    {t("Select")}
+                  </Button>
+                </Tooltip>
+              </Box>
+            </Box>
+
+            {/* Select mode sub-bar */}
+            <Collapse in={selectMode}>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  flexWrap: "wrap",
+                  gap: 1,
+                  mt: 0.75,
+                  pt: 0.75,
+                  borderTop: 1,
+                  borderColor: "divider",
+                }}
+              >
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: "text.secondary",
+                  }}
+                >
+                  {selectedIds.size} {t("selected")}
+                </Typography>
+                <Box sx={{ flex: 1 }} />
+                <Button
+                  size="small"
+                  variant="outlined"
+                  onClick={(e) => setCopyAnchor(e.currentTarget)}
+                  startIcon={<FileCopy />}
+                >
+                  {t("Copy")}
+                </Button>
+                <MuiMenu
+                  anchorEl={copyAnchor}
+                  open={Boolean(copyAnchor)}
+                  onClose={() => setCopyAnchor(null)}
+                >
+                  <MenuItem
+                    disabled={selectedIds.size === 0}
+                    onClick={() => {
+                      setCopyAnchor(null);
+                      copySelectedToLocal();
+                    }}
+                  >
+                    <ListItemIcon>
+                      <StorageIcon fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={`${t("Copy Selected to Local")} (${selectedIds.size})`}
+                    />
+                  </MenuItem>
+                  <MenuItem
+                    disabled={selectedIds.size === 0 || !cloudUser}
+                    onClick={() => {
+                      setCopyAnchor(null);
+                      copySelectedToCloud();
+                    }}
+                  >
+                    <ListItemIcon>
+                      <CloudIcon fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={`${t("Copy Selected to Cloud")} (${selectedIds.size})`}
+                    />
+                  </MenuItem>
+                  <Divider />
+                  <MenuItem
+                    onClick={() => {
+                      setCopyAnchor(null);
+                      copyAllToLocal();
+                    }}
+                  >
+                    <ListItemIcon>
+                      <StorageIcon fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText primary={t("Copy All to Local")} />
+                  </MenuItem>
+                  <MenuItem
+                    disabled={!cloudUser}
+                    onClick={() => {
+                      setCopyAnchor(null);
+                      copyAllToCloud();
+                    }}
+                  >
+                    <ListItemIcon>
+                      <CloudIcon fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText primary={t("Copy All to Cloud")} />
+                  </MenuItem>
+                </MuiMenu>
+                <Button
+                  size="small"
+                  variant="outlined"
+                  onClick={(e) => setMoveAnchor(e.currentTarget)}
+                  startIcon={<DriveFileMove />}
+                >
+                  {t("Move")}
+                </Button>
+                <MuiMenu
+                  anchorEl={moveAnchor}
+                  open={Boolean(moveAnchor)}
+                  onClose={() => setMoveAnchor(null)}
+                >
+                  <MenuItem
+                    disabled={selectedIds.size === 0}
+                    onClick={() => {
+                      setMoveAnchor(null);
+                      moveSelectedToLocal();
+                    }}
+                  >
+                    <ListItemIcon>
+                      <StorageIcon fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={`${t("Move Selected to Local")} (${selectedIds.size})`}
+                    />
+                  </MenuItem>
+                  <MenuItem
+                    disabled={selectedIds.size === 0 || !cloudUser}
+                    onClick={() => {
+                      setMoveAnchor(null);
+                      moveSelectedToCloud();
+                    }}
+                  >
+                    <ListItemIcon>
+                      <CloudIcon fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={`${t("Move Selected to Cloud")} (${selectedIds.size})`}
+                    />
+                  </MenuItem>
+                  <Divider />
+                  <MenuItem
+                    onClick={() => {
+                      setMoveAnchor(null);
+                      moveAllToLocal();
+                    }}
+                  >
+                    <ListItemIcon>
+                      <StorageIcon fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText primary={t("Move All to Local")} />
+                  </MenuItem>
+                  <MenuItem
+                    disabled={!cloudUser}
+                    onClick={() => {
+                      setMoveAnchor(null);
+                      moveAllToCloud();
+                    }}
+                  >
+                    <ListItemIcon>
+                      <CloudIcon fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText primary={t("Move All to Cloud")} />
+                  </MenuItem>
+                </MuiMenu>
+                <Tooltip
+                  title={`${t("Export Selected as JSON")} (${selectedIds.size})`}
+                >
+                  <span>
+                    <IconButton
+                      onClick={exportSelectedAsJson}
+                      disabled={selectedIds.size === 0}
+                    >
+                      <Download />
+                    </IconButton>
+                  </span>
+                </Tooltip>
+                <Tooltip
+                  title={`${t("Delete Selected")} (${selectedIds.size})`}
+                >
+                  <span>
+                    <IconButton
+                      onClick={deleteSelected}
+                      disabled={selectedIds.size === 0}
+                      color="error"
+                    >
+                      <Delete />
+                    </IconButton>
+                  </span>
+                </Tooltip>
+              </Box>
+            </Collapse>
+          </Container>
         </Paper>
-      )}
-      {loading && (dbMode !== "cloud" || cloudUser) && (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            marginBottom: 50,
-          }}
-        >
-          <CircularProgress />
-        </div>
-      )}
-      <Grid container spacing={1} sx={{ py: 1 }}>
-        {filteredList.map((player) => (
-          <Grid
-            key={player.id}
+      </Box>
+      <Box
+        sx={{
+          display: layout === "list" ? "contents" : "block",
+          ml: sidebarShifts ? SIDEBAR_WIDTH : 0,
+          transition: "margin-left 0.2s ease",
+        }}
+      >
+        {!cloudUser && (
+          <Paper
+            elevation={dbMode === "cloud" ? 3 : 0}
+            variant={dbMode === "cloud" ? "elevation" : "outlined"}
             sx={{
+              p: 2,
+              mb: 2,
+              display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              marginBottom: "20px",
-              ...(selectMode
-                ? {
-                    cursor: "pointer",
-                    outline: selectedIds.has(player.id)
-                      ? "3px solid"
-                      : "1px dashed",
-                    outlineColor: selectedIds.has(player.id)
-                      ? "primary.main"
-                      : "divider",
-                    borderRadius: 1,
-                  }
-                : {}),
-            }}
-            onClick={
-              selectMode ? () => toggleSelectPlayer(player.id) : undefined
-            }
-            size={{
-              xs: 12,
-              md: 6,
+              gap: 2,
+              flexWrap: "wrap",
             }}
           >
-            <PlayerGalleryCardActions
-              player={player}
-              t={t}
-              dbMode={dbMode}
-              handleNavigation={handleNavigation}
-              deletePlayer={deletePlayer}
-              sharePlayer={sharePlayer}
-              copyPlayerToLocal={copyPlayerToLocal}
-              copyPlayerToCloud={copyPlayerToCloud}
-              movePlayerToLocal={movePlayerToLocal}
-              movePlayerToCloud={movePlayerToCloud}
-            />
-          </Grid>
-        ))}
-        <Grid size={12}>
-          <Button
-            variant="outlined"
-            startIcon={<BugReport />}
-            sx={{ marginTop: "5rem" }}
-            onClick={() => setIsBugDialogOpen(true)}
+            <CloudIcon color={dbMode === "cloud" ? "primary" : "disabled"} />
+            <Typography
+              variant="body2"
+              color={dbMode === "cloud" ? "text.primary" : "text.secondary"}
+              sx={{ flex: 1, minWidth: 200 }}
+            >
+              {dbMode === "cloud"
+                ? t("You have to be logged in to access this feature")
+                : t(
+                    "Have a Google account? Sign in to sync your data between devices",
+                  )}
+            </Typography>
+            <SignIn />
+          </Paper>
+        )}
+        {loading && (dbMode !== "cloud" || cloudUser) && (
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              marginBottom: 50,
+            }}
           >
-            {t("Report a Bug")}
-          </Button>
-        </Grid>
-      </Grid>
+            <CircularProgress />
+          </div>
+        )}
+        {layout === "list" ? (
+          <NpcListPreview
+            items={gridItems}
+            columns={playerColumns}
+            title={t("Players")}
+            emptyText={t("No players match your filters.")}
+            selectMode={selectMode}
+            selectedIds={selectedIds}
+            onSelectionChange={setSelectedIds}
+            stickyTop={listTop}
+            previewSize={previewSize}
+            renderCard={renderPlayer}
+          />
+        ) : (
+          <>
+            {!desktop && (
+              <MobileListBar
+                top={appBarHeight}
+                title={t("Players")}
+                currentName={
+                  filteredList.find((p) => p.id === highlightId)?.name
+                }
+                currentIndex={
+                  filteredList.findIndex((p) => p.id === highlightId) + 1
+                }
+                count={filteredList.length}
+                onOpen={() => setListDrawerOpen(true)}
+              />
+            )}
+            <MasonryColumns columnWidth={MASONRY_WIDTHS[masonrySize]}>
+              {filteredList.map((player) => (
+                <MasonryCard
+                  key={player.id}
+                  id={player.id}
+                  active={highlightId === player.id}
+                  scrollMarginTop={cardScrollMargin}
+                >
+                  {renderPlayer(player)}
+                </MasonryCard>
+              ))}
+            </MasonryColumns>
+          </>
+        )}
+      </Box>
+      {layout === "masonry" && (
+        <NpcListDrawer
+          persistent={desktop}
+          top={appBarHeight}
+          open={desktop ? sidebarOpen : listDrawerOpen}
+          onClose={() =>
+            desktop ? setSidebarOpen(false) : setListDrawerOpen(false)
+          }
+          items={gridItems}
+          columns={playerColumns}
+          title={t("Players")}
+          selectMode={selectMode}
+          selectedIds={selectedIds}
+          onSelectionChange={setSelectedIds}
+          activeId={highlightId}
+          onSelect={focusCard}
+        />
+      )}
+      <Button
+        variant="outlined"
+        startIcon={<BugReport />}
+        sx={{ marginTop: "5rem" }}
+        onClick={() => setIsBugDialogOpen(true)}
+      >
+        {t("Report a Bug")}
+      </Button>
       <Box sx={{ height: "10vh" }} />
       <MigrationDialog
         open={migrationDialogOpen}
@@ -1742,9 +2185,14 @@ function PlayerGalleryCardActions({
   copyPlayerToCloud,
   movePlayerToLocal,
   movePlayerToCloud,
+  expandAll,
 }) {
   const cardRef = useRef(null);
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(expandAll);
+
+  useEffect(() => {
+    setExpanded(expandAll);
+  }, [expandAll]);
   const [actionsAnchor, setActionsAnchor] = useState(null);
   const [actionsSubmenu, setActionsSubmenu] = useState(null); // "export" | "transfer" | null
   const [localShareSnackbarOpen, setLocalShareSnackbarOpen] = useState(false);

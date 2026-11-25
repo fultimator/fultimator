@@ -54,6 +54,7 @@
     "@libpdf/core": "^0.5.3",
     "@mui/icons-material": "^9.5.0",
     "@mui/material": "^9.5.0",
+    "@mui/x-data-grid": "^9.18.0",
     "@supabase/supabase-js": "^2.119.2",
     "axios": "^1.21.1",
     "buffer": "^6.0.3",

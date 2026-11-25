@@ -7,13 +7,15 @@ import {
   DialogContentText,
   DialogTitle,
   CircularProgress,
+  IconButton,
+  Tooltip,
 } from "@mui/material";
 import JSZip from "jszip";
 import useDownload from "../../hooks/useDownload";
 import { useTranslate } from "../../translation/translate";
 import { Download } from "@mui/icons-material";
 
-function ExportAllNPCs({ npcs }) {
+function ExportAllNPCs({ npcs, size, iconOnly, sx, buttonRef }) {
   const [open, setOpen] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [download] = useDownload();
@@ -41,16 +43,33 @@ function ExportAllNPCs({ npcs }) {
 
   return (
     <>
-      <Button
-        variant="outlined"
-        color="primary"
-        onClick={handleOpen}
-        fullWidth
-        disabled={!npcs || npcs.length === 0}
-        startIcon={<Download />}
-      >
-        {t("export_npcs_button")}
-      </Button>
+      {iconOnly ? (
+        <Tooltip title={t("export_npcs_button")}>
+          <span>
+            <IconButton
+              ref={buttonRef}
+              onClick={handleOpen}
+              disabled={!npcs || npcs.length === 0}
+              aria-label={t("export_npcs_button")}
+              sx={sx}
+            >
+              <Download />
+            </IconButton>
+          </span>
+        </Tooltip>
+      ) : (
+        <Button
+          variant="outlined"
+          color="primary"
+          size={size}
+          onClick={handleOpen}
+          fullWidth
+          disabled={!npcs || npcs.length === 0}
+          startIcon={<Download />}
+        >
+          {t("export_npcs_button")}
+        </Button>
+      )}
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle variant="h3">
           {t("export_all_npcs_dialog_title")}

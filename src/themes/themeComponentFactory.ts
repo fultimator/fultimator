@@ -1291,7 +1291,8 @@ export function createThemeComponents({
               ? `linear-gradient(180deg, ${secondary}, ${primary}, ${ternary})`
               : `linear-gradient(180deg, ${alpha(secondary, isDark ? 0.95 : 0.9)}, ${alpha(primary, isDark ? 1 : 0.95)})`;
           return {
-            background,
+            backgroundColor: primary,
+            backgroundImage: background,
             borderBottom: `1px solid ${alpha(quaternary, isDark ? 0.8 : 0.5)}`,
             boxShadow: tokens.paperShadow,
             ...(shouldApplyTextEffectColor

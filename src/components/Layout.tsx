@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Container, Box, useMediaQuery } from "@mui/material";
 import { useLocation, useNavigate } from "react-router";
 import AppBar from "./appbar/AppBar";
@@ -10,6 +10,7 @@ import { ChatToastOverlay } from "./chat/ChatToastOverlay";
 import type { ThemeValue, StyleProfileValue } from "../store/themeStore";
 import { globalConfirm } from "../utility/globalConfirm";
 import { useTranslate } from "../translation/translate";
+import { AppBarSearchSlotContext } from "./appbar/appBarSearchSlot";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -56,6 +57,12 @@ const Layout: React.FC<LayoutProps> = ({
   const handleSelectStyleProfile = (profile: StyleProfileValue) => {
     setStyleProfile(profile);
   };
+
+  const [searchSlot, setSearchSlot] = useState<HTMLElement | null>(null);
+  const searchSlotValue = useMemo(
+    () => ({ slot: searchSlot, setSlot: setSearchSlot }),
+    [searchSlot],
+  );
 
   const isMobile = useMediaQuery("(max-width: 768px)");
   const location = useLocation();
@@ -160,17 +167,22 @@ const Layout: React.FC<LayoutProps> = ({
     new RegExp(route.replace(/:\w+/, "[^/]+")).test(location.pathname),
   );
 
+  const isGallery = ["/npc-gallery", "/pc-gallery", "/npc-compedium"].includes(
+    location.pathname,
+  );
+
   // Determine if the current path is the homepage
   const isHomepage = location.pathname === "/";
-  const usesCompactHeader = !loading && (isNpcEdit || isPcEdit);
+  const usesCompactHeader = !loading && (isNpcEdit || isPcEdit || isGallery);
   const contentTopOffset = usesCompactHeader ? "4.5em" : "6em";
 
   return (
-    <>
-      {!loading && (isNpcEdit || isPcEdit) ? (
+    <AppBarSearchSlotContext.Provider value={searchSlotValue}>
+      {usesCompactHeader ? (
         <CompactAppBar
           isNpcEdit={isNpcEdit}
           isPcEdit={isPcEdit}
+          isGallery={isGallery}
           selectedTheme={selectedTheme}
           selectedStyleProfile={selectedStyleProfile}
           handleSelectTheme={handleSelectTheme}
@@ -233,7 +245,7 @@ const Layout: React.FC<LayoutProps> = ({
           </Container>
         )}
       </Box>
-    </>
+    </AppBarSearchSlotContext.Provider>
   );
 };
 

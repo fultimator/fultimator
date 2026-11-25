@@ -22,7 +22,6 @@ import {
   Grid,
   Snackbar,
   Paper,
-  TextField,
   Slider,
   Avatar,
   Button,
@@ -34,20 +33,22 @@ import {
   Fab,
   Chip,
   Box,
+  ButtonBase,
 } from "@mui/material";
 import Layout from "../../components/Layout";
+import AppBarSearch from "../../components/appbar/AppBarSearch";
 import { SignIn } from "../../components/auth";
 import NpcActorCard from "../../components/shared/actors/npc/NpcActorCard";
 import {
   ArrowRight,
   ArrowLeft,
   Cloud as CloudIcon,
-  Search,
   ContentCopy,
   Share,
   Download,
   Report,
   KeyboardArrowUp,
+  DeleteSweep,
 } from "@mui/icons-material";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router";
@@ -62,6 +63,9 @@ import monsterToken from "/images/routes/icons/species/Monster-token.webp";
 import plantToken from "/images/routes/icons/species/Plant-token.webp";
 import undeadToken from "/images/routes/icons/species/Undead-token.webp";
 import useDownloadImage from "../../hooks/useDownloadImage";
+import { usePersistentState } from "../../hooks/usePersistentState";
+import MasonryCard from "../npc-gallery/listPreview/MasonryCard";
+import MasonryColumns from "../../components/common/MasonryColumns";
 import Export from "../../components/Export";
 import {
   NPC_CURRENT_SCHEMA_VERSION,
@@ -76,36 +80,38 @@ export default function NpcCompedium() {
   const [user, loading] = useAuthState(auth);
 
   return (
-    <Layout>
-      {loading && <Skeleton />}
-      {!loading && !user && (
-        <Paper
-          elevation={3}
-          sx={{
-            p: 2,
-            mb: 2,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 2,
-            flexWrap: "wrap",
-          }}
-        >
-          <CloudIcon color="primary" />
-          <Typography
-            variant="body2"
+    <Layout fullWidth>
+      <Box sx={{ px: { xs: 2, md: 3 } }}>
+        {loading && <Skeleton />}
+        {!loading && !user && (
+          <Paper
+            elevation={3}
             sx={{
-              color: "text.primary",
-              flex: 1,
-              minWidth: 200,
+              p: 2,
+              mb: 2,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 2,
+              flexWrap: "wrap",
             }}
           >
-            {t("You have to be logged in to access this feature")}
-          </Typography>
-          <SignIn />
-        </Paper>
-      )}
-      {user && <Personal user={user} />}
+            <CloudIcon color="primary" />
+            <Typography
+              variant="body2"
+              sx={{
+                color: "text.primary",
+                flex: 1,
+                minWidth: 200,
+              }}
+            >
+              {t("You have to be logged in to access this feature")}
+            </Typography>
+            <SignIn />
+          </Paper>
+        )}
+        {user && <Personal user={user} />}
+      </Box>
     </Layout>
   );
 }
@@ -127,7 +133,10 @@ function Personal({ user }) {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const [collapse, setCollapse] = useState(true);
+  const [collapse, setCollapse] = usePersistentState(
+    "npcCompendium.collapse",
+    true,
+  );
   const [lastItem, setLastItem] = useState(undefined);
   const [prevLastItem, setPrevLastItem] = useState([]);
   const personalRef = useMemo(
@@ -198,6 +207,43 @@ function Personal({ user }) {
     console.error(err);
   }
 
+  const activeFilters = [
+    selectedType !== "All" && t(selectedType),
+    (levels[0] !== 5 || levels[1] !== 60) &&
+      `${t("Lvl:")} ${levels[0]}–${levels[1]}`,
+    rank && rank,
+    language !== "en" && language.toUpperCase(),
+  ].filter(Boolean);
+
+  const runSearch = (query = name) => {
+    setPrevLastItem([]);
+    setLastItem(undefined);
+    setSearchParams({
+      type: selectedType,
+      name: query.toLowerCase(),
+      level: levels,
+      rank: rank ? rank : "",
+      language: language,
+    });
+  };
+
+  const clearFilters = () => {
+    setSelectedType("All");
+    setName("");
+    setRank("");
+    setLanguage("en");
+    setLevels([5, 60]);
+    setPrevLastItem([]);
+    setLastItem(undefined);
+    setSearchParams({
+      type: "All",
+      name: "",
+      level: [5, 60],
+      rank: "",
+      language: "en",
+    });
+  };
+
   const nextPage = () => {
     setPrevLastItem([...prevLastItem, lastItem]);
     for (let i = 1; i < personalList.length; i++) {
@@ -254,60 +300,49 @@ function Personal({ user }) {
   };
 
   const enemyType = (token, name, label) => {
-    const isMobile = window.innerWidth < 900;
+    const selected = selectedType === name;
     return (
-      <Grid
+      <ButtonBase
+        key={name}
+        onClick={() => setSelectedType(name)}
+        aria-pressed={selected}
+        aria-label={label}
         sx={{
-          alignItems: "center",
-          justifyContent: "center",
           display: "flex",
           flexDirection: "column",
-        }}
-        size={{
-          xs: 4,
-          md: 1.3,
+          alignItems: "center",
+          gap: 0.5,
+          px: { xs: 0.5, md: 1.5 },
+          py: 0.5,
+          borderRadius: 2,
+          bgcolor: selected ? "action.selected" : "transparent",
+          fontWeight: selected ? 700 : 400,
+          fontSize: { xs: "0.9rem", md: "1rem" },
+          whiteSpace: "nowrap",
         }}
       >
         <Avatar
-          alt="icon"
+          alt=""
           src={token}
           sx={{
-            width:
-              selectedType === name
-                ? isMobile
-                  ? 80
-                  : 130
-                : isMobile
-                  ? 60
-                  : 100,
-            height:
-              selectedType === name
-                ? isMobile
-                  ? 80
-                  : 130
-                : isMobile
-                  ? 60
-                  : 100,
-            border: selectedType === name ? "6px solid purple" : "none",
-            cursor: "pointer",
-          }}
-          onClick={() => {
-            setSelectedType(name);
+            width: { xs: 48, md: 52 },
+            height: { xs: 48, md: 52 },
+            border: 2,
+            borderColor: selected ? "primary.main" : "transparent",
+            filter: selected ? "none" : "grayscale(1)",
+            opacity: selected ? 1 : 0.8,
           }}
         />
-        <div
-          style={{
-            color: selectedType === name ? "purple" : "#999999",
-            fontWeight: selectedType === name ? 700 : 400,
-          }}
-        >
-          {label}
-        </div>
-      </Grid>
+        {label}
+      </ButtonBase>
     );
   };
 
   const marks = [
+    {
+      value: 5,
+      label: t("Lvl 5"),
+    },
     {
       value: 10,
       label: t("Lvl 10"),
@@ -334,8 +369,6 @@ function Personal({ user }) {
     },
   ];
 
-  const isMobile = window.innerWidth < 900;
-
   const handleCloseReportDialog = () => {
     setOpenReportDialog(false);
     setSelectedReportNpc({ id: "", name: "", author: "" });
@@ -351,10 +384,26 @@ function Personal({ user }) {
     );
   }
 
-  return (
+  const filterPanel = (
     <>
-      <Paper elevation={3} sx={{ marginBottom: 5, padding: 4 }}>
-        <Grid container spacing={1} sx={{ py: 1, justifyContent: "center" }}>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          gap: 2.5,
+        }}
+      >
+        <Box
+          sx={{
+            display: { xs: "grid", md: "flex" },
+            gridTemplateColumns: "repeat(3, 1fr)",
+            justifyItems: "center",
+            gap: { xs: 0.5, md: 0.75 },
+            flexWrap: { md: "wrap" },
+            justifyContent: { md: "space-between" },
+            "& > *": { flex: { md: 1 } },
+          }}
+        >
           {enemyType(allToken, "All", t("All"))}
           {enemyType(beastToken, "Beast", t("Beast"))}
           {enemyType(constructToken, "Construct", t("Construct"))}
@@ -364,45 +413,24 @@ function Personal({ user }) {
           {enemyType(monsterToken, "Monster", t("Monster"))}
           {enemyType(plantToken, "Plant", t("Plant"))}
           {enemyType(undeadToken, "Undead", t("Undead"))}
-        </Grid>
-
-        <Grid container spacing={1} sx={{ py: 0, justifyContent: "center" }}>
-          <Grid
+        </Box>
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: {
+              xs: "minmax(0, 1fr)",
+              sm: "repeat(2, minmax(0, 1fr))",
+              lg: "1fr 170px 170px auto",
+            },
+            alignItems: "center",
+            gap: 1.5,
+            flex: { lg: 1 },
+          }}
+        >
+          <Box
             sx={{
-              alignItems: "center",
-              justifyContent: "center",
-              display: "flex",
-            }}
-            size={{
-              xs: 12,
-              md: 3,
-              lg: 4,
-            }}
-          >
-            <TextField
-              id="outlined-basic"
-              label={t("Adversary Name")}
-              variant="outlined"
-              size="small"
-              fullWidth
-              value={name}
-              onChange={(evt) => {
-                setName(evt.target.value);
-              }}
-            />
-          </Grid>
-
-          <Grid
-            sx={{
-              alignItems: "center",
-              justifyContent: "center",
-              display: "flex",
-              marginLeft: 5,
-              marginRight: 5,
-            }}
-            size={{
-              xs: 12,
-              md: 3,
+              gridColumn: { sm: "1 / -1", lg: "auto" },
+              px: { xs: 3, md: 4 },
             }}
           >
             <Slider
@@ -411,188 +439,122 @@ function Personal({ user }) {
               step={5}
               min={5}
               marks={marks}
-              onChange={(val, val2) => {
-                setLevels(val2);
-              }}
-              sx={{ width: 300 }}
+              onChange={(_, value) => setLevels(value)}
               max={60}
-              valueLabelDisplay="auto"
-              getAriaValueText={(value) => {
-                return `${t("Lvl:")}${value}`;
+              size="small"
+              valueLabelDisplay="on"
+              getAriaValueText={(value) => `${t("Lvl:")}${value}`}
+              sx={{
+                display: "block",
+                mt: 3,
+                mb: 1,
+                "& .MuiSlider-mark": {
+                  height: 10,
+                  width: 2,
+                  backgroundColor: "text.disabled",
+                },
+                "& .MuiSlider-markActive": { backgroundColor: "primary.main" },
+                "& .MuiSlider-markLabel": { fontSize: "0.75rem" },
               }}
             />
-          </Grid>
-          <Grid
-            sx={{
-              alignItems: "center",
-              justifyContent: "center",
-              display: "flex",
-            }}
-            size={{
-              xs: 6,
-              md: 2,
-            }}
-          >
-            <FormControl fullWidth size="small">
-              <InputLabel id="rank">{t("Rank:")}</InputLabel>
-              <Select
-                labelId="rank"
-                id="select-rank"
-                value={rank}
-                label={t("Rank:")}
-                onChange={(evt, _val2) => {
-                  setRank(evt.target.value);
-                }}
-              >
-                <MenuItem value={""}>{t("All")}</MenuItem>
-                <MenuItem value={"soldier"}>{t("Soldier")}</MenuItem>
-                <MenuItem value={"elite"}>{t("Elite")}</MenuItem>
-                <MenuItem value={"champion1"}>{t("Champion (1)")}</MenuItem>
-                <MenuItem value={"champion2"}>{t("Champion (2)")}</MenuItem>
-                <MenuItem value={"champion3"}>{t("Champion (3)")}</MenuItem>
-                <MenuItem value={"champion4"}>{t("Champion (4)")}</MenuItem>
-                <MenuItem value={"champion5"}>{t("Champion (5)")}</MenuItem>
-                <MenuItem value={"champion6"}>{t("Champion (6)")}</MenuItem>
-                <MenuItem value={"companion"}>{t("Companion")}</MenuItem>
-                <MenuItem value={"groupvehicle"}>{t("Group Vehicle")}</MenuItem>
-              </Select>
-            </FormControl>
-          </Grid>
+          </Box>
 
-          <Grid
-            sx={{ alignItems: "center", display: "flex" }}
-            size={{
-              xs: 6,
-              md: 2,
-            }}
-          >
-            <FormControl fullWidth size="small">
-              <InputLabel id="Language">{t("Language:")}</InputLabel>
-              <Select
-                labelId="language"
-                id="select-language"
-                value={language}
-                label={t("Language:")}
-                onChange={(evt) => {
-                  setLanguage(evt.target.value);
-                }}
-              >
-                {languageOptions.map((option) => (
-                  <MenuItem key={option.code} value={option.code}>
-                    {option.label}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid
-            sx={{ alignItems: "center", display: "flex" }}
-            size={{
-              xs: 6,
-              md: 2,
+          <FormControl size="small" sx={{ width: "100%" }}>
+            <InputLabel id="rank">{t("Rank:")}</InputLabel>
+            <Select
+              labelId="rank"
+              id="select-rank"
+              value={rank}
+              label={t("Rank:")}
+              onChange={(evt) => setRank(evt.target.value)}
+            >
+              <MenuItem value={""}>{t("All")}</MenuItem>
+              <MenuItem value={"soldier"}>{t("Soldier")}</MenuItem>
+              <MenuItem value={"elite"}>{t("Elite")}</MenuItem>
+              <MenuItem value={"champion1"}>{t("Champion (1)")}</MenuItem>
+              <MenuItem value={"champion2"}>{t("Champion (2)")}</MenuItem>
+              <MenuItem value={"champion3"}>{t("Champion (3)")}</MenuItem>
+              <MenuItem value={"champion4"}>{t("Champion (4)")}</MenuItem>
+              <MenuItem value={"champion5"}>{t("Champion (5)")}</MenuItem>
+              <MenuItem value={"champion6"}>{t("Champion (6)")}</MenuItem>
+              <MenuItem value={"companion"}>{t("Companion")}</MenuItem>
+              <MenuItem value={"groupvehicle"}>{t("Group Vehicle")}</MenuItem>
+            </Select>
+          </FormControl>
+
+          <FormControl size="small" sx={{ width: "100%" }}>
+            <InputLabel id="language">{t("Language:")}</InputLabel>
+            <Select
+              labelId="language"
+              id="select-language"
+              value={language}
+              label={t("Language:")}
+              onChange={(evt) => setLanguage(evt.target.value)}
+            >
+              {languageOptions.map((option) => (
+                <MenuItem key={option.code} value={option.code}>
+                  {option.label}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <Box
+            sx={{
+              display: "flex",
+              gap: 1,
+              gridColumn: { xs: "1 / -1", lg: "auto" },
             }}
           >
             <Button
               variant="outlined"
-              fullWidth
-              onClick={() => {
-                setCollapse(!collapse);
-              }}
+              color="warning"
+              startIcon={<DeleteSweep />}
+              disabled={!activeFilters.length && !name}
+              onClick={clearFilters}
+              sx={{ flex: 1 }}
+            >
+              {t("Clear")}
+            </Button>
+            <Button
+              variant="outlined"
+              onClick={() => setCollapse(!collapse)}
+              sx={{ flex: 1 }}
             >
               {collapse ? t("Collapse") : t("Expand")}
             </Button>
-          </Grid>
-          <Grid
-            sx={{ alignItems: "center", justifyContent: "center" }}
-            size={{
-              xs: 6,
-              md: 2,
-            }}
-          >
-            <Button
-              fullWidth
-              variant="contained"
-              startIcon={<Search />}
-              onClick={() => {
-                setPrevLastItem([]);
-                setLastItem(undefined);
-                setSearchParams({
-                  type: selectedType,
-                  name: name.toLowerCase(),
-                  level: levels,
-                  rank: rank ? rank : "",
-                  language: language,
-                });
+          </Box>
+        </Box>
+      </Box>
+    </>
+  );
+
+  return (
+    <>
+      <AppBarSearch
+        value={name}
+        onChange={setName}
+        onSubmit={runSearch}
+        placeholder={t("Adversary Name")}
+        chips={activeFilters}
+        panel={filterPanel}
+      />
+      <MasonryColumns>
+        {personalList?.map((npc) => (
+          <MasonryCard key={npc.id} id={npc.id}>
+            <Npc
+              npc={npc}
+              copyNpc={copyNpc}
+              deleteNpc={deleteNpc}
+              shareNpc={shareNpc}
+              reportNpc={() => {
+                setSelectedReportNpc(npc);
+                setOpenReportDialog(true);
               }}
-            >
-              {t("Search")}
-            </Button>
-          </Grid>
-        </Grid>
-      </Paper>
-      {isMobile ? (
-        <div>
-          {personalList?.map((npc, i) => {
-            return (
-              <Npc
-                key={i}
-                npc={npc}
-                copyNpc={copyNpc}
-                deleteNpc={deleteNpc}
-                shareNpc={shareNpc}
-                reportNpc={() => {
-                  setSelectedReportNpc(npc);
-                  setOpenReportDialog(true);
-                }}
-                collapseGet={collapse}
-              />
-            );
-          })}
-        </div>
-      ) : (
-        <div
-          style={{ display: "flex", flexDirection: "row-reverse", rowGap: 30 }}
-        >
-          <div style={{ marginLeft: 10, width: "50%" }}>
-            {personalList?.map((npc, i) => {
-              if (i % 2 === 0) return "";
-              return (
-                <Npc
-                  key={i}
-                  npc={npc}
-                  copyNpc={copyNpc}
-                  deleteNpc={deleteNpc}
-                  shareNpc={shareNpc}
-                  reportNpc={() => {
-                    setSelectedReportNpc(npc);
-                    setOpenReportDialog(true);
-                  }}
-                  collapseGet={collapse}
-                />
-              );
-            })}
-          </div>
-          <div style={{ marginRight: 10, width: "50%" }}>
-            {personalList?.map((npc, i) => {
-              if (i % 2 !== 0) return "";
-              return (
-                <Npc
-                  key={i}
-                  npc={npc}
-                  copyNpc={copyNpc}
-                  deleteNpc={deleteNpc}
-                  shareNpc={shareNpc}
-                  reportNpc={() => {
-                    setSelectedReportNpc(npc);
-                    setOpenReportDialog(true);
-                  }}
-                  collapseGet={collapse}
-                />
-              );
-            })}
-          </div>
-        </div>
-      )}
+              collapseGet={collapse}
+            />
+          </MasonryCard>
+        ))}
+      </MasonryColumns>
       <div
         style={{
           display: "flex",
