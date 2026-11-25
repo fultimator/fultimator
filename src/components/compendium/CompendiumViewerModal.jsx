@@ -263,6 +263,72 @@ const CompendiumViewerModal = ({
     [importing, importFromFile],
   );
 
+  const handleImportJsonFile = useCallback(
+    async (file) => {
+      if (importing) return;
+      setImporting(true);
+      setImportError("");
+      try {
+        const parsed = JSON.parse(await file.text());
+        const entries = Array.isArray(parsed) ? parsed : [parsed];
+        const packTypes = new Set(Object.values(VIEWER_TO_PACK_TYPE));
+        const targetId =
+          activePack && !activePack.locked
+            ? activePack.id
+            : (await ensurePersonalPack()).id;
+        let added = 0;
+        const errors = [];
+        for (const entry of entries) {
+          const { dataType, ...data } = entry ?? {};
+          const itemType =
+            VIEWER_TO_PACK_TYPE[dataType] ??
+            (packTypes.has(dataType) ? dataType : undefined);
+          if (!itemType) {
+            errors.push(
+              `${t("Unknown or missing dataType")}: ${dataType ?? "-"}`,
+            );
+            continue;
+          }
+          if (itemType === "class") {
+            data.skills = Array.isArray(data.skills) ? data.skills : [];
+            data.spells = Array.isArray(data.spells) ? data.spells : [];
+            data.heroic = data.heroic ?? { name: "", description: "" };
+            data.benefits = {
+              ...(data.benefits ?? {}),
+              spellClasses: Array.isArray(data.benefits?.spellClasses)
+                ? data.benefits.spellClasses
+                : [],
+            };
+          }
+          try {
+            await addItem(targetId, itemType, data);
+            added += 1;
+          } catch (err) {
+            errors.push(err.message ?? String(err));
+          }
+        }
+        if (added === 0)
+          throw new Error(errors.join("\n") || "Nothing imported");
+        setBulkSnackbar({
+          open: true,
+          message:
+            `${t("Added")} ${added} ${t("items to compendium")}` +
+            (errors.length ? ` (${errors.length} ${t("failed")})` : ""),
+          severity: errors.length ? "error" : "success",
+        });
+        setPendingNavPackId(targetId);
+        setImportDialogOpen(false);
+      } catch (err) {
+        setImportError(
+          err instanceof SyntaxError ? t("Invalid JSON file") : err.message,
+        );
+      } finally {
+        setImporting(false);
+      }
+    },
+    [importing, activePack, ensurePersonalPack, addItem, t],
+  );
+
   const handleImportUrl = useCallback(async () => {
     if (!importUrl.trim() || importing) return;
     setImporting(true);
@@ -1377,6 +1443,7 @@ const CompendiumViewerModal = ({
             }}
           >
             <Tab label={t("Upload .fcp file")} />
+            <Tab label={t("JSON item")} />
             <Tab
               label={t("From URL")}
               icon={<LinkIcon sx={{ fontSize: "small" }} />}
@@ -1419,6 +1486,34 @@ const CompendiumViewerModal = ({
             <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
               <Typography variant="body2" sx={{ color: "text.secondary" }}>
                 {t(
+                  "Select a .json file exported from Fultimator (class, spell, weapon, ...). It will be added to the current compendium.",
+                )}
+              </Typography>
+              <Button
+                variant="outlined"
+                component="label"
+                startIcon={<FileUploadIcon />}
+                disabled={importing}
+              >
+                {t("Choose file")}
+                <input
+                  type="file"
+                  accept=".json,application/json"
+                  hidden
+                  disabled={importing}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) handleImportJsonFile(file);
+                    e.target.value = "";
+                  }}
+                />
+              </Button>
+            </Box>
+          )}
+          {importTab === 2 && (
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+              <Typography variant="body2" sx={{ color: "text.secondary" }}>
+                {t(
                   "Paste a manifest.json URL to download and import the pack.",
                 )}
               </Typography>
@@ -1443,7 +1538,7 @@ const CompendiumViewerModal = ({
           >
             {t("Cancel")}
           </Button>
-          {importTab === 1 && (
+          {importTab === 2 && (
             <Button
               variant="contained"
               onClick={handleImportUrl}
