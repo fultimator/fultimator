@@ -28,16 +28,18 @@ function SpecialRow({ item, npc, showRoll }) {
 
   return (
     <Fragment>
-      <Grid sx={{ px: 3, py: 0.5 }} size={12}>
+      <Grid sx={{ px: 2, py: 0.5 }} size={12}>
         <Typography component="div">
-          <span style={{ display: "inline" }}>
-            {showRoll ? (
-              <ClickableName name={item.name} onAction={handleSend} />
-            ) : (
-              <strong>{item.name}</strong>
-            )}{" "}
-            <Diamond />{" "}
-          </span>
+          {item.name && (
+            <span style={{ display: "inline" }}>
+              {showRoll ? (
+                <ClickableName name={item.name} onAction={handleSend} />
+              ) : (
+                <strong>{item.name}</strong>
+              )}{" "}
+              <Diamond />{" "}
+            </span>
+          )}
           <SpanMarkdown>{item.effect}</SpanMarkdown>
         </Typography>
       </Grid>
@@ -94,13 +96,26 @@ export function NpcSpecialRules({ npc, variant = "interactive" }) {
   if (special.length === 0) return null;
 
   return (
-    <Grid container>
-      <Grid sx={{ mt: 0, px: 2, py: 0.3, background }} size={12}>
+    <Grid container sx={{ pb: 0.75 }}>
+      <Grid
+        sx={{
+          mt: 0,
+          px: 2,
+          py: 0.3,
+          minHeight: 34,
+          mb: 0.75,
+          display: "flex",
+          alignItems: "center",
+          background,
+        }}
+        size={12}
+      >
         <Typography
           sx={{
             color: "white.main",
             fontFamily: "Antonio",
             fontSize: "1.1rem",
+            lineHeight: 1,
             fontWeight: "medium",
             textTransform: "uppercase",
           }}

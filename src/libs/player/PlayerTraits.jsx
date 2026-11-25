@@ -175,7 +175,7 @@ export default function PlayerTraits({ player, isCharacterSheet }) {
                 </Typography>
                 <StyledMarkdown
                   sx={{
-                    fontFamily: "PT Sans Narrow",
+                    fontFamily: "PFU Sans Narrow",
                     fontSize: "1rem",
                   }}
                 >

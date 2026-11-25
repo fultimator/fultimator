@@ -1080,7 +1080,7 @@ export default function PlayerCardGallery({
             <Box sx={{ px: 1, py: { xs: "6px", sm: "8px" } }}>
               <Typography
                 sx={{
-                  fontFamily: ["PT Sans Narrow", "sans-serif"].join(","),
+                  fontFamily: ["PFU Sans Narrow", "sans-serif"].join(","),
                   fontSize: { xs: "0.82rem", sm: "0.92rem", md: "0.98rem" },
                   lineHeight: 1.45,
                   whiteSpace: "pre-line",

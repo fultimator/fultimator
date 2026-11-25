@@ -19,7 +19,7 @@ import Diamond from "/src/components/Diamond";
 import avatar_image from "/images/components/avatar.jpg";
 import ExpIcon from "/src/components/svgs/exp.svg?react";
 import ExpDisabledIcon from "/src/components/svgs/exp_disabled.svg?react";
-import { StyledMarkdown } from "/src/components/shared/actors/pc/shared";
+import { StyledMarkdown } from "/src/components/shared/actors/pc/pcStyled";
 import {
   MIN_LEVEL,
   MAX_LEVEL,

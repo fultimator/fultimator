@@ -17,7 +17,7 @@ import {
 } from "/src/components/icons";
 import StatTooltip from "/src/components/common/StatTooltip";
 import { newShade } from "/src/libs/playerCalculations";
-import { GradientLinearProgress } from "/src/components/shared/actors/pc/shared";
+import { GradientLinearProgress } from "/src/components/shared/actors/pc/pcStyled";
 import { RESOURCE_SCALES } from "/src/components/shared/actors/scaleTokens";
 import {
   getDeltaOverlaySx,

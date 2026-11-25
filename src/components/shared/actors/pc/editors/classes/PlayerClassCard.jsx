@@ -654,7 +654,7 @@ export default function PlayerClassCard({
               allowedElements={["strong", "em"]}
               unwrapDisallowed={true}
               sx={{
-                fontFamily: "PT Sans Narrow",
+                fontFamily: "PFU Sans Narrow",
                 padding: "0 17px",
                 fontSize: "1rem",
               }}
@@ -694,7 +694,7 @@ export default function PlayerClassCard({
               allowedElements={["strong", "em"]}
               unwrapDisallowed={true}
               sx={{
-                fontFamily: "PT Sans Narrow",
+                fontFamily: "PFU Sans Narrow",
                 padding: "0 17px",
                 fontSize: "1rem",
               }}

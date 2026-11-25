@@ -36,28 +36,50 @@ function NoteRow({ note, npc, showRoll, t }) {
 
   return (
     <Fragment>
-      <Grid sx={{ pl: 2, py: 1 }} size={1}>
-        <Typography sx={{ textAlign: "center" }}>
+      <Grid
+        sx={{ pl: 2, pr: 0, py: 0.25, width: 40, flexShrink: 0 }}
+        size="auto"
+      >
+        <Typography sx={{ textAlign: "left", "& svg": { width: "1.1em" } }}>
           <NotesIcon />
         </Typography>
       </Grid>
-      <Grid sx={{ pl: 1, pr: 5, py: 1 }} size={11}>
+      <Grid
+        sx={{
+          pl: 1,
+          pr: 1,
+          py: 0.25,
+          minWidth: 0,
+          flex: "1 1 calc(100% - 40px)",
+          maxWidth: "calc(100% - 40px)",
+        }}
+      >
         <Typography component="div">
-          {showRoll ? (
-            <ClickableName name={note.name} onAction={handleSend} />
-          ) : (
-            <strong>{note.name}</strong>
-          )}{" "}
+          {note.name &&
+            (showRoll ? (
+              <ClickableName name={note.name} onAction={handleSend} />
+            ) : (
+              <strong>{note.name}</strong>
+            ))}{" "}
           {clockSummaries.map((clock, i) => (
             <Fragment key={i}>
-              <Diamond />{" "}
+              {(note.name || i > 0) && (
+                <>
+                  <Diamond />{" "}
+                </>
+              )}
               <strong>
                 {t("npc_note_clock_sections", [clock.sections])}
                 {clock.name ? ` (${clock.name})` : ""}
               </strong>{" "}
             </Fragment>
           ))}
-          <Diamond /> <SpanMarkdown>{note.effect}</SpanMarkdown>
+          {(note.name || clockSummaries.length > 0) && note.effect && (
+            <>
+              <Diamond />{" "}
+            </>
+          )}
+          <SpanMarkdown>{note.effect}</SpanMarkdown>
         </Typography>
       </Grid>
     </Fragment>
@@ -71,13 +93,26 @@ export function NpcNotes({ npc, variant = "interactive" }) {
   if (!npc.notes?.length) return null;
 
   return (
-    <Grid container>
-      <Grid sx={{ mt: 0, px: 2, py: 0.3, background }} size={12}>
+    <Grid container sx={{ pb: 0.75 }}>
+      <Grid
+        sx={{
+          mt: 0,
+          px: 2,
+          py: 0.3,
+          minHeight: 34,
+          mb: 0.75,
+          display: "flex",
+          alignItems: "center",
+          background,
+        }}
+        size={12}
+      >
         <Typography
           sx={{
             color: "white.main",
             fontFamily: "Antonio",
             fontSize: "1.1rem",
+            lineHeight: 1,
             fontWeight: "medium",
             textTransform: "uppercase",
           }}

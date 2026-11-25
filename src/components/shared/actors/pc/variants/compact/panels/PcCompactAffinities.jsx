@@ -3,7 +3,7 @@ import { TypeAffinity } from "/src/components/shared/actors/common/TypeAffinity"
 import {
   AffinityStrip,
   AffinityCell,
-} from "/src/components/shared/actors/pc/shared";
+} from "/src/components/shared/actors/pc/pcStyled";
 import { AFFINITY_TYPES } from "/src/components/shared/actors/core-utils";
 import { resolveActorEffects } from "/src/libs/actorEffectsResolver";
 

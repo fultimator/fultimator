@@ -12,7 +12,7 @@ import {
   FpResourceIcon,
   ZenitResourceIcon,
 } from "/src/components/icons";
-import { GradientLinearProgress } from "/src/components/shared/actors/pc/shared";
+import { GradientLinearProgress } from "/src/components/shared/actors/pc/pcStyled";
 import { newShade } from "/src/libs/playerCalculations";
 import StatTooltip from "/src/components/common/StatTooltip";
 import { getActorBonuses, getActorMultipliers } from "/src/libs/actorBonuses";

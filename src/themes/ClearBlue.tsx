@@ -42,7 +42,7 @@ const lightClearBlue = createTheme({
     },
   } as PaletteOptions,
   typography: {
-    fontFamily: ["PT Sans Narrow", "sans-serif"].join(","),
+    fontFamily: ["PFU Sans Narrow", "sans-serif"].join(","),
     body1: {
       lineHeight: 1.45,
       color: "#1f3044",
@@ -136,7 +136,7 @@ const darkClearBlue = createTheme({
     },
   } as PaletteOptions,
   typography: {
-    fontFamily: ["PT Sans Narrow", "sans-serif"].join(","),
+    fontFamily: ["PFU Sans Narrow", "sans-serif"].join(","),
     body1: {
       lineHeight: 1.45,
       color: "#d5e7fb",

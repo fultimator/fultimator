@@ -45,7 +45,7 @@ const lightNoir = createTheme({
     },
   } as PaletteOptions,
   typography: {
-    fontFamily: ["PT Sans Narrow", "sans-serif"].join(","),
+    fontFamily: ["PFU Sans Narrow", "sans-serif"].join(","),
     body1: {
       lineHeight: 1.45,
       color: "#1a1a1a",
@@ -139,7 +139,7 @@ const darkNoir = createTheme({
     },
   } as PaletteOptions,
   typography: {
-    fontFamily: ["PT Sans Narrow", "sans-serif"].join(","),
+    fontFamily: ["PFU Sans Narrow", "sans-serif"].join(","),
     body1: {
       lineHeight: 1.45,
       color: "#f2f2f2",

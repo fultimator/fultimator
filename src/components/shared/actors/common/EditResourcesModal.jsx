@@ -27,7 +27,7 @@ import {
   UpResourceIcon,
   ZenitResourceIcon,
 } from "/src/components/icons";
-import { GradientLinearProgress } from "/src/components/shared/actors/pc/shared";
+import { GradientLinearProgress } from "/src/components/shared/actors/pc/pcStyled";
 import { newShade } from "/src/libs/playerCalculations";
 import {
   getPipFlashSx,

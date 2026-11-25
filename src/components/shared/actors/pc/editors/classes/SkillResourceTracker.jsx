@@ -26,7 +26,7 @@ export default function SkillResourceTracker({
         py: "4px",
       }}
     >
-      <Typography sx={{ fontFamily: "PT Sans Narrow", fontWeight: "bold" }}>
+      <Typography sx={{ fontFamily: "PFU Sans Narrow", fontWeight: "bold" }}>
         {t(label)}:
       </Typography>
       <IconButton size="small" onClick={decrement} disabled={isMin}>

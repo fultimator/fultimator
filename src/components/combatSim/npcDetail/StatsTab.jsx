@@ -9,7 +9,7 @@ import { t } from "../../../translation/translate";
 import { useTheme } from "@mui/material/styles";
 import { useBarShell } from "/src/components/shared/actors/common/barShellUtils";
 import ActorActionBar from "../ActorActionBar";
-import { GradientLinearProgress } from "/src/components/shared/actors/pc/shared";
+import { GradientLinearProgress } from "/src/components/shared/actors/pc/pcStyled";
 import {
   FpResourceIcon,
   HpResourceIcon,

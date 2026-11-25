@@ -42,7 +42,7 @@ const lightBravely = createTheme({
     },
   } as PaletteOptions,
   typography: {
-    fontFamily: ["PT Sans Narrow", "sans-serif"].join(","),
+    fontFamily: ["PFU Sans Narrow", "sans-serif"].join(","),
     body1: {
       lineHeight: 1.45,
       color: "#333333",
@@ -133,7 +133,7 @@ const darkBravely = createTheme({
     },
   } as PaletteOptions,
   typography: {
-    fontFamily: ["PT Sans Narrow", "sans-serif"].join(","),
+    fontFamily: ["PFU Sans Narrow", "sans-serif"].join(","),
     body1: {
       lineHeight: 1.45,
       color: "#e0e0e0",
