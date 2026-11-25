@@ -76,6 +76,7 @@ import {
 } from "../../libs/actor";
 import { stampSave } from "../../libs/actor/timestamps";
 import { NpcProvider } from "/src/components/shared/actors/npc/context";
+import NpcSectionTimeline from "./NpcSectionTimeline";
 
 // Combine all blacklisted names into a single array
 const mergedBlacklistNames = blacklist.flatMap((item) => Object.values(item));
@@ -461,7 +462,7 @@ export default function NpcEdit() {
 
         {(!isSmallScreen || mobileTab === 0) && (
           <>
-            <Grid container spacing={2}>
+            <Grid id="edit-section-overview" container spacing={2}>
               <Grid
                 size={{
                   xs: 12,
@@ -651,6 +652,7 @@ export default function NpcEdit() {
             </Box>
           </>
         )}
+        {isOwner && !isSmallScreen && <NpcSectionTimeline />}
         {/* <NpcUgly npc={npcTemp} /> */}
         {/* FAB container */}
         <Box
