@@ -1,0 +1,1488 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "uid": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "lvl": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 60
+    },
+    "imgurl": {
+      "type": "string"
+    },
+    "traits": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "species": {
+      "default": "Beast",
+      "type": "string"
+    },
+    "role": {
+      "default": "custom",
+      "type": "string",
+      "enum": [
+        "brute",
+        "hunter",
+        "mage",
+        "saboteur",
+        "sentinel",
+        "support",
+        "custom"
+      ]
+    },
+    "rank": {
+      "type": "string"
+    },
+    "qaSelections": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {
+        "type": "boolean"
+      }
+    },
+    "qaNegativeSkills": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "bonusKind": {
+            "default": "roleSkill",
+            "type": "string",
+            "enum": ["roleSkill", "bossSkill"]
+          }
+        },
+        "required": ["id"]
+      }
+    },
+    "sizes": {
+      "type": "string"
+    },
+    "phases": {
+      "type": "number"
+    },
+    "villain": {
+      "type": "string"
+    },
+    "companionlvl": {
+      "type": "number"
+    },
+    "companionpclvl": {
+      "type": "number"
+    },
+    "multipart": {
+      "type": "string"
+    },
+    "attributes": {
+      "type": "object",
+      "properties": {
+        "dexterity": {
+          "$ref": "#/$defs/__schema0"
+        },
+        "insight": {
+          "$ref": "#/$defs/__schema0"
+        },
+        "might": {
+          "$ref": "#/$defs/__schema0"
+        },
+        "willpower": {
+          "$ref": "#/$defs/__schema0"
+        }
+      },
+      "required": ["dexterity", "insight", "might", "willpower"]
+    },
+    "affinities": {
+      "default": {},
+      "type": "object",
+      "properties": {
+        "physical": {
+          "$ref": "#/$defs/__schema1"
+        },
+        "air": {
+          "$ref": "#/$defs/__schema1"
+        },
+        "bolt": {
+          "$ref": "#/$defs/__schema1"
+        },
+        "dark": {
+          "$ref": "#/$defs/__schema1"
+        },
+        "earth": {
+          "$ref": "#/$defs/__schema1"
+        },
+        "fire": {
+          "$ref": "#/$defs/__schema1"
+        },
+        "ice": {
+          "$ref": "#/$defs/__schema1"
+        },
+        "light": {
+          "$ref": "#/$defs/__schema1"
+        },
+        "poison": {
+          "$ref": "#/$defs/__schema1"
+        }
+      }
+    },
+    "speciesGrants": {
+      "type": "object",
+      "properties": {
+        "affinities": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "immunities": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "immunities": {
+      "default": {
+        "slow": false,
+        "dazed": false,
+        "weak": false,
+        "shaken": false,
+        "enraged": false,
+        "poisoned": false
+      },
+      "type": "object",
+      "properties": {
+        "slow": {
+          "default": false,
+          "type": "boolean"
+        },
+        "dazed": {
+          "default": false,
+          "type": "boolean"
+        },
+        "weak": {
+          "default": false,
+          "type": "boolean"
+        },
+        "shaken": {
+          "default": false,
+          "type": "boolean"
+        },
+        "enraged": {
+          "default": false,
+          "type": "boolean"
+        },
+        "poisoned": {
+          "default": false,
+          "type": "boolean"
+        }
+      }
+    },
+    "extra": {
+      "type": "object",
+      "properties": {
+        "statusImmunity": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 3,
+          "multipleOf": 0.5
+        }
+      }
+    },
+    "armor": {
+      "$ref": "#/$defs/__schema2"
+    },
+    "shield": {
+      "$ref": "#/$defs/__schema2"
+    },
+    "attacks": {
+      "default": [],
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/__schema3"
+      }
+    },
+    "weaponattacks": {
+      "default": [],
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/__schema3"
+      }
+    },
+    "spells": {
+      "default": [],
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "accuracy": {
+            "$ref": "#/$defs/__schema4"
+          },
+          "isOffensive": {
+            "type": "boolean"
+          },
+          "damage": {
+            "$ref": "#/$defs/__schema5"
+          },
+          "cost": {
+            "type": "object",
+            "properties": {
+              "resource": {
+                "type": "string"
+              },
+              "amount": {
+                "type": "number"
+              },
+              "perTarget": {
+                "type": "boolean"
+              }
+            }
+          },
+          "maxTargets": {
+            "type": "number"
+          },
+          "targetDescription": {
+            "type": "string"
+          },
+          "duration": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string",
+            "enum": ["melee", "ranged"]
+          },
+          "effect": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "special": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "itemType": {
+            "type": "string"
+          },
+          "spellType": {
+            "type": "string"
+          },
+          "behaviors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/__schema6"
+            }
+          },
+          "_qaAdded": {
+            "type": "boolean"
+          }
+        },
+        "required": ["name"],
+        "additionalProperties": {}
+      }
+    },
+    "special": {
+      "default": [],
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/__schema12"
+      }
+    },
+    "actions": {
+      "default": [],
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/__schema12"
+      }
+    },
+    "notes": {
+      "default": [],
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "fuid": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "effect": {
+            "type": "string"
+          }
+        },
+        "required": ["name"]
+      }
+    },
+    "raregear": {
+      "default": [],
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "effect": {
+            "type": "string"
+          },
+          "behaviors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/__schema6"
+            }
+          }
+        },
+        "required": ["name"]
+      }
+    },
+    "label": {
+      "type": "string"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": ["name"]
+      }
+    },
+    "schemaVersion": {
+      "type": "number"
+    },
+    "createdBy": {
+      "type": "string"
+    },
+    "language": {
+      "type": "string"
+    },
+    "published": {
+      "type": "boolean"
+    },
+    "statuses": {
+      "type": "object",
+      "properties": {
+        "slow": {
+          "type": "boolean"
+        },
+        "dazed": {
+          "type": "boolean"
+        },
+        "weak": {
+          "type": "boolean"
+        },
+        "shaken": {
+          "type": "boolean"
+        },
+        "enraged": {
+          "type": "boolean"
+        },
+        "poisoned": {
+          "type": "boolean"
+        }
+      },
+      "required": ["slow", "dazed", "weak", "shaken", "enraged", "poisoned"]
+    },
+    "resources": {
+      "type": "object",
+      "properties": {
+        "hp": {
+          "$ref": "#/$defs/__schema13"
+        },
+        "mp": {
+          "$ref": "#/$defs/__schema13"
+        }
+      },
+      "required": ["hp", "mp"]
+    },
+    "derived": {
+      "type": "object",
+      "properties": {
+        "def": {
+          "$ref": "#/$defs/__schema14"
+        },
+        "mdef": {
+          "$ref": "#/$defs/__schema14"
+        },
+        "init": {
+          "type": "object",
+          "properties": {
+            "bonus": {
+              "type": "number"
+            }
+          },
+          "required": ["bonus"]
+        }
+      },
+      "required": ["def", "mdef", "init"]
+    },
+    "features": {
+      "type": "object",
+      "properties": {
+        "init": {
+          "$ref": "#/$defs/__schema15"
+        },
+        "precision": {
+          "$ref": "#/$defs/__schema15"
+        },
+        "magic": {
+          "$ref": "#/$defs/__schema15"
+        }
+      }
+    },
+    "bonuses": {
+      "type": "object",
+      "properties": {
+        "incomingRecovery": {
+          "$ref": "#/$defs/__schema16"
+        },
+        "incomingLoss": {
+          "$ref": "#/$defs/__schema16"
+        },
+        "outgoingRecovery": {
+          "$ref": "#/$defs/__schema16"
+        },
+        "accuracy": {
+          "type": "object",
+          "properties": {
+            "all": {
+              "type": "number"
+            },
+            "accuracyCheck": {
+              "type": "number"
+            },
+            "melee": {
+              "type": "number"
+            },
+            "ranged": {
+              "type": "number"
+            },
+            "magic": {
+              "type": "number"
+            },
+            "opposed": {
+              "type": "number"
+            },
+            "open": {
+              "type": "number"
+            },
+            "arcane": {
+              "type": "number"
+            },
+            "bow": {
+              "type": "number"
+            },
+            "brawling": {
+              "type": "number"
+            },
+            "dagger": {
+              "type": "number"
+            },
+            "firearm": {
+              "type": "number"
+            },
+            "flail": {
+              "type": "number"
+            },
+            "heavy": {
+              "type": "number"
+            },
+            "spear": {
+              "type": "number"
+            },
+            "sword": {
+              "type": "number"
+            },
+            "thrown": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "all",
+            "accuracyCheck",
+            "melee",
+            "ranged",
+            "magic",
+            "opposed",
+            "open",
+            "arcane",
+            "bow",
+            "brawling",
+            "dagger",
+            "firearm",
+            "flail",
+            "heavy",
+            "spear",
+            "sword",
+            "thrown"
+          ]
+        },
+        "damage": {
+          "$ref": "#/$defs/__schema17"
+        },
+        "incomingDamage": {
+          "$ref": "#/$defs/__schema17"
+        }
+      },
+      "required": [
+        "incomingRecovery",
+        "incomingLoss",
+        "outgoingRecovery",
+        "accuracy",
+        "damage",
+        "incomingDamage"
+      ]
+    },
+    "multipliers": {
+      "type": "object",
+      "properties": {
+        "incomingRecovery": {
+          "$ref": "#/$defs/__schema18"
+        },
+        "incomingLoss": {
+          "$ref": "#/$defs/__schema18"
+        },
+        "outgoingRecovery": {
+          "$ref": "#/$defs/__schema18"
+        }
+      },
+      "required": ["incomingRecovery", "incomingLoss", "outgoingRecovery"]
+    },
+    "effects": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "default": "",
+            "type": "string"
+          },
+          "disabled": {
+            "type": "boolean"
+          },
+          "origin": {
+            "type": "string"
+          },
+          "behaviors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/__schema6"
+            }
+          }
+        },
+        "required": ["id"]
+      }
+    }
+  },
+  "required": ["id", "uid", "name", "lvl", "attributes"],
+  "$defs": {
+    "__schema0": {
+      "type": "object",
+      "properties": {
+        "base": {
+          "type": "integer",
+          "minimum": 6,
+          "maximum": 12
+        }
+      },
+      "required": ["base"]
+    },
+    "__schema1": {
+      "type": "string",
+      "enum": ["vu", "rs", "im", "ab", "no"]
+    },
+    "__schema2": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "def": {
+          "type": "number"
+        },
+        "mdef": {
+          "type": "number"
+        },
+        "init": {
+          "type": "number"
+        },
+        "martial": {
+          "type": "boolean"
+        },
+        "cost": {
+          "type": "number"
+        },
+        "category": {
+          "type": "string"
+        },
+        "fuid": {
+          "type": "string"
+        },
+        "armor": {
+          "type": "boolean"
+        }
+      },
+      "required": ["name"],
+      "additionalProperties": {}
+    },
+    "__schema3": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "range": {
+          "type": "string",
+          "enum": ["melee", "ranged"]
+        },
+        "accuracy": {
+          "$ref": "#/$defs/__schema4"
+        },
+        "damage": {
+          "$ref": "#/$defs/__schema5"
+        },
+        "effect": {
+          "type": "string"
+        },
+        "special": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "extraDamage": {
+          "type": "boolean"
+        },
+        "itemType": {
+          "type": "string"
+        },
+        "behaviors": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/__schema6"
+          }
+        }
+      },
+      "required": ["name"],
+      "additionalProperties": {}
+    },
+    "__schema4": {
+      "type": "object",
+      "properties": {
+        "attr1": {
+          "type": "string"
+        },
+        "attr2": {
+          "type": "string"
+        },
+        "value": {
+          "type": "number"
+        },
+        "defense": {
+          "type": "string"
+        }
+      },
+      "required": ["attr1", "attr2"]
+    },
+    "__schema5": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "number"
+        },
+        "type": {
+          "type": "string"
+        },
+        "hrZero": {
+          "type": "boolean"
+        }
+      }
+    },
+    "__schema6": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "default": "",
+          "type": "string"
+        },
+        "trigger": {
+          "default": {
+            "kind": "passive"
+          },
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "passive"
+                }
+              },
+              "required": ["kind"]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "active"
+                }
+              },
+              "required": ["kind"]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "chat-action"
+                },
+                "action": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "const": "guard"
+                    },
+                    {
+                      "type": "string",
+                      "const": "attack"
+                    },
+                    {
+                      "type": "string",
+                      "const": "spell"
+                    },
+                    {
+                      "type": "string",
+                      "const": "equipment"
+                    }
+                  ]
+                },
+                "condition": {
+                  "type": "object",
+                  "properties": {
+                    "guardVariant": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "cover"
+                        },
+                        {
+                          "type": "string",
+                          "const": "no-cover"
+                        }
+                      ]
+                    }
+                  }
+                }
+              },
+              "required": ["kind", "action"]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "reactive"
+                },
+                "event": {
+                  "type": "string",
+                  "const": "ally-targeted"
+                },
+                "cooldown": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "const": "until-next-turn"
+                    },
+                    {
+                      "type": "string",
+                      "const": "until-next-round"
+                    }
+                  ]
+                }
+              },
+              "required": ["kind", "event"]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "combat-start"
+                }
+              },
+              "required": ["kind"]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "combat-end"
+                }
+              },
+              "required": ["kind"]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "on-hit"
+                },
+                "condition": {
+                  "type": "object",
+                  "properties": {
+                    "singleTarget": {
+                      "type": "boolean"
+                    },
+                    "targetHasStatusEffects": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              },
+              "required": ["kind"]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "on-damage-taken"
+                }
+              },
+              "required": ["kind"]
+            }
+          ]
+        },
+        "predicate": {
+          "$ref": "#/$defs/__schema7"
+        },
+        "transfer": {
+          "type": "boolean"
+        },
+        "changes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/__schema8"
+          }
+        },
+        "grants": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/__schema9"
+          }
+        },
+        "voluntaryNoDamage": {
+          "type": "boolean"
+        },
+        "appliesEffect": {
+          "$ref": "#/$defs/__schema10"
+        },
+        "afterEffects": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/__schema11"
+          }
+        },
+        "branches": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "label": {
+                "default": "",
+                "type": "string"
+              },
+              "appliesEffect": {
+                "$ref": "#/$defs/__schema10"
+              },
+              "afterEffects": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/__schema11"
+                }
+              }
+            }
+          }
+        },
+        "manual": {
+          "type": "object",
+          "properties": {
+            "reason": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "const": "prompt-required"
+                },
+                {
+                  "type": "string",
+                  "const": "free-attack"
+                },
+                {
+                  "type": "string",
+                  "const": "future-effect"
+                },
+                {
+                  "type": "string",
+                  "const": "other"
+                }
+              ]
+            },
+            "hint": {
+              "type": "string"
+            }
+          }
+        },
+        "chatOutput": {
+          "type": "object",
+          "properties": {
+            "text": {
+              "type": "string"
+            }
+          },
+          "required": ["text"]
+        }
+      },
+      "required": ["id"]
+    },
+    "__schema7": {
+      "type": "object",
+      "properties": {
+        "crisisInteraction": {
+          "anyOf": [
+            {
+              "type": "string",
+              "const": "none"
+            },
+            {
+              "type": "string",
+              "const": "active"
+            },
+            {
+              "type": "string",
+              "const": "inactive"
+            }
+          ]
+        }
+      }
+    },
+    "__schema8": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "mode": {
+          "anyOf": [
+            {
+              "type": "number",
+              "const": 0
+            },
+            {
+              "type": "number",
+              "const": 1
+            },
+            {
+              "type": "number",
+              "const": 2
+            },
+            {
+              "type": "number",
+              "const": 3
+            },
+            {
+              "type": "number",
+              "const": 4
+            },
+            {
+              "type": "number",
+              "const": 5
+            }
+          ]
+        },
+        "value": {
+          "default": "0",
+          "type": "string"
+        },
+        "priority": {
+          "type": ["number", "null"]
+        }
+      },
+      "required": ["key", "mode"]
+    },
+    "__schema9": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "ref": {
+          "type": "string"
+        }
+      },
+      "required": ["type"]
+    },
+    "__schema10": {
+      "type": "object",
+      "properties": {
+        "label": {
+          "default": "",
+          "type": "string"
+        },
+        "target": {
+          "anyOf": [
+            {
+              "type": "string",
+              "const": "single"
+            },
+            {
+              "type": "string",
+              "const": "all"
+            },
+            {
+              "type": "string",
+              "const": "self"
+            },
+            {
+              "type": "string",
+              "const": "cover-target"
+            }
+          ]
+        },
+        "duration": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "event": {
+                  "type": "string",
+                  "const": "none"
+                }
+              },
+              "required": ["event"]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "event": {
+                  "type": "string",
+                  "const": "rest"
+                }
+              },
+              "required": ["event"]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "event": {
+                  "type": "string",
+                  "const": "end-of-scene"
+                }
+              },
+              "required": ["event"]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "event": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "const": "start-of-turn"
+                    },
+                    {
+                      "type": "string",
+                      "const": "end-of-turn"
+                    },
+                    {
+                      "type": "string",
+                      "const": "end-of-round"
+                    }
+                  ]
+                },
+                "tracking": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "const": "self"
+                    },
+                    {
+                      "type": "string",
+                      "const": "source"
+                    }
+                  ]
+                }
+              },
+              "required": ["event", "tracking"]
+            }
+          ]
+        },
+        "changes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/__schema8"
+          }
+        },
+        "grants": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/__schema9"
+          }
+        },
+        "predicate": {
+          "$ref": "#/$defs/__schema7"
+        }
+      },
+      "required": ["target", "duration"]
+    },
+    "__schema11": {
+      "type": "object",
+      "properties": {
+        "resource": {
+          "anyOf": [
+            {
+              "type": "string",
+              "const": "hp"
+            },
+            {
+              "type": "string",
+              "const": "mp"
+            },
+            {
+              "type": "string",
+              "const": "ip"
+            }
+          ]
+        },
+        "direction": {
+          "anyOf": [
+            {
+              "type": "string",
+              "const": "loss"
+            },
+            {
+              "type": "string",
+              "const": "recovery"
+            }
+          ]
+        },
+        "amount": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string",
+              "const": "half-damage"
+            },
+            {
+              "type": "string",
+              "const": "half-loss"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "expr": {
+                  "type": "string"
+                }
+              },
+              "required": ["expr"]
+            }
+          ]
+        },
+        "target": {
+          "anyOf": [
+            {
+              "type": "string",
+              "const": "self"
+            },
+            {
+              "type": "string",
+              "const": "targets"
+            },
+            {
+              "type": "string",
+              "const": "cover-target"
+            }
+          ]
+        },
+        "predicate": {
+          "$ref": "#/$defs/__schema7"
+        }
+      },
+      "required": ["resource", "direction", "amount", "target"]
+    },
+    "__schema12": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "effect": {
+          "type": "string"
+        },
+        "spCost": {
+          "type": "number"
+        },
+        "behaviors": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/__schema6"
+          }
+        },
+        "_qaAdded": {
+          "type": "boolean"
+        },
+        "_qaSlot": {
+          "type": ["string", "null"]
+        }
+      },
+      "required": ["name"]
+    },
+    "__schema13": {
+      "type": "object",
+      "properties": {
+        "current": {
+          "type": "number"
+        },
+        "bonus": {
+          "type": "number"
+        }
+      },
+      "required": ["current", "bonus"]
+    },
+    "__schema14": {
+      "type": "object",
+      "properties": {
+        "bonus": {
+          "type": "number"
+        },
+        "override": {
+          "type": "number"
+        }
+      },
+      "required": ["bonus"]
+    },
+    "__schema15": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        }
+      },
+      "required": ["enabled"]
+    },
+    "__schema16": {
+      "type": "object",
+      "properties": {
+        "hp": {
+          "type": "number"
+        },
+        "mp": {
+          "type": "number"
+        },
+        "ip": {
+          "type": "number"
+        }
+      },
+      "required": ["hp", "mp", "ip"]
+    },
+    "__schema17": {
+      "type": "object",
+      "properties": {
+        "all": {
+          "type": "number"
+        },
+        "melee": {
+          "type": "number"
+        },
+        "ranged": {
+          "type": "number"
+        },
+        "spell": {
+          "type": "number"
+        },
+        "arcane": {
+          "type": "number"
+        },
+        "bow": {
+          "type": "number"
+        },
+        "brawling": {
+          "type": "number"
+        },
+        "dagger": {
+          "type": "number"
+        },
+        "firearm": {
+          "type": "number"
+        },
+        "flail": {
+          "type": "number"
+        },
+        "heavy": {
+          "type": "number"
+        },
+        "spear": {
+          "type": "number"
+        },
+        "sword": {
+          "type": "number"
+        },
+        "thrown": {
+          "type": "number"
+        },
+        "physical": {
+          "type": "number"
+        },
+        "air": {
+          "type": "number"
+        },
+        "bolt": {
+          "type": "number"
+        },
+        "dark": {
+          "type": "number"
+        },
+        "earth": {
+          "type": "number"
+        },
+        "fire": {
+          "type": "number"
+        },
+        "ice": {
+          "type": "number"
+        },
+        "light": {
+          "type": "number"
+        },
+        "poison": {
+          "type": "number"
+        },
+        "beast": {
+          "type": "number"
+        },
+        "construct": {
+          "type": "number"
+        },
+        "demon": {
+          "type": "number"
+        },
+        "elemental": {
+          "type": "number"
+        },
+        "humanoid": {
+          "type": "number"
+        },
+        "monster": {
+          "type": "number"
+        },
+        "plant": {
+          "type": "number"
+        },
+        "undead": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "all",
+        "melee",
+        "ranged",
+        "spell",
+        "arcane",
+        "bow",
+        "brawling",
+        "dagger",
+        "firearm",
+        "flail",
+        "heavy",
+        "spear",
+        "sword",
+        "thrown",
+        "physical",
+        "air",
+        "bolt",
+        "dark",
+        "earth",
+        "fire",
+        "ice",
+        "light",
+        "poison",
+        "beast",
+        "construct",
+        "demon",
+        "elemental",
+        "humanoid",
+        "monster",
+        "plant",
+        "undead"
+      ]
+    },
+    "__schema18": {
+      "type": "object",
+      "properties": {
+        "hp": {
+          "type": "number"
+        },
+        "mp": {
+          "type": "number"
+        },
+        "ip": {
+          "type": "number"
+        }
+      },
+      "required": ["hp", "mp", "ip"]
+    }
+  }
+}

@@ -12,6 +12,7 @@ import {
 import { normalizeDefensiveList } from "../../libs/equipmentDefensiveNormalization";
 import { availableModules } from "../../libs/pilotVehicleData";
 import { backfillIds } from "./itemIds";
+import { calcMaxHp, calcMaxIp, calcMaxMp } from "../playerCalculations";
 import { renameWillAttrValueDeep } from "./renameWillAttrValue";
 
 type PlayerTransform = (player: TypePlayer) => TypePlayer;
@@ -1526,9 +1527,57 @@ function rehydrateVehicleModules(player: TypePlayer): TypePlayer {
 }
 
 // Always-run transforms.
+// Max HP/MP use resources.<hp|mp>.bonus before modifiers.<hp|mp>, so mirror the
+// manual modifiers there or they are ignored.
+function syncManualResourceBonuses(player: TypePlayer): TypePlayer {
+  const { modifiers, resources } = player;
+  if (!modifiers || !resources) return player;
+  const hp = Number(modifiers.hp) || 0;
+  const mp = Number(modifiers.mp) || 0;
+  if (resources.hp.bonus === hp && resources.mp.bonus === mp) return player;
+  return {
+    ...player,
+    resources: {
+      hp: { ...resources.hp, bonus: hp },
+      mp: { ...resources.mp, bonus: mp },
+    },
+  };
+}
+
+type StatPool = { max?: number };
+
+// The sheet reads stats.<pool>.max and recalculates it from level, attributes
+// and class benefits. A file that has no `max` (for example one written to the
+// schema, which names the cap `base`) would show NaN until that recalculation,
+// so derive it on load.
+function ensureStatMax(player: TypePlayer): TypePlayer {
+  const stats = player.stats as unknown as
+    Record<string, StatPool | undefined> | undefined;
+  if (!stats) return player;
+  const derived: Record<string, () => number> = {
+    hp: () => calcMaxHp(player),
+    mp: () => calcMaxMp(player),
+    ip: () => calcMaxIp(player),
+  };
+  let changed = false;
+  const next: Record<string, StatPool | undefined> = { ...stats };
+  for (const key of Object.keys(derived)) {
+    const pool = stats[key];
+    if (pool && typeof pool.max !== "number") {
+      next[key] = { ...pool, max: derived[key]() };
+      changed = true;
+    }
+  }
+  return changed
+    ? ({ ...player, stats: next } as unknown as TypePlayer)
+    : player;
+}
+
 // Applied on every load regardless of schemaVersion; these guard runtime
 // integrity rather than perform one-time shape changes.
 const ALWAYS_RUN_TRANSFORMS: PlayerTransform[] = [
+  syncManualResourceBonuses, // manual max HP/MP modifiers feed resources bonus
+  ensureStatMax, // sheet reads stats.max, which is recalculated anyway
   syncAutomaticClassLevels, // class lvl must stay in sync with skill totals
   migrateSlotIndexes, // new items may be saved without an index
   backfillItemIds, // new items may be saved without an id
