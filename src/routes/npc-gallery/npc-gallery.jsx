@@ -107,6 +107,7 @@ import {
 } from "./listPreview/constants";
 import NpcListPreview from "./NpcListPreview";
 import NpcListDrawer from "./NpcListDrawer";
+import { useDockedBarInset } from "../../hooks/useDockedBarInset";
 import { useAppBarTop } from "./listPreview/useAppBarTop";
 import DeleteConfirmationDialog from "../../components/common/DeleteConfirmationDialog";
 import MigrationDialog from "../../components/common/MigrationDialog";
@@ -242,6 +243,7 @@ function Personal() {
   const deferredName = useDeferredValue(name);
   const appBarHeight = useAppBarTop();
   const desktop = useMediaQuery("(min-width: 900px)");
+  const dockedBarInset = useDockedBarInset();
   const filterWrapRef = useRef(null);
   const exportButtonRef = useRef(null);
   const [toolsAnchor, setToolsAnchor] = useState(null);
@@ -1118,12 +1120,14 @@ function Personal() {
           position: { md: "sticky" },
           top: { md: appBarHeight },
           zIndex: 2,
-          mx: { md: -3 },
+          ml: { md: -3 },
+          ...dockedBarInset,
           mt: { md: `calc(${appBarHeight}px - 4.5em)` },
           pl: sidebarShifts
             ? `clamp(0px, calc(1200px + 2 * ${SIDEBAR_WIDTH} - 100vw), ${SIDEBAR_WIDTH})`
             : 0,
-          transition: "padding-left 0.2s ease",
+          transition:
+            "padding-left 0.2s ease, margin-right 0.3s ease, padding-right 0.3s ease",
         }}
       >
         <Paper

@@ -167,9 +167,12 @@ const Layout: React.FC<LayoutProps> = ({
     new RegExp(route.replace(/:\w+/, "[^/]+")).test(location.pathname),
   );
 
-  const isGallery = ["/npc-gallery", "/pc-gallery", "/npc-compedium"].includes(
-    location.pathname,
-  );
+  const isGallery = [
+    "/npc-gallery",
+    "/pc-gallery",
+    "/npc-compedium",
+    "/combat-sim",
+  ].includes(location.pathname);
 
   // Determine if the current path is the homepage
   const isHomepage = location.pathname === "/";

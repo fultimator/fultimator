@@ -1,8 +1,13 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useDeferredValue,
+  useMemo,
+} from "react";
 import {
   Button,
   TextField,
-  Grid,
   Box,
   Typography,
   IconButton,
@@ -25,12 +30,16 @@ import {
   DialogContent,
   DialogActions,
   // TODO: re-enable when cross-db encounter copy/move is solved (NPC refs tied to source db)
-  // Divider,
   // ListItemIcon,
-  // ListItemText,
   // Menu as MuiMenu,
-  // MenuItem,
   Fab,
+  Container,
+  Divider,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  useMediaQuery,
 } from "@mui/material";
 import { useNavigate, useLocation } from "react-router";
 import SettingsIcon from "@mui/icons-material/Settings";
@@ -38,12 +47,16 @@ import StorageIcon from "@mui/icons-material/Storage";
 import CloudIcon from "@mui/icons-material/Cloud";
 import Layout from "../../components/Layout";
 import { useTheme } from "@mui/material/styles";
-import CustomHeaderAlt from "../../components/common/CustomHeaderAlt";
+import AppBarSearch from "../../components/appbar/AppBarSearch";
+import MasonryColumns from "../../components/common/MasonryColumns";
+import { useDockedBarInset } from "../../hooks/useDockedBarInset";
+import { useAppBarTop } from "../npc-gallery/listPreview/useAppBarTop";
 import SettingsDialog from "../../components/combatSim/SettingsDialog";
 import {
   Delete,
   /*DriveFileMove, FileCopy,*/ LibraryAddCheck,
-  SportsMartialArts,
+  DeleteSweep,
+  Add,
   KeyboardArrowUp,
 } from "@mui/icons-material";
 import { t } from "../../translation/translate";
@@ -69,17 +82,27 @@ import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 
 const MAX_ENCOUNTERS = 3;
 
+const toolButtonSx = {
+  width: 36,
+  height: 36,
+  border: 1,
+  borderColor: "divider",
+  borderRadius: 1,
+};
+
 export default function CombatSimulatorEncounters() {
   const { authLoading, dbMode } = useDatabaseContext();
 
   return (
     <Layout fullWidth>
-      {authLoading && (
-        <Box sx={{ display: "flex", justifyContent: "center", mt: 10 }}>
-          <CircularProgress />
-        </Box>
-      )}
-      {!authLoading && <CombatSimEncounters key={dbMode} />}
+      <Box sx={{ px: { xs: 2, md: 3 } }}>
+        {authLoading && (
+          <Box sx={{ display: "flex", justifyContent: "center", mt: 10 }}>
+            <CircularProgress />
+          </Box>
+        )}
+        {!authLoading && <CombatSimEncounters key={dbMode} />}
+      </Box>
     </Layout>
   );
 }
@@ -139,12 +162,19 @@ const CombatSimEncounters = () => {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [selectMode, setSelectMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState(new Set());
+  const [search, setSearch] = useState("");
+  const deferredSearch = useDeferredValue(search);
+  const [sort, setSort] = useState("updatedAt");
+  const [direction, setDirection] = useState("descending");
+  const [createOpen, setCreateOpen] = useState(false);
+  const desktop = useMediaQuery("(min-width: 900px)");
+  const dockedBarInset = useDockedBarInset();
+  const appBarHeight = useAppBarTop();
   // TODO: re-enable when cross-db encounter copy/move is solved
   // const [copyAnchor, setCopyAnchor] = useState(null);
   // const [moveAnchor, setMoveAnchor] = useState(null);
   const navigate = useNavigate();
   const theme = useTheme();
-  const isDarkMode = theme.palette.mode === "dark";
 
   const settingsStore = useCombatSimSettingsStore();
   const [localSettings, setLocalSettings] = useState({});
@@ -168,6 +198,25 @@ const CombatSimEncounters = () => {
       setEncounters(sortedEncounters);
     }
   }, [encountersList, loading]);
+
+  const filteredEncounters = useMemo(() => {
+    const query = deferredSearch.trim().toLowerCase();
+    const factor = direction === "ascending" ? 1 : -1;
+    const valueOf = (encounter) =>
+      sort === "name"
+        ? (encounter.name ?? "")
+        : new Date(encounter[sort] ?? 0).getTime();
+    return encounters
+      .filter((encounter) =>
+        query ? (encounter.name ?? "").toLowerCase().includes(query) : true,
+      )
+      .sort((a, b) => {
+        const [va, vb] = [valueOf(a), valueOf(b)];
+        return (
+          factor * (typeof va === "string" ? va.localeCompare(vb) : va - vb)
+        );
+      });
+  }, [encounters, deferredSearch, sort, direction]);
 
   // Initialize settings
   useEffect(() => {
@@ -239,6 +288,7 @@ const CombatSimEncounters = () => {
     }
 
     setEncounterName("");
+    setCreateOpen(false);
   };
 
   const handleDeleteEncounter = async (id) => {
@@ -414,88 +464,133 @@ const CombatSimEncounters = () => {
     );
   }
 
+  const clearFilters = () => {
+    setSearch("");
+    setSort("updatedAt");
+    setDirection("descending");
+  };
+
+  const activeFilters = [
+    sort !== "updatedAt" && sort,
+    direction !== "descending" && direction,
+  ].filter(Boolean);
+
+  const filterPanel = (
+    <Box
+      sx={{
+        display: "grid",
+        gridTemplateColumns: {
+          xs: "repeat(2, minmax(0, 1fr))",
+          md: "repeat(2, minmax(0, 1fr)) auto",
+        },
+        alignItems: "center",
+        gap: 1.5,
+      }}
+    >
+      <FormControl fullWidth size="small">
+        <InputLabel id="encounter-sort">{t("Sort:")}</InputLabel>
+        <Select
+          labelId="encounter-sort"
+          value={sort}
+          label={t("Sort:")}
+          onChange={(evt) => setSort(evt.target.value)}
+        >
+          <MenuItem value="updatedAt">{t("updated_date")}</MenuItem>
+          <MenuItem value="createdAt">{t("creation_date")}</MenuItem>
+          <MenuItem value="name">{t("Name")}</MenuItem>
+        </Select>
+      </FormControl>
+      <FormControl fullWidth size="small">
+        <InputLabel id="encounter-direction">{t("Direction:")}</InputLabel>
+        <Select
+          labelId="encounter-direction"
+          value={direction}
+          label={t("Direction:")}
+          onChange={(evt) => setDirection(evt.target.value)}
+        >
+          <MenuItem value="ascending">{t("Ascending")}</MenuItem>
+          <MenuItem value="descending">{t("Descending")}</MenuItem>
+        </Select>
+      </FormControl>
+      <Button
+        variant="outlined"
+        color="warning"
+        startIcon={<DeleteSweep />}
+        disabled={!activeFilters.length && !search}
+        onClick={clearFilters}
+        sx={{ gridColumn: { xs: "1 / -1", md: "auto" } }}
+      >
+        {t("clear_search_filters")}
+      </Button>
+    </Box>
+  );
+
   return (
-    <Box sx={{ padding: 3, maxWidth: "1200px", margin: "auto" }}>
-      <Paper
-        elevation={isDarkMode ? 6 : 3}
+    <>
+      <AppBarSearch
+        value={search}
+        onChange={setSearch}
+        placeholder={t("Search encounters")}
+        chips={activeFilters}
+        panel={filterPanel}
+      />
+      <Box
         sx={{
-          p: "14px",
-          borderRadius: "8px",
-          border: `2px solid ${theme.palette.secondary.main}`,
-          backgroundColor: theme.palette.background.paper,
-          display: "flex",
-          flexDirection: "column",
-          position: "relative",
+          mb: 2.5,
+          position: { md: "sticky" },
+          top: { md: appBarHeight },
+          zIndex: 2,
+          ml: { md: -3 },
+          ...dockedBarInset,
+          transition: "margin-right 0.3s ease, padding-right 0.3s ease",
+          mt: { md: `calc(${appBarHeight}px - 4.5em)` },
         }}
       >
-        {/* Header with Settings Button */}
-        <CustomHeaderAlt
-          headerText={t("combat_sim_title")}
-          icon={<SportsMartialArts fontSize="large" />}
-        />
-
-        <div style={{ paddingLeft: 10, paddingRight: 10 }}>
-          <Typography
-            variant="h6"
-            gutterBottom
-            sx={{
-              color: "text.primary",
-            }}
-          >
-            {t("combat_sim_new_encounter")}
-          </Typography>
-          <Grid container spacing={2}>
-            <Grid
-              size={{
-                xs: 12,
-                sm: 8,
-              }}
-            >
-              <TextField
-                label={t("combat_sim_encounter_name")}
-                variant="outlined"
-                fullWidth
-                value={encounterName}
-                onKeyDown={handleKeyDown}
-                onChange={handleEncounterNameChange}
-                disabled={dbMode === "cloud" && !cloudUser}
-                slotProps={{
-                  htmlInput: { maxLength: 200 },
-                }}
-              />
-            </Grid>
-            <Grid
-              size={{
-                xs: 12,
-                sm: 4,
+        <Paper
+          square={desktop}
+          elevation={desktop ? 3 : 1}
+          sx={{
+            px: { xs: 2, md: 0 },
+            py: 1,
+            backgroundImage: "none",
+            backgroundColor: (muiTheme) => muiTheme.palette.background.paper,
+          }}
+        >
+          <Container disableGutters={!desktop}>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                flexWrap: "wrap",
+                gap: 1.5,
+                rowGap: 1,
+                "& .MuiToggleButton-root, & .MuiButton-root:not(.MuiToggleButton-root)":
+                  { height: 36 },
               }}
             >
               <Button
                 variant="contained"
-                color="primary"
-                fullWidth
-                onClick={handleSaveEncounter}
-                disabled={!encounterName || isAtCloudLimit}
-                sx={{ height: "100%" }}
+                startIcon={<Add />}
+                onClick={() => setCreateOpen(true)}
+                disabled={(dbMode === "cloud" && !cloudUser) || isAtCloudLimit}
+                sx={{
+                  flex: { xs: "1 1 100%", md: "none" },
+                  order: { xs: 1, md: 0 },
+                  whiteSpace: "nowrap",
+                }}
               >
                 {t("combat_sim_create_encounter")}
               </Button>
-            </Grid>
-          </Grid>
-          <Box
-            sx={{
-              mt: 2,
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
               <ToggleButtonGroup
                 value={dbMode}
                 exclusive
                 size="small"
                 onChange={(_, val) => val && requestModeSwitch(val)}
+                sx={{
+                  flex: { xs: 1, md: "none" },
+                  order: { xs: 2, md: 0 },
+                  "& .MuiToggleButton-root": { flex: { xs: 1, md: "none" } },
+                }}
               >
                 <ToggleButton value="local">
                   <StorageIcon sx={{ mr: 0.5 }} fontSize="small" />
@@ -506,181 +601,192 @@ const CombatSimEncounters = () => {
                   {t("Cloud")}
                 </ToggleButton>
               </ToggleButtonGroup>
-              {dbMode === "local" && <DriveSync />}
-              <Typography
-                variant="h5"
-                sx={{
-                  color: "text.primary",
-                }}
-              >
-                {t("combat_sim_saved_encounters")}{" "}
-                {dbMode === "cloud"
-                  ? `(${encounters.length}/${MAX_ENCOUNTERS})`
-                  : `(${encounters.length})`}
-              </Typography>
-            </Box>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              <Tooltip
-                title={
-                  selectMode ? t("Exit Select Mode") : t("Select Encounters")
-                }
-              >
-                <Button
-                  variant={selectMode ? "contained" : "outlined"}
-                  size="small"
-                  startIcon={<LibraryAddCheck />}
-                  onClick={toggleSelectMode}
-                >
-                  {t("Select")}
-                </Button>
-              </Tooltip>
+              {dbMode === "local" && (
+                <Box sx={{ order: { xs: 3, md: 0 } }}>
+                  <DriveSync />
+                </Box>
+              )}
+              <Box sx={{ flex: 1, display: { xs: "none", md: "block" } }} />
               <Tooltip title={t("combat_sim_settings")}>
                 <IconButton
-                  color={isDarkMode ? "white" : "primary"}
+                  aria-label={t("combat_sim_settings")}
+                  sx={{ ...toolButtonSx, order: { xs: 4, md: 0 } }}
                   onClick={() => setSettingsOpen(true)}
                 >
                   <SettingsIcon />
                 </IconButton>
               </Tooltip>
-            </Box>
-          </Box>
-
-          {/* Select mode action bar */}
-          <Collapse in={selectMode}>
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                flexWrap: "wrap",
-                gap: 1,
-                mt: 0.75,
-                pt: 0.75,
-                borderTop: 1,
-                borderColor: "divider",
-              }}
-            >
-              <Typography
-                variant="body2"
+              <Divider
+                orientation="vertical"
+                flexItem
+                sx={{ display: { xs: "none", md: "block" } }}
+              />
+              <Box
                 sx={{
-                  color: "text.secondary",
+                  display: { xs: "flex", md: "contents" },
+                  alignItems: "center",
+                  gap: 1.5,
+                  flex: "1 1 100%",
+                  order: { xs: 5, md: 0 },
                 }}
               >
-                {selectedIds.size} {t("selected")}
-              </Typography>
-              <Box sx={{ flex: 1 }} />
-              {/* TODO: re-enable Copy/Move when cross-db encounter solution is ready */}
-              {/* <Button size="small" variant="outlined" startIcon={<FileCopy />} onClick={(e) => setCopyAnchor(e.currentTarget)}>{t("Copy")}</Button> */}
-              {/* <Button size="small" variant="outlined" startIcon={<DriveFileMove />} onClick={(e) => setMoveAnchor(e.currentTarget)}>{t("Move")}</Button> */}
-              <Tooltip title={`${t("Delete Selected")} (${selectedIds.size})`}>
-                <span>
-                  <IconButton
-                    onClick={deleteSelectedEncounters}
-                    disabled={selectedIds.size === 0}
-                    color="error"
+                <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                  {t("combat_sim_saved_encounters")}{" "}
+                  {dbMode === "cloud"
+                    ? `(${encounters.length}/${MAX_ENCOUNTERS})`
+                    : `(${encounters.length})`}
+                </Typography>
+                <Tooltip
+                  title={
+                    selectMode ? t("Exit Select Mode") : t("Select Encounters")
+                  }
+                >
+                  <Button
+                    variant={selectMode ? "contained" : "outlined"}
+                    startIcon={<LibraryAddCheck />}
+                    onClick={toggleSelectMode}
+                    sx={{ ml: { xs: "auto", md: 0 } }}
                   >
-                    <Delete />
-                  </IconButton>
-                </span>
-              </Tooltip>
+                    {t("Select")}
+                  </Button>
+                </Tooltip>
+              </Box>
             </Box>
-          </Collapse>
-        </div>
-      </Paper>
-      {dbMode === "cloud" && !cloudUser && (
-        <Paper
-          elevation={3}
-          sx={{
-            p: 2,
-            mt: 2,
-            mb: 2,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 2,
-            flexWrap: "wrap",
-          }}
-        >
-          <CloudIcon color="primary" />
-          <Typography
-            variant="body2"
+            <Collapse in={selectMode}>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  flexWrap: "wrap",
+                  gap: 1,
+                  mt: 0.75,
+                  pt: 0.75,
+                  borderTop: 1,
+                  borderColor: "divider",
+                }}
+              >
+                <Typography variant="body2" sx={{ color: "text.secondary" }}>
+                  {selectedIds.size} {t("selected")}
+                </Typography>
+                <Box sx={{ flex: 1 }} />
+                <Tooltip
+                  title={`${t("Delete Selected")} (${selectedIds.size})`}
+                >
+                  <span>
+                    <IconButton
+                      onClick={deleteSelectedEncounters}
+                      disabled={selectedIds.size === 0}
+                      color="error"
+                    >
+                      <Delete />
+                    </IconButton>
+                  </span>
+                </Tooltip>
+              </Box>
+            </Collapse>
+          </Container>
+        </Paper>
+      </Box>
+      <Container disableGutters={!desktop}>
+        {dbMode === "cloud" && !cloudUser && (
+          <Paper
+            elevation={3}
             sx={{
-              color: "text.primary",
-              flex: 1,
-              minWidth: 200,
+              p: 2,
+              mb: 2,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 2,
+              flexWrap: "wrap",
             }}
           >
-            {t("You have to be logged in to access this feature")}
-          </Typography>
-          <SignIn />
-        </Paper>
-      )}
-      <Grid container spacing={3} sx={{ marginTop: 2 }}>
-        {loading ? (
-          <Grid
-            sx={{ display: "flex", justifyContent: "center", py: 4 }}
-            size={12}
-          >
-            <CircularProgress color="primary" />
-          </Grid>
-        ) : encounters.length === 0 ? (
-          <Grid size={12}>
-            <Paper
-              sx={{
-                p: 3,
-                textAlign: "center",
-                borderRadius: 2,
-                backgroundColor: theme.palette.background.paper,
-                border: `1px dashed ${theme.palette.divider}`,
-              }}
+            <CloudIcon color="primary" />
+            <Typography
+              variant="body2"
+              sx={{ color: "text.primary", flex: 1, minWidth: 200 }}
             >
-              <Typography
-                variant="h6"
-                gutterBottom
-                sx={{
-                  color: "text.secondary",
-                }}
-              >
-                {t("combat_sim_no_encounters")}
-              </Typography>
-              <Typography
-                variant="body2"
-                sx={{
-                  color: "text.secondary",
-                }}
-              >
-                {t("combat_sim_create_first_encounter")}
-              </Typography>
-            </Paper>
-          </Grid>
-        ) : (
-          encounters.map((encounter) => (
-            <Grid
-              key={encounter.id}
-              size={{
-                xs: 12,
-                sm: 6,
-                md: 4,
-              }}
-            >
-              <EncounterCard
-                encounter={encounter}
-                onDelete={handleDeleteEncounter}
-                onClick={() => handleNavigateToEncounter(encounter)}
-                onMigrate={() => {
-                  setPendingMigrationEncounter(encounter);
-                  setPendingMigrationAction("migrate");
-                }}
-                hasPendingMigrations={
-                  getPendingMigrationCounts(encounter).total > 0
-                }
-                selectMode={selectMode}
-                isSelected={selectedIds.has(encounter.id)}
-                onToggleSelect={toggleSelectEncounter}
-              />
-            </Grid>
-          ))
+              {t("You have to be logged in to access this feature")}
+            </Typography>
+            <SignIn />
+          </Paper>
         )}
-      </Grid>
+        {encounters.length === 0 ? (
+          <Paper
+            sx={{
+              p: 3,
+              textAlign: "center",
+              borderRadius: 2,
+              backgroundColor: theme.palette.background.paper,
+              border: `1px dashed ${theme.palette.divider}`,
+            }}
+          >
+            <Typography
+              variant="h6"
+              gutterBottom
+              sx={{ color: "text.secondary" }}
+            >
+              {t("combat_sim_no_encounters")}
+            </Typography>
+            <Typography variant="body2" sx={{ color: "text.secondary" }}>
+              {t("combat_sim_create_first_encounter")}
+            </Typography>
+          </Paper>
+        ) : (
+          <MasonryColumns columnWidth={360}>
+            {filteredEncounters.map((encounter) => (
+              <Box key={encounter.id} sx={{ mb: 2.5 }}>
+                <EncounterCard
+                  encounter={encounter}
+                  onDelete={handleDeleteEncounter}
+                  onClick={() => handleNavigateToEncounter(encounter)}
+                  onMigrate={() => {
+                    setPendingMigrationEncounter(encounter);
+                    setPendingMigrationAction("migrate");
+                  }}
+                  hasPendingMigrations={
+                    getPendingMigrationCounts(encounter).total > 0
+                  }
+                  selectMode={selectMode}
+                  isSelected={selectedIds.has(encounter.id)}
+                  onToggleSelect={toggleSelectEncounter}
+                />
+              </Box>
+            ))}
+          </MasonryColumns>
+        )}
+      </Container>
+      <Dialog
+        open={createOpen}
+        onClose={() => setCreateOpen(false)}
+        fullWidth
+        maxWidth="xs"
+      >
+        <DialogTitle>{t("combat_sim_new_encounter")}</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            label={t("combat_sim_encounter_name")}
+            variant="outlined"
+            fullWidth
+            value={encounterName}
+            onKeyDown={handleKeyDown}
+            onChange={handleEncounterNameChange}
+            sx={{ mt: 1 }}
+            slotProps={{ htmlInput: { maxLength: 200 } }}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setCreateOpen(false)}>{t("Cancel")}</Button>
+          <Button
+            variant="contained"
+            onClick={handleSaveEncounter}
+            disabled={!encounterName || isAtCloudLimit}
+          >
+            {t("combat_sim_create_encounter")}
+          </Button>
+        </DialogActions>
+      </Dialog>
       {/* Settings Dialog */}
       <SettingsDialog
         open={settingsOpen}
@@ -872,6 +978,6 @@ const CombatSimEncounters = () => {
           </Fab>
         </Tooltip>
       )}
-    </Box>
+    </>
   );
 };

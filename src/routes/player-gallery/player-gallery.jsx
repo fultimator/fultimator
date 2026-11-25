@@ -55,6 +55,7 @@ import {
 } from "@mui/material";
 import MasonryColumns from "../../components/common/MasonryColumns";
 import { usePersistentState } from "../../hooks/usePersistentState";
+import { useDockedBarInset } from "../../hooks/useDockedBarInset";
 import { useAppBarTop } from "../npc-gallery/listPreview/useAppBarTop";
 import MasonryCard from "../npc-gallery/listPreview/MasonryCard";
 import { scrollToCardId } from "../npc-gallery/listPreview/utils";
@@ -180,6 +181,7 @@ function Personal() {
     "phone",
   );
   const desktop = useMediaQuery("(min-width: 900px)");
+  const dockedBarInset = useDockedBarInset();
   const [sidebarOpen, setSidebarOpen] = usePersistentState(
     "playerGallery.sidebar",
     false,
@@ -1175,12 +1177,14 @@ function Personal() {
           position: { md: "sticky" },
           top: { md: appBarHeight },
           zIndex: 2,
-          mx: { md: -3 },
+          ml: { md: -3 },
+          ...dockedBarInset,
           mt: { md: `calc(${appBarHeight}px - 4.5em)` },
           pl: sidebarShifts
             ? `clamp(0px, calc(1200px + 2 * ${SIDEBAR_WIDTH} - 100vw), ${SIDEBAR_WIDTH})`
             : 0,
-          transition: "padding-left 0.2s ease",
+          transition:
+            "padding-left 0.2s ease, margin-right 0.3s ease, padding-right 0.3s ease",
         }}
       >
         <Paper
