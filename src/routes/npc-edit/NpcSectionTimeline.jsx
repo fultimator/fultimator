@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Box,
   Button,
@@ -41,77 +41,117 @@ const SECTIONS = [
   { id: "edit-section-attackchance", label: "Attack Chance", Icon: QueryStats },
 ];
 
-const IDS = SECTIONS.map((section) => section.id);
+const SAME_ROW_TOLERANCE = 12;
+const ACTIVE_LINE = 0.3;
+
+const present = () => SECTIONS.filter(({ id }) => document.getElementById(id));
+
+function findActiveRow(tops, { pinnedId, atBottom, line }) {
+  let current = atBottom ? tops.at(-1) : tops[0];
+  const pinnedTop = tops.find(({ id }) => id === pinnedId);
+  if (pinnedTop) current = pinnedTop;
+  else if (!atBottom)
+    tops.forEach((entry) => {
+      if (entry.top <= line && entry.top >= current.top - 1) current = entry;
+    });
+  return tops
+    .filter(({ top }) => Math.abs(top - current.top) <= SAME_ROW_TOLERANCE)
+    .map(({ id }) => id);
+}
 
 function useActiveSection() {
-  const [active, setActive] = useState(IDS[0]);
+  const [active, setActive] = useState([SECTIONS[0].id]);
   const [sections, setSections] = useState([]);
+  const pinned = useRef(null);
+  const update = useRef(() => {});
 
   useEffect(() => {
-    setSections(SECTIONS.filter(({ id }) => document.getElementById(id)));
-    const visible = new Set();
-    const observer = new window.IntersectionObserver(
-      (entries) => {
-        entries.forEach(({ target, isIntersecting }) =>
-          isIntersecting ? visible.add(target.id) : visible.delete(target.id),
-        );
-        const first = IDS.find((id) => visible.has(id));
-        if (first) setActive(first);
-      },
-      { rootMargin: `-${APP_BAR_OFFSET}px 0px -55% 0px` },
-    );
-    IDS.forEach((id) => {
-      const el = document.getElementById(id);
-      if (el) observer.observe(el);
-    });
-
-    const onScroll = () => {
-      const atBottom =
-        window.innerHeight + window.scrollY >=
-        document.documentElement.scrollHeight - BOTTOM_TOLERANCE;
-      if (!atBottom) return;
-      const last = [...IDS].reverse().find((id) => document.getElementById(id));
-      if (last) setActive(last);
+    let frame = 0;
+    update.current = () => {
+      frame = 0;
+      const found = present();
+      setSections((prev) => (prev.length === found.length ? prev : found));
+      if (!found.length) return;
+      const row = findActiveRow(
+        found.map(({ id }) => ({
+          id,
+          top: document.getElementById(id).getBoundingClientRect().top,
+        })),
+        {
+          pinnedId: pinned.current,
+          atBottom:
+            window.innerHeight + window.scrollY >=
+            document.documentElement.scrollHeight - BOTTOM_TOLERANCE,
+          line: APP_BAR_OFFSET + window.innerHeight * ACTIVE_LINE,
+        },
+      );
+      setActive((prev) =>
+        prev.length === row.length && prev.every((id, i) => id === row[i])
+          ? prev
+          : row,
+      );
     };
-    window.addEventListener("scroll", onScroll, { passive: true });
+    const schedule = () => {
+      frame ||= window.requestAnimationFrame(update.current);
+    };
+    const release = () => {
+      pinned.current = null;
+      schedule();
+    };
+    const events = {
+      scroll: schedule,
+      resize: schedule,
+      wheel: release,
+      touchmove: release,
+      keydown: release,
+    };
 
+    update.current();
+    Object.entries(events).forEach(([type, fn]) =>
+      window.addEventListener(type, fn, { passive: true }),
+    );
     return () => {
-      observer.disconnect();
-      window.removeEventListener("scroll", onScroll);
+      window.cancelAnimationFrame(frame);
+      Object.entries(events).forEach(([type, fn]) =>
+        window.removeEventListener(type, fn),
+      );
     };
   }, []);
 
-  return { active, sections };
-}
+  const select = (id) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    pinned.current = id;
+    update.current();
+    window.scrollTo({
+      top: el.getBoundingClientRect().top + window.scrollY - APP_BAR_OFFSET,
+      behavior: "smooth",
+    });
+  };
 
-function scrollToSection(id) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  const top = el.getBoundingClientRect().top + window.scrollY - APP_BAR_OFFSET;
-  window.scrollTo({ top, behavior: "smooth" });
+  return { active, sections, select };
 }
 
 function TimelineList({ sections, active, showLabels, onSelect }) {
   const { t } = useTranslate();
-  const activeIndex = sections.findIndex(({ id }) => id === active);
+  const lastActive = Math.max(
+    -1,
+    ...sections.flatMap(({ id }, i) => (active.includes(id) ? [i] : [])),
+  );
 
   return (
     <Box
       sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}
     >
       {sections.map(({ id, label, Icon }, index) => {
-        const isActive = id === active;
-        const reached = index <= activeIndex;
+        const isActive = active.includes(id);
         const dot = (
           <Button
-            onClick={() => {
-              scrollToSection(id);
-              onSelect?.();
-            }}
+            onClick={() => onSelect(id)}
             aria-label={t(label)}
             aria-current={isActive ? "location" : undefined}
             variant={isActive ? "contained" : "outlined"}
-            color={reached ? "primary" : "inherit"}
+            color={index <= lastActive ? "primary" : "inherit"}
             size="small"
             startIcon={showLabels ? <Icon /> : undefined}
             sx={{
@@ -149,7 +189,7 @@ function TimelineList({ sections, active, showLabels, onSelect }) {
                   width: 2,
                   height: 14,
                   ml: showLabels ? "21px" : 0,
-                  bgcolor: index < activeIndex ? "primary.main" : "divider",
+                  bgcolor: index < lastActive ? "primary.main" : "divider",
                   transition: "background-color 0.2s ease",
                 }}
               />
@@ -165,10 +205,11 @@ export default function NpcSectionTimeline() {
   const { t } = useTranslate();
   const wide = useMediaQuery("(min-width: 1400px)");
   const roomy = useMediaQuery("(min-width: 1640px)");
-  const { active, sections } = useActiveSection();
+  const { active, sections, select } = useActiveSection();
   const [anchor, setAnchor] = useState(null);
+  const list = { sections, active };
 
-  if (wide) {
+  if (wide)
     return (
       <Paper
         component="nav"
@@ -182,10 +223,9 @@ export default function NpcSectionTimeline() {
           p: 1,
         }}
       >
-        <TimelineList sections={sections} active={active} showLabels={roomy} />
+        <TimelineList {...list} showLabels={roomy} onSelect={select} />
       </Paper>
     );
-  }
 
   return (
     <>
@@ -209,10 +249,12 @@ export default function NpcSectionTimeline() {
       >
         <Box sx={{ p: 1.5, minWidth: 200 }}>
           <TimelineList
-            sections={sections}
-            active={active}
+            {...list}
             showLabels
-            onSelect={() => setAnchor(null)}
+            onSelect={(id) => {
+              select(id);
+              setAnchor(null);
+            }}
           />
         </Box>
       </Popover>
