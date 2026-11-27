@@ -1,3 +1,4 @@
+import { selectedToggleSx } from "../../components/common/selectedToggleSx";
 import {
   Link as RouterLink,
   useSearchParams,
@@ -1085,16 +1086,7 @@ function Personal() {
         <IconButton
           aria-label={t("Adversaries")}
           aria-pressed={desktop && sidebarOpen}
-          color={desktop && sidebarOpen ? "primary" : "default"}
-          sx={{
-            ...toolButtonSx,
-            ...(desktop &&
-              sidebarOpen && {
-                bgcolor: "action.selected",
-                borderColor: "primary.main",
-              }),
-            ...sx,
-          }}
+          sx={[toolButtonSx, desktop && sidebarOpen && selectedToggleSx, sx]}
           onClick={() =>
             desktop ? setSidebarOpen(!sidebarOpen) : setListDrawerOpen(true)
           }

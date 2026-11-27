@@ -738,6 +738,7 @@ export default function NpcEdit() {
               right: 0,
               bottom: 0,
               zIndex: 1300,
+              backgroundImage: "none",
               borderTop: "1px solid",
               borderColor: "divider",
               display: "flex",
@@ -811,9 +812,19 @@ export default function NpcEdit() {
               <Tooltip title={t("Save")} placement="top">
                 <span>
                   <IconButton
-                    color={isUpdated && isOwner ? "primary" : "default"}
                     onClick={handleSave}
                     disabled={!isOwner || !isUpdated}
+                    sx={{
+                      borderRadius: 1,
+                      color: "#fff",
+                      bgcolor: "primary.main",
+                      "&:hover": { bgcolor: "primary.dark" },
+                      "&.Mui-disabled": {
+                        bgcolor: "transparent",
+                        color: "text.secondary",
+                        opacity: 0.6,
+                      },
+                    }}
                     aria-label="save"
                   >
                     <Save />

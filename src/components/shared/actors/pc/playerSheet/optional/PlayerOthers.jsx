@@ -11,6 +11,47 @@ import { highlightMatch } from "/src/components/shared/actors/pc/variants/compac
 import { sendDisplayMessage } from "/src/hooks/useRollToChat";
 import { SharedOptionalCard } from "/src/components/shared/items";
 
+export function OtherClock({ other, index, setPlayer, compact, primary }) {
+  const { t } = useTranslate();
+  const sections = other.clockEnabled
+    ? (other.clockSections ?? other.clock?.sections ?? 6)
+    : (other.clock?.sections ?? 0);
+  if (!(sections > 0)) return null;
+  const clockState = other.clockState ?? new Array(sections).fill(false);
+
+  const persistState = (newState) => {
+    if (!setPlayer) return;
+    setPlayer((prev) => {
+      const updated = [...(prev.others ?? [])];
+      updated[index] = { ...updated[index], clockState: newState };
+      return { ...prev, others: updated };
+    });
+  };
+
+  return (
+    <ClockControls
+      sections={sections}
+      state={clockState}
+      setState={persistState}
+      label={
+        <Typography
+          sx={{
+            fontWeight: "bold",
+            fontSize: compact ? "0.85rem" : "0.9rem",
+            lineHeight: 1.3,
+          }}
+          noWrap
+        >
+          {t("Clock")}
+        </Typography>
+      }
+      clockSize={compact ? 36 : 60}
+      compact={compact}
+      theme={{ primary }}
+    />
+  );
+}
+
 function OtherItem({
   other,
   index,
@@ -25,23 +66,6 @@ function OtherItem({
 }) {
   const { t } = useTranslate();
   const [isOpen, setIsOpen] = useState(false);
-
-  const sections = other.clockEnabled
-    ? (other.clockSections ?? other.clock?.sections ?? 6)
-    : (other.clock?.sections ?? 0);
-  const hasClock = sections > 0;
-  const clockState = hasClock
-    ? (other.clockState ?? new Array(sections).fill(false))
-    : [];
-
-  const persistState = (newState) => {
-    if (!setPlayer) return;
-    setPlayer((prev) => {
-      const updated = [...(prev.others ?? [])];
-      updated[index] = { ...updated[index], clockState: newState };
-      return { ...prev, others: updated };
-    });
-  };
 
   const hasDetails = !!(other.description || other.effect);
   const forceOpen =
@@ -96,29 +120,6 @@ function OtherItem({
     </Box>
   ) : null;
 
-  const clock = hasClock ? (
-    <ClockControls
-      sections={sections}
-      state={clockState}
-      setState={persistState}
-      label={
-        <Typography
-          sx={{
-            fontWeight: "bold",
-            fontSize: compact ? "0.85rem" : "0.9rem",
-            lineHeight: 1.3,
-          }}
-          noWrap
-        >
-          {t("Clock")}
-        </Typography>
-      }
-      clockSize={compact ? 36 : 60}
-      compact={compact}
-      theme={{ primary }}
-    />
-  ) : null;
-
   return (
     <React.Fragment>
       <ItemRowCard
@@ -145,7 +146,13 @@ function OtherItem({
       >
         {body}
       </ItemRowCard>
-      {clock}
+      <OtherClock
+        other={other}
+        index={index}
+        setPlayer={setPlayer}
+        compact={compact}
+        primary={primary}
+      />
     </React.Fragment>
   );
 }

@@ -1,3 +1,4 @@
+import { selectedToggleSx } from "../../components/common/selectedToggleSx";
 import {
   addDoc,
   deleteDoc,
@@ -34,6 +35,8 @@ import {
   Chip,
   Box,
   ButtonBase,
+  useMediaQuery,
+  Divider,
 } from "@mui/material";
 import Layout from "../../components/Layout";
 import AppBarSearch from "../../components/appbar/AppBarSearch";
@@ -49,6 +52,9 @@ import {
   Report,
   KeyboardArrowUp,
   DeleteSweep,
+  ViewList,
+  UnfoldLess,
+  UnfoldMore,
 } from "@mui/icons-material";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router";
@@ -65,6 +71,17 @@ import undeadToken from "/images/routes/icons/species/Undead-token.webp";
 import useDownloadImage from "../../hooks/useDownloadImage";
 import { usePersistentState } from "../../hooks/usePersistentState";
 import MasonryCard from "../npc-gallery/listPreview/MasonryCard";
+import MobileListBar from "../npc-gallery/listPreview/MobileListBar";
+import PreviewWidthToggle from "../npc-gallery/listPreview/PreviewWidthToggle";
+import NpcListDrawer from "../npc-gallery/NpcListDrawer";
+import { scrollToCardId } from "../npc-gallery/listPreview/utils";
+import {
+  MASONRY_WIDTHS,
+  MOBILE_LIST_BAR_HEIGHT,
+  SIDEBAR_WIDTH,
+} from "../npc-gallery/listPreview/constants";
+import { useAppBarTop } from "../npc-gallery/listPreview/useAppBarTop";
+import { useDockedBarInset } from "../../hooks/useDockedBarInset";
 import MasonryColumns from "../../components/common/MasonryColumns";
 import Export from "../../components/Export";
 import {
@@ -74,6 +91,14 @@ import {
 import { useTranslate, languageOptions } from "../../translation/translate";
 
 import ReportContentDialog from "../../components/appbar/ReportContentDialog";
+
+const TOOL_BUTTON_SX = {
+  width: 36,
+  height: 36,
+  border: 1,
+  borderColor: "divider",
+  borderRadius: 1,
+};
 
 export default function NpcCompedium() {
   const { t } = useTranslate();
@@ -137,6 +162,69 @@ function Personal({ user }) {
     "npcCompendium.collapse",
     true,
   );
+
+  const desktop = useMediaQuery("(min-width: 900px)");
+  const appBarHeight = useAppBarTop();
+  const dockedBarInset = useDockedBarInset();
+  const [listDrawerOpen, setListDrawerOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = usePersistentState(
+    "npcCompendium.sidebar",
+    false,
+  );
+  const [highlightId, setHighlightId] = useState(null);
+  const [masonrySize, setMasonrySize] = usePersistentState(
+    "masonry.size",
+    "phone",
+  );
+  const sidebarShifts = desktop && sidebarOpen;
+  const focusCard = (id) => {
+    scrollToCardId(id);
+    setHighlightId(id);
+  };
+  const toolbarRef = useRef(null);
+  const [toolbarBottom, setToolbarBottom] = useState(appBarHeight + 16);
+  useEffect(() => {
+    const el = toolbarRef.current;
+    if (!el || !desktop) return undefined;
+    const update = () => setToolbarBottom(appBarHeight + el.offsetHeight + 4);
+    update();
+    const observer = new window.ResizeObserver(update);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [desktop, appBarHeight]);
+  const contentRef = useRef(null);
+  const toolbarPaperRef = useRef(null);
+  const [contentBox, setContentBox] = useState(null);
+  useEffect(() => {
+    const content = contentRef.current;
+    const paper = toolbarPaperRef.current;
+    if (!content || !paper || !desktop) return undefined;
+    const update = () => {
+      const c = content.getBoundingClientRect();
+      const p = paper.getBoundingClientRect();
+      const left = Math.round(c.left - p.left);
+      const width = Math.round(c.width);
+      setContentBox((prev) =>
+        prev && prev.left === left && prev.width === width
+          ? prev
+          : { left, width },
+      );
+    };
+    update();
+    const observer = new window.ResizeObserver(update);
+    observer.observe(content);
+    observer.observe(paper);
+    content.addEventListener("transitionend", update);
+    window.addEventListener("resize", update);
+    return () => {
+      observer.disconnect();
+      content.removeEventListener("transitionend", update);
+      window.removeEventListener("resize", update);
+    };
+  }, [desktop]);
+  const cardScrollMargin = desktop
+    ? toolbarBottom
+    : appBarHeight + MOBILE_LIST_BAR_HEIGHT + 8;
   const [lastItem, setLastItem] = useState(undefined);
   const [prevLastItem, setPrevLastItem] = useState([]);
   const personalRef = useMemo(
@@ -260,6 +348,35 @@ function Personal({ user }) {
     newPrevLastItem.pop();
     setPrevLastItem(newPrevLastItem);
   };
+
+  const pageButtons = (buttonSx) => (
+    <Box sx={{ display: "flex", gap: 1 }}>
+      <Button
+        variant="outlined"
+        startIcon={<ArrowLeft />}
+        disabled={loading || !prevLastItem.length}
+        onClick={() => {
+          prevPage();
+          setHighlightId(null);
+        }}
+        sx={buttonSx}
+      >
+        {t("Prev Items")}
+      </Button>
+      <Button
+        variant="outlined"
+        endIcon={<ArrowRight />}
+        disabled={loading || !(personalList && personalList.length > 5)}
+        onClick={() => {
+          nextPage();
+          setHighlightId(null);
+        }}
+        sx={buttonSx}
+      >
+        {t("Next Items")}
+      </Button>
+    </Box>
+  );
 
   const copyNpc = function (npc) {
     return async function () {
@@ -538,96 +655,186 @@ function Personal({ user }) {
         chips={activeFilters}
         panel={filterPanel}
       />
-      <MasonryColumns>
-        {personalList?.map((npc) => (
-          <MasonryCard key={npc.id} id={npc.id}>
-            <Npc
-              npc={npc}
-              copyNpc={copyNpc}
-              deleteNpc={deleteNpc}
-              shareNpc={shareNpc}
-              reportNpc={() => {
-                setSelectedReportNpc(npc);
-                setOpenReportDialog(true);
-              }}
-              collapseGet={collapse}
-            />
-          </MasonryCard>
-        ))}
-      </MasonryColumns>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          marginBottom: 50,
+      <Box
+        ref={toolbarRef}
+        sx={{
+          mb: 2.5,
+          position: { md: "sticky" },
+          top: { md: appBarHeight },
+          zIndex: 2,
+          ml: { md: -3 },
+          ...dockedBarInset,
+          mt: { md: `calc(${appBarHeight}px - 4.5em)` },
+          pl: sidebarShifts
+            ? `clamp(0px, calc(1200px + 2 * ${SIDEBAR_WIDTH} - 100vw), ${SIDEBAR_WIDTH})`
+            : 0,
+          transition:
+            "padding-left 0.2s ease, margin-right 0.3s ease, padding-right 0.3s ease",
         }}
       >
-        {!loading ? (
-          <>
-            {personalList && personalList.length > 5 ? (
-              <>
-                {prevLastItem.length ? (
-                  <Button
-                    variant="contained"
-                    sx={{ marginRight: 4 }}
-                    startIcon={<ArrowLeft />}
-                    onClick={prevPage}
-                    size="large"
-                  >
-                    {t("Prev Items")}
-                  </Button>
-                ) : (
-                  ""
+        <Paper
+          ref={toolbarPaperRef}
+          square={desktop}
+          elevation={desktop ? 3 : 1}
+          sx={{
+            px: { xs: 2, md: 0 },
+            py: 1,
+            backgroundImage: "none",
+            backgroundColor: (theme) => theme.palette.background.paper,
+          }}
+        >
+          <Box
+            sx={
+              desktop && contentBox
+                ? {
+                    ml: `${contentBox.left}px`,
+                    width: `${contentBox.width}px`,
+                  }
+                : undefined
+            }
+          >
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: { xs: "1fr", md: "1fr auto 1fr" },
+                alignItems: "center",
+                gap: 1.5,
+                rowGap: 1,
+                "& .MuiToggleButton-root, & .MuiButton-root": { height: 36 },
+              }}
+            >
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+                {desktop && (
+                  <Tooltip title={t("Adversaries")}>
+                    <IconButton
+                      aria-label={t("Adversaries")}
+                      aria-pressed={sidebarOpen}
+                      onClick={() => setSidebarOpen(!sidebarOpen)}
+                      sx={[TOOL_BUTTON_SX, sidebarOpen && selectedToggleSx]}
+                    >
+                      <ViewList />
+                    </IconButton>
+                  </Tooltip>
                 )}
-                <Button
-                  variant="contained"
-                  sx={{}}
-                  endIcon={<ArrowRight />}
-                  onClick={nextPage}
-                  size="large"
-                >
-                  {t("Next Items")}
-                </Button>
-              </>
-            ) : (
-              <div style={{ textAlign: "center" }}>
-                <Typography
-                  sx={{
-                    fontWeight: 700,
-                    marginBottom: 4,
-                  }}
-                >
-                  {t("No more adversaries found.")}
+                <Tooltip title={collapse ? t("Collapse") : t("Expand")}>
+                  <IconButton
+                    aria-label={collapse ? t("Collapse") : t("Expand")}
+                    onClick={() => setCollapse(!collapse)}
+                    sx={TOOL_BUTTON_SX}
+                  >
+                    {collapse ? <UnfoldLess /> : <UnfoldMore />}
+                  </IconButton>
+                </Tooltip>
+                <Divider orientation="vertical" flexItem />
+                <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                  {t("Adversaries")}: {personalList?.length ?? 0}
                 </Typography>
-                {prevLastItem.length ? (
-                  <Button
-                    variant="contained"
-                    sx={{}}
-                    startIcon={<ArrowLeft />}
-                    onClick={prevPage}
-                    size="large"
-                  >
-                    {t("Prev Items")}
-                  </Button>
-                ) : (
-                  ""
-                )}
-              </div>
-            )}
-            <ReportContentDialog
-              open={openReportDialog}
-              onClose={handleCloseReportDialog}
-              userUUID={user.uid}
-              contentId={selectedReportNpc.id}
-              contentName={selectedReportNpc.name}
-              contentAuthor={selectedReportNpc.uid}
-              contentType="NPC"
-            />
-          </>
-        ) : (
-          <CircularProgress />
+              </Box>
+              <Box sx={{ justifySelf: "center" }}>{pageButtons()}</Box>
+              {desktop && (
+                <PreviewWidthToggle
+                  value={masonrySize}
+                  onChange={setMasonrySize}
+                  sx={{ justifySelf: "end" }}
+                />
+              )}
+            </Box>
+          </Box>
+        </Paper>
+      </Box>
+      <Box
+        ref={contentRef}
+        sx={{
+          ml: sidebarShifts ? SIDEBAR_WIDTH : 0,
+          transition: "margin-left 0.2s ease",
+        }}
+      >
+        {!desktop && (
+          <MobileListBar
+            top={appBarHeight}
+            title={t("Adversaries")}
+            currentName={personalList?.find((n) => n.id === highlightId)?.name}
+            currentIndex={
+              (personalList?.findIndex((n) => n.id === highlightId) ?? -1) + 1
+            }
+            count={personalList?.length ?? 0}
+            onOpen={() => setListDrawerOpen(true)}
+          />
         )}
-      </div>
+        <MasonryColumns columnWidth={MASONRY_WIDTHS[masonrySize]}>
+          {personalList?.map((npc) => (
+            <MasonryCard
+              key={npc.id}
+              id={npc.id}
+              active={highlightId === npc.id}
+              scrollMarginTop={cardScrollMargin}
+            >
+              <Npc
+                npc={npc}
+                copyNpc={copyNpc}
+                deleteNpc={deleteNpc}
+                shareNpc={shareNpc}
+                reportNpc={() => {
+                  setSelectedReportNpc(npc);
+                  setOpenReportDialog(true);
+                }}
+                collapseGet={collapse}
+              />
+            </MasonryCard>
+          ))}
+        </MasonryColumns>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            marginBottom: 50,
+          }}
+        >
+          {!loading ? (
+            <>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: 1.5,
+                  "& .MuiButton-root": { height: 36 },
+                }}
+              >
+                {!(personalList && personalList.length > 5) && (
+                  <Typography sx={{ fontWeight: 700 }}>
+                    {t("No more adversaries found.")}
+                  </Typography>
+                )}
+                {pageButtons()}
+              </Box>
+              <ReportContentDialog
+                open={openReportDialog}
+                onClose={handleCloseReportDialog}
+                userUUID={user.uid}
+                contentId={selectedReportNpc.id}
+                contentName={selectedReportNpc.name}
+                contentAuthor={selectedReportNpc.uid}
+                contentType="NPC"
+              />
+            </>
+          ) : (
+            <CircularProgress />
+          )}
+        </div>
+      </Box>
+      <NpcListDrawer
+        persistent={desktop}
+        top={appBarHeight}
+        open={desktop ? sidebarOpen : listDrawerOpen}
+        onClose={() =>
+          desktop ? setSidebarOpen(false) : setListDrawerOpen(false)
+        }
+        items={personalList ?? []}
+        activeId={highlightId}
+        onSelect={focusCard}
+        footer={pageButtons({ flex: 1, minHeight: 44 })}
+      />
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
         open={open}

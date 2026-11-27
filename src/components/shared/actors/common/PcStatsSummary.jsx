@@ -32,12 +32,26 @@ import { CombatStatCard } from "/src/components/shared/actors/pc/pcStyled";
 
 // -- Modifier +/- controls for DEF / M.DEF / INIT --
 
+const STEPPER_ROW = {
+  display: "flex",
+  alignItems: "center",
+  alignSelf: "stretch",
+  gap: "4px",
+};
+const STEPPER_BTN = {
+  flex: 1,
+  p: 0,
+  py: { xs: "3px", sm: 0 },
+  borderRadius: 1,
+  color: "#fff",
+};
+
 function ModifierControls({ value, onChange, font, theme }) {
   return (
-    <Box sx={{ display: "inline-flex", alignItems: "center", gap: 0 }}>
+    <Box sx={STEPPER_ROW}>
       <IconButton
         size="small"
-        sx={{ p: 0, color: "#fff" }}
+        sx={STEPPER_BTN}
         onPointerDown={(e) => {
           e.preventDefault();
           onChange((value ?? 0) - 1);
@@ -83,7 +97,7 @@ function ModifierControls({ value, onChange, font, theme }) {
       />
       <IconButton
         size="small"
-        sx={{ p: 0, color: "#fff" }}
+        sx={STEPPER_BTN}
         onPointerDown={(e) => {
           e.preventDefault();
           onChange((value ?? 0) + 1);
@@ -192,14 +206,16 @@ function QuickChecks({ onQuickCheck, pc, scale = "lg" }) {
             onClick={(e) => openPopover(e, checkKind)}
             sx={{
               flex: 1,
+              minWidth: 0,
               display: "flex",
               flexDirection: "row",
               alignItems: "center",
               justifyContent: "center",
               gap: "4px",
-              px: "6px",
-              py: "4px",
+              px: { xs: "4px", sm: "6px" },
+              py: { xs: "6px", sm: "4px" },
               borderRadius: 1,
+              bgcolor: { xs: alpha(primary, 0.06), sm: "transparent" },
               cursor: "pointer",
               color: "text.primary",
               "&:hover": {
@@ -1040,12 +1056,10 @@ export default function PcStatsSummary({
                   {pc.info.fabulapoints || 0}
                 </Typography>
               </Box>
-              <Box
-                sx={{ display: "inline-flex", alignItems: "center", gap: 0 }}
-              >
+              <Box sx={STEPPER_ROW}>
                 <IconButton
                   size="small"
-                  sx={{ p: 0, color: "#fff" }}
+                  sx={STEPPER_BTN}
                   onClick={() => {
                     const c = parseInt(pc.info?.fabulapoints, 10) || 0;
                     onUpdate?.((p) => ({
@@ -1103,7 +1117,7 @@ export default function PcStatsSummary({
                 />
                 <IconButton
                   size="small"
-                  sx={{ p: 0, color: "#fff" }}
+                  sx={STEPPER_BTN}
                   onClick={() => {
                     const c = parseInt(pc.info?.fabulapoints, 10) || 0;
                     onUpdate?.((p) => ({

@@ -349,7 +349,8 @@ export default function PcCompactHeader({
                     whiteSpace: "nowrap",
                   }}
                 >
-                  {pc.info.pronouns} <Diamond />
+                  {pc.info.pronouns}{" "}
+                  <Diamond color={theme.palette.primary.main} />
                 </Typography>
               )}
               <IconButton
@@ -388,32 +389,7 @@ export default function PcCompactHeader({
               >
                 <Add fontSize="small" />
               </IconButton>
-              <Diamond />
-              <Tooltip
-                title={canLevelUpFromExp ? t("Level Up") : t("Need 10 EXP")}
-              >
-                <span>
-                  <IconButton
-                    size="small"
-                    onClick={onLevelUpRequest}
-                    disabled={!canLevelUpFromExp}
-                    sx={{
-                      animation: canLevelUpFromExp
-                        ? "flash 1s infinite"
-                        : "none",
-                      p: 0.25,
-                    }}
-                  >
-                    {canLevelUpFromExp ? (
-                      <ExpIcon style={{ width: "18px", height: "18px" }} />
-                    ) : (
-                      <ExpDisabledIcon
-                        style={{ width: "18px", height: "18px" }}
-                      />
-                    )}
-                  </IconButton>
-                </span>
-              </Tooltip>
+              <Diamond color={theme.palette.primary.main} />
               <Typography
                 sx={{
                   fontFamily: "Antonio",
@@ -461,27 +437,6 @@ export default function PcCompactHeader({
               <IconButton size="small" onClick={() => bumpInfoNumber("exp", 1)}>
                 <Add fontSize="small" />
               </IconButton>
-            </Box>
-          ) : (
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: metaJustify,
-                gap: 0.35,
-                flexWrap: metaWrap,
-              }}
-            >
-              <Typography
-                sx={{
-                  fontFamily: "Antonio",
-                  fontSize: "1.25rem",
-                  fontWeight: "medium",
-                  textTransform: "uppercase",
-                }}
-              >
-                {pc.info.pronouns} <Diamond /> {t("Lvl")} {pc.lvl} <Diamond />
-              </Typography>
               <Tooltip
                 title={canLevelUpFromExp ? t("Level Up") : t("Need 10 EXP")}
               >
@@ -498,25 +453,70 @@ export default function PcCompactHeader({
                     }}
                   >
                     {canLevelUpFromExp ? (
-                      <ExpIcon style={{ width: "16px", height: "16px" }} />
+                      <ExpIcon style={{ width: "18px", height: "18px" }} />
                     ) : (
                       <ExpDisabledIcon
-                        style={{ width: "16px", height: "16px" }}
+                        style={{ width: "18px", height: "18px" }}
                       />
                     )}
                   </IconButton>
                 </span>
               </Tooltip>
-              <Typography
-                sx={{
-                  fontFamily: "Antonio",
-                  fontSize: "1.25rem",
-                  fontWeight: "medium",
-                  textTransform: "uppercase",
-                }}
-              >
+            </Box>
+          ) : (
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: metaJustify,
+                gap: "0.4em",
+                flexWrap: metaWrap,
+                fontFamily: "Antonio",
+                fontSize: "1.25rem",
+                fontWeight: "medium",
+                textTransform: "uppercase",
+                lineHeight: 1,
+              }}
+            >
+              {pc.info.pronouns && (
+                <>
+                  <span>{pc.info.pronouns}</span>
+                  <Diamond color={theme.palette.primary.main} />
+                </>
+              )}
+              <span>
+                {t("Lvl")} {pc.lvl}
+              </span>
+              <Diamond color={theme.palette.primary.main} />
+              <span>
                 {t("Exp")} {pc.info.exp || 0}
-              </Typography>
+              </span>
+              <Tooltip
+                title={canLevelUpFromExp ? t("Level Up") : t("Need 10 EXP")}
+              >
+                <span style={{ display: "inline-flex" }}>
+                  <IconButton
+                    size="small"
+                    onClick={onLevelUpRequest}
+                    disabled={!canLevelUpFromExp}
+                    sx={{
+                      animation: canLevelUpFromExp
+                        ? "flash 1s infinite"
+                        : "none",
+                      p: 0.25,
+                      fontSize: "inherit",
+                    }}
+                  >
+                    {canLevelUpFromExp ? (
+                      <ExpIcon style={{ width: "1em", height: "1em" }} />
+                    ) : (
+                      <ExpDisabledIcon
+                        style={{ width: "1em", height: "1em" }}
+                      />
+                    )}
+                  </IconButton>
+                </span>
+              </Tooltip>
             </Box>
           )}
         </Grid>

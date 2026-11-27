@@ -9,7 +9,6 @@ import {
   MenuItem,
   Snackbar,
   Tooltip,
-  Typography,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import Casino from "@mui/icons-material/Casino";
@@ -26,6 +25,7 @@ import ItemEditModal from "/src/forms/ui/ItemEditModal";
 import CompendiumViewerModal from "/src/components/compendium/CompendiumViewerModal";
 import { useAddChatMessage } from "/src/hooks/useAddChatMessage";
 import { SharedZeroPowerCard } from "/src/components/shared/items";
+import EmptySectionText from "/src/components/shared/common/EmptySectionText";
 
 const ZERO_POWER_SUBTYPES = ["zero-power", "zero-trigger", "zero-effect"];
 
@@ -267,15 +267,9 @@ export default function EditPlayerZeroPower({
           )
         }
       >
-        <Box sx={{ p: 0.75 }}>
+        <Box sx={{ p: 1 }}>
           {!hasZeroPower ? (
-            <Typography
-              color="text.secondary"
-              variant="body2"
-              sx={{ px: 0.5, py: 0.25 }}
-            >
-              {t("No zero power yet.")}
-            </Typography>
+            <EmptySectionText>{t("No zero power yet.")}</EmptySectionText>
           ) : (
             <ItemRowCard
               variant="outlined"

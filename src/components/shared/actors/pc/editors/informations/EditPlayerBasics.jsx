@@ -25,6 +25,9 @@ import ExpDisabledIcon from "/src/components/svgs/exp_disabled.svg?react";
 const zenitIcon = "/assets/icons/resources/zenit.png";
 const fpBorderlessIcon = "/assets/icons/resources/fp_borderless.png";
 
+const ADORNMENT_BTN = { width: 40, height: 40, p: 0 };
+const ADORNMENT_IMG = { width: 28, height: 28, objectFit: "contain" };
+
 export default function EditPlayerBasics({
   player,
   setPlayer,
@@ -240,15 +243,13 @@ export default function EditPlayerBasics({
                             isEditMode ? () => setFpDialogOpen(true) : undefined
                           }
                           disabled={!isEditMode}
+                          edge="end"
+                          sx={ADORNMENT_BTN}
                         >
                           <img
                             src={fpBorderlessIcon}
                             alt="FP"
-                            style={{
-                              width: "36px",
-                              height: "26px",
-                              objectFit: "contain",
-                            }}
+                            style={ADORNMENT_IMG}
                           />
                         </IconButton>
                       </InputAdornment>
@@ -335,11 +336,13 @@ export default function EditPlayerBasics({
                               : undefined
                           }
                           disabled={!isEditMode}
+                          edge="end"
+                          sx={ADORNMENT_BTN}
                         >
                           <img
                             src={zenitIcon}
                             alt="Zenit"
-                            style={{ width: "28px", height: "28px" }}
+                            style={ADORNMENT_IMG}
                           />
                         </IconButton>
                       </InputAdornment>
@@ -553,6 +556,7 @@ function EditPlayerLevel({
                 edge="start"
                 onClick={onLowerLevel}
                 disabled={!isEditMode}
+                sx={ADORNMENT_BTN}
               >
                 <Remove />
               </IconButton>
@@ -563,6 +567,7 @@ function EditPlayerLevel({
                 edge="end"
                 onClick={onRaiseLevel}
                 disabled={!isEditMode || advancement}
+                sx={ADORNMENT_BTN}
               >
                 <Add />
               </IconButton>
@@ -582,14 +587,16 @@ function ExpAdornment({ exp, onLevelUpRequest }) {
       <IconButton
         onClick={onLevelUpRequest}
         disabled={!canLevelUp}
+        edge="end"
         sx={{
+          ...ADORNMENT_BTN,
           animation: canLevelUp ? "flash 1s infinite" : "none",
         }}
       >
         {canLevelUp ? (
-          <ExpIcon style={{ width: "28px", height: "28px" }} />
+          <ExpIcon style={ADORNMENT_IMG} />
         ) : (
-          <ExpDisabledIcon style={{ width: "28px", height: "28px" }} />
+          <ExpDisabledIcon style={ADORNMENT_IMG} />
         )}
       </IconButton>
     </InputAdornment>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { flushSync } from "react-dom";
-import { useLocation, useParams } from "react-router";
+import { useLocation, useNavigate, useParams } from "react-router";
+import PlayerActionsMenu from "../../components/shared/actors/pc/PlayerActionsMenu";
 import { useTranslate } from "../../translation/translate";
 import { useDatabase } from "../../hooks/useDatabase";
 import { useDatabaseContext } from "../../context/useDatabaseContext";
@@ -8,7 +9,6 @@ import {
   Grid,
   Button,
   Typography,
-  Stack,
   IconButton,
   Fab,
   Box,
@@ -67,6 +67,7 @@ export default function CharacterSheet() {
   const location = useLocation();
   const { cloudUser: user, dbMode } = useDatabaseContext();
   let params = useParams();
+  const navigate = useNavigate();
   const isMobile = useMediaQuery("(max-width:600px)");
   const isLocalPlayer =
     /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
@@ -516,64 +517,100 @@ export default function CharacterSheet() {
 
   return (
     <Layout fullWidth={true} unsavedChanges={isUpdated}>
-      <Grid container spacing={1} sx={{ paddingX: 1 }} id="sheet-action-bar">
-        <Grid size={isMobile ? 8 : 10}>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => setExportDialogOpen(true)}
-            style={{ marginBottom: "16px", width: "100%" }}
-            startIcon={<Download />}
-          >
-            {t("Download Character Sheet")}
-          </Button>
-        </Grid>
-        <Grid size={isMobile ? 4 : 2}>
-          <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
-            <Button
-              variant="outlined"
-              color="primary"
-              onClick={() => setFullCharacterSheet(!fullCharacterSheet)}
-              style={{ marginBottom: "16px", width: "100%" }}
-              sx={{ display: isMobile ? "none" : "flex" }}
-            >
-              {fullCharacterSheet
+      <Box
+        id="sheet-action-bar"
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          gap: 1,
+          px: 1,
+          mb: 2,
+          "& .MuiButton-root": { height: 36 },
+        }}
+      >
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => setExportDialogOpen(true)}
+          startIcon={<Download />}
+          sx={{ flex: 1, minWidth: 0, whiteSpace: "nowrap" }}
+        >
+          {t("Download Character Sheet")}
+        </Button>
+        {isMobile ? (
+          <Tooltip
+            title={
+              fullCharacterSheet
                 ? t("Short Character Sheet")
-                : t("Full Character Sheet")}
-            </Button>
-
-            {/* Render icons for mobile */}
-            {isMobile && (
-              <IconButton
-                onClick={() => setFullCharacterSheet(!fullCharacterSheet)}
-                style={{ marginBottom: "16px" }}
-              >
-                {fullCharacterSheet ? (
-                  <FullscreenExitTwoTone />
-                ) : (
-                  <FullscreenTwoTone />
-                )}
-              </IconButton>
-            )}
-
-            {isOwner && (
-              <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
-                {isUpdated && (
-                  <Tooltip title={t("Save Changes")}>
-                    <IconButton
-                      onClick={handleSave}
-                      style={{ marginBottom: "16px" }}
-                      color="secondary"
-                    >
-                      <Save />
-                    </IconButton>
-                  </Tooltip>
-                )}
-              </Stack>
-            )}
-          </Stack>
-        </Grid>
-      </Grid>
+                : t("Full Character Sheet")
+            }
+          >
+            <IconButton
+              aria-label={
+                fullCharacterSheet
+                  ? t("Short Character Sheet")
+                  : t("Full Character Sheet")
+              }
+              onClick={() => setFullCharacterSheet(!fullCharacterSheet)}
+              sx={{
+                width: 36,
+                height: 36,
+                flexShrink: 0,
+                border: 1,
+                borderColor: "divider",
+                borderRadius: 1,
+              }}
+            >
+              {fullCharacterSheet ? (
+                <FullscreenExitTwoTone />
+              ) : (
+                <FullscreenTwoTone />
+              )}
+            </IconButton>
+          </Tooltip>
+        ) : (
+          <Button
+            variant="outlined"
+            color="primary"
+            onClick={() => setFullCharacterSheet(!fullCharacterSheet)}
+            sx={{ flex: "0 0 auto", minWidth: 200 }}
+          >
+            {fullCharacterSheet
+              ? t("Short Character Sheet")
+              : t("Full Character Sheet")}
+          </Button>
+        )}
+        {isOwner && isUpdated && (
+          <Tooltip title={t("Save Changes")}>
+            <IconButton
+              aria-label={t("Save Changes")}
+              onClick={handleSave}
+              color="secondary"
+              sx={{ width: 36, height: 36, flexShrink: 0 }}
+            >
+              <Save />
+            </IconButton>
+          </Tooltip>
+        )}
+        <PlayerActionsMenu
+          player={{ ...player, id: params.playerId }}
+          isLocal={isUsingLocalDb}
+          onEdit={
+            isOwner
+              ? () => navigate(`/player-edit/${params.playerId}`)
+              : undefined
+          }
+          onDownloadImage={() => setExportDialogOpen(true)}
+          buttonSx={{
+            width: 36,
+            height: 36,
+            flexShrink: 0,
+            border: 1,
+            borderColor: "divider",
+            borderRadius: 1,
+          }}
+        />
+      </Box>
       {fullCharacterSheet ? (
         <Box id="character-sheet" sx={{ p: 1 }}>
           <PlayerSheetFull
@@ -591,30 +628,43 @@ export default function CharacterSheet() {
             clockState={ritualClockState}
             setClockState={setRitualClockState}
           />
-          <Grid container size={12} sx={{ mt: 2 }}>
-            <Grid size={4}>
-              <img
-                src={powered_by_fu}
-                alt="Powered by Fu"
-                style={{ width: "100%", maxWidth: "15rem" }}
-                onLoad={() => setImagesLoaded(true)}
-              />
-            </Grid>
-            <Grid size={4}>
-              <Typography variant="h4" align="center">
-                <span
-                  style={{
-                    fontWeight: "bolder",
-                    fontSize: "1.6em",
-                    textTransform: "uppercase",
-                    verticalAlign: "middle",
-                  }}
-                >
-                  {t("Made with Fultimator")}
-                </span>
-              </Typography>
-            </Grid>
-          </Grid>
+          <Box
+            sx={{
+              mt: 2,
+              pt: 1,
+              borderTop: "1px solid",
+              borderColor: "divider",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 1.5,
+            }}
+          >
+            <Box
+              component="img"
+              src={powered_by_fu}
+              alt="Powered by Fabula Ultima"
+              onLoad={() => setImagesLoaded(true)}
+              sx={{
+                width: 64,
+                height: "auto",
+                flexShrink: 0,
+              }}
+            />
+            <Typography
+              sx={{
+                fontFamily: "Antonio",
+                fontWeight: 700,
+                fontSize: "1.5rem",
+                lineHeight: 1,
+                whiteSpace: "nowrap",
+                textTransform: "uppercase",
+                letterSpacing: "0.04em",
+              }}
+            >
+              {t("Made with Fultimator")}
+            </Typography>
+          </Box>
         </Box>
       ) : (
         <Grid

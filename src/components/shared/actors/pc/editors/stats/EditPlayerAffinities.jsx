@@ -132,20 +132,35 @@ export default function EditPlayerAffinities({
 
                 return (
                   <Fragment key={i}>
-                    <Grid size={3}>
+                    <Grid
+                      size={3}
+                      sx={{ display: "flex", alignItems: "center" }}
+                    >
                       <Typography
                         variant="h2"
+                        component="div"
                         sx={{
                           minWidth: "50px",
                           display: "flex",
+                          flexDirection: { xs: "column", sm: "row" },
                           alignItems: "center",
-                          gap: 0.5,
+                          gap: { xs: 0.25, sm: 0.5 },
+                          lineHeight: 1,
+                          "& > :last-child": {
+                            fontSize: { xs: "0.8rem", sm: "inherit" },
+                          },
                         }}
                       >
-                        <TypeIcon type={typeKey} /> <TypeName type={typeKey} />
+                        <TypeIcon type={typeKey} />
+                        <span>
+                          <TypeName type={typeKey} />
+                        </span>
                       </Typography>
                     </Grid>
-                    <Grid size={9}>
+                    <Grid
+                      size={9}
+                      sx={{ display: "flex", alignItems: "center" }}
+                    >
                       <FormControl variant="standard" fullWidth>
                         <Slider
                           marks={marks}

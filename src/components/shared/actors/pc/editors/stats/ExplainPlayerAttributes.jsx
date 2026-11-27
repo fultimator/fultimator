@@ -30,7 +30,14 @@ export default function ExplainPlayerAttributes() {
           <strong>{t("Specialized")}</strong>: d10, d10, d6, d6
         </Typography>
         <Divider sx={{ my: 1 }} />
-        <Typography variant="body2">
+        <Typography
+          variant="body2"
+          sx={
+            theme.mode === "dark"
+              ? { color: "rgba(255,255,255,0.85)" }
+              : undefined
+          }
+        >
           <ReactMarkdown allowedElements={["strong"]} unwrapDisallowed={true}>
             {t(
               "Upon reaching levels **20** and **40**, the Character chooses one of its Attributes and increases it by one die size (to a maximum of d12).",

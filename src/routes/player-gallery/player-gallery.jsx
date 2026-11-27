@@ -1,3 +1,4 @@
+import { selectedToggleSx } from "../../components/common/selectedToggleSx";
 import { useState, useRef, useEffect, useMemo, useDeferredValue } from "react";
 import HelpFeedbackDialog from "../../components/appbar/HelpFeedbackDialog";
 import { useDeleteConfirmation } from "../../hooks/useDeleteConfirmation";
@@ -214,14 +215,14 @@ function Personal() {
         field: "name",
         headerName: t("Name"),
         flex: 2,
-        minWidth: 160,
+        minWidth: desktop ? 160 : 80,
         cellClassName: "npc-name-cell",
       },
       {
         field: "lvl",
         headerName: t("Lvl"),
         type: "number",
-        width: 72,
+        width: desktop ? 72 : 48,
         headerAlign: "left",
         align: "left",
       },
@@ -229,10 +230,10 @@ function Personal() {
         field: "classNames",
         headerName: t("Classes"),
         flex: 2,
-        minWidth: 140,
+        minWidth: desktop ? 140 : 90,
       },
     ],
-    [t],
+    [t, desktop],
   );
   const [open, setOpen] = useState(false);
   const [isBugDialogOpen, setIsBugDialogOpen] = useState(false);
@@ -1141,16 +1142,7 @@ function Personal() {
         <IconButton
           aria-label={t("Players")}
           aria-pressed={desktop && sidebarOpen}
-          color={desktop && sidebarOpen ? "primary" : "default"}
-          sx={{
-            ...toolButtonSx,
-            ...(desktop &&
-              sidebarOpen && {
-                bgcolor: "action.selected",
-                borderColor: "primary.main",
-              }),
-            ...sx,
-          }}
+          sx={[toolButtonSx, desktop && sidebarOpen && selectedToggleSx, sx]}
           onClick={() =>
             desktop ? setSidebarOpen(!sidebarOpen) : setListDrawerOpen(true)
           }

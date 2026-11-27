@@ -221,7 +221,7 @@ export default function PcActorCard({
               "@container (min-width: 900px)": { display: "none" },
             }}
           >
-            <PcControlsPanel {...sharedProps} />
+            <PcControlsPanel {...sharedProps} canAdjust={ownerInteractive} />
             <PcTraitsDescription {...sharedProps} />
           </Box>
         </Box>
@@ -251,11 +251,11 @@ export default function PcActorCard({
               "@container (min-width: 900px)": { display: "block" },
             }}
           >
-            <PcControlsPanel {...sharedProps} />
+            <PcControlsPanel {...sharedProps} canAdjust={ownerInteractive} />
             <PcTraitsDescription {...sharedProps} />
           </Box>
 
-          <PlayerBonds {...ownerPsProps} />
+          <PlayerBonds {...ownerPsProps} isEditMode={isInteractive} />
           <CardLoadout
             {...ownerPsProps}
             isOwner={ownerInteractive}
@@ -264,9 +264,10 @@ export default function PcActorCard({
             showSupportColumn={false}
           />
           <PcVehicle {...sharedProps} />
-          <PlayerEquipment {...ownerPsProps} />
+          <PlayerEquipment {...ownerPsProps} isLocked={!isInteractive} />
           <PlayerNotes
             {...ownerPsProps}
+            isEditMode={isInteractive}
             defaultExpanded={!ownerInteractive}
             speaker={pc?.name ?? ""}
           />
@@ -298,6 +299,7 @@ export default function PcActorCard({
           <PcClasses
             {...ownerSharedProps}
             variant="full"
+            isLocked={!isInteractive}
             updateMaxStats={updateMaxStats}
             defaultExpanded={!ownerInteractive}
           />

@@ -1094,6 +1094,7 @@ export default function PcMnemospheres({
               letterSpacing: "0.04em",
               whiteSpace: "nowrap",
               flexShrink: 0,
+              "@container (max-width: 480px)": { display: "none" },
             }}
           >
             {t("Total Invested Levels")}
@@ -1232,14 +1233,22 @@ export default function PcMnemospheres({
   );
 
   return isCompact ? (
-    <Paper sx={{ mb: 1, overflow: "hidden" }} elevation={0} variant="outlined">
+    <Paper
+      sx={{ mb: 1, overflow: "hidden", containerType: "inline-size" }}
+      elevation={0}
+      variant="outlined"
+    >
       <CompactSectionHeader title={t("Mnemospheres")}>
         {actions}
       </CompactSectionHeader>
       {content}
     </Paper>
   ) : (
-    <SectionCard title={t("Mnemospheres")} actions={actions} sx={{ mb: 1 }}>
+    <SectionCard
+      title={t("Mnemospheres")}
+      actions={actions}
+      sx={{ mb: 1, containerType: "inline-size" }}
+    >
       {content}
     </SectionCard>
   );

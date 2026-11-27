@@ -59,12 +59,12 @@ export default function ItemRowCard({
   const labelAreaSx = {
     display: "flex",
     flexDirection: "column",
-    justifyContent: subtitle ? "flex-start" : "center",
+    justifyContent: "center",
     alignItems: typeof label === "string" ? "flex-start" : "stretch",
     flex: 1,
     minWidth: 0,
     px: compact ? "8px" : "6px",
-    py: typeof label === "string" ? "4px" : 0,
+    py: typeof label === "string" || subtitle ? "4px" : 0,
   };
 
   return (

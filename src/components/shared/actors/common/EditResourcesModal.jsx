@@ -293,7 +293,17 @@ export default function EditResourcesModal({
   };
 
   const actions = (
-    <Box sx={{ display: "flex", justifyContent: "center", gap: 1 }}>
+    <Box
+      sx={{
+        display: "flex",
+        justifyContent: "center",
+        gap: 1,
+        width: "100%",
+        "& > .MuiButton-root, & > span, & > span > .MuiButton-root": {
+          flex: 1,
+        },
+      }}
+    >
       {isPipResource || isFpResource || isUpResource ? (
         <>
           <Tooltip title={t("Subtract Amount")} placement="top">

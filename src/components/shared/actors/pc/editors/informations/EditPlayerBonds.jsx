@@ -8,6 +8,7 @@ import {
   Box,
   Typography,
   Tooltip,
+  InputAdornment,
 } from "@mui/material";
 import { useTranslate } from "/src/translation/translate";
 import SectionCard from "/src/components/shared/actors/common/SectionCard";
@@ -140,15 +141,6 @@ export default function EditPlayerBonds({ player, setPlayer, isEditMode }) {
                       alignItems: "center",
                     }}
                   >
-                    {isEditMode ? (
-                      <IconButton
-                        aria-label="delete"
-                        onClick={() => openDeleteDialog(index)}
-                        sx={{ ml: 1 }}
-                      >
-                        <RemoveCircleOutlined />
-                      </IconButton>
-                    ) : null}
                     <TextField
                       fullWidth
                       label={t("Bond Name")}
@@ -157,6 +149,20 @@ export default function EditPlayerBonds({ player, setPlayer, isEditMode }) {
                       slotProps={{
                         input: {
                           readOnly: !isEditMode,
+                          endAdornment: isEditMode ? (
+                            <InputAdornment position="end">
+                              <Tooltip title={t("Delete")}>
+                                <IconButton
+                                  aria-label="delete"
+                                  edge="end"
+                                  onClick={() => openDeleteDialog(index)}
+                                  sx={{ width: 40, height: 40, p: 0 }}
+                                >
+                                  <RemoveCircleOutlined />
+                                </IconButton>
+                              </Tooltip>
+                            </InputAdornment>
+                          ) : null,
                         },
 
                         htmlInput: { maxLength: 50 },

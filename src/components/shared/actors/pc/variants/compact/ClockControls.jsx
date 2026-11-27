@@ -191,81 +191,90 @@ export default function ClockControls({
   // Narrow container (<= ~260px) → vertical stack: clock → name → controls
   // Wide container → horizontal: clock left, name+controls stacked right
   return (
-    <Box
-      sx={{
-        containerType: "inline-size",
-        border: "1px solid",
-        borderColor: "divider",
-        borderRadius: "4px",
-        overflow: "hidden",
-        transition: "border-color 0.15s ease",
-        "&:hover": { borderColor: theme.primary },
-        display: "flex",
-        alignItems: "stretch",
-        gap: "6px",
-        px: "6px",
-        py: "4px",
-        "@container (max-width: 260px)": {
-          flexDirection: "column",
-          alignItems: "center",
-          gap: "4px",
-          py: "8px",
-        },
-      }}
-    >
+    <Box sx={{ containerType: "inline-size", containerName: "clockrow" }}>
       <Box
         sx={{
-          alignSelf: "center",
-          flexShrink: 0,
-          "@container (max-width: 260px)": { alignSelf: "auto" },
-        }}
-      >
-        <Clock
-          numSections={sections}
-          size={clockSize}
-          state={state}
-          setState={setState}
-          isCharacterSheet={true}
-        />
-      </Box>
-      <Box
-        sx={{
-          flex: 1,
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          minWidth: 0,
+          containerType: "inline-size",
+          "@container clockrow (min-width: 521px)": { width: "50%" },
+          border: "1px solid",
+          borderColor: "divider",
+          borderRadius: "4px",
           overflow: "hidden",
+          transition: "border-color 0.15s ease",
+          "&:hover": { borderColor: theme.primary },
+          display: "flex",
+          alignItems: "stretch",
+          gap: "6px",
+          px: "6px",
+          py: "4px",
           "@container (max-width: 260px)": {
+            flexDirection: "column",
             alignItems: "center",
-            width: "100%",
+            gap: "4px",
+            py: "8px",
           },
         }}
       >
         <Box
           sx={{
-            fontWeight: "bold",
-            fontSize: "0.95rem",
-            lineHeight: 1.3,
+            alignSelf: "center",
+            flexShrink: 0,
+            "@container (max-width: 260px)": { alignSelf: "auto" },
+          }}
+        >
+          <Clock
+            numSections={sections}
+            size={clockSize}
+            state={state}
+            setState={setState}
+            isCharacterSheet={true}
+          />
+        </Box>
+        <Box
+          sx={{
+            flex: 1,
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            minWidth: 0,
             overflow: "hidden",
             "@container (max-width: 260px)": {
-              textAlign: "center",
+              alignItems: "center",
               width: "100%",
             },
           }}
         >
-          {label}
-        </Box>
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            gap: 0,
-            mt: "2px",
-            "@container (max-width: 260px)": { mt: 0 },
-          }}
-        >
-          {controls}
+          <Box
+            sx={{
+              fontWeight: "bold",
+              fontSize: "0.95rem",
+              lineHeight: 1.3,
+              overflow: "hidden",
+              "@container (max-width: 260px)": {
+                textAlign: "center",
+                width: "100%",
+              },
+            }}
+          >
+            {label}
+          </Box>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: 0,
+              mt: "2px",
+              "@container (max-width: 260px)": { mt: 0 },
+              "@container (max-width: 520px)": {
+                alignSelf: "stretch",
+                "& .clock-stepper": { flex: 1 },
+                "& .clock-stepper-step": { flex: 1 },
+                "& .clock-stepper-step > .MuiButton-root": { width: "100%" },
+              },
+            }}
+          >
+            {controls}
+          </Box>
         </Box>
       </Box>
     </Box>

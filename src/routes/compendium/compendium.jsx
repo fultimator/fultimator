@@ -940,7 +940,15 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
         variant="outlined"
         sx={{ flex: 1, overflow: "auto" }}
       >
-        <Table size="small" stickyHeader>
+        <Table
+          size="small"
+          stickyHeader
+          sx={{
+            "& .MuiTableBody-root .MuiTableCell-root": {
+              py: { xs: "12px", sm: "6px" },
+            },
+          }}
+        >
           <TableHead>
             <TableRow
               sx={{

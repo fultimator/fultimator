@@ -9,7 +9,6 @@ import {
   MenuItem,
   Snackbar,
   Tooltip,
-  Typography,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import Casino from "@mui/icons-material/Casino";
@@ -26,6 +25,7 @@ import ItemEditModal from "/src/forms/ui/ItemEditModal";
 import CompendiumViewerModal from "/src/components/compendium/CompendiumViewerModal";
 import { useAddChatMessage } from "/src/hooks/useAddChatMessage";
 import { SharedOptionalCard } from "/src/components/shared/items";
+import EmptySectionText from "/src/components/shared/common/EmptySectionText";
 
 const QUIRK_SUBTYPES = ["quirk"];
 
@@ -212,15 +212,9 @@ export default function EditPlayerQuirk({
           )
         }
       >
-        <Box sx={{ p: 0.75 }}>
+        <Box sx={{ p: 1 }}>
           {!hasQuirk ? (
-            <Typography
-              color="text.secondary"
-              variant="body2"
-              sx={{ px: 0.5, py: 0.25 }}
-            >
-              {t("No quirk yet.")}
-            </Typography>
+            <EmptySectionText>{t("No quirk yet.")}</EmptySectionText>
           ) : (
             <ItemRowCard
               variant="outlined"

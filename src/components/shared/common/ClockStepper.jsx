@@ -48,7 +48,7 @@ export default function ClockStepper({
 
   const stepButton = (label, onClick, disabled, Icon) => (
     <Tooltip title={label} arrow>
-      <span style={{ display: "inline-flex" }}>
+      <span className="clock-stepper-step" style={{ display: "inline-flex" }}>
         <Button
           aria-label={label}
           size="small"
@@ -74,6 +74,7 @@ export default function ClockStepper({
 
   return (
     <Box
+      className="clock-stepper"
       onClick={(e) => e.stopPropagation()}
       sx={{
         display: "flex",

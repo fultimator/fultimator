@@ -9,7 +9,6 @@ import {
   MenuItem,
   Snackbar,
   Tooltip,
-  Typography,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import Casino from "@mui/icons-material/Casino";
@@ -18,6 +17,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import LibraryAdd from "@mui/icons-material/LibraryAdd";
 import MenuIcon from "@mui/icons-material/Menu";
 import Search from "@mui/icons-material/Search";
+import { useTheme } from "@mui/material/styles";
 import { useTranslate } from "/src/translation/translate";
 import { useCompendiumPacks } from "/src/hooks/useCompendiumPacks";
 import SectionCard from "/src/components/shared/actors/common/SectionCard";
@@ -26,6 +26,8 @@ import CompendiumViewerModal from "/src/components/compendium/CompendiumViewerMo
 import ItemEditModal from "/src/forms/ui/ItemEditModal";
 import { useAddChatMessage } from "/src/hooks/useAddChatMessage";
 import { SharedOptionalCard } from "/src/components/shared/items";
+import { OtherClock } from "/src/components/shared/actors/pc/playerSheet/optional/PlayerOthers";
+import EmptySectionText from "/src/components/shared/common/EmptySectionText";
 
 const OTHER_SUBTYPES = ["other"];
 
@@ -51,7 +53,16 @@ function fromFormState(form) {
   };
 }
 
-function OtherRow({ other, index, isEditMode, onEdit, onDelete, onRoll }) {
+function OtherRow({
+  other,
+  index,
+  isEditMode,
+  onEdit,
+  onDelete,
+  onRoll,
+  setPlayer,
+}) {
+  const theme = useTheme();
   const { t } = useTranslate();
   const { packs, ensurePersonalPack, addItem } = useCompendiumPacks();
   const [expanded, setExpanded] = useState(false);
@@ -173,6 +184,12 @@ function OtherRow({ other, index, isEditMode, onEdit, onDelete, onRoll }) {
           </Box>
         )}
       </ItemRowCard>
+      <OtherClock
+        other={other}
+        index={index}
+        setPlayer={setPlayer}
+        primary={theme.palette.primary.main}
+      />
       <Snackbar
         open={snackbar.open}
         autoHideDuration={2500}
@@ -358,17 +375,9 @@ export default function EditPlayerOthers({
         )
       }
     >
-      <Box
-        sx={{ display: "flex", flexDirection: "column", gap: "4px", p: 0.75 }}
-      >
+      <Box sx={{ display: "flex", flexDirection: "column", gap: "4px", p: 1 }}>
         {others.length === 0 ? (
-          <Typography
-            color="text.secondary"
-            variant="body2"
-            sx={{ px: 0.5, py: 0.25 }}
-          >
-            {t("No optional entries yet.")}
-          </Typography>
+          <EmptySectionText>{t("No optional entries yet.")}</EmptySectionText>
         ) : (
           others.map((other, index) => (
             <OtherRow
@@ -379,6 +388,7 @@ export default function EditPlayerOthers({
               onEdit={setEditIndex}
               onDelete={handleDelete}
               onRoll={handleRoll}
+              setPlayer={setPlayer}
             />
           ))
         )}

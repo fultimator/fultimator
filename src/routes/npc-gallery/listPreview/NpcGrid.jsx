@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Avatar, Box } from "@mui/material";
+import { Avatar, Box, useMediaQuery } from "@mui/material";
 import { alpha, lighten } from "@mui/material/styles";
 import { DataGrid } from "@mui/x-data-grid";
 import { useTranslate } from "../../../translation/translate";
@@ -99,6 +99,7 @@ export default function NpcGrid({
   columns: customColumns,
 }) {
   const { t } = useTranslate();
+  const isPhone = useMediaQuery((theme) => theme.breakpoints.down("sm"));
 
   const defaultColumns = useMemo(
     () => [
@@ -179,9 +180,9 @@ export default function NpcGrid({
       rows={items}
       columns={columns}
       density="compact"
-      columnVisibilityModel={{ rank: !hideRank }}
-      rowHeight={large ? 46 : 40}
-      columnHeaderHeight={40}
+      columnVisibilityModel={{ rank: !(hideRank || isPhone) }}
+      rowHeight={isPhone ? (large ? 52 : 48) : large ? 50 : 44}
+      columnHeaderHeight={isPhone ? 44 : 40}
       disableColumnMenu
       hideFooterSelectedRowCount
       checkboxSelection={selectMode}

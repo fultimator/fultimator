@@ -28,6 +28,7 @@ export default function NpcListDrawer({
   persistent,
   top = 0,
   width = SIDEBAR_WIDTH,
+  footer,
 }) {
   const large = useMediaQuery("(min-width: 1600px)");
   const { t } = useTranslate();
@@ -104,6 +105,12 @@ export default function NpcListDrawer({
           }}
         />
       </Box>
+      {footer && (
+        <>
+          <Divider />
+          <Box sx={{ p: 1 }}>{footer}</Box>
+        </>
+      )}
     </Drawer>
   );
 }

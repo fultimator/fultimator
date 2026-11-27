@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Paper, IconButton, Tooltip, Box, Typography } from "@mui/material";
+import { Paper, IconButton, Tooltip, Box } from "@mui/material";
 import SectionCard from "/src/components/shared/actors/common/SectionCard";
 import { Add } from "@mui/icons-material";
 import { useTranslate } from "/src/translation/translate";
@@ -7,6 +7,7 @@ import CompactSectionHeader from "/src/components/shared/actors/pc/variants/comp
 import NoteCard from "/src/components/shared/actors/common/NoteCard";
 import { PlayerNoteModal } from "/src/components/shared/actors/pc/editors";
 import { usePlayerSheetCompactStore } from "/src/store/playerSheetCompactStore";
+import EmptySectionText from "/src/components/shared/common/EmptySectionText";
 
 export default function PlayerNotes({
   player,
@@ -108,13 +109,7 @@ export default function PlayerNotes({
   const noteList = (
     <Box sx={{ display: "flex", flexDirection: "column", gap: "4px", p: 1 }}>
       {visibleNotes.length === 0 && (
-        <Typography
-          color="text.secondary"
-          variant="body2"
-          sx={{ px: 0.5, py: 0.25 }}
-        >
-          {t("No notes.")}
-        </Typography>
+        <EmptySectionText>{t("No notes.")}</EmptySectionText>
       )}
       {visibleNotes.map((note, noteIndex) => {
         const noteKey = `note-${noteIndex}`;
