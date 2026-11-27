@@ -3,6 +3,7 @@ import { Button, Typography, Tooltip, Box } from "@mui/material";
 import { useTheme } from "@mui/system";
 import { useTranslate } from "../../translation/translate";
 import ActorEditModal from "../../forms/ui/ActorEditModal";
+import { Add, Remove } from "@mui/icons-material";
 
 interface SkillLevelModalProps {
   open: boolean;
@@ -85,65 +86,57 @@ const SkillLevelModal: React.FC<SkillLevelModalProps> = ({
     </svg>
   );
 
-  const actions = (
-    <Box
-      sx={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        gap: 1,
-      }}
-    >
-      {isEditMode && (
-        <Tooltip title={currentLvl <= 0 ? "" : t("Decrease Level")}>
-          <span>
-            <Button
-              variant="outlined"
-              color="error"
-              onClick={onDecrease}
-              disabled={currentLvl <= 0}
-              sx={{
-                minWidth: 48,
-                minHeight: 36,
-                fontSize: "1.25rem",
-                lineHeight: 1,
-              }}
-            >
-              −
-            </Button>
-          </span>
-        </Tooltip>
-      )}
-      <Button onClick={onClose} color="secondary" variant="contained">
-        {t("Close")}
+  const stepSx = {
+    width: "100%",
+    minWidth: 0,
+    minHeight: 44,
+    fontSize: "1rem",
+    gap: 0.75,
+  };
+
+  const actions = isEditMode ? (
+    <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 1.5 }}>
+      <Button
+        variant="outlined"
+        color="error"
+        onClick={onDecrease}
+        disabled={currentLvl <= 0}
+        startIcon={<Remove />}
+        sx={stepSx}
+      >
+        {t("Decrease Level")}
       </Button>
-      {isEditMode && (
-        <Tooltip
-          title={
-            currentLvl >= maxLvl || increaseDisabled
-              ? (increaseTooltip ?? "")
-              : t("Increase Level")
-          }
-        >
-          <span>
-            <Button
-              variant="outlined"
-              color="success"
-              onClick={onIncrease}
-              disabled={currentLvl >= maxLvl || increaseDisabled}
-              sx={{
-                minWidth: 48,
-                minHeight: 36,
-                fontSize: "1.25rem",
-                lineHeight: 1,
-              }}
-            >
-              +
-            </Button>
-          </span>
-        </Tooltip>
-      )}
+      <Tooltip
+        title={
+          currentLvl >= maxLvl || increaseDisabled
+            ? (increaseTooltip ?? "")
+            : ""
+        }
+      >
+        <Box component="span" sx={{ display: "flex", minWidth: 0 }}>
+          <Button
+            variant="outlined"
+            color="success"
+            onClick={onIncrease}
+            disabled={currentLvl >= maxLvl || increaseDisabled}
+            startIcon={<Add />}
+            sx={stepSx}
+          >
+            {t("Increase Level")}
+          </Button>
+        </Box>
+      </Tooltip>
     </Box>
+  ) : (
+    <Button
+      onClick={onClose}
+      color="secondary"
+      variant="contained"
+      fullWidth
+      sx={{ minHeight: 44 }}
+    >
+      {t("Close")}
+    </Button>
   );
 
   return (

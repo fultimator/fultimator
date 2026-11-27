@@ -226,6 +226,7 @@ function MnemoSkillRow({
               size="small"
               sx={{
                 p: "3px",
+                ml: 1,
                 color: "rgba(255,255,255,0.85)",
                 border: "1px solid rgba(255,255,255,0.4)",
                 borderRadius: "4px",

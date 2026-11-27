@@ -755,7 +755,8 @@ function SkillCard({
                           fontWeight: "bold",
                           color: "#fff",
                           lineHeight: 1,
-                          mr: "4px",
+                          minWidth: 28,
+                          textAlign: "center",
                         }}
                       >
                         SL{skill.currentLvl}
@@ -842,6 +843,7 @@ function SkillCard({
                   size="small"
                   sx={{
                     p: "3px",
+                    ml: 1,
                     color: "rgba(255,255,255,0.85)",
                     border: "1px solid rgba(255,255,255,0.4)",
                     borderRadius: "4px",
