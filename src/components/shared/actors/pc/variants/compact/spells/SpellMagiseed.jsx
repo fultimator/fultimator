@@ -10,7 +10,7 @@ import {
   IconButton,
   Tooltip,
 } from "@mui/material";
-import { Add, Remove, RestartAlt } from "@mui/icons-material";
+import ClockStepper from "/src/components/shared/common/ClockStepper";
 import LocalFloristIcon from "@mui/icons-material/LocalFlorist";
 import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
 import { styled } from "@mui/system";
@@ -111,41 +111,15 @@ export default function SpellMagiseed({
                   sx={{ height: 6, borderRadius: 3 }}
                 />
               </Box>
-              <Box sx={{ display: "flex" }}>
-                <IconButton
-                  size="small"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleClockChange(0);
-                  }}
-                  disabled={growthClock === 0 || !setPlayer}
-                  sx={{ p: 0 }}
-                >
-                  <RestartAlt fontSize="small" />
-                </IconButton>
-                <IconButton
-                  size="small"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleClockChange(growthClock - 1);
-                  }}
-                  disabled={growthClock <= 0 || !setPlayer}
-                  sx={{ p: 0 }}
-                >
-                  <Remove fontSize="small" />
-                </IconButton>
-                <IconButton
-                  size="small"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleClockChange(growthClock + 1);
-                  }}
-                  disabled={growthClock >= 4 || !setPlayer}
-                  sx={{ p: 0 }}
-                >
-                  <Add fontSize="small" />
-                </IconButton>
-              </Box>
+              <ClockStepper
+                size="small"
+                onDecrement={() => handleClockChange(growthClock - 1)}
+                onIncrement={() => handleClockChange(growthClock + 1)}
+                onReset={() => handleClockChange(0)}
+                decrementDisabled={growthClock <= 0 || !setPlayer}
+                incrementDisabled={growthClock >= 4 || !setPlayer}
+                resetDisabled={growthClock === 0 || !setPlayer}
+              />
             </Box>
           </StyledTableCell>
         </TableRow>

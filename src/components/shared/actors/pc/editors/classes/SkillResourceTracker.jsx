@@ -1,5 +1,5 @@
-import { Box, IconButton, Typography, Tooltip } from "@mui/material";
-import { Add, Remove, RestartAlt } from "@mui/icons-material";
+import { Box, Typography } from "@mui/material";
+import ClockStepper from "/src/components/shared/common/ClockStepper";
 import { useTranslate } from "/src/translation/translate";
 import { resolveResourceMax } from "/src/forms/schema/shared/resourceTrackSchema";
 import { useResourceTrack } from "/src/hooks/useClock";
@@ -29,23 +29,21 @@ export default function SkillResourceTracker({
       <Typography sx={{ fontFamily: "PFU Sans Narrow", fontWeight: "bold" }}>
         {t(label)}:
       </Typography>
-      <IconButton size="small" onClick={decrement} disabled={isMin}>
-        <Remove fontSize="small" />
-      </IconButton>
-      <Typography sx={{ minWidth: 48, textAlign: "center" }}>
-        {current}
-        {cap > 0 ? ` / ${cap}` : ""}
-      </Typography>
-      <IconButton size="small" onClick={increment} disabled={isMax}>
-        <Add fontSize="small" />
-      </IconButton>
-      <Tooltip title={t("class_skill_resource_reset")}>
-        <span>
-          <IconButton size="small" onClick={reset} disabled={isMin}>
-            <RestartAlt fontSize="small" />
-          </IconButton>
-        </span>
-      </Tooltip>
+      <ClockStepper
+        size="small"
+        onDecrement={decrement}
+        onIncrement={increment}
+        onReset={reset}
+        decrementDisabled={isMin}
+        incrementDisabled={isMax}
+        resetDisabled={isMin}
+        resetTooltip={t("class_skill_resource_reset")}
+      >
+        <Typography sx={{ minWidth: 48, textAlign: "center" }}>
+          {current}
+          {cap > 0 ? ` / ${cap}` : ""}
+        </Typography>
+      </ClockStepper>
     </Box>
   );
 }

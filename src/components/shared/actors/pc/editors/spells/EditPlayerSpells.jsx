@@ -1203,6 +1203,96 @@ export default function EditPlayerSpells({
     "mutant",
   ]);
 
+  const buildCompendiumSubItem = (spell, spellType) => {
+    const key = spell.key || spell.name;
+    const _packItemId = spell._packItemId;
+    switch (spellType) {
+      case "dance":
+        return {
+          itemsKey: "dances",
+          subItem: {
+            key,
+            name: spell.name,
+            effect: spell.effect || "",
+            duration: spell.duration || "",
+            customName: "",
+            _packItemId,
+          },
+        };
+      case "symbol":
+        return {
+          itemsKey: "symbols",
+          subItem: {
+            key,
+            name: spell.name,
+            effect: spell.effect || "",
+            customName: "",
+            _packItemId,
+          },
+        };
+      case "gift":
+        return {
+          itemsKey: "gifts",
+          subItem: {
+            key,
+            event: spell.event || "",
+            effect: spell.effect || "",
+            customName: "",
+            _packItemId,
+          },
+        };
+      case "therioform":
+        return {
+          itemsKey: "therioforms",
+          subItem: {
+            name: spell.name,
+            genoclepsis: spell.genoclepsis || "",
+            description: spell.description || "",
+            customName: "",
+            _packItemId,
+          },
+        };
+      case "magiseed":
+        return {
+          itemsKey: "magiseeds",
+          subItem: {
+            key,
+            customName: "",
+            description: spell.description || "",
+            rangeStart: spell.rangeStart || 0,
+            rangeEnd: spell.rangeEnd || 3,
+            effects: spell.effects || { 0: "", 1: "", 2: "", 3: "" },
+            _packItemId,
+          },
+        };
+      case "magichant":
+        return spell.magichantSubtype === "tone"
+          ? {
+              itemsKey: "tones",
+              subItem: {
+                key,
+                effect: spell.effect || "",
+                customName: spell.customName || "",
+                _packItemId,
+              },
+            }
+          : {
+              itemsKey: "keys",
+              subItem: {
+                key,
+                type: spell.type || "",
+                status: spell.status || "",
+                attribute: spell.attribute || "",
+                recovery: spell.recovery || "",
+                customName: spell.customName || "",
+                _packItemId,
+              },
+            };
+      default:
+        return null;
+    }
+  };
+
   const addSystemSpellFromCompendium = (spell, className, spellType, label) => {
     if (!className) return false;
     if (spell?.spellType !== spellType) {
@@ -1211,25 +1301,10 @@ export default function EditPlayerSpells({
       else alert(`Please select a ${label} spell.`);
       return false;
     }
-    if (spellType === "dance" || spellType === "symbol") {
-      const subItem =
-        spellType === "dance"
-          ? {
-              key: spell.key || spell.name,
-              name: spell.name,
-              effect: spell.effect || "",
-              duration: spell.duration || "",
-              customName: "",
-              _packItemId: spell._packItemId,
-            }
-          : {
-              key: spell.key || spell.name,
-              name: spell.name,
-              effect: spell.effect || "",
-              customName: "",
-              _packItemId: spell._packItemId,
-            };
-      const itemsKey = spellType === "dance" ? "dances" : "symbols";
+
+    const subEntry = buildCompendiumSubItem(spell, spellType);
+    if (subEntry) {
+      const { itemsKey, subItem } = subEntry;
       setPlayer((prev) => ({
         ...prev,
         classes: prev.classes.map((cls) => {

@@ -24,6 +24,7 @@ import ReactMarkdown from "/src/components/common/Markdown";
 import { useCustomTheme } from "/src/hooks/useCustomTheme";
 import { magiseeds } from "/src/libs/floralistMagiseedData";
 import Clock from "/src/components/shared/actors/pc/playerSheet/Clock";
+import ClockStepper from "/src/components/shared/common/ClockStepper";
 import { useNumericClock } from "/src/hooks/useClock";
 import { sendDisplayMessage } from "/src/hooks/useRollToChat";
 
@@ -356,56 +357,15 @@ function ThemedSpellMagiseed({
                 {growthClock}/4
               </Typography>
             )}
-            <Box sx={{ display: "flex", gap: "4px" }}>
-              <Button
-                size="small"
-                onClick={decrement}
-                disabled={growthClock === 0}
-                style={{
-                  minWidth: 32,
-                  height: 28,
-                  padding: 0,
-                  border: "none",
-                  color: theme.primary,
-                  backgroundColor: theme.white,
-                  fontWeight: 800,
-                }}
-              >
-                -
-              </Button>
-              <Button
-                size="small"
-                onClick={increment}
-                disabled={growthClock === 4}
-                style={{
-                  minWidth: 32,
-                  height: 28,
-                  padding: 0,
-                  border: "none",
-                  color: theme.primary,
-                  backgroundColor: theme.white,
-                  fontWeight: 800,
-                }}
-              >
-                +
-              </Button>
-              <Button
-                size="small"
-                onClick={resetClock}
-                style={{
-                  minWidth: 46,
-                  height: 28,
-                  padding: "0 4px",
-                  border: "none",
-                  color: theme.primary,
-                  backgroundColor: theme.white,
-                  fontWeight: 800,
-                  fontSize: "0.7rem",
-                }}
-              >
-                {t("Reset")}
-              </Button>
-            </Box>
+            <ClockStepper
+              onPrimary
+              onDecrement={decrement}
+              onIncrement={increment}
+              onReset={resetClock}
+              decrementDisabled={growthClock === 0}
+              incrementDisabled={growthClock === 4}
+              resetDisabled={growthClock === 0}
+            />
           </Box>
           {onRoll && currentMagiseed && (
             <IconButton
@@ -542,8 +502,6 @@ function ThemedSpellMagiseed({
                     >
                       <Button
                         size="small"
-                        variant="outlined"
-                        color="inherit"
                         onClick={() =>
                           onMagiseedChange &&
                           onMagiseedChange(isPlanted ? null : seed, index)

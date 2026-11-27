@@ -1,7 +1,6 @@
 import { useState } from "react";
-import { Box, IconButton, InputBase, Tooltip } from "@mui/material";
-import { Add, Remove, RestartAlt } from "@mui/icons-material";
-import { useTranslate } from "/src/translation/translate";
+import { Box, InputBase } from "@mui/material";
+import ClockStepper from "/src/components/shared/common/ClockStepper";
 import Clock from "/src/components/shared/actors/pc/playerSheet/Clock";
 import { useClock } from "/src/hooks/useClock";
 
@@ -15,7 +14,6 @@ export default function ClockControls({
   clockSize = 36,
   compact = false,
 }) {
-  const { t } = useTranslate();
   const {
     filledCount: filled,
     set,
@@ -44,25 +42,22 @@ export default function ClockControls({
   };
 
   const controls = (
-    <>
-      <Tooltip title={t("Decrement")} arrow>
-        <span>
-          <IconButton
-            disabled={filled === 0}
-            onClick={decrement}
-            sx={{ p: 0, width: 40, height: 40 }}
-          >
-            <Remove sx={{ fontSize: "1.4rem" }} />
-          </IconButton>
-        </span>
-      </Tooltip>
+    <ClockStepper
+      onDecrement={decrement}
+      onIncrement={increment}
+      onReset={reset}
+      decrementDisabled={filled === 0}
+      incrementDisabled={filled >= sections}
+      resetDisabled={filled === 0}
+    >
       <Box
         onClick={editing ? undefined : startEditing}
         sx={{
           width: 40,
-          height: 40,
+          height: 32,
           borderRadius: "4px",
-          bgcolor: "action.selected",
+          border: "1px solid",
+          borderColor: "divider",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -107,23 +102,7 @@ export default function ClockControls({
           `${filled}/${sections}`
         )}
       </Box>
-      <Tooltip title={t("Increment")} arrow>
-        <span>
-          <IconButton
-            disabled={filled >= sections}
-            onClick={increment}
-            sx={{ p: 0, width: 40, height: 40 }}
-          >
-            <Add sx={{ fontSize: "1.4rem" }} />
-          </IconButton>
-        </span>
-      </Tooltip>
-      <Tooltip title={t("Reset")} arrow>
-        <IconButton onClick={reset} sx={{ p: 0, width: 40, height: 40 }}>
-          <RestartAlt sx={{ fontSize: "1.4rem" }} />
-        </IconButton>
-      </Tooltip>
-    </>
+    </ClockStepper>
   );
 
   if (compact) {

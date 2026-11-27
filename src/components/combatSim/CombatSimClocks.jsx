@@ -18,7 +18,6 @@ import {
 } from "@mui/material";
 import {
   RemoveCircleOutlined,
-  RestartAlt,
   Close,
   Add,
   ExpandMore,
@@ -26,6 +25,7 @@ import {
   AccessTime,
 } from "@mui/icons-material";
 import Clock from "/src/components/shared/actors/pc/playerSheet/Clock";
+import ClockStepper from "/src/components/shared/common/ClockStepper";
 import { t } from "../../translation/translate";
 import { useTheme } from "@mui/material/styles";
 import { useCombatSimSettingsStore } from "../../stores/combatSimSettingsStore";
@@ -82,27 +82,15 @@ export function CombatClock({
           gap: 0.5,
         }}
       >
-        <Tooltip title={t("Decrement")}>
-          <IconButton size="small" onClick={decrement}>
-            <RemoveCircleOutlined fontSize="small" />
-          </IconButton>
-        </Tooltip>
-        {onReset && (
-          <Tooltip title={t("clocks_reset_tooltip")}>
-            <IconButton
-              size="small"
-              onClick={() => onReset(index)}
-              sx={{ mr: 0.5 }}
-            >
-              <RestartAlt fontSize="small" />
-            </IconButton>
-          </Tooltip>
-        )}
-        <Tooltip title={t("Increment")}>
-          <IconButton size="small" onClick={increment}>
-            <Add fontSize="small" />
-          </IconButton>
-        </Tooltip>
+        <ClockStepper
+          size="small"
+          onDecrement={decrement}
+          onIncrement={increment}
+          onReset={onReset ? () => onReset(index) : undefined}
+          decrementDisabled={filledCount === 0}
+          incrementDisabled={filledCount >= clock.sections}
+          resetTooltip={t("clocks_reset_tooltip")}
+        />
         {onRemove && (
           <Tooltip title={t("clocks_remove_tooltip")}>
             <IconButton
@@ -132,7 +120,7 @@ export function CombatClock({
           mb: 2,
           fontWeight: "medium",
           textAlign: "center",
-          mt: 1,
+          mt: 3,
         }}
       >
         {clock.name}

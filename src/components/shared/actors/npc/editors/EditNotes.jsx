@@ -18,7 +18,6 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
-  Stack,
   Button,
 } from "@mui/material";
 import { useState } from "react";
@@ -27,6 +26,7 @@ import CustomTextarea from "/src/components/common/CustomTextarea";
 import SectionCard from "/src/components/shared/actors/common/SectionCard";
 import ItemRowCard from "/src/components/shared/common/ItemRowCard";
 import Clock from "/src/components/shared/actors/pc/playerSheet/Clock";
+import ClockStepper from "/src/components/shared/common/ClockStepper";
 import {
   Add,
   ArrowDownward,
@@ -35,8 +35,6 @@ import {
   Delete,
   Menu as MenuIcon,
   Search,
-  RestartAlt as RestartAltIcon,
-  Remove as RemoveIcon,
   Edit as EditIcon,
   RemoveCircleOutlined,
 } from "@mui/icons-material";
@@ -560,38 +558,16 @@ export default function EditNotes({ npc, setNpc }) {
                                 }
                               />
 
-                              <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
-                                <Tooltip title={t("Decrement")}>
-                                  <IconButton
-                                    size="small"
-                                    onClick={() =>
-                                      decrementClockState(i, clockIndex)
-                                    }
-                                  >
-                                    <RemoveIcon fontSize="small" />
-                                  </IconButton>
-                                </Tooltip>
-                                <Tooltip title={t("Reset")}>
-                                  <IconButton
-                                    size="small"
-                                    onClick={() =>
-                                      resetClockState(i, clockIndex)
-                                    }
-                                  >
-                                    <RestartAltIcon fontSize="small" />
-                                  </IconButton>
-                                </Tooltip>
-                                <Tooltip title={t("Increment")}>
-                                  <IconButton
-                                    size="small"
-                                    onClick={() =>
-                                      incrementClockState(i, clockIndex)
-                                    }
-                                  >
-                                    <Add fontSize="small" />
-                                  </IconButton>
-                                </Tooltip>
-                              </Stack>
+                              <ClockStepper
+                                sx={{ mt: 1 }}
+                                onDecrement={() =>
+                                  decrementClockState(i, clockIndex)
+                                }
+                                onIncrement={() =>
+                                  incrementClockState(i, clockIndex)
+                                }
+                                onReset={() => resetClockState(i, clockIndex)}
+                              />
                             </Paper>
                           </Grid>
                         ))}

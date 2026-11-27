@@ -5,7 +5,6 @@ import {
   Tooltip,
   Icon,
   IconButton,
-  Button,
   Accordion,
   AccordionSummary,
   AccordionDetails,
@@ -21,6 +20,7 @@ import { useTranslate } from "/src/translation/translate";
 import ReactMarkdown from "/src/components/common/Markdown";
 import { useCustomTheme } from "/src/hooks/useCustomTheme";
 import Clock from "/src/components/shared/actors/pc/playerSheet/Clock";
+import ClockStepper from "/src/components/shared/common/ClockStepper";
 import { useNumericClock } from "/src/hooks/useClock";
 
 function ThemedSpellGift({ gift, isEditMode, onEdit, onClockChange }) {
@@ -284,56 +284,15 @@ function ThemedSpellGift({ gift, isEditMode, onEdit, onClockChange }) {
                 {clock}/4
               </Typography>
             )}
-            <Box sx={{ display: "flex", gap: "4px" }}>
-              <Button
-                size="small"
-                onClick={decrement}
-                disabled={clock === 0}
-                style={{
-                  minWidth: 32,
-                  height: 28,
-                  padding: 0,
-                  border: "none",
-                  color: theme.primary,
-                  backgroundColor: theme.white,
-                  fontWeight: 800,
-                }}
-              >
-                -
-              </Button>
-              <Button
-                size="small"
-                onClick={increment}
-                disabled={clock === 4}
-                style={{
-                  minWidth: 32,
-                  height: 28,
-                  padding: 0,
-                  border: "none",
-                  color: theme.primary,
-                  backgroundColor: theme.white,
-                  fontWeight: 800,
-                }}
-              >
-                +
-              </Button>
-              <Button
-                size="small"
-                onClick={resetClock}
-                style={{
-                  minWidth: 46,
-                  height: 28,
-                  padding: "0 4px",
-                  border: "none",
-                  color: theme.primary,
-                  backgroundColor: theme.white,
-                  fontWeight: 800,
-                  fontSize: "0.7rem",
-                }}
-              >
-                {t("Reset")}
-              </Button>
-            </Box>
+            <ClockStepper
+              onPrimary
+              onDecrement={decrement}
+              onIncrement={increment}
+              onReset={resetClock}
+              decrementDisabled={clock === 0}
+              incrementDisabled={clock === 4}
+              resetDisabled={clock === 0}
+            />
           </Box>
         </Box>
       </Box>

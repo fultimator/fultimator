@@ -11,17 +11,13 @@ import {
   Radio,
   Input,
   InputLabel,
-  IconButton,
-  Tooltip,
   Box,
   Chip,
   Stack,
 } from "@mui/material";
 import { useTranslate } from "/src/translation/translate";
 import Clock from "/src/components/shared/actors/pc/playerSheet/Clock";
-import AddIcon from "@mui/icons-material/Add";
-import RemoveIcon from "@mui/icons-material/Remove";
-import RestartAltIcon from "@mui/icons-material/RestartAlt";
+import ClockStepper from "/src/components/shared/common/ClockStepper";
 import SectionCard from "/src/components/shared/actors/common/SectionCard";
 import CompactSectionHeader from "/src/components/shared/actors/pc/variants/compact/CompactSectionHeader";
 
@@ -330,23 +326,11 @@ export default function PlayerRituals({
               state={clockState}
               setState={setClockState}
             />
-            <Stack direction="row" spacing={0.5}>
-              <Tooltip title={t("Decrement")} arrow>
-                <IconButton onClick={decrementClock} size="small">
-                  <RemoveIcon fontSize="small" />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title={t("Reset")} arrow>
-                <IconButton onClick={resetClock} size="small">
-                  <RestartAltIcon fontSize="small" />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title={t("Increment")} arrow>
-                <IconButton onClick={incrementClock} size="small">
-                  <AddIcon fontSize="small" />
-                </IconButton>
-              </Tooltip>
-            </Stack>
+            <ClockStepper
+              onDecrement={decrementClock}
+              onIncrement={incrementClock}
+              onReset={resetClock}
+            />
           </Box>
         </Grid>
       </Grid>

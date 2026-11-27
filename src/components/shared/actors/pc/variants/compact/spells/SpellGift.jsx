@@ -10,7 +10,8 @@ import {
   IconButton,
   Tooltip,
 } from "@mui/material";
-import { Add, Message, Remove, RestartAlt } from "@mui/icons-material";
+import { Message } from "@mui/icons-material";
+import ClockStepper from "/src/components/shared/common/ClockStepper";
 import { styled } from "@mui/system";
 import { useTranslate } from "/src/translation/translate";
 import { useCustomTheme } from "/src/hooks/useCustomTheme";
@@ -114,41 +115,15 @@ export default function SpellGift({
                   sx={{ height: 6, borderRadius: 3 }}
                 />
               </Box>
-              <Box sx={{ display: "flex" }}>
-                <IconButton
-                  size="small"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleClockReset();
-                  }}
-                  disabled={clock === 0 || !setPlayer}
-                  sx={{ p: 0 }}
-                >
-                  <RestartAlt fontSize="small" />
-                </IconButton>
-                <IconButton
-                  size="small"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleClockChange(clock - 1);
-                  }}
-                  disabled={clock <= 0 || !setPlayer}
-                  sx={{ p: 0 }}
-                >
-                  <Remove fontSize="small" />
-                </IconButton>
-                <IconButton
-                  size="small"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleClockChange(clock + 1);
-                  }}
-                  disabled={clock >= 4 || !setPlayer}
-                  sx={{ p: 0 }}
-                >
-                  <Add fontSize="small" />
-                </IconButton>
-              </Box>
+              <ClockStepper
+                size="small"
+                onDecrement={() => handleClockChange(clock - 1)}
+                onIncrement={() => handleClockChange(clock + 1)}
+                onReset={handleClockReset}
+                decrementDisabled={clock <= 0 || !setPlayer}
+                incrementDisabled={clock >= 4 || !setPlayer}
+                resetDisabled={clock === 0 || !setPlayer}
+              />
             </Box>
           </StyledTableCell>
         </TableRow>
