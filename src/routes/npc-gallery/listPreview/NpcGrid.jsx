@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { Avatar, Box } from "@mui/material";
-import { alpha } from "@mui/material/styles";
+import { alpha, lighten } from "@mui/material/styles";
 import { DataGrid } from "@mui/x-data-grid";
 import { useTranslate } from "../../../translation/translate";
 import { formatRank, PAGE_SIZE } from "./utils";
@@ -28,8 +28,9 @@ const includeIds = (ids) => ({ type: "include", ids });
 
 const gridSx = (theme, compact, large) => {
   const primary = theme.palette.primary.main;
-  const accent =
-    theme.palette.mode === "dark" ? theme.palette.primary.light : primary;
+  const dark = theme.palette.mode === "dark";
+  const accent = dark ? lighten(primary, 0.7) : primary;
+  const tint = dark ? 0.3 : 0.13;
   const contrast = theme.palette.primary.contrastText;
   const header = ".MuiDataGrid-columnHeader";
   const row = ".MuiDataGrid-row";
@@ -62,13 +63,15 @@ const gridSx = (theme, compact, large) => {
       "&:hover": { backgroundColor: alpha(contrast, 0.2) },
     },
     [`& ${row}`]: { cursor: "pointer", borderLeft: "3px solid transparent" },
-    [`& ${row}:hover`]: { backgroundColor: alpha(primary, 0.13) },
+    [`& ${row}:hover`]: { backgroundColor: alpha(primary, tint) },
     [`& ${row}.Mui-selected`]: {
-      backgroundColor: alpha(primary, 0.13),
-      borderLeft: `3px solid ${primary}`,
+      backgroundColor: alpha(primary, tint),
+      borderLeft: `3px solid ${accent}`,
       color: accent,
     },
-    [`& ${row}.Mui-selected:hover`]: { backgroundColor: alpha(primary, 0.18) },
+    [`& ${row}.Mui-selected:hover`]: {
+      backgroundColor: alpha(primary, tint + 0.05),
+    },
     [`& ${row}.Mui-selected .npc-name-cell`]: { fontWeight: 700 },
     "& .MuiDataGrid-footerContainer": {
       minHeight: 40,
