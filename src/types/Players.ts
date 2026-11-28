@@ -323,6 +323,7 @@ export interface TypePlayer {
   bonuses?: ActorBonuses;
   multipliers?: ActorMultipliers;
   effects?: ActorEffect[];
+  tags?: { name: string }[];
 }
 
 // Canonical schema-derived player type

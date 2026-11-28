@@ -20,6 +20,7 @@ import SystemUpdateAltIcon from "@mui/icons-material/SystemUpdateAlt";
 import { useNavigate } from "react-router";
 
 import {
+  Autocomplete,
   Chip,
   Divider,
   IconButton,
@@ -169,6 +170,7 @@ function Personal() {
   const deferredName = useDeferredValue(name);
   const [sort, setSort] = useState("name");
   const [direction, setDirection] = useState("ascending");
+  const [tagFilter, setTagFilter] = useState(null);
   const [layout, setLayout] = usePersistentState(
     "playerGallery.layout",
     "masonry",
@@ -313,6 +315,13 @@ function Personal() {
                 !item.name.toLowerCase().includes(deferredName.toLowerCase())
               )
                 return false;
+              if (
+                tagFilter &&
+                !item.tags?.some(
+                  (tag) => tag.name?.toUpperCase() === tagFilter.toUpperCase(),
+                )
+              )
+                return false;
               return true;
             })
             .sort((item1, item2) => {
@@ -331,8 +340,20 @@ function Personal() {
               }
             })
         : [],
-    [personalList, deferredName, sort, direction],
+    [personalList, deferredName, sort, direction, tagFilter],
   );
+
+  const sortedTags = useMemo(() => {
+    const counts = {};
+    (personalList ?? []).forEach((player) => {
+      player.tags?.forEach((tag) => {
+        if (!tag?.name) return;
+        const tagName = tag.name.toUpperCase();
+        counts[tagName] = (counts[tagName] || 0) + 1;
+      });
+    });
+    return Object.keys(counts).sort((a, b) => counts[b] - counts[a]);
+  }, [personalList]);
 
   const gridItems = useMemo(
     () =>
@@ -1077,9 +1098,11 @@ function Personal() {
     setName("");
     setSort("name");
     setDirection("ascending");
+    setTagFilter(null);
   };
 
   const activeFilters = [
+    tagFilter,
     sort !== "name" && sort,
     direction !== "ascending" && direction,
   ].filter(Boolean);
@@ -1090,12 +1113,35 @@ function Personal() {
         display: "grid",
         gridTemplateColumns: {
           xs: "repeat(2, minmax(0, 1fr))",
-          md: "repeat(2, minmax(0, 1fr)) auto",
+          md: "1.3fr repeat(2, minmax(0, 1fr)) auto",
         },
         alignItems: "center",
         gap: 1.5,
       }}
     >
+      <Box sx={{ gridColumn: { xs: "1 / -1", md: "auto" } }}>
+        <Autocomplete
+          fullWidth
+          size="small"
+          options={sortedTags}
+          value={tagFilter}
+          onChange={(event, newValue) => setTagFilter(newValue)}
+          filterOptions={(options, { inputValue }) => {
+            const inputValueUpper = inputValue.toUpperCase();
+            return options.filter((option) =>
+              option.toUpperCase().includes(inputValueUpper),
+            );
+          }}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label={t("Tag Search")}
+              variant="outlined"
+              fullWidth
+            />
+          )}
+        />
+      </Box>
       <FormControl fullWidth size="small">
         <InputLabel id="sort">{t("Sort:")}</InputLabel>
         <Select

@@ -9,39 +9,42 @@ import { useCustomTheme } from "../hooks/useCustomTheme";
 import { useTranslate } from "../translation/translate";
 import AddIcon from "@mui/icons-material/Add";
 
-const TagList = ({ npc, setNpc }) => {
+const MAX_TAGS = 5;
+const MAX_TAG_LENGTH = 50;
+
+export const TagEditor = ({ item, setItem, readOnly = false, label }) => {
   const { t } = useTranslate();
-  const theme = useCustomTheme();
-  const secondary = theme.secondary;
-
   const [inputValue, setInputValue] = useState("");
-  const maxTags = 5; // Maximum tag count
-  const maxTagLength = 50; // Maximum tag length
+  const tags = item.tags ?? [];
 
-  //console.log(npc.tags);
-
-  // Function to handle deletion of a tag
-  const handleDelete = (i) => {
-    return () => {
-      setNpc((prevState) => {
-        const newState = {
-          ...prevState,
-          tags: [...prevState.tags.slice(0, i), ...prevState.tags.slice(i + 1)],
-        };
-        return newState;
-      });
-    };
+  const handleDelete = (i) => () => {
+    setItem((prevState) => ({
+      ...prevState,
+      tags: (prevState.tags ?? []).filter((_, idx) => idx !== i),
+    }));
   };
 
-  // Function to handle input change in the text field
   const handleInputChange = (e) => {
-    // Limit input value to maxTagLength characters
-    if (e.target.value.length <= maxTagLength) {
+    if (e.target.value.length <= MAX_TAG_LENGTH) {
       setInputValue(e.target.value);
     }
   };
 
-  // Function to handle key down events in the text field
+  const handleAddTag = () => {
+    const trimmedValue = inputValue.trim().toUpperCase();
+    if (
+      trimmedValue &&
+      tags.length < MAX_TAGS &&
+      !tags.some((tag) => tag.name?.toUpperCase() === trimmedValue)
+    ) {
+      setItem((prevState) => ({
+        ...prevState,
+        tags: [...(prevState.tags ?? []), { name: trimmedValue }],
+      }));
+      setInputValue("");
+    }
+  };
+
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
       e.preventDefault();
@@ -49,31 +52,67 @@ const TagList = ({ npc, setNpc }) => {
     }
   };
 
-  // Function to handle adding a tag
-  const handleAddTag = () => {
-    const trimmedValue = inputValue.trim().toUpperCase();
-    if (
-      trimmedValue &&
-      (npc.tags?.length < maxTags || !npc.tags) &&
-      !npc.tags?.some(
-        (tag) => tag.name.toUpperCase() === trimmedValue.toUpperCase(),
-      )
-    ) {
-      setNpc((prevState) => {
-        const newState = {
-          ...prevState,
-          tags: prevState.tags
-            ? [...prevState.tags, { name: trimmedValue }]
-            : [{ name: trimmedValue }],
-        };
-        return newState;
-      });
-      setInputValue("");
-    }
-  };
+  const isInputDisabled = tags.length >= MAX_TAGS;
 
-  // Check if the input field is disabled
-  const isInputDisabled = npc.tags?.length >= maxTags;
+  return (
+    <>
+      {!readOnly && (
+        <Stack direction="row" spacing={1} sx={{ alignItems: "flex-start" }}>
+          <TextField
+            value={inputValue}
+            onChange={handleInputChange}
+            onKeyDown={handleKeyDown}
+            label={
+              isInputDisabled ? t("Reached tag limit") : (label ?? t("Add Tag"))
+            }
+            variant="outlined"
+            size="small"
+            fullWidth
+            disabled={isInputDisabled}
+            slotProps={{
+              htmlInput: { maxLength: MAX_TAG_LENGTH },
+            }}
+          />
+          <Button
+            variant="contained"
+            color="primary"
+            size="small"
+            onClick={handleAddTag}
+            disabled={isInputDisabled}
+            aria-label={t("Add Tag")}
+            sx={{
+              height: "40px",
+              display: isInputDisabled ? "none" : "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              padding: "0 16px",
+            }}
+          >
+            <AddIcon />
+          </Button>
+        </Stack>
+      )}
+      {tags.length > 0 && (
+        <div style={{ marginTop: readOnly ? 0 : "8px" }}>
+          {tags.map((tag, i) => (
+            <Chip
+              key={`${tag.name}-${i}`}
+              label={tag.name?.toUpperCase()}
+              onDelete={readOnly ? undefined : handleDelete(i)}
+              color="primary"
+              variant="outlined"
+              style={{ marginRight: "5px", marginBottom: "5px" }}
+            />
+          ))}
+        </div>
+      )}
+    </>
+  );
+};
+
+const TagList = ({ npc, setNpc }) => {
+  const { t } = useTranslate();
+  const theme = useCustomTheme();
 
   return (
     <Paper
@@ -82,10 +121,9 @@ const TagList = ({ npc, setNpc }) => {
         p: "10px",
         borderRadius: "8px",
         border: "2px solid",
-        borderColor: secondary,
+        borderColor: theme.secondary,
       }}
     >
-      {/* Label for the tag list */}
       <Typography
         sx={{
           mb: 1,
@@ -100,54 +138,7 @@ const TagList = ({ npc, setNpc }) => {
       >
         {t("Personal Tags")}
       </Typography>
-      {/* Stack for input field and add button */}
-      <Stack direction="row" spacing={1} sx={{ alignItems: "flex-start" }}>
-        {/* Text field for adding tags */}
-        <TextField
-          value={inputValue}
-          onChange={handleInputChange}
-          onKeyDown={handleKeyDown} // Check if handleKeyDown is properly attached
-          placeholder={isInputDisabled ? t("Reached tag limit") : t("Add Tag")}
-          variant="outlined"
-          size="small"
-          fullWidth
-          disabled={isInputDisabled}
-          sx={{ height: "40px" }} // Set fixed height for the TextField
-          slotProps={{
-            htmlInput: { maxLength: maxTagLength },
-          }}
-        />
-        {/* Button to add tags */}
-        <Button
-          variant="contained"
-          color="primary"
-          size="small"
-          onClick={handleAddTag}
-          disabled={isInputDisabled}
-          sx={{
-            height: "40px",
-            display: isInputDisabled ? "none" : "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            padding: "0 16px",
-          }}
-        >
-          <AddIcon />
-        </Button>
-      </Stack>
-      {/* Container for displaying added tags */}
-      <div style={{ marginTop: "8px" }}>
-        {npc.tags?.map((tag, i) => (
-          <Chip
-            key={i}
-            label={tag.name.toUpperCase()}
-            onDelete={handleDelete(i)}
-            color="primary"
-            variant="outlined"
-            style={{ marginRight: "5px", marginBottom: "5px" }}
-          />
-        ))}
-      </div>
+      <TagEditor item={npc} setItem={setNpc} />
     </Paper>
   );
 };

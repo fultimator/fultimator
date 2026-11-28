@@ -978,7 +978,7 @@ export function createThemeComponents({
           "&.Mui-disabled": {
             color: isDark ? alpha("#ffffff", 0.4) : alpha(quaternary, 0.45),
           },
-          ".MuiFormControl-root:has(input[readonly]) &, .MuiFormControl-root:has(textarea[readonly]) &":
+          ".MuiFormControl-root:has(input[readonly]) &, .MuiFormControl-root:has(textarea[readonly]:not([aria-hidden])) &":
             {
               color: isDark ? alpha("#ffffff", 0.4) : alpha(quaternary, 0.45),
             },

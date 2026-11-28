@@ -9,7 +9,10 @@ import {
   Button,
   InputAdornment,
   Snackbar,
+  Typography,
+  alpha,
 } from "@mui/material";
+import { TagEditor } from "/src/components/TagList";
 import { useTranslate } from "/src/translation/translate";
 import CustomTextarea from "/src/components/common/CustomTextarea";
 import SectionCard from "/src/components/shared/actors/common/SectionCard";
@@ -201,6 +204,31 @@ export default function EditPlayerBasics({
               />
             </FormControl>
           </Grid>
+          {(isEditMode || player.tags?.length > 0) && (
+            <Grid size={12}>
+              {!isEditMode && (
+                <Typography
+                  variant="caption"
+                  component="div"
+                  sx={(theme) => ({
+                    mb: 0.5,
+                    color:
+                      theme.palette.mode === "dark"
+                        ? alpha("#ffffff", 0.4)
+                        : alpha(theme.palette.quaternary.main, 0.45),
+                  })}
+                >
+                  {t("Personal Tags")}
+                </Typography>
+              )}
+              <TagEditor
+                item={player}
+                setItem={setPlayer}
+                readOnly={!isEditMode}
+                label={t("Personal Tags")}
+              />
+            </Grid>
+          )}
           <Grid
             size={{
               xs: 12,
