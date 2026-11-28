@@ -25,7 +25,7 @@ import {
   Alert,
   CircularProgress,
 } from "@mui/material";
-import { useTheme } from "@mui/material/styles";
+import { lighten, useTheme } from "@mui/material/styles";
 import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
 import ShareIcon from "@mui/icons-material/Share";
@@ -138,6 +138,10 @@ const CompendiumBrowser = React.memo(function CompendiumBrowser({
   const { t } = useTranslate();
   const customTheme = useCustomTheme();
   const muiTheme = useTheme();
+  const selectedOutline =
+    customTheme.mode === "dark"
+      ? lighten(customTheme.primary, 0.5)
+      : customTheme.primary;
   const isDesktopMq = useMediaQuery(muiTheme.breakpoints.up("md"));
   const isDesktop =
     isDesktopOverride !== undefined ? isDesktopOverride : isDesktopMq;
@@ -978,8 +982,8 @@ const CompendiumBrowser = React.memo(function CompendiumBrowser({
                         position: "relative",
                         borderRadius: 2,
                         border: isSelected
-                          ? `2px solid ${customTheme.primary}`
-                          : "2px solid transparent",
+                          ? `3px solid ${selectedOutline}`
+                          : "3px solid transparent",
                         transition: "border-color 0.15s ease",
                         contain: "content",
                         scrollMarginTop: { xs: 88, md: 96 },

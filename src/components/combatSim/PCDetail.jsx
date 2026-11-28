@@ -30,7 +30,7 @@ import {
 } from "../app-drawer/panels/chat/domain/checks";
 import { deriveCombatStats } from "/src/components/shared/actors/core-utils";
 import { useBarShell } from "/src/components/shared/actors/common/barShellUtils";
-import { GradientLinearProgress } from "/src/components/shared/actors/pc/shared";
+import { GradientLinearProgress } from "/src/components/shared/actors/pc/pcStyled";
 import {
   FpResourceIcon,
   HpResourceIcon,

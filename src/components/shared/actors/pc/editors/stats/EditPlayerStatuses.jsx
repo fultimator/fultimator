@@ -72,7 +72,11 @@ export default function EditPlayerStatuses({ player, setPlayer, isEditMode }) {
                 <Typography
                   variant="body2"
                   component="span"
-                  sx={{ fontSize: "0.8em" }}
+                  sx={{
+                    fontSize: "0.9rem",
+                    lineHeight: 1.3,
+                    color: "text.secondary",
+                  }}
                 >
                   <ReactMarkdown
                     allowedElements={["strong"]}

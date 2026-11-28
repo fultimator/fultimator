@@ -31,6 +31,8 @@ import {
   TextField,
   Tooltip,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import { Add, Delete } from "@mui/icons-material";
 import { BevelColorPicker } from "../../components/app-drawer/pickers/ColorPicker";
@@ -892,28 +894,57 @@ export function NpcAttrSliderRenderer({
         { value: 12, label: "d12" },
       ]
     : true;
+  const die = (value as number) ?? min;
 
   return (
-    <Grid container spacing={1} sx={{ pr: 2, alignItems: "center" }}>
-      <Grid size={2}>
-        <InputLabel sx={{ fontSize: "20px", fontWeight: 400 }}>
+    <Box sx={{ display: "flex", alignItems: "center", gap: 1, pr: 0.5 }}>
+      <InputLabel
+        sx={{
+          fontSize: "20px",
+          fontWeight: 400,
+          display: "flex",
+          alignItems: "baseline",
+          gap: 0.5,
+          width: { xs: 78, sm: 92 },
+          flexShrink: 0,
+          whiteSpace: "nowrap",
+        }}
+      >
+        <Box component="span" sx={{ minWidth: "2.2em" }}>
           {t(label)}
-        </InputLabel>
-      </Grid>
-      <Grid size={10}>
-        <FormControl variant="standard" fullWidth>
-          <Slider
-            marks={marks}
-            min={min}
-            max={max}
-            step={step}
-            size="medium"
-            value={(value as number) ?? min}
-            onChange={(_e, v) => onCommit(v)}
-          />
-        </FormControl>
-      </Grid>
-    </Grid>
+        </Box>
+        <Box
+          component="span"
+          sx={{
+            opacity: 0.85,
+            minWidth: "2em",
+            fontVariantNumeric: "tabular-nums",
+          }}
+        >
+          d{die}
+        </Box>
+      </InputLabel>
+      <FormControl
+        variant="standard"
+        sx={{ flex: 1, minWidth: 0, px: 1, boxSizing: "border-box" }}
+      >
+        <Slider
+          marks={marks}
+          min={min}
+          max={max}
+          step={step}
+          size="medium"
+          value={die}
+          onChange={(_e, v) => onCommit(v)}
+          aria-label={t(label)}
+          sx={{
+            "@media (max-width:600px)": {
+              "& .MuiSlider-thumb": { width: 26, height: 26 },
+            },
+          }}
+        />
+      </FormControl>
+    </Box>
   );
 }
 
@@ -929,13 +960,14 @@ export function NpcAffinitySliderRenderer({
   const { t } = useTranslate();
   const showLabels = (componentProps?.showLabels as boolean) ?? false;
 
+  const compactLegend = useMediaQuery(useTheme().breakpoints.down("md"));
   const marks = showLabels
     ? [
-        { value: 0, label: t("Vulnerability", true) },
+        { value: 0, label: compactLegend ? "VU" : t("Vulnerability", true) },
         { value: 1, label: " " },
-        { value: 2, label: t("Resistance", true) },
-        { value: 3, label: t("Immunity", true) },
-        { value: 4, label: t("Absorption", true) },
+        { value: 2, label: compactLegend ? "RS" : t("Resistance", true) },
+        { value: 3, label: compactLegend ? "IM" : t("Immunity", true) },
+        { value: 4, label: compactLegend ? "AB" : t("Absorption", true) },
       ]
     : true;
 
@@ -944,27 +976,49 @@ export function NpcAffinitySliderRenderer({
   const typeKey = label.toLowerCase();
 
   return (
-    <Grid container spacing={1} sx={{ pr: 2, alignItems: "center" }}>
-      <Grid size={3}>
-        <InputLabel sx={{ fontSize: "20px", fontWeight: 400 }}>
-          <TypeIcon type={typeKey} disabled={false} />{" "}
-          <TypeName type={typeKey} />
-        </InputLabel>
-      </Grid>
-      <Grid size={9}>
-        <FormControl variant="standard" fullWidth>
-          <Slider
-            marks={marks}
-            min={0}
-            max={4}
-            step={1}
-            size="medium"
-            value={numValue}
-            onChange={(_e, v) => onCommit(affinityNumToStr(v as number))}
-          />
-        </FormControl>
-      </Grid>
-    </Grid>
+    <Box sx={{ display: "flex", alignItems: "center", gap: 1, pr: 0.5 }}>
+      <InputLabel
+        sx={{
+          fontSize: { xs: "16px", sm: "20px" },
+          fontWeight: 400,
+          display: "flex",
+          alignItems: "center",
+          gap: 0.5,
+          width: { xs: 92, sm: 124 },
+          flexShrink: 0,
+          whiteSpace: "nowrap",
+          overflow: "visible",
+        }}
+      >
+        <TypeIcon type={typeKey} disabled={false} />
+        <TypeName type={typeKey} />
+      </InputLabel>
+      <FormControl
+        variant="standard"
+        sx={{ flex: 1, minWidth: 0, px: 1, boxSizing: "border-box" }}
+      >
+        <Slider
+          marks={marks}
+          min={0}
+          max={4}
+          step={1}
+          size="medium"
+          value={numValue}
+          onChange={(_e, v) => onCommit(affinityNumToStr(v as number))}
+          aria-label={t(label)}
+          sx={{
+            "& .MuiSlider-markLabel": {
+              fontSize: compactLegend ? "0.875rem" : "0.8rem",
+              fontWeight: compactLegend ? 600 : 400,
+              color: "text.primary",
+            },
+            "@media (max-width:600px)": {
+              "& .MuiSlider-thumb": { width: 26, height: 26 },
+            },
+          }}
+        />
+      </FormControl>
+    </Box>
   );
 }
 

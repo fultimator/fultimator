@@ -12,7 +12,7 @@ import {
   FpResourceIcon,
   ZenitResourceIcon,
 } from "/src/components/icons";
-import { GradientLinearProgress } from "/src/components/shared/actors/pc/shared";
+import { GradientLinearProgress } from "/src/components/shared/actors/pc/pcStyled";
 import { newShade } from "/src/libs/playerCalculations";
 import StatTooltip from "/src/components/common/StatTooltip";
 import { getActorBonuses, getActorMultipliers } from "/src/libs/actorBonuses";
@@ -40,6 +40,30 @@ import {
 } from "/src/components/shared/actors/common/barShellUtils";
 import BarShell from "/src/components/shared/actors/common/BarShell";
 
+function BarLabel({ tooltip, Icon, label, labelBg, labelBorder }) {
+  const label_ = (
+    <Box
+      sx={{
+        ...LABEL_SX,
+        height: "100%",
+        bgcolor: labelBg,
+        borderRight: `1px solid ${labelBorder}`,
+      }}
+    >
+      {Icon && <Icon size="1.4em" />}
+      <span style={{ lineHeight: 1 }}>{label}</span>
+    </Box>
+  );
+  if (!tooltip) return label_;
+  return (
+    <Box onClick={(e) => e.stopPropagation()} sx={{ display: "flex" }}>
+      <StatTooltip {...tooltip} display="flex">
+        {label_}
+      </StatTooltip>
+    </Box>
+  );
+}
+
 function StatBar({
   label,
   Icon,
@@ -52,6 +76,7 @@ function StatBar({
   onSetCrisis = null,
   onClick,
   isClickable = false,
+  tooltip,
 }) {
   const { shellBg, shellBorder, labelBg, labelBorder, trackBg } = useBarShell();
   const [crisisHover, setCrisisHover] = useState(false);
@@ -63,16 +88,13 @@ function StatBar({
 
   return (
     <BarShell shellBg={shellBg} shellBorder={shellBorder}>
-      <Box
-        sx={{
-          ...LABEL_SX,
-          bgcolor: labelBg,
-          borderRight: `1px solid ${labelBorder}`,
-        }}
-      >
-        {Icon && <Icon size="1.4em" />}
-        <span style={{ lineHeight: 1 }}>{label}</span>
-      </Box>
+      <BarLabel
+        tooltip={tooltip}
+        Icon={Icon}
+        label={label}
+        labelBg={labelBg}
+        labelBorder={labelBorder}
+      />
       <Box
         onClick={isClickable ? onClick : undefined}
         sx={{
@@ -107,15 +129,16 @@ function StatBar({
               onMouseEnter={() => setCrisisHover(true)}
               onMouseLeave={() => setCrisisHover(false)}
               onClick={(e) => {
+                if (!onSetCrisis) return;
                 e.stopPropagation();
-                onSetCrisis?.();
+                onSetCrisis();
               }}
               sx={{
                 position: "absolute",
                 inset: 0,
                 left: "calc(50% - 12px)",
                 width: "24px",
-                cursor: onSetCrisis ? "pointer" : "default",
+                cursor: onSetCrisis ? "pointer" : "inherit",
               }}
             >
               <Box
@@ -167,7 +190,7 @@ function DeltaControls({ onApply, defaultValue = 1, min = 1, steps = [] }) {
       sx={{
         flex: 1,
         minWidth: 0,
-        height: 30,
+        height: { xs: 38, sm: 30 },
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -195,8 +218,20 @@ function DeltaControls({ onApply, defaultValue = 1, min = 1, steps = [] }) {
   );
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", gap: "3px" }}>
-      <Box sx={{ display: "flex", gap: "4px", alignItems: "stretch" }}>
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        gap: { xs: "6px", sm: "3px" },
+      }}
+    >
+      <Box
+        sx={{
+          display: "flex",
+          gap: { xs: "10px", sm: "4px" },
+          alignItems: "stretch",
+        }}
+      >
         <IconButton
           size="small"
           onPointerDown={(e) => {
@@ -204,8 +239,8 @@ function DeltaControls({ onApply, defaultValue = 1, min = 1, steps = [] }) {
             onApply(-val);
           }}
           sx={{
-            flex: "0 0 36px",
-            height: 30,
+            flex: { xs: "1 1 0", sm: "0 0 36px" },
+            height: { xs: 38, sm: 30 },
             borderRadius: "3px",
             border: "1px solid",
             borderColor: "error.main",
@@ -213,7 +248,7 @@ function DeltaControls({ onApply, defaultValue = 1, min = 1, steps = [] }) {
             p: 0,
           }}
         >
-          <Remove sx={{ fontSize: "1rem" }} />
+          <Remove sx={{ fontSize: { xs: "1.25rem", sm: "1rem" } }} />
         </IconButton>
         <InputBase
           value={amount}
@@ -231,8 +266,8 @@ function DeltaControls({ onApply, defaultValue = 1, min = 1, steps = [] }) {
             },
           }}
           sx={{
-            flex: 1,
-            height: 30,
+            flex: { xs: "0 0 72px", sm: 1 },
+            height: { xs: 38, sm: 30 },
             border: "1px solid",
             borderColor: "divider",
             borderRadius: "3px",
@@ -246,8 +281,8 @@ function DeltaControls({ onApply, defaultValue = 1, min = 1, steps = [] }) {
             onApply(val);
           }}
           sx={{
-            flex: "0 0 36px",
-            height: 30,
+            flex: { xs: "1 1 0", sm: "0 0 36px" },
+            height: { xs: 38, sm: 30 },
             borderRadius: "3px",
             border: "1px solid",
             borderColor: "success.main",
@@ -255,7 +290,7 @@ function DeltaControls({ onApply, defaultValue = 1, min = 1, steps = [] }) {
             p: 0,
           }}
         >
-          <Add sx={{ fontSize: "1rem" }} />
+          <Add sx={{ fontSize: { xs: "1.25rem", sm: "1rem" } }} />
         </IconButton>
       </Box>
 
@@ -263,7 +298,7 @@ function DeltaControls({ onApply, defaultValue = 1, min = 1, steps = [] }) {
         <Box
           sx={{
             display: "flex",
-            gap: "4px",
+            gap: { xs: "10px", sm: "4px" },
             alignItems: "stretch",
             minWidth: 0,
           }}
@@ -271,7 +306,7 @@ function DeltaControls({ onApply, defaultValue = 1, min = 1, steps = [] }) {
           <Box
             sx={{
               display: "flex",
-              gap: "2px",
+              gap: { xs: "4px", sm: "2px" },
               flex: 1,
               minWidth: 0,
               overflow: "hidden",
@@ -290,7 +325,7 @@ function DeltaControls({ onApply, defaultValue = 1, min = 1, steps = [] }) {
           <Box
             sx={{
               display: "flex",
-              gap: "2px",
+              gap: { xs: "4px", sm: "2px" },
               flex: 1,
               minWidth: 0,
               overflow: "hidden",
@@ -318,31 +353,27 @@ function ResourceCell({
   steps = [],
   tooltip,
   isInteractive = false,
+  barClickable = isInteractive,
   onBarClick,
 }) {
   return (
     <Box
       sx={{ display: "flex", flexDirection: "column", gap: "4px", minWidth: 0 }}
     >
-      <StatTooltip
-        {...(tooltip ?? {})}
-        display="block"
-        disabled={isInteractive}
-      >
-        <StatBar
-          label={label}
-          Icon={Icon}
-          value={value}
-          max={max}
-          color1={color1}
-          color2={color2}
-          crisis={crisis}
-          crisisTooltip={crisisTooltip}
-          onSetCrisis={onSetCrisis}
-          isClickable={isInteractive}
-          onClick={onBarClick}
-        />
-      </StatTooltip>
+      <StatBar
+        label={label}
+        Icon={Icon}
+        value={value}
+        max={max}
+        color1={color1}
+        color2={color2}
+        crisis={crisis}
+        crisisTooltip={crisisTooltip}
+        onSetCrisis={onSetCrisis}
+        isClickable={barClickable}
+        onClick={onBarClick}
+        tooltip={tooltip}
+      />
       {isInteractive && <DeltaControls onApply={onApply} steps={steps} />}
     </Box>
   );
@@ -356,6 +387,7 @@ function FpCell({
   onBarClick,
   tooltip,
   isInteractive = false,
+  barClickable = isInteractive,
 }) {
   const { t } = useTranslate();
   const { shellBg, shellBorder, labelBg, labelBorder, trackBg } = useBarShell();
@@ -379,29 +411,28 @@ function FpCell({
     <Box
       sx={{ display: "flex", flexDirection: "column", gap: "4px", minWidth: 0 }}
     >
-      <StatTooltip
-        {...(tooltip ?? {})}
-        display="block"
-        disabled={isInteractive}
+      <Box
+        onClick={!isInteractive && barClickable ? onBarClick : undefined}
+        sx={{
+          cursor: !isInteractive && barClickable ? "pointer" : undefined,
+        }}
       >
         <BarShell shellBg={shellBg} shellBorder={shellBorder}>
-          <Box
-            sx={{
-              ...LABEL_SX,
-              bgcolor: labelBg,
-              borderRight: `1px solid ${labelBorder}`,
-            }}
-          >
-            <FpResourceIcon size="1.4em" />
-            <span style={{ lineHeight: 1 }}>{t("FP")}</span>
-          </Box>
+          <BarLabel
+            tooltip={tooltip}
+            Icon={FpResourceIcon}
+            label={t("FP")}
+            labelBg={labelBg}
+            labelBorder={labelBorder}
+          />
           <Box
             sx={{
               flex: 1,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              mx: "-4px",
+              gap: "2px",
+              px: "4px",
               bgcolor: trackBg,
             }}
             onMouseLeave={() => setHoveredPip(null)}
@@ -418,11 +449,14 @@ function FpCell({
                   onMouseEnter={() => isInteractive && setHoveredPip(i)}
                   onClick={() => handleSetPip(i)}
                   sx={{
-                    width: "1.35em",
+                    flex: 1,
+                    minWidth: 0,
+                    maxWidth: 44,
+                    alignSelf: "stretch",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    cursor: isInteractive ? "pointer" : "default",
+                    cursor: isInteractive ? "pointer" : "inherit",
                     flexShrink: 0,
                     position: "relative",
                     overflow: "hidden",
@@ -473,18 +507,18 @@ function FpCell({
             )}
           </Box>
           <Box
-            onClick={isInteractive ? onBarClick : undefined}
+            onClick={barClickable ? onBarClick : undefined}
             sx={{
               ...VALUE_SX,
               bgcolor: labelBg,
               borderLeft: `1px solid ${labelBorder}`,
-              cursor: isInteractive ? "pointer" : "default",
+              cursor: barClickable ? "pointer" : "default",
             }}
           >
             {value}
           </Box>
         </BarShell>
-      </StatTooltip>
+      </Box>
       {isInteractive && <DeltaControls onApply={onApply} steps={[1, 2, 3]} />}
     </Box>
   );
@@ -497,6 +531,7 @@ function IpCell({
   onBarClick,
   tooltip,
   isInteractive = false,
+  barClickable = isInteractive,
 }) {
   const { t } = useTranslate();
   const { isDark, shellBg, shellBorder, labelBg, labelBorder, trackBg, theme } =
@@ -522,22 +557,20 @@ function IpCell({
     <Box
       sx={{ display: "flex", flexDirection: "column", gap: "4px", minWidth: 0 }}
     >
-      <StatTooltip
-        {...(tooltip ?? {})}
-        display="block"
-        disabled={isInteractive}
+      <Box
+        onClick={!isInteractive && barClickable ? onBarClick : undefined}
+        sx={{
+          cursor: !isInteractive && barClickable ? "pointer" : undefined,
+        }}
       >
         <BarShell shellBg={shellBg} shellBorder={shellBorder}>
-          <Box
-            sx={{
-              ...LABEL_SX,
-              bgcolor: labelBg,
-              borderRight: `1px solid ${labelBorder}`,
-            }}
-          >
-            <IpResourceIcon size="1.4em" />
-            <span style={{ lineHeight: 1 }}>{t("IP")}</span>
-          </Box>
+          <BarLabel
+            tooltip={tooltip}
+            Icon={IpResourceIcon}
+            label={t("IP")}
+            labelBg={labelBg}
+            labelBorder={labelBorder}
+          />
           <Box
             sx={{
               flex: 1,
@@ -577,7 +610,7 @@ function IpCell({
                           : isPreview
                             ? 1
                             : 0.28,
-                      cursor: isInteractive ? "pointer" : "default",
+                      cursor: isInteractive ? "pointer" : "inherit",
                       transition: (t) =>
                         t.transitions.create(["background", "opacity"], {
                           duration: t.transitions.duration.standard,
@@ -598,18 +631,18 @@ function IpCell({
             )}
           </Box>
           <Box
-            onClick={isInteractive ? onBarClick : undefined}
+            onClick={barClickable ? onBarClick : undefined}
             sx={{
               ...VALUE_SX,
               bgcolor: labelBg,
               borderLeft: `1px solid ${labelBorder}`,
-              cursor: isInteractive ? "pointer" : "default",
+              cursor: barClickable ? "pointer" : "default",
             }}
           >
             {value}/{max}
           </Box>
         </BarShell>
-      </StatTooltip>
+      </Box>
       {isInteractive && <DeltaControls onApply={onApply} steps={[1, 2, 3]} />}
     </Box>
   );
@@ -621,31 +654,36 @@ function ZenitRow({
   onBarClick,
   tooltip,
   isInteractive = false,
+  barClickable = isInteractive,
 }) {
   const { t } = useTranslate();
   const { shellBg, shellBorder, labelBg, labelBorder, trackBg } = useBarShell();
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-      <StatTooltip {...(tooltip ?? {})} display="block">
+      <Box
+        onClick={!isInteractive && barClickable ? onBarClick : undefined}
+        sx={{
+          cursor: !isInteractive && barClickable ? "pointer" : undefined,
+        }}
+      >
         <BarShell shellBg={shellBg} shellBorder={shellBorder}>
+          <BarLabel
+            tooltip={tooltip}
+            Icon={ZenitResourceIcon}
+            label={t("Z")}
+            labelBg={labelBg}
+            labelBorder={labelBorder}
+          />
           <Box
-            sx={{
-              ...LABEL_SX,
-              bgcolor: labelBg,
-              borderRight: `1px solid ${labelBorder}`,
-            }}
-          >
-            <ZenitResourceIcon size="1.4em" />
-            <span style={{ lineHeight: 1 }}>{t("Z")}</span>
-          </Box>
-          <Box
+            onClick={barClickable ? onBarClick : undefined}
             sx={{
               flex: 1,
               bgcolor: trackBg,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
+              cursor: barClickable ? "pointer" : "default",
             }}
           >
             <Typography
@@ -662,18 +700,18 @@ function ZenitRow({
             </Typography>
           </Box>
           <Box
-            onClick={isInteractive ? onBarClick : undefined}
+            onClick={barClickable ? onBarClick : undefined}
             sx={{
               ...LABEL_SX,
               bgcolor: labelBg,
               borderLeft: `1px solid ${labelBorder}`,
-              cursor: isInteractive ? "pointer" : "default",
+              cursor: barClickable ? "pointer" : "default",
             }}
           >
             <ZenitResourceIcon size="1.4em" />
           </Box>
         </BarShell>
-      </StatTooltip>
+      </Box>
       {isInteractive && (
         <DeltaControls
           onApply={onApply}
@@ -688,15 +726,17 @@ function ZenitRow({
 export default function PcControlsPanel({
   pc,
   isInteractive = false,
+  canAdjust = false,
   onUpdate,
 }) {
+  const canOpen = isInteractive || (canAdjust && !!onUpdate);
   const { t } = useTranslate();
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const applyStat = (key) => (delta) => {
-    if (!isInteractive || !onUpdate) return;
+    if (!canOpen || !onUpdate) return;
     onUpdate((prev) => {
       const next = Math.max(
         0,
@@ -724,7 +764,7 @@ export default function PcControlsPanel({
   };
 
   const applyFp = (delta) => {
-    if (!isInteractive || !onUpdate) return;
+    if (!canOpen || !onUpdate) return;
     onUpdate((prev) => ({
       ...prev,
       info: {
@@ -738,7 +778,7 @@ export default function PcControlsPanel({
   };
 
   const applyZenit = (delta) => {
-    if (!isInteractive || !onUpdate) return;
+    if (!canOpen || !onUpdate) return;
     onUpdate((prev) => ({
       ...prev,
       info: {
@@ -752,28 +792,28 @@ export default function PcControlsPanel({
   const [zenitDialogOpen, setZenitDialogOpen] = useState(false);
 
   const openResourceDialog = (resource) => {
-    if (!isInteractive) return;
+    if (!canOpen) return;
     setResourceDialog(resource);
   };
 
   const closeResourceDialog = () => setResourceDialog(null);
 
   const openFpDialog = () => {
-    if (!isInteractive) return;
+    if (!canOpen) return;
     setFpDialogOpen(true);
   };
 
   const closeFpDialog = () => setFpDialogOpen(false);
 
   const openZenitDialog = () => {
-    if (!isInteractive) return;
+    if (!canOpen) return;
     setZenitDialogOpen(true);
   };
 
   const closeZenitDialog = () => setZenitDialogOpen(false);
 
   const applyFpDialogChange = (payload) => {
-    if (!isInteractive || !onUpdate) return;
+    if (!canOpen || !onUpdate) return;
     const amount = Math.max(0, parseInt(payload?.amount, 10) || 0);
     if (amount <= 0) return;
     const delta = payload.mode === "heal" ? amount : -amount;
@@ -790,7 +830,7 @@ export default function PcControlsPanel({
   };
 
   const applyZenitDialogChange = (payload) => {
-    if (!isInteractive || !onUpdate) return;
+    if (!canOpen || !onUpdate) return;
     const amount = Math.max(0, parseInt(payload?.amount, 10) || 0);
     if (amount <= 0) return;
     const delta = payload.mode === "heal" ? amount : -amount;
@@ -804,7 +844,7 @@ export default function PcControlsPanel({
   };
 
   const setFpCurrent = (nextCurrent) => {
-    if (!isInteractive || !onUpdate) return;
+    if (!canOpen || !onUpdate) return;
     onUpdate((prev) => ({
       ...prev,
       info: {
@@ -815,7 +855,7 @@ export default function PcControlsPanel({
   };
 
   const setResourceCurrent = (resourceKey) => (nextCurrent) => {
-    if (!isInteractive || !onUpdate) return;
+    if (!canOpen || !onUpdate) return;
     onUpdate((prev) => {
       const maxValue = prev.stats[resourceKey].max ?? 0;
       const bounded = Math.max(0, Math.min(nextCurrent ?? 0, maxValue));
@@ -833,7 +873,7 @@ export default function PcControlsPanel({
   };
 
   const applyResourceDialogChange = (resourceKey) => (payload) => {
-    if (!isInteractive || !onUpdate) return;
+    if (!canOpen || !onUpdate) return;
     const amount = Math.max(0, parseInt(payload?.amount, 10) || 0);
     if (amount <= 0) return;
 
@@ -982,7 +1022,7 @@ export default function PcControlsPanel({
       <Box
         sx={{
           p: 1,
-          "@container (max-width: 420px)": { p: 0 },
+          "@container (max-width: 420px)": { p: "6px" },
           display: "flex",
           flexDirection: "column",
           gap: 1,
@@ -1007,11 +1047,12 @@ export default function PcControlsPanel({
             color2={theme.palette.error.main}
             crisis
             crisisTooltip={t("Set to Crisis")}
-            onSetCrisis={setHpToCrisis}
+            onSetCrisis={isInteractive ? setHpToCrisis : undefined}
             onApply={applyStat("hp")}
             steps={[1, 5, 10, 20]}
             tooltip={hpTooltip}
             isInteractive={isInteractive}
+            barClickable={canOpen}
             onBarClick={() => openResourceDialog("hp")}
           />
           <ResourceCell
@@ -1025,6 +1066,7 @@ export default function PcControlsPanel({
             steps={[1, 5, 10, 20]}
             tooltip={mpTooltip}
             isInteractive={isInteractive}
+            barClickable={canOpen}
             onBarClick={() => openResourceDialog("mp")}
           />
         </Box>
@@ -1043,6 +1085,7 @@ export default function PcControlsPanel({
             onApply={applyStat("ip")}
             tooltip={ipTooltip}
             isInteractive={isInteractive}
+            barClickable={canOpen}
             onBarClick={() => openResourceDialog("ip")}
           />
           <FpCell
@@ -1051,6 +1094,7 @@ export default function PcControlsPanel({
             onBarClick={openFpDialog}
             tooltip={fpTooltip}
             isInteractive={isInteractive}
+            barClickable={canOpen}
           />
         </Box>
 
@@ -1060,6 +1104,7 @@ export default function PcControlsPanel({
           onBarClick={openZenitDialog}
           tooltip={zenitTooltip}
           isInteractive={isInteractive}
+          barClickable={canOpen}
         />
       </Box>
       {resourceDialog && (

@@ -64,6 +64,7 @@ export function TypeAffinity({
   editable = false,
   onChangeAffinity,
   showDropdownArrow = true,
+  stackBelow,
 }) {
   const { t } = useTranslate();
   const rawAffinity = String(affinity ?? "").toLowerCase();
@@ -96,6 +97,12 @@ export function TypeAffinity({
             alignItems: "center",
             justifyContent: "center",
             gap: 0.5,
+            ...(stackBelow && {
+              [`@container (max-width: ${stackBelow}px)`]: {
+                flexDirection: "column",
+                gap: 0.25,
+              },
+            }),
           }}
         >
           {iconNode}

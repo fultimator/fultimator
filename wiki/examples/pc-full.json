@@ -1,0 +1,647 @@
+{
+  "id": "00000000-0000-4000-8000-0000000000a1",
+  "uid": "local-user",
+  "name": "Example Hero",
+  "lvl": 10,
+  "info": {
+    "pronouns": "they/them",
+    "identity": "Wandering Sellsword",
+    "theme": "Duty",
+    "origin": "Port Town",
+    "bonds": [
+      {
+        "name": "Old Friend",
+        "admiration": true,
+        "loyality": false,
+        "affection": true,
+        "inferiority": false,
+        "mistrust": false,
+        "hatred": false
+      }
+    ],
+    "description": "Lorem ipsum dolor sit amet.",
+    "fabulapoints": 3,
+    "exp": 12,
+    "zenit": 250,
+    "imgurl": "https://example.com/portrait.png"
+  },
+  "attributes": {
+    "might": {
+      "base": 10
+    },
+    "insight": {
+      "base": 8
+    },
+    "willpower": {
+      "base": 6
+    },
+    "dexterity": {
+      "base": 8
+    }
+  },
+  "stats": {
+    "hp": {
+      "base": 65,
+      "max": 65,
+      "current": 65
+    },
+    "mp": {
+      "base": 40,
+      "max": 40,
+      "current": 40
+    },
+    "ip": {
+      "base": 6,
+      "max": 6,
+      "current": 6
+    }
+  },
+  "statuses": {
+    "slow": false,
+    "dazed": false,
+    "weak": false,
+    "shaken": false,
+    "enraged": false,
+    "poisoned": false
+  },
+  "immunities": {
+    "slow": false,
+    "dazed": false,
+    "weak": false,
+    "shaken": false,
+    "enraged": false,
+    "poisoned": false
+  },
+  "affinities": {
+    "physical": "no",
+    "air": "no",
+    "bolt": "no",
+    "dark": "no",
+    "earth": "no",
+    "fire": "rs",
+    "ice": "no",
+    "light": "no",
+    "poison": "no"
+  },
+  "classes": [
+    {
+      "itemType": "class",
+      "name": "Example Class",
+      "also": "",
+      "description": "Lorem ipsum dolor sit amet.",
+      "lvl": 5,
+      "benefits": {
+        "hpplus": 5,
+        "mpplus": 0,
+        "ipplus": 0,
+        "isCustomBenefit": false,
+        "martials": {
+          "armor": true,
+          "shields": true,
+          "melee": true,
+          "ranged": false
+        },
+        "rituals": {
+          "ritualism": false
+        },
+        "custom": [],
+        "spellClasses": ["default"],
+        "other": []
+      },
+      "skills": [
+        {
+          "name": "Example Skill 1",
+          "maxLvl": 4,
+          "currentLvl": 1,
+          "description": "Lorem ipsum dolor sit amet.",
+          "specialSkill": ""
+        },
+        {
+          "name": "Example Skill 2",
+          "maxLvl": 4,
+          "currentLvl": 1,
+          "description": "Lorem ipsum dolor sit amet.",
+          "specialSkill": ""
+        },
+        {
+          "name": "Example Skill 3",
+          "maxLvl": 4,
+          "currentLvl": 1,
+          "description": "Lorem ipsum dolor sit amet.",
+          "specialSkill": ""
+        },
+        {
+          "name": "Example Skill 4",
+          "maxLvl": 4,
+          "currentLvl": 1,
+          "description": "Lorem ipsum dolor sit amet.",
+          "specialSkill": ""
+        },
+        {
+          "name": "Example Skill 5",
+          "maxLvl": 4,
+          "currentLvl": 1,
+          "description": "Lorem ipsum dolor sit amet.",
+          "specialSkill": ""
+        }
+      ],
+      "heroic": [
+        {
+          "name": "Example Heroic Skill",
+          "quote": "Lorem ipsum dolor sit amet.",
+          "description": "Lorem ipsum dolor sit amet."
+        }
+      ],
+      "spells": [
+        {
+          "spellType": "default",
+          "name": "Example Spell",
+          "cost": {
+            "resource": "mp",
+            "amount": 5,
+            "perTarget": true
+          },
+          "maxTargets": 1,
+          "targetDescription": "One creature",
+          "duration": "Instantaneous",
+          "description": "Lorem ipsum dolor sit amet.",
+          "isOffensive": false,
+          "showInPlayerSheet": true,
+          "class": "Example Class",
+          "accuracy": {
+            "attr1": "insight",
+            "attr2": "willpower",
+            "value": 0,
+            "defense": "mdef"
+          },
+          "damage": {
+            "value": 5,
+            "type": "fire",
+            "hrZero": false
+          },
+          "range": "ranged",
+          "itemType": "spell",
+          "special": [],
+          "id": "c1f1449d-d28d-42b7-9c9d-5dc4119b91de"
+        }
+      ]
+    },
+    {
+      "itemType": "class",
+      "name": "Second Example Class",
+      "also": "",
+      "description": "Lorem ipsum dolor sit amet.",
+      "lvl": 5,
+      "benefits": {
+        "hpplus": 0,
+        "mpplus": 0,
+        "ipplus": 0,
+        "isCustomBenefit": false,
+        "martials": {
+          "armor": false,
+          "shields": false,
+          "melee": false,
+          "ranged": false
+        },
+        "rituals": {
+          "ritualism": false
+        },
+        "custom": [],
+        "spellClasses": [],
+        "other": []
+      },
+      "skills": [
+        {
+          "name": "Second Skill 1",
+          "maxLvl": 4,
+          "currentLvl": 1,
+          "description": "Lorem ipsum dolor sit amet.",
+          "specialSkill": ""
+        },
+        {
+          "name": "Second Skill 2",
+          "maxLvl": 4,
+          "currentLvl": 1,
+          "description": "Lorem ipsum dolor sit amet.",
+          "specialSkill": ""
+        },
+        {
+          "name": "Second Skill 3",
+          "maxLvl": 4,
+          "currentLvl": 1,
+          "description": "Lorem ipsum dolor sit amet.",
+          "specialSkill": ""
+        },
+        {
+          "name": "Second Skill 4",
+          "maxLvl": 4,
+          "currentLvl": 1,
+          "description": "Lorem ipsum dolor sit amet.",
+          "specialSkill": ""
+        },
+        {
+          "name": "Second Skill 5",
+          "maxLvl": 4,
+          "currentLvl": 1,
+          "description": "Lorem ipsum dolor sit amet.",
+          "specialSkill": ""
+        }
+      ],
+      "heroic": [
+        {
+          "name": "Second Heroic Skill",
+          "quote": "Lorem ipsum dolor sit amet.",
+          "description": "Lorem ipsum dolor sit amet."
+        }
+      ],
+      "spells": []
+    }
+  ],
+  "equipment": [
+    {
+      "weapons": [
+        {
+          "base": {
+            "fuid": "katana",
+            "itemType": "weapon",
+            "category": "Sword",
+            "name": "Katana",
+            "cost": 200,
+            "accuracy": {
+              "attr1": "dexterity",
+              "attr2": "insight",
+              "value": 1,
+              "defense": "def"
+            },
+            "damage": {
+              "value": 10,
+              "type": "physical",
+              "hrZero": false
+            },
+            "hands": 2,
+            "range": "melee",
+            "martial": true,
+            "meta": {
+              "book": "core",
+              "page": "",
+              "isOfficial": true
+            }
+          },
+          "name": "Example Sword",
+          "description": "Lorem ipsum dolor sit amet.",
+          "category": "",
+          "id": "94b32e35-ca05-4205-8b61-806a69f759e5",
+          "range": "melee",
+          "hands": 1,
+          "martial": false,
+          "rework": false,
+          "quality": "",
+          "qualityName": "",
+          "qualityCost": 0,
+          "totalBonus": 0,
+          "selectedQuality": "",
+          "cost": 200,
+          "damage": {
+            "value": 6,
+            "type": "physical",
+            "hrZero": false
+          },
+          "itemType": "weapon",
+          "accuracy": {
+            "attr1": "dexterity",
+            "attr2": "might",
+            "value": 1,
+            "defense": "def"
+          },
+          "modifiers": {
+            "damage": 0,
+            "accuracy": 0,
+            "def": 0,
+            "mdef": 0
+          },
+          "rare": {
+            "accuracyBonus": false,
+            "damageBonus": false
+          }
+        }
+      ],
+      "customWeapons": [
+        {
+          "itemType": "customWeapon",
+          "id": "c3b4fdaa-2d4f-44f7-8d88-1a91975e7727",
+          "name": "Example Custom Weapon",
+          "description": "Lorem ipsum dolor sit amet.",
+          "category": "weapon_category_arcane",
+          "range": "melee",
+          "modifiers": {
+            "damage": 0,
+            "accuracy": 0,
+            "def": 0,
+            "mdef": 0
+          },
+          "rare": {
+            "accuracyBonus": false,
+            "damageBonus": false,
+            "overrideDamageType": false,
+            "overrideAccuracyAttributes": false,
+            "overrideDamageTypeValue": "physical",
+            "overrideAccuracyAttr1": "dexterity",
+            "overrideAccuracyAttr2": "insight"
+          },
+          "customizations": [],
+          "selectedQuality": "",
+          "qualityName": "",
+          "quality": "",
+          "qualityCost": 0,
+          "cost": 300,
+          "hands": 2,
+          "martial": false,
+          "secondName": "",
+          "secondCategory": "weapon_category_arcane",
+          "secondRange": "melee",
+          "secondCustomizations": [],
+          "secondModifiers": {
+            "damage": 0,
+            "accuracy": 0,
+            "def": 0,
+            "mdef": 0
+          },
+          "dataType": "weapon",
+          "accuracy": {
+            "attr1": "dexterity",
+            "attr2": "insight",
+            "value": 0,
+            "defense": "def"
+          },
+          "damage": {
+            "value": 5,
+            "type": "physical",
+            "hrZero": false
+          }
+        }
+      ],
+      "shields": [
+        {
+          "itemType": "shield",
+          "base": {
+            "fuid": "bronze-shield",
+            "category": "Shield",
+            "name": "Bronze Shield",
+            "cost": 100,
+            "def": 2,
+            "mdef": 0,
+            "martial": false,
+            "init": 0,
+            "meta": {
+              "book": "core",
+              "page": "",
+              "isOfficial": true
+            }
+          },
+          "id": "80b7ee65-57cd-4236-abcd-68a2d7639053",
+          "meta": {
+            "isOfficial": false,
+            "book": "homebrew"
+          },
+          "name": "Example Shield",
+          "description": "Lorem ipsum dolor sit amet.",
+          "martial": false,
+          "def": 2,
+          "mdef": 0,
+          "init": 0,
+          "rework": false,
+          "quality": "",
+          "qualityCost": 0,
+          "selectedQuality": "",
+          "cost": 100,
+          "defModifier": 0,
+          "mDefModifier": 0,
+          "initModifier": 0,
+          "magicModifier": 0,
+          "precModifier": 0,
+          "damageMeleeModifier": 0,
+          "damageRangedModifier": 0,
+          "modifiers": {
+            "def": 0,
+            "mdef": 0,
+            "init": 0,
+            "magic": 0,
+            "accuracy": 0,
+            "damageMelee": 0,
+            "damageRanged": 0
+          },
+          "isMartial": false,
+          "value": 100,
+          "defbonus": 0,
+          "mdefbonus": 0
+        }
+      ],
+      "accessories": [
+        {
+          "itemType": "accessory",
+          "id": "dfa6dddc-1a47-4c25-a2ab-57edf90a7087",
+          "meta": {
+            "isOfficial": false,
+            "book": "homebrew"
+          },
+          "name": "Example Charm",
+          "description": "Lorem ipsum dolor sit amet.",
+          "quality": "",
+          "qualityCost": 0,
+          "selectedQuality": "",
+          "cost": 0,
+          "defModifier": 0,
+          "mDefModifier": 0,
+          "initModifier": 0,
+          "magicModifier": 0,
+          "precModifier": 0,
+          "damageMeleeModifier": 0,
+          "damageRangedModifier": 0,
+          "modifiers": {
+            "def": 0,
+            "mdef": 0,
+            "init": 0,
+            "magic": 0,
+            "accuracy": 0,
+            "damageMelee": 0,
+            "damageRanged": 0
+          },
+          "martial": false,
+          "isMartial": false,
+          "value": 0
+        }
+      ],
+      "armor": [
+        {
+          "itemType": "armor",
+          "base": {
+            "fuid": "travel-garb",
+            "category": "Armor",
+            "name": "Travel Garb",
+            "cost": 100,
+            "def": 1,
+            "mdef": 1,
+            "armor": true,
+            "martial": false,
+            "init": -1,
+            "meta": {
+              "book": "core",
+              "page": "",
+              "isOfficial": true
+            }
+          },
+          "id": "c59756f7-829c-484e-86dd-4faa82a9ad3e",
+          "meta": {
+            "isOfficial": false,
+            "book": "homebrew"
+          },
+          "name": "Example Armor",
+          "description": "Lorem ipsum dolor sit amet.",
+          "martial": false,
+          "def": 1,
+          "mdef": 1,
+          "init": -1,
+          "rework": false,
+          "quality": "",
+          "qualityCost": 0,
+          "selectedQuality": "",
+          "isSlotsVariant": false,
+          "slots": "alpha",
+          "slotted": [],
+          "cost": 100,
+          "defModifier": 0,
+          "mDefModifier": 0,
+          "initModifier": 0,
+          "magicModifier": 0,
+          "precModifier": 0,
+          "damageMeleeModifier": 0,
+          "damageRangedModifier": 0,
+          "modifiers": {
+            "def": 0,
+            "mdef": 0,
+            "init": 0,
+            "magic": 0,
+            "accuracy": 0,
+            "damageMelee": 0,
+            "damageRanged": 0
+          },
+          "isMartial": false,
+          "value": 100,
+          "defbonus": 0,
+          "mdefbonus": 0
+        }
+      ],
+      "mnemospheres": [],
+      "hoplospheres": []
+    }
+  ],
+  "martials": {
+    "armor": true,
+    "shields": true,
+    "melee": true,
+    "ranged": false
+  },
+  "rituals": {
+    "ritualism": false,
+    "arcanism": false,
+    "chimerism": false,
+    "elementalism": false,
+    "entropism": false,
+    "spiritism": false
+  },
+  "items": [
+    {
+      "name": "Example Item",
+      "description": "Lorem ipsum dolor sit amet.",
+      "value": 10,
+      "quantity": 2,
+      "id": "1f3bc991-a2ce-4629-a8ad-78797996a5d1"
+    }
+  ],
+  "consumables": [
+    {
+      "name": "Example Potion",
+      "description": "Lorem ipsum dolor sit amet.",
+      "ipCost": 3,
+      "id": "8d15c580-6412-4f32-9a50-a7f6d4032f65"
+    }
+  ],
+  "notes": [
+    {
+      "name": "Example Note",
+      "description": "Lorem ipsum dolor sit amet.",
+      "id": "65b35a39-a843-4e28-b381-db7a126761eb"
+    }
+  ],
+  "modifiers": {
+    "hp": 0,
+    "mp": 0,
+    "ip": 0,
+    "def": 0,
+    "mdef": 0,
+    "init": 0,
+    "meleePrec": 0,
+    "rangedPrec": 0,
+    "magicPrec": 0
+  },
+  "equippedSlots": {
+    "mainHand": {
+      "source": "weapons",
+      "name": "Example Sword",
+      "index": 0
+    },
+    "offHand": {
+      "source": "shields",
+      "name": "Example Shield",
+      "index": 0
+    },
+    "armor": {
+      "source": "armor",
+      "name": "Example Armor",
+      "index": 0
+    },
+    "accessory": {
+      "source": "accessories",
+      "name": "Example Charm",
+      "index": 0
+    }
+  },
+  "vehicleSlots": {},
+  "settings": {
+    "defaultView": "normal",
+    "advancement": false,
+    "automaticClassLevel": false,
+    "autoEquipUnarmed": true,
+    "optionalRules": {
+      "quirks": false,
+      "campActivities": false,
+      "zeroPower": false,
+      "technospheres": false,
+      "technospheresVariant": "standard",
+      "innateClasses": []
+    }
+  },
+  "schemaVersion": 12,
+  "resources": {
+    "hp": {
+      "current": 65,
+      "bonus": 0
+    },
+    "mp": {
+      "current": 40,
+      "bonus": 0
+    }
+  },
+  "derived": {
+    "def": {
+      "bonus": 0
+    },
+    "mdef": {
+      "bonus": 0
+    },
+    "init": {
+      "bonus": 0
+    }
+  },
+  "dataType": "pc"
+}

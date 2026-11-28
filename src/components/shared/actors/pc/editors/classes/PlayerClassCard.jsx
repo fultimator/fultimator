@@ -315,7 +315,7 @@ export default function PlayerClassCard({
 
   // Filter out all "Faithful Companion" skills across all classes
   const faithfulCompanionSkills = allClasses
-    .flatMap((cls) => cls.skills)
+    .flatMap((cls) => cls.skills ?? [])
     .filter((skill) => skill.specialSkill === "Faithful Companion");
 
   // Determine if there are multiple "Faithful Companion" skills
@@ -654,7 +654,7 @@ export default function PlayerClassCard({
               allowedElements={["strong", "em"]}
               unwrapDisallowed={true}
               sx={{
-                fontFamily: "PT Sans Narrow",
+                fontFamily: "PFU Sans Narrow",
                 padding: "0 17px",
                 fontSize: "1rem",
               }}
@@ -694,7 +694,7 @@ export default function PlayerClassCard({
               allowedElements={["strong", "em"]}
               unwrapDisallowed={true}
               sx={{
-                fontFamily: "PT Sans Narrow",
+                fontFamily: "PFU Sans Narrow",
                 padding: "0 17px",
                 fontSize: "1rem",
               }}

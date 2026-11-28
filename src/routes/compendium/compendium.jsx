@@ -37,6 +37,7 @@ import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import SearchIcon from "@mui/icons-material/Search";
 import ShareIcon from "@mui/icons-material/Share";
 import AddIcon from "@mui/icons-material/Add";
+import FileUploadIcon from "@mui/icons-material/FileUpload";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import StarIcon from "@mui/icons-material/Star";
@@ -276,6 +277,7 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
   onCompendiumChange,
   onNewPack,
   onManagePack,
+  onImportPack,
   activePack,
   onToggleLock,
   onOpenQuickCreate,
@@ -424,6 +426,13 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
               <AddIcon fontSize="small" />
             </IconButton>
           </Tooltip>
+          {onImportPack && (
+            <Tooltip title={t("Import")}>
+              <IconButton size="small" onClick={onImportPack}>
+                <FileUploadIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          )}
           {isPackMode && (
             <Tooltip
               title={activePack?.locked ? t("Unlock Pack") : t("Lock Pack")}
@@ -931,7 +940,15 @@ export const CompendiumSidebar = React.memo(function CompendiumSidebar({
         variant="outlined"
         sx={{ flex: 1, overflow: "auto" }}
       >
-        <Table size="small" stickyHeader>
+        <Table
+          size="small"
+          stickyHeader
+          sx={{
+            "& .MuiTableBody-root .MuiTableCell-root": {
+              py: { xs: "12px", sm: "6px" },
+            },
+          }}
+        >
           <TableHead>
             <TableRow
               sx={{

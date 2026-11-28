@@ -178,11 +178,12 @@ export default function StatTooltip({
           open={!disabled && Boolean(anchorEl)}
           anchorEl={anchorEl}
           onClose={() => setAnchorEl(null)}
-          anchorOrigin={{ vertical: "top", horizontal: "center" }}
-          transformOrigin={{ vertical: "bottom", horizontal: "center" }}
+          anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+          transformOrigin={{ vertical: "top", horizontal: "left" }}
           slotProps={{
             paper: {
               sx: {
+                mt: "4px",
                 borderRadius: 2,
                 boxShadow: 6,
                 border: "1px solid",

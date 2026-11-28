@@ -404,10 +404,10 @@ export default function EditPlayerSpells({
   const spellTypeOptions = player.classes
     .filter(
       (cls) =>
-        cls.benefits.spellClasses && cls.benefits.spellClasses.length > 0,
+        cls.benefits?.spellClasses && cls.benefits?.spellClasses.length > 0,
     )
     .flatMap((cls) =>
-      cls.benefits.spellClasses.map((spellType) => ({
+      cls.benefits?.spellClasses.map((spellType) => ({
         label: `${spellType.charAt(0).toUpperCase() + spellType.slice(1)} (${t(cls.name)})`,
         spellType,
         className: cls.name,
@@ -643,7 +643,7 @@ export default function EditPlayerSpells({
             };
           } else if (spell === "tinkerer-alchemy") {
             // Check if there's already a tinkerer-alchemy spell
-            const hasTinkererAlchemy = cls.spells.some(
+            const hasTinkererAlchemy = (cls.spells ?? []).some(
               (sp) => sp.spellType === "tinkerer-alchemy",
             );
 
@@ -674,7 +674,7 @@ export default function EditPlayerSpells({
             }
           } else if (spell === "tinkerer-infusion") {
             // Check if there's already a tinkerer-infusion spell
-            const hasTinkererInfusion = cls.spells.some(
+            const hasTinkererInfusion = (cls.spells ?? []).some(
               (sp) => sp.spellType === "tinkerer-infusion",
             );
 
@@ -704,7 +704,7 @@ export default function EditPlayerSpells({
             }
           } else if (spell === "tinkerer-magitech") {
             // Check if there's already a tinkerer-magitech spell
-            const hasTinkererMagitech = cls.spells.some(
+            const hasTinkererMagitech = (cls.spells ?? []).some(
               (sp) => sp.spellType === "tinkerer-magitech",
             );
 
@@ -769,7 +769,7 @@ export default function EditPlayerSpells({
             };
           } else if (spell === "magichant") {
             // Check if there's already a magichant spell
-            const hasMagichant = cls.spells.some(
+            const hasMagichant = (cls.spells ?? []).some(
               (sp) => sp.spellType === "magichant",
             );
 
@@ -797,7 +797,7 @@ export default function EditPlayerSpells({
             }
           } else if (spell === "symbol") {
             // Check if there's already a symbol spell
-            const hasSymbol = cls.spells.some(
+            const hasSymbol = (cls.spells ?? []).some(
               (sp) => sp.spellType === "symbol",
             );
 
@@ -824,7 +824,9 @@ export default function EditPlayerSpells({
             }
           } else if (spell === "dance") {
             // Check if there's already a dance spell
-            const hasDance = cls.spells.some((sp) => sp.spellType === "dance");
+            const hasDance = (cls.spells ?? []).some(
+              (sp) => sp.spellType === "dance",
+            );
 
             if (hasDance) {
               if (window.electron) {
@@ -849,7 +851,9 @@ export default function EditPlayerSpells({
             }
           } else if (spell === "gift") {
             // Check if there's already a gift spell
-            const hasGift = cls.spells.some((sp) => sp.spellType === "gift");
+            const hasGift = (cls.spells ?? []).some(
+              (sp) => sp.spellType === "gift",
+            );
             if (hasGift) {
               if (window.electron) {
                 window.electron.alert("You already have a gift spell");
@@ -874,7 +878,7 @@ export default function EditPlayerSpells({
             }
           } else if (spell === "therioform") {
             // Check if there's already a mutant spell
-            const hasTherioform = cls.spells.some(
+            const hasTherioform = (cls.spells ?? []).some(
               (sp) => sp.spellType === "therioform",
             );
             if (hasTherioform) {
@@ -900,7 +904,7 @@ export default function EditPlayerSpells({
             }
           } else if (spell === "pilot-vehicle") {
             // Check if there's already a pilot spell
-            const hasPilot = cls.spells.some(
+            const hasPilot = (cls.spells ?? []).some(
               (sp) => sp.spellType === "pilot-vehicle",
             );
             if (hasPilot) {
@@ -925,7 +929,7 @@ export default function EditPlayerSpells({
               };
             }
           } else if (spell === "magiseed") {
-            const hasMagiseed = cls.spells.some(
+            const hasMagiseed = (cls.spells ?? []).some(
               (sp) => sp.spellType === "magiseed",
             );
             if (hasMagiseed) {
@@ -952,7 +956,7 @@ export default function EditPlayerSpells({
               };
             }
           } else if (spell === "cooking") {
-            const hasCooking = cls.spells.some(
+            const hasCooking = (cls.spells ?? []).some(
               (sp) => sp.spellType === "cooking",
             );
             if (hasCooking) {
@@ -977,7 +981,7 @@ export default function EditPlayerSpells({
               };
             }
           } else if (spell === "invocation") {
-            const hasInvocation = cls.spells.some(
+            const hasInvocation = (cls.spells ?? []).some(
               (sp) => sp.spellType === "invocation",
             );
             if (hasInvocation) {
@@ -1003,7 +1007,9 @@ export default function EditPlayerSpells({
               };
             }
           } else if (spell === "deck") {
-            const hasDeck = cls.spells.some((sp) => sp.spellType === "deck");
+            const hasDeck = (cls.spells ?? []).some(
+              (sp) => sp.spellType === "deck",
+            );
             if (hasDeck) {
               if (window.electron) {
                 window.electron.alert("You already have a deck spell");
@@ -1197,6 +1203,96 @@ export default function EditPlayerSpells({
     "mutant",
   ]);
 
+  const buildCompendiumSubItem = (spell, spellType) => {
+    const key = spell.key || spell.name;
+    const _packItemId = spell._packItemId;
+    switch (spellType) {
+      case "dance":
+        return {
+          itemsKey: "dances",
+          subItem: {
+            key,
+            name: spell.name,
+            effect: spell.effect || "",
+            duration: spell.duration || "",
+            customName: "",
+            _packItemId,
+          },
+        };
+      case "symbol":
+        return {
+          itemsKey: "symbols",
+          subItem: {
+            key,
+            name: spell.name,
+            effect: spell.effect || "",
+            customName: "",
+            _packItemId,
+          },
+        };
+      case "gift":
+        return {
+          itemsKey: "gifts",
+          subItem: {
+            key,
+            event: spell.event || "",
+            effect: spell.effect || "",
+            customName: "",
+            _packItemId,
+          },
+        };
+      case "therioform":
+        return {
+          itemsKey: "therioforms",
+          subItem: {
+            name: spell.name,
+            genoclepsis: spell.genoclepsis || "",
+            description: spell.description || "",
+            customName: "",
+            _packItemId,
+          },
+        };
+      case "magiseed":
+        return {
+          itemsKey: "magiseeds",
+          subItem: {
+            key,
+            customName: "",
+            description: spell.description || "",
+            rangeStart: spell.rangeStart || 0,
+            rangeEnd: spell.rangeEnd || 3,
+            effects: spell.effects || { 0: "", 1: "", 2: "", 3: "" },
+            _packItemId,
+          },
+        };
+      case "magichant":
+        return spell.magichantSubtype === "tone"
+          ? {
+              itemsKey: "tones",
+              subItem: {
+                key,
+                effect: spell.effect || "",
+                customName: spell.customName || "",
+                _packItemId,
+              },
+            }
+          : {
+              itemsKey: "keys",
+              subItem: {
+                key,
+                type: spell.type || "",
+                status: spell.status || "",
+                attribute: spell.attribute || "",
+                recovery: spell.recovery || "",
+                customName: spell.customName || "",
+                _packItemId,
+              },
+            };
+      default:
+        return null;
+    }
+  };
+
   const addSystemSpellFromCompendium = (spell, className, spellType, label) => {
     if (!className) return false;
     if (spell?.spellType !== spellType) {
@@ -1205,25 +1301,10 @@ export default function EditPlayerSpells({
       else alert(`Please select a ${label} spell.`);
       return false;
     }
-    if (spellType === "dance" || spellType === "symbol") {
-      const subItem =
-        spellType === "dance"
-          ? {
-              key: spell.key || spell.name,
-              name: spell.name,
-              effect: spell.effect || "",
-              duration: spell.duration || "",
-              customName: "",
-              _packItemId: spell._packItemId,
-            }
-          : {
-              key: spell.key || spell.name,
-              name: spell.name,
-              effect: spell.effect || "",
-              customName: "",
-              _packItemId: spell._packItemId,
-            };
-      const itemsKey = spellType === "dance" ? "dances" : "symbols";
+
+    const subEntry = buildCompendiumSubItem(spell, spellType);
+    if (subEntry) {
+      const { itemsKey, subItem } = subEntry;
       setPlayer((prev) => ({
         ...prev,
         classes: prev.classes.map((cls) => {
@@ -1234,7 +1315,7 @@ export default function EditPlayerSpells({
           if (existingIndex >= 0) {
             return {
               ...cls,
-              spells: cls.spells.map((sp, index) =>
+              spells: (cls.spells ?? []).map((sp, index) =>
                 index === existingIndex
                   ? {
                       ...sp,
@@ -1399,7 +1480,7 @@ export default function EditPlayerSpells({
         if (cls.name === spellClass) {
           return {
             ...cls,
-            spells: cls.spells.map((spell, idx) =>
+            spells: (cls.spells ?? []).map((spell, idx) =>
               idx === spellIndex ? { ...spell, ...updatedDeck } : spell,
             ),
           };
@@ -1416,7 +1497,7 @@ export default function EditPlayerSpells({
         if (cls.name === className) {
           return {
             ...cls,
-            spells: cls.spells.map((spell, idx) => {
+            spells: (cls.spells ?? []).map((spell, idx) => {
               if (idx === spellIndex && spell.spellType === "invocation") {
                 const tracker = spell.tracker || {};
                 const currentWellsprings = tracker.activeWellsprings || [];
@@ -1480,7 +1561,7 @@ export default function EditPlayerSpells({
         if (cls.name === spellClass) {
           return {
             ...cls,
-            spells: cls.spells.map((spell, spellIdx) => {
+            spells: (cls.spells ?? []).map((spell, spellIdx) => {
               if (spellIdx === spellIndex && spell.spellType === "magiseed") {
                 return setNestedActivation(
                   spell,
@@ -1505,7 +1586,7 @@ export default function EditPlayerSpells({
         if (cls.name === spellClass) {
           return {
             ...cls,
-            spells: cls.spells.map((spell, spellIdx) => {
+            spells: (cls.spells ?? []).map((spell, spellIdx) => {
               if (spellIdx === spellIndex && spell.spellType === "magiseed") {
                 return {
                   ...spell,
@@ -1528,7 +1609,7 @@ export default function EditPlayerSpells({
         if (cls.name === spellClass) {
           return {
             ...cls,
-            spells: cls.spells.map((spell, spellIdx) => {
+            spells: (cls.spells ?? []).map((spell, spellIdx) => {
               if (spellIdx === spellIndex && spell.spellType === "gift") {
                 return {
                   ...spell,
@@ -1559,7 +1640,7 @@ export default function EditPlayerSpells({
           if (cls.name === spellClass) {
             return {
               ...cls,
-              spells: cls.spells.map((spell, spellIdx) => {
+              spells: (cls.spells ?? []).map((spell, spellIdx) => {
                 if (
                   spellIdx === spellIndex &&
                   spell.spellType === "pilot-vehicle"
@@ -1609,7 +1690,7 @@ export default function EditPlayerSpells({
           if (cls.name === spellClass) {
             return {
               ...cls,
-              spells: cls.spells.map((spell, spellIdx) => {
+              spells: (cls.spells ?? []).map((spell, spellIdx) => {
                 if (
                   spellIdx === spellIndex &&
                   spell.spellType === "pilot-vehicle"
@@ -1689,7 +1770,7 @@ export default function EditPlayerSpells({
           if (cls.name === editingSpellClass) {
             return {
               ...cls,
-              spells: cls.spells.map((spell, index) => {
+              spells: (cls.spells ?? []).map((spell, index) => {
                 if (index === spellIndex) {
                   return spellToSave;
                 }
@@ -1714,7 +1795,9 @@ export default function EditPlayerSpells({
           if (cls.name === editingSpellClass) {
             return {
               ...cls,
-              spells: cls.spells.filter((_, index) => index !== spellIndex),
+              spells: (cls.spells ?? []).filter(
+                (_, index) => index !== spellIndex,
+              ),
             };
           }
           return cls;
@@ -1846,8 +1929,8 @@ export default function EditPlayerSpells({
             .filter((cls) => cls.spells && cls.spells.length > 0)
             .filter(
               (cls) =>
-                cls.benefits.spellClasses &&
-                cls.benefits.spellClasses.length > 0,
+                cls.benefits?.spellClasses &&
+                cls.benefits?.spellClasses.length > 0,
             )
             .map((cls) => {
               const sortedSpells = [...cls.spells].sort((a, b) =>

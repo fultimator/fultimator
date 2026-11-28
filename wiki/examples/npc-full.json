@@ -1,0 +1,366 @@
+{
+  "id": "00000000-0000-4000-8000-000000000001",
+  "uid": "local-user",
+  "name": "Example Adversary",
+  "lvl": 20,
+  "imgurl": "https://example.com/portrait.png",
+  "traits": "Cunning, Ferocious",
+  "description": "Lorem ipsum dolor sit amet.",
+  "species": "Monster",
+  "role": "brute",
+  "rank": "champion2",
+  "villain": "minor",
+  "phases": 2,
+  "multipart": "Head",
+  "companionlvl": 1,
+  "companionpclvl": 5,
+  "sizes": "medium",
+  "attributes": {
+    "dexterity": {
+      "base": 8
+    },
+    "insight": {
+      "base": 8
+    },
+    "might": {
+      "base": 10
+    },
+    "willpower": {
+      "base": 6
+    }
+  },
+  "affinities": {
+    "physical": "no",
+    "air": "no",
+    "bolt": "vu",
+    "dark": "rs",
+    "earth": "no",
+    "fire": "im",
+    "ice": "no",
+    "light": "ab",
+    "poison": "no"
+  },
+  "speciesGrants": {
+    "affinities": {
+      "dark": "rs"
+    },
+    "immunities": {
+      "poisoned": true
+    }
+  },
+  "immunities": {
+    "slow": false,
+    "dazed": false,
+    "weak": false,
+    "shaken": false,
+    "enraged": false,
+    "poisoned": true
+  },
+  "extra": {
+    "statusImmunity": 0.5
+  },
+  "armor": {
+    "id": "11111111-0000-4000-8000-000000000001",
+    "name": "Hide Plating",
+    "def": 11,
+    "mdef": 0,
+    "init": 0,
+    "martial": false,
+    "isMartial": false,
+    "cost": 100,
+    "value": 100,
+    "quality": "",
+    "category": "armor",
+    "precModifier": 0
+  },
+  "shield": {
+    "id": "11111111-0000-4000-8000-000000000002",
+    "name": "Bone Shield",
+    "def": 2,
+    "mdef": 2,
+    "init": 0,
+    "martial": false,
+    "isMartial": false,
+    "cost": 100,
+    "value": 100,
+    "quality": "",
+    "precModifier": 0
+  },
+  "attacks": [
+    {
+      "id": "22222222-0000-4000-8000-000000000001",
+      "name": "Claw Swipe",
+      "itemType": "attack",
+      "range": "melee",
+      "accuracy": {
+        "attr1": "dexterity",
+        "attr2": "might",
+        "value": 1,
+        "defense": "def"
+      },
+      "damage": {
+        "value": 5,
+        "type": "physical",
+        "hrZero": false
+      },
+      "effect": "Lorem ipsum dolor sit amet."
+    }
+  ],
+  "weaponattacks": [
+    {
+      "id": "22222222-0000-4000-8000-000000000002",
+      "name": "Heavy Axe",
+      "itemType": "weaponAttack",
+      "category": "Heavy",
+      "range": "melee",
+      "accuracy": {
+        "attr1": "dexterity",
+        "attr2": "might",
+        "value": 0,
+        "defense": "def"
+      },
+      "damage": {
+        "value": 12,
+        "type": "physical",
+        "hrZero": false
+      },
+      "effect": "Lorem ipsum dolor sit amet."
+    }
+  ],
+  "spells": [
+    {
+      "id": "33333333-0000-4000-8000-000000000001",
+      "name": "Fireball",
+      "itemType": "spell",
+      "spellType": "npc",
+      "isOffensive": true,
+      "range": "ranged",
+      "accuracy": {
+        "attr1": "insight",
+        "attr2": "willpower",
+        "value": 0,
+        "defense": "mdef"
+      },
+      "damage": {
+        "value": 5,
+        "type": "fire",
+        "hrZero": false
+      },
+      "cost": {
+        "resource": "mp",
+        "amount": 10,
+        "perTarget": true
+      },
+      "maxTargets": 3,
+      "targetDescription": "Up to three creatures",
+      "duration": "Instantaneous",
+      "effect": "Lorem ipsum dolor sit amet.",
+      "description": "Lorem ipsum dolor sit amet."
+    }
+  ],
+  "special": [
+    {
+      "id": "44444444-0000-4000-8000-000000000001",
+      "name": "Thick Hide",
+      "effect": "Lorem ipsum dolor sit amet.",
+      "spCost": 0
+    }
+  ],
+  "actions": [
+    {
+      "id": "44444444-0000-4000-8000-000000000002",
+      "name": "Rampage",
+      "effect": "Lorem ipsum dolor sit amet.",
+      "spCost": 2
+    }
+  ],
+  "notes": [
+    {
+      "id": "55555555-0000-4000-8000-000000000001",
+      "name": "Tactics",
+      "description": "Lorem ipsum dolor sit amet.",
+      "effect": "Lorem ipsum dolor sit amet."
+    }
+  ],
+  "raregear": [
+    {
+      "id": "66666666-0000-4000-8000-000000000001",
+      "name": "Royal Crown",
+      "effect": "Lorem ipsum dolor sit amet."
+    }
+  ],
+  "label": "Boss",
+  "tags": [
+    {
+      "name": "Forest"
+    },
+    {
+      "name": "Boss"
+    }
+  ],
+  "schemaVersion": 15,
+  "createdBy": "Example Author",
+  "language": "en",
+  "published": false,
+  "statuses": {
+    "slow": false,
+    "dazed": false,
+    "weak": false,
+    "shaken": false,
+    "enraged": false,
+    "poisoned": false
+  },
+  "resources": {
+    "hp": {
+      "current": 110,
+      "bonus": 0
+    },
+    "mp": {
+      "current": 130,
+      "bonus": 0
+    }
+  },
+  "derived": {
+    "def": {
+      "bonus": 0
+    },
+    "mdef": {
+      "bonus": 0
+    },
+    "init": {
+      "bonus": 0
+    }
+  },
+  "features": {
+    "init": {
+      "enabled": false
+    },
+    "precision": {
+      "enabled": false
+    },
+    "magic": {
+      "enabled": false
+    }
+  },
+  "bonuses": {
+    "incomingRecovery": {
+      "hp": 0,
+      "mp": 0,
+      "ip": 0
+    },
+    "incomingLoss": {
+      "hp": 0,
+      "mp": 0,
+      "ip": 0
+    },
+    "outgoingRecovery": {
+      "hp": 0,
+      "mp": 0,
+      "ip": 0
+    },
+    "accuracy": {
+      "all": 0,
+      "accuracyCheck": 0,
+      "melee": 0,
+      "ranged": 0,
+      "magic": 0,
+      "opposed": 0,
+      "open": 0,
+      "arcane": 0,
+      "bow": 0,
+      "brawling": 0,
+      "dagger": 0,
+      "firearm": 0,
+      "flail": 0,
+      "heavy": 0,
+      "spear": 0,
+      "sword": 0,
+      "thrown": 0
+    },
+    "damage": {
+      "all": 0,
+      "melee": 0,
+      "ranged": 0,
+      "spell": 0,
+      "arcane": 0,
+      "bow": 0,
+      "brawling": 0,
+      "dagger": 0,
+      "firearm": 0,
+      "flail": 0,
+      "heavy": 0,
+      "spear": 0,
+      "sword": 0,
+      "thrown": 0,
+      "physical": 0,
+      "air": 0,
+      "bolt": 0,
+      "dark": 0,
+      "earth": 0,
+      "fire": 0,
+      "ice": 0,
+      "light": 0,
+      "poison": 0,
+      "beast": 0,
+      "construct": 0,
+      "demon": 0,
+      "elemental": 0,
+      "humanoid": 0,
+      "monster": 0,
+      "plant": 0,
+      "undead": 0
+    },
+    "incomingDamage": {
+      "all": 0,
+      "melee": 0,
+      "ranged": 0,
+      "spell": 0,
+      "arcane": 0,
+      "bow": 0,
+      "brawling": 0,
+      "dagger": 0,
+      "firearm": 0,
+      "flail": 0,
+      "heavy": 0,
+      "spear": 0,
+      "sword": 0,
+      "thrown": 0,
+      "physical": 0,
+      "air": 0,
+      "bolt": 0,
+      "dark": 0,
+      "earth": 0,
+      "fire": 0,
+      "ice": 0,
+      "light": 0,
+      "poison": 0,
+      "beast": 0,
+      "construct": 0,
+      "demon": 0,
+      "elemental": 0,
+      "humanoid": 0,
+      "monster": 0,
+      "plant": 0,
+      "undead": 0
+    }
+  },
+  "multipliers": {
+    "incomingRecovery": {
+      "hp": 1,
+      "mp": 1,
+      "ip": 1
+    },
+    "incomingLoss": {
+      "hp": 1,
+      "mp": 1,
+      "ip": 1
+    },
+    "outgoingRecovery": {
+      "hp": 1,
+      "mp": 1,
+      "ip": 1
+    }
+  },
+  "effects": [],
+  "dataType": "npc"
+}

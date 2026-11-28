@@ -117,7 +117,13 @@ const EncounterCard = ({
           }}
         >
           <Box
-            sx={{ display: "flex", alignItems: "center", gap: 1, minWidth: 0 }}
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: 1,
+              minWidth: 0,
+              flex: 1,
+            }}
           >
             {selectMode &&
               (isSelected ? (
@@ -136,7 +142,7 @@ const EncounterCard = ({
                 overflow: "hidden",
                 textOverflow: "ellipsis",
                 whiteSpace: "nowrap",
-                maxWidth: "80%",
+                maxWidth: "100%",
               }}
             >
               {encounter.name}

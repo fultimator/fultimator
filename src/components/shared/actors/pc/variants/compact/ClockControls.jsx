@@ -1,7 +1,6 @@
 import { useState } from "react";
-import { Box, IconButton, InputBase, Tooltip } from "@mui/material";
-import { Add, Remove, RestartAlt } from "@mui/icons-material";
-import { useTranslate } from "/src/translation/translate";
+import { Box, InputBase } from "@mui/material";
+import ClockStepper from "/src/components/shared/common/ClockStepper";
 import Clock from "/src/components/shared/actors/pc/playerSheet/Clock";
 import { useClock } from "/src/hooks/useClock";
 
@@ -15,7 +14,6 @@ export default function ClockControls({
   clockSize = 36,
   compact = false,
 }) {
-  const { t } = useTranslate();
   const {
     filledCount: filled,
     set,
@@ -44,25 +42,22 @@ export default function ClockControls({
   };
 
   const controls = (
-    <>
-      <Tooltip title={t("Decrement")} arrow>
-        <span>
-          <IconButton
-            disabled={filled === 0}
-            onClick={decrement}
-            sx={{ p: 0, width: 40, height: 40 }}
-          >
-            <Remove sx={{ fontSize: "1.4rem" }} />
-          </IconButton>
-        </span>
-      </Tooltip>
+    <ClockStepper
+      onDecrement={decrement}
+      onIncrement={increment}
+      onReset={reset}
+      decrementDisabled={filled === 0}
+      incrementDisabled={filled >= sections}
+      resetDisabled={filled === 0}
+    >
       <Box
         onClick={editing ? undefined : startEditing}
         sx={{
           width: 40,
-          height: 40,
+          height: 32,
           borderRadius: "4px",
-          bgcolor: "action.selected",
+          border: "1px solid",
+          borderColor: "divider",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -107,23 +102,7 @@ export default function ClockControls({
           `${filled}/${sections}`
         )}
       </Box>
-      <Tooltip title={t("Increment")} arrow>
-        <span>
-          <IconButton
-            disabled={filled >= sections}
-            onClick={increment}
-            sx={{ p: 0, width: 40, height: 40 }}
-          >
-            <Add sx={{ fontSize: "1.4rem" }} />
-          </IconButton>
-        </span>
-      </Tooltip>
-      <Tooltip title={t("Reset")} arrow>
-        <IconButton onClick={reset} sx={{ p: 0, width: 40, height: 40 }}>
-          <RestartAlt sx={{ fontSize: "1.4rem" }} />
-        </IconButton>
-      </Tooltip>
-    </>
+    </ClockStepper>
   );
 
   if (compact) {
@@ -212,81 +191,90 @@ export default function ClockControls({
   // Narrow container (<= ~260px) → vertical stack: clock → name → controls
   // Wide container → horizontal: clock left, name+controls stacked right
   return (
-    <Box
-      sx={{
-        containerType: "inline-size",
-        border: "1px solid",
-        borderColor: "divider",
-        borderRadius: "4px",
-        overflow: "hidden",
-        transition: "border-color 0.15s ease",
-        "&:hover": { borderColor: theme.primary },
-        display: "flex",
-        alignItems: "stretch",
-        gap: "6px",
-        px: "6px",
-        py: "4px",
-        "@container (max-width: 260px)": {
-          flexDirection: "column",
-          alignItems: "center",
-          gap: "4px",
-          py: "8px",
-        },
-      }}
-    >
+    <Box sx={{ containerType: "inline-size", containerName: "clockrow" }}>
       <Box
         sx={{
-          alignSelf: "center",
-          flexShrink: 0,
-          "@container (max-width: 260px)": { alignSelf: "auto" },
-        }}
-      >
-        <Clock
-          numSections={sections}
-          size={clockSize}
-          state={state}
-          setState={setState}
-          isCharacterSheet={true}
-        />
-      </Box>
-      <Box
-        sx={{
-          flex: 1,
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          minWidth: 0,
+          containerType: "inline-size",
+          "@container clockrow (min-width: 521px)": { width: "50%" },
+          border: "1px solid",
+          borderColor: "divider",
+          borderRadius: "4px",
           overflow: "hidden",
+          transition: "border-color 0.15s ease",
+          "&:hover": { borderColor: theme.primary },
+          display: "flex",
+          alignItems: "stretch",
+          gap: "6px",
+          px: "6px",
+          py: "4px",
           "@container (max-width: 260px)": {
+            flexDirection: "column",
             alignItems: "center",
-            width: "100%",
+            gap: "4px",
+            py: "8px",
           },
         }}
       >
         <Box
           sx={{
-            fontWeight: "bold",
-            fontSize: "0.95rem",
-            lineHeight: 1.3,
+            alignSelf: "center",
+            flexShrink: 0,
+            "@container (max-width: 260px)": { alignSelf: "auto" },
+          }}
+        >
+          <Clock
+            numSections={sections}
+            size={clockSize}
+            state={state}
+            setState={setState}
+            isCharacterSheet={true}
+          />
+        </Box>
+        <Box
+          sx={{
+            flex: 1,
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            minWidth: 0,
             overflow: "hidden",
             "@container (max-width: 260px)": {
-              textAlign: "center",
+              alignItems: "center",
               width: "100%",
             },
           }}
         >
-          {label}
-        </Box>
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            gap: 0,
-            mt: "2px",
-            "@container (max-width: 260px)": { mt: 0 },
-          }}
-        >
-          {controls}
+          <Box
+            sx={{
+              fontWeight: "bold",
+              fontSize: "0.95rem",
+              lineHeight: 1.3,
+              overflow: "hidden",
+              "@container (max-width: 260px)": {
+                textAlign: "center",
+                width: "100%",
+              },
+            }}
+          >
+            {label}
+          </Box>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: 0,
+              mt: "2px",
+              "@container (max-width: 260px)": { mt: 0 },
+              "@container (max-width: 520px)": {
+                alignSelf: "stretch",
+                "& .clock-stepper": { flex: 1 },
+                "& .clock-stepper-step": { flex: 1 },
+                "& .clock-stepper-step > .MuiButton-root": { width: "100%" },
+              },
+            }}
+          >
+            {controls}
+          </Box>
         </Box>
       </Box>
     </Box>

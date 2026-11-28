@@ -76,6 +76,7 @@ import {
 } from "../../libs/actor";
 import { stampSave } from "../../libs/actor/timestamps";
 import { NpcProvider } from "/src/components/shared/actors/npc/context";
+import NpcSectionTimeline from "./NpcSectionTimeline";
 
 // Combine all blacklisted names into a single array
 const mergedBlacklistNames = blacklist.flatMap((item) => Object.values(item));
@@ -120,6 +121,7 @@ export default function NpcEdit() {
   const [checkedRules, setCheckedRules] = useState(false);
   const [rulesDialogOpen, setRulesDialogOpen] = useState(false);
   const [openShareSnackbar, setOpenShareSnackbar] = useState(false);
+  const [localShareSnackbarOpen, setLocalShareSnackbarOpen] = useState(false);
 
   const handleCheckboxChange = (event) => {
     setCheckedRules(event.target.checked);
@@ -460,7 +462,7 @@ export default function NpcEdit() {
 
         {(!isSmallScreen || mobileTab === 0) && (
           <>
-            <Grid container spacing={2}>
+            <Grid id="edit-section-overview" container spacing={2}>
               <Grid
                 size={{
                   xs: 12,
@@ -490,8 +492,26 @@ export default function NpcEdit() {
                   </IconButton>
                 </Tooltip>
 
-                <Tooltip title={t("Share URL")}>
-                  <span>
+                <Tooltip
+                  title={
+                    isLocalNpc ? (
+                      <>
+                        {t("Share URL")}
+                        <br />
+                        {t("Disabled for local")}
+                      </>
+                    ) : (
+                      t("Share URL")
+                    )
+                  }
+                >
+                  <span
+                    onClick={
+                      isLocalNpc
+                        ? () => setLocalShareSnackbarOpen(true)
+                        : undefined
+                    }
+                  >
                     <IconButton
                       onClick={() => shareNpc(npc.id)}
                       disabled={isLocalNpc}
@@ -531,7 +551,9 @@ export default function NpcEdit() {
                     isUpdated={isUpdated}
                   />
                 )}
-                {isOwner && <TagList npc={npcTemp} setNpc={setNpcTemp} />}
+                {isOwner && (
+                  <TagList npc={npcTemp} setNpc={setNpcTemp} db={db} />
+                )}
                 {isOwner && <NpcClockList npc={npcTemp} setNpc={setNpcTemp} />}
               </Grid>
             </Grid>
@@ -632,6 +654,7 @@ export default function NpcEdit() {
             </Box>
           </>
         )}
+        {isOwner && !isSmallScreen && <NpcSectionTimeline />}
         {/* <NpcUgly npc={npcTemp} /> */}
         {/* FAB container */}
         <Box
@@ -670,6 +693,12 @@ export default function NpcEdit() {
           autoHideDuration={2000}
           onClose={handleClose}
           message={t("Copied to Clipboard!")}
+        />
+        <Snackbar
+          open={localShareSnackbarOpen}
+          autoHideDuration={2500}
+          onClose={() => setLocalShareSnackbarOpen(false)}
+          message={`${t("Share URL")}: ${t("Disabled for local")}`}
         />
         <Snackbar
           open={savedSnackbarOpen}
@@ -711,6 +740,7 @@ export default function NpcEdit() {
               right: 0,
               bottom: 0,
               zIndex: 1300,
+              backgroundImage: "none",
               borderTop: "1px solid",
               borderColor: "divider",
               display: "flex",
@@ -784,9 +814,19 @@ export default function NpcEdit() {
               <Tooltip title={t("Save")} placement="top">
                 <span>
                   <IconButton
-                    color={isUpdated && isOwner ? "primary" : "default"}
                     onClick={handleSave}
                     disabled={!isOwner || !isUpdated}
+                    sx={{
+                      borderRadius: 1,
+                      color: "#fff",
+                      bgcolor: "primary.main",
+                      "&:hover": { bgcolor: "primary.dark" },
+                      "&.Mui-disabled": {
+                        bgcolor: "transparent",
+                        color: "text.secondary",
+                        opacity: 0.6,
+                      },
+                    }}
                     aria-label="save"
                   >
                     <Save />

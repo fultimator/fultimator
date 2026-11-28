@@ -1,0 +1,4502 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "uid": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "lvl": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 60
+    },
+    "info": {
+      "type": "object",
+      "properties": {
+        "pronouns": {
+          "default": "",
+          "type": "string"
+        },
+        "identity": {
+          "default": "",
+          "type": "string"
+        },
+        "theme": {
+          "default": "",
+          "type": "string"
+        },
+        "origin": {
+          "default": "",
+          "type": "string"
+        },
+        "bonds": {
+          "default": [],
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "admiration": {
+                "default": false,
+                "type": "boolean"
+              },
+              "loyality": {
+                "default": false,
+                "type": "boolean"
+              },
+              "affection": {
+                "default": false,
+                "type": "boolean"
+              },
+              "inferiority": {
+                "default": false,
+                "type": "boolean"
+              },
+              "mistrust": {
+                "default": false,
+                "type": "boolean"
+              },
+              "hatred": {
+                "default": false,
+                "type": "boolean"
+              }
+            },
+            "required": ["name"]
+          }
+        },
+        "description": {
+          "default": "",
+          "type": "string"
+        },
+        "fabulapoints": {
+          "default": 0,
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        "exp": {
+          "default": 0,
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        "zenit": {
+          "default": 0,
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        "imgurl": {
+          "default": "",
+          "type": "string"
+        }
+      }
+    },
+    "attributes": {
+      "type": "object",
+      "properties": {
+        "might": {
+          "$ref": "#/$defs/__schema0"
+        },
+        "insight": {
+          "$ref": "#/$defs/__schema0"
+        },
+        "willpower": {
+          "$ref": "#/$defs/__schema0"
+        },
+        "dexterity": {
+          "$ref": "#/$defs/__schema0"
+        }
+      },
+      "required": ["might", "insight", "willpower", "dexterity"]
+    },
+    "stats": {
+      "type": "object",
+      "properties": {
+        "hp": {
+          "$ref": "#/$defs/__schema1"
+        },
+        "mp": {
+          "$ref": "#/$defs/__schema1"
+        },
+        "ip": {
+          "$ref": "#/$defs/__schema1"
+        }
+      },
+      "required": ["hp", "mp", "ip"]
+    },
+    "statuses": {
+      "$ref": "#/$defs/__schema2"
+    },
+    "immunities": {
+      "$ref": "#/$defs/__schema2"
+    },
+    "affinities": {
+      "type": "object",
+      "properties": {
+        "physical": {
+          "default": "no",
+          "$ref": "#/$defs/__schema3"
+        },
+        "air": {
+          "default": "no",
+          "$ref": "#/$defs/__schema3"
+        },
+        "bolt": {
+          "default": "no",
+          "$ref": "#/$defs/__schema3"
+        },
+        "dark": {
+          "default": "no",
+          "$ref": "#/$defs/__schema3"
+        },
+        "earth": {
+          "default": "no",
+          "$ref": "#/$defs/__schema3"
+        },
+        "fire": {
+          "default": "no",
+          "$ref": "#/$defs/__schema3"
+        },
+        "ice": {
+          "default": "no",
+          "$ref": "#/$defs/__schema3"
+        },
+        "light": {
+          "default": "no",
+          "$ref": "#/$defs/__schema3"
+        },
+        "poison": {
+          "default": "no",
+          "$ref": "#/$defs/__schema3"
+        }
+      }
+    },
+    "classes": {
+      "default": [],
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "itemType": {
+            "default": "class",
+            "type": "string",
+            "const": "class"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "also": {
+            "default": "",
+            "type": "string"
+          },
+          "description": {
+            "default": "",
+            "type": "string"
+          },
+          "fuid": {
+            "type": "string"
+          },
+          "lvl": {
+            "default": 1,
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "meta": {
+            "$ref": "#/$defs/__schema4"
+          },
+          "benefits": {
+            "type": "object",
+            "properties": {
+              "hpplus": {
+                "default": 0,
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              "mpplus": {
+                "default": 0,
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              "ipplus": {
+                "default": 0,
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              "isCustomBenefit": {
+                "default": false,
+                "type": "boolean"
+              },
+              "martials": {
+                "type": "object",
+                "properties": {
+                  "armor": {
+                    "default": false,
+                    "type": "boolean"
+                  },
+                  "shields": {
+                    "default": false,
+                    "type": "boolean"
+                  },
+                  "melee": {
+                    "default": false,
+                    "type": "boolean"
+                  },
+                  "ranged": {
+                    "default": false,
+                    "type": "boolean"
+                  }
+                },
+                "additionalProperties": {}
+              },
+              "rituals": {
+                "type": "object",
+                "properties": {
+                  "ritualism": {
+                    "default": false,
+                    "type": "boolean"
+                  }
+                },
+                "additionalProperties": {}
+              },
+              "custom": {
+                "default": [],
+                "type": "array",
+                "items": {}
+              },
+              "spellClasses": {
+                "default": [],
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "other": {
+                "default": [],
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "description": {
+                      "default": "",
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "required": ["martials", "rituals"]
+          },
+          "skills": {
+            "default": [],
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/__schema5"
+            }
+          },
+          "heroic": {
+            "default": [],
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/__schema13"
+            }
+          },
+          "spells": {
+            "default": [],
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/__schema14"
+            }
+          }
+        },
+        "required": ["name", "benefits"]
+      }
+    },
+    "equipment": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "weapons": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "itemType": {
+                  "type": "string",
+                  "const": "weapon"
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "description": {
+                  "type": "string"
+                },
+                "category": {
+                  "type": "string"
+                },
+                "range": {
+                  "type": "string",
+                  "enum": ["melee", "ranged"]
+                },
+                "hands": {
+                  "anyOf": [
+                    {
+                      "type": "number",
+                      "const": 1
+                    },
+                    {
+                      "type": "number",
+                      "const": 2
+                    }
+                  ]
+                },
+                "martial": {
+                  "default": false,
+                  "type": "boolean"
+                },
+                "accuracy": {
+                  "$ref": "#/$defs/__schema35"
+                },
+                "damage": {
+                  "$ref": "#/$defs/__schema37"
+                },
+                "modifiers": {
+                  "$ref": "#/$defs/__schema38"
+                },
+                "rare": {
+                  "type": "object",
+                  "properties": {
+                    "accuracyBonus": {
+                      "default": false,
+                      "type": "boolean"
+                    },
+                    "damageBonus": {
+                      "default": false,
+                      "type": "boolean"
+                    }
+                  }
+                },
+                "quality": {
+                  "type": "string"
+                },
+                "cost": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "special": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "meta": {
+                  "$ref": "#/$defs/__schema4"
+                },
+                "base": {},
+                "fuid": {
+                  "type": "string"
+                },
+                "behaviors": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/__schema6"
+                  }
+                },
+                "att1": {
+                  "type": "string"
+                },
+                "att2": {
+                  "type": "string"
+                },
+                "type": {
+                  "type": "string"
+                },
+                "damageHrZero": {
+                  "default": false,
+                  "type": "boolean"
+                },
+                "rareBonuses": {
+                  "type": "object",
+                  "properties": {
+                    "precBonus": {
+                      "default": false,
+                      "type": "boolean"
+                    },
+                    "damageBonus": {
+                      "default": false,
+                      "type": "boolean"
+                    },
+                    "damageReworkBonus": {
+                      "default": false,
+                      "type": "boolean"
+                    }
+                  }
+                },
+                "precModifier": {
+                  "default": 0,
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "damageModifier": {
+                  "default": 0,
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "defModifier": {
+                  "default": 0,
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "mDefModifier": {
+                  "default": 0,
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "damageBonus": {
+                  "default": false,
+                  "type": "boolean"
+                },
+                "damageReworkBonus": {
+                  "default": false,
+                  "type": "boolean"
+                },
+                "precBonus": {
+                  "default": false,
+                  "type": "boolean"
+                },
+                "rework": {
+                  "default": false,
+                  "type": "boolean"
+                },
+                "qualityCost": {
+                  "default": 0,
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "totalBonus": {
+                  "default": 0,
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "selectedQuality": {
+                  "type": "string"
+                },
+                "qualityName": {
+                  "type": "string"
+                },
+                "isEquipped": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "itemType",
+                "name",
+                "category",
+                "range",
+                "hands",
+                "accuracy",
+                "damage"
+              ]
+            }
+          },
+          "customWeapons": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "itemType": {
+                  "type": "string",
+                  "const": "customWeapon"
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "description": {
+                  "type": "string"
+                },
+                "category": {
+                  "type": "string"
+                },
+                "range": {
+                  "type": "string",
+                  "enum": ["melee", "ranged"]
+                },
+                "hands": {
+                  "anyOf": [
+                    {
+                      "type": "number",
+                      "const": 1
+                    },
+                    {
+                      "type": "number",
+                      "const": 2
+                    }
+                  ]
+                },
+                "martial": {
+                  "default": false,
+                  "type": "boolean"
+                },
+                "accuracy": {
+                  "$ref": "#/$defs/__schema35"
+                },
+                "damage": {
+                  "$ref": "#/$defs/__schema37"
+                },
+                "modifiers": {
+                  "$ref": "#/$defs/__schema38"
+                },
+                "rare": {
+                  "type": "object",
+                  "properties": {
+                    "accuracyBonus": {
+                      "default": false,
+                      "type": "boolean"
+                    },
+                    "damageBonus": {
+                      "default": false,
+                      "type": "boolean"
+                    },
+                    "overrideDamageType": {
+                      "default": false,
+                      "type": "boolean"
+                    },
+                    "overrideAccuracyAttributes": {
+                      "default": false,
+                      "type": "boolean"
+                    },
+                    "overrideDamageTypeValue": {
+                      "type": "string",
+                      "enum": [
+                        "physical",
+                        "air",
+                        "bolt",
+                        "dark",
+                        "earth",
+                        "fire",
+                        "ice",
+                        "light",
+                        "poison",
+                        "untyped"
+                      ]
+                    },
+                    "overrideAccuracyAttr1": {
+                      "$ref": "#/$defs/__schema39"
+                    },
+                    "overrideAccuracyAttr2": {
+                      "$ref": "#/$defs/__schema39"
+                    }
+                  }
+                },
+                "customizations": {
+                  "default": [],
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/__schema40"
+                  }
+                },
+                "quality": {
+                  "type": "string"
+                },
+                "qualityName": {
+                  "type": "string"
+                },
+                "qualityCost": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "cost": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "slots": {
+                  "type": "string",
+                  "enum": ["alpha", "beta", "gamma", "delta"]
+                },
+                "slotted": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "secondName": {
+                  "type": "string"
+                },
+                "secondCategory": {
+                  "type": "string"
+                },
+                "secondRange": {
+                  "type": "string",
+                  "enum": ["melee", "ranged"]
+                },
+                "secondAccuracy": {
+                  "$ref": "#/$defs/__schema35"
+                },
+                "secondDamage": {
+                  "$ref": "#/$defs/__schema37"
+                },
+                "secondModifiers": {
+                  "$ref": "#/$defs/__schema38"
+                },
+                "secondCustomizations": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/__schema40"
+                  }
+                },
+                "meta": {
+                  "$ref": "#/$defs/__schema4"
+                },
+                "selectedQuality": {
+                  "type": "string"
+                },
+                "isEquipped": {
+                  "type": "boolean"
+                },
+                "dataType": {
+                  "type": "string"
+                },
+                "behaviors": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/__schema6"
+                  }
+                }
+              },
+              "required": [
+                "itemType",
+                "name",
+                "category",
+                "range",
+                "hands",
+                "accuracy",
+                "damage"
+              ]
+            }
+          },
+          "shields": {
+            "default": [],
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "itemType": {
+                  "type": "string",
+                  "const": "shield"
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "description": {
+                  "type": "string"
+                },
+                "martial": {
+                  "default": false,
+                  "type": "boolean"
+                },
+                "def": {
+                  "default": 0,
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "mdef": {
+                  "default": 0,
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "init": {
+                  "default": 0,
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "rework": {
+                  "default": false,
+                  "type": "boolean"
+                },
+                "quality": {
+                  "type": "string"
+                },
+                "cost": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "modifiers": {
+                  "type": "object",
+                  "properties": {
+                    "def": {
+                      "default": 0,
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
+                    "mdef": {
+                      "default": 0,
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
+                    "init": {
+                      "default": 0,
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
+                    "magic": {
+                      "default": 0,
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
+                    "accuracy": {
+                      "default": 0,
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
+                    "damageMelee": {
+                      "default": 0,
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
+                    "damageRanged": {
+                      "default": 0,
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    }
+                  }
+                },
+                "meta": {
+                  "$ref": "#/$defs/__schema4"
+                },
+                "base": {},
+                "fuid": {
+                  "type": "string"
+                },
+                "behaviors": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/__schema6"
+                  }
+                },
+                "qualityCost": {
+                  "default": 0,
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "selectedQuality": {
+                  "type": "string"
+                },
+                "defModifier": {
+                  "default": 0,
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "mDefModifier": {
+                  "default": 0,
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "initModifier": {
+                  "default": 0,
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "magicModifier": {
+                  "default": 0,
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "precModifier": {
+                  "default": 0,
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "damageMeleeModifier": {
+                  "default": 0,
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "damageRangedModifier": {
+                  "default": 0,
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "isEquipped": {
+                  "type": "boolean"
+                }
+              },
+              "required": ["itemType", "name"]
+            }
+          },
+          "accessories": {
+            "default": [],
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "itemType": {
+                  "type": "string",
+                  "const": "accessory"
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "description": {
+                  "type": "string"
+                },
+                "quality": {
+                  "type": "string"
+                },
+                "cost": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "meta": {
+                  "$ref": "#/$defs/__schema4"
+                },
+                "fuid": {
+                  "type": "string"
+                },
+                "behaviors": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/__schema6"
+                  }
+                },
+                "qualityCost": {
+                  "default": 0,
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "selectedQuality": {
+                  "type": "string"
+                },
+                "modifiers": {
+                  "type": "object",
+                  "properties": {
+                    "def": {
+                      "default": 0,
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
+                    "mdef": {
+                      "default": 0,
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
+                    "init": {
+                      "default": 0,
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
+                    "magic": {
+                      "default": 0,
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
+                    "accuracy": {
+                      "default": 0,
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
+                    "damageMelee": {
+                      "default": 0,
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
+                    "damageRanged": {
+                      "default": 0,
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    }
+                  }
+                },
+                "defModifier": {
+                  "default": 0,
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "mDefModifier": {
+                  "default": 0,
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "initModifier": {
+                  "default": 0,
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "magicModifier": {
+                  "default": 0,
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "precModifier": {
+                  "default": 0,
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "damageMeleeModifier": {
+                  "default": 0,
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "damageRangedModifier": {
+                  "default": 0,
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "isEquipped": {
+                  "type": "boolean"
+                }
+              },
+              "required": ["itemType", "name"]
+            }
+          },
+          "armor": {
+            "default": [],
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "itemType": {
+                  "type": "string",
+                  "const": "armor"
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "description": {
+                  "type": "string"
+                },
+                "martial": {
+                  "default": false,
+                  "type": "boolean"
+                },
+                "def": {
+                  "default": 0,
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "mdef": {
+                  "default": 0,
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "init": {
+                  "default": 0,
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "rework": {
+                  "default": false,
+                  "type": "boolean"
+                },
+                "quality": {
+                  "type": "string"
+                },
+                "cost": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "modifiers": {
+                  "type": "object",
+                  "properties": {
+                    "def": {
+                      "default": 0,
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
+                    "mdef": {
+                      "default": 0,
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
+                    "init": {
+                      "default": 0,
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
+                    "magic": {
+                      "default": 0,
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
+                    "accuracy": {
+                      "default": 0,
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
+                    "damageMelee": {
+                      "default": 0,
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
+                    "damageRanged": {
+                      "default": 0,
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    }
+                  }
+                },
+                "slots": {
+                  "type": "string",
+                  "enum": ["alpha", "beta", "gamma", "delta"]
+                },
+                "slotted": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "meta": {
+                  "$ref": "#/$defs/__schema4"
+                },
+                "base": {},
+                "fuid": {
+                  "type": "string"
+                },
+                "behaviors": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/__schema6"
+                  }
+                },
+                "qualityCost": {
+                  "default": 0,
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "selectedQuality": {
+                  "type": "string"
+                },
+                "isSlotsVariant": {
+                  "default": false,
+                  "type": "boolean"
+                },
+                "defModifier": {
+                  "default": 0,
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "mDefModifier": {
+                  "default": 0,
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "initModifier": {
+                  "default": 0,
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "magicModifier": {
+                  "default": 0,
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "precModifier": {
+                  "default": 0,
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "damageMeleeModifier": {
+                  "default": 0,
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "damageRangedModifier": {
+                  "default": 0,
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "isEquipped": {
+                  "type": "boolean"
+                }
+              },
+              "required": ["itemType", "name"]
+            }
+          },
+          "mnemospheres": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "itemType": {
+                  "default": "mnemosphere",
+                  "type": "string",
+                  "const": "mnemosphere"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "fuid": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "class": {
+                  "type": "string"
+                },
+                "lvl": {
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "cost": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "skills": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/__schema5"
+                  }
+                },
+                "heroic": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/__schema13"
+                  }
+                },
+                "spells": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/__schema14"
+                  }
+                },
+                "meta": {
+                  "$ref": "#/$defs/__schema4"
+                }
+              },
+              "required": ["name"],
+              "additionalProperties": {}
+            }
+          },
+          "hoplospheres": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "itemType": {
+                  "default": "hoplosphere",
+                  "type": "string",
+                  "const": "hoplosphere"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "fuid": {
+                  "type": "string"
+                },
+                "description": {
+                  "default": "",
+                  "type": "string"
+                },
+                "requiredSlots": {
+                  "anyOf": [
+                    {
+                      "type": "number",
+                      "const": 1
+                    },
+                    {
+                      "type": "number",
+                      "const": 2
+                    }
+                  ]
+                },
+                "socketable": {
+                  "type": "string",
+                  "enum": ["all", "weapon"]
+                },
+                "cost": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "coagEffects": {
+                  "default": {},
+                  "type": "object",
+                  "propertyNames": {
+                    "type": "string"
+                  },
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                },
+                "meta": {
+                  "$ref": "#/$defs/__schema4"
+                },
+                "behaviors": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/__schema6"
+                  }
+                }
+              },
+              "required": ["name", "requiredSlots", "socketable", "cost"]
+            }
+          },
+          "mnemoReceptacle": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "martials": {
+      "type": "object",
+      "properties": {
+        "armor": {
+          "default": false,
+          "type": "boolean"
+        },
+        "shields": {
+          "default": false,
+          "type": "boolean"
+        },
+        "melee": {
+          "default": false,
+          "type": "boolean"
+        },
+        "ranged": {
+          "default": false,
+          "type": "boolean"
+        }
+      }
+    },
+    "rituals": {
+      "type": "object",
+      "properties": {
+        "ritualism": {
+          "default": false,
+          "type": "boolean"
+        },
+        "arcanism": {
+          "default": false,
+          "type": "boolean"
+        },
+        "chimerism": {
+          "default": false,
+          "type": "boolean"
+        },
+        "elementalism": {
+          "default": false,
+          "type": "boolean"
+        },
+        "entropism": {
+          "default": false,
+          "type": "boolean"
+        },
+        "spiritism": {
+          "default": false,
+          "type": "boolean"
+        }
+      }
+    },
+    "items": {
+      "default": [],
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "fuid": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "default": "",
+            "type": "string"
+          },
+          "value": {
+            "default": 0,
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "quantity": {
+            "default": 0,
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": ["name"]
+      }
+    },
+    "consumables": {
+      "default": [],
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "fuid": {
+            "type": "string"
+          },
+          "itemType": {
+            "type": "string",
+            "const": "consumable"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "default": "",
+            "type": "string"
+          },
+          "ipCost": {
+            "default": 0,
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "behaviors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/__schema6"
+            }
+          },
+          "meta": {
+            "$ref": "#/$defs/__schema4"
+          }
+        },
+        "required": ["name"]
+      }
+    },
+    "notes": {
+      "default": [],
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "fuid": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "default": "",
+            "type": "string"
+          },
+          "effect": {
+            "type": "string"
+          }
+        },
+        "required": ["name"]
+      }
+    },
+    "modifiers": {
+      "type": "object",
+      "properties": {
+        "hp": {
+          "default": 0,
+          "type": "number"
+        },
+        "mp": {
+          "default": 0,
+          "type": "number"
+        },
+        "ip": {
+          "default": 0,
+          "type": "number"
+        },
+        "def": {
+          "default": 0,
+          "type": "number"
+        },
+        "mdef": {
+          "default": 0,
+          "type": "number"
+        },
+        "init": {
+          "default": 0,
+          "type": "number"
+        },
+        "meleePrec": {
+          "default": 0,
+          "type": "number"
+        },
+        "rangedPrec": {
+          "default": 0,
+          "type": "number"
+        },
+        "magicPrec": {
+          "default": 0,
+          "type": "number"
+        }
+      }
+    },
+    "equippedSlots": {
+      "type": "object",
+      "properties": {
+        "mainHand": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/__schema41"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "offHand": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/__schema41"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "armor": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/__schema41"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "accessory": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/__schema41"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "vehicleSlots": {
+      "type": "object",
+      "properties": {
+        "mainHand": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/__schema42"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "offHand": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/__schema42"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "armor": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/__schema42"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "accessory": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/__schema42"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "support": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/__schema42"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "settings": {
+      "type": "object",
+      "properties": {
+        "defaultView": {
+          "type": "string",
+          "enum": ["compact", "normal"]
+        },
+        "advancement": {
+          "type": "boolean"
+        },
+        "automaticClassLevel": {
+          "type": "boolean"
+        },
+        "autoEquipUnarmed": {
+          "type": "boolean"
+        },
+        "defaultUnarmedStrikeRef": {
+          "$ref": "#/$defs/__schema41"
+        },
+        "optionalRules": {
+          "type": "object",
+          "properties": {
+            "quirks": {
+              "type": "boolean"
+            },
+            "campActivities": {
+              "type": "boolean"
+            },
+            "zeroPower": {
+              "type": "boolean"
+            },
+            "technospheres": {
+              "type": "boolean"
+            },
+            "technospheresVariant": {
+              "type": "string"
+            },
+            "innateClasses": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "specialSkillOverrides": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {
+            "type": "boolean",
+            "const": true
+          }
+        }
+      }
+    },
+    "schemaVersion": {
+      "type": "number"
+    },
+    "resources": {
+      "type": "object",
+      "properties": {
+        "hp": {
+          "$ref": "#/$defs/__schema43"
+        },
+        "mp": {
+          "$ref": "#/$defs/__schema43"
+        }
+      },
+      "required": ["hp", "mp"]
+    },
+    "derived": {
+      "type": "object",
+      "properties": {
+        "def": {
+          "$ref": "#/$defs/__schema44"
+        },
+        "mdef": {
+          "$ref": "#/$defs/__schema44"
+        },
+        "init": {
+          "type": "object",
+          "properties": {
+            "bonus": {
+              "type": "number"
+            }
+          },
+          "required": ["bonus"]
+        }
+      },
+      "required": ["def", "mdef", "init"]
+    },
+    "bonuses": {
+      "type": "object",
+      "properties": {
+        "incomingRecovery": {
+          "$ref": "#/$defs/__schema45"
+        },
+        "incomingLoss": {
+          "$ref": "#/$defs/__schema45"
+        },
+        "outgoingRecovery": {
+          "$ref": "#/$defs/__schema45"
+        },
+        "accuracy": {
+          "type": "object",
+          "properties": {
+            "all": {
+              "type": "number"
+            },
+            "accuracyCheck": {
+              "type": "number"
+            },
+            "melee": {
+              "type": "number"
+            },
+            "ranged": {
+              "type": "number"
+            },
+            "magic": {
+              "type": "number"
+            },
+            "opposed": {
+              "type": "number"
+            },
+            "open": {
+              "type": "number"
+            },
+            "arcane": {
+              "type": "number"
+            },
+            "bow": {
+              "type": "number"
+            },
+            "brawling": {
+              "type": "number"
+            },
+            "dagger": {
+              "type": "number"
+            },
+            "firearm": {
+              "type": "number"
+            },
+            "flail": {
+              "type": "number"
+            },
+            "heavy": {
+              "type": "number"
+            },
+            "spear": {
+              "type": "number"
+            },
+            "sword": {
+              "type": "number"
+            },
+            "thrown": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "all",
+            "accuracyCheck",
+            "melee",
+            "ranged",
+            "magic",
+            "opposed",
+            "open",
+            "arcane",
+            "bow",
+            "brawling",
+            "dagger",
+            "firearm",
+            "flail",
+            "heavy",
+            "spear",
+            "sword",
+            "thrown"
+          ]
+        },
+        "damage": {
+          "$ref": "#/$defs/__schema46"
+        },
+        "incomingDamage": {
+          "$ref": "#/$defs/__schema46"
+        }
+      },
+      "required": [
+        "incomingRecovery",
+        "incomingLoss",
+        "outgoingRecovery",
+        "accuracy",
+        "damage",
+        "incomingDamage"
+      ]
+    },
+    "multipliers": {
+      "type": "object",
+      "properties": {
+        "incomingRecovery": {
+          "$ref": "#/$defs/__schema47"
+        },
+        "incomingLoss": {
+          "$ref": "#/$defs/__schema47"
+        },
+        "outgoingRecovery": {
+          "$ref": "#/$defs/__schema47"
+        }
+      },
+      "required": ["incomingRecovery", "incomingLoss", "outgoingRecovery"]
+    },
+    "effects": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "default": "",
+            "type": "string"
+          },
+          "disabled": {
+            "type": "boolean"
+          },
+          "origin": {
+            "type": "string"
+          },
+          "behaviors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/__schema6"
+            }
+          }
+        },
+        "required": ["id"]
+      }
+    }
+  },
+  "required": [
+    "id",
+    "uid",
+    "name",
+    "lvl",
+    "info",
+    "attributes",
+    "stats",
+    "statuses",
+    "immunities",
+    "affinities",
+    "martials",
+    "rituals",
+    "modifiers"
+  ],
+  "$defs": {
+    "__schema0": {
+      "type": "object",
+      "properties": {
+        "base": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": ["base"]
+    },
+    "__schema1": {
+      "type": "object",
+      "properties": {
+        "base": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        "current": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": ["base", "current"]
+    },
+    "__schema2": {
+      "type": "object",
+      "properties": {
+        "slow": {
+          "default": false,
+          "type": "boolean"
+        },
+        "dazed": {
+          "default": false,
+          "type": "boolean"
+        },
+        "weak": {
+          "default": false,
+          "type": "boolean"
+        },
+        "shaken": {
+          "default": false,
+          "type": "boolean"
+        },
+        "enraged": {
+          "default": false,
+          "type": "boolean"
+        },
+        "poisoned": {
+          "default": false,
+          "type": "boolean"
+        }
+      }
+    },
+    "__schema3": {
+      "type": "string",
+      "enum": ["vu", "rs", "im", "ab", "no"]
+    },
+    "__schema4": {
+      "type": "object",
+      "properties": {
+        "book": {
+          "default": "",
+          "type": "string"
+        },
+        "page": {
+          "type": "number"
+        },
+        "bookName": {
+          "type": "string"
+        },
+        "isOfficial": {
+          "default": false,
+          "type": "boolean"
+        }
+      }
+    },
+    "__schema5": {
+      "type": "object",
+      "properties": {
+        "fuid": {
+          "type": "string"
+        },
+        "name": {
+          "default": "",
+          "type": "string"
+        },
+        "maxLvl": {
+          "default": 1,
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10
+        },
+        "currentLvl": {
+          "default": 0,
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        "description": {
+          "default": "",
+          "type": "string"
+        },
+        "specialSkill": {
+          "default": "",
+          "type": "string"
+        },
+        "behaviors": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/__schema6"
+          }
+        },
+        "resource": {
+          "$ref": "#/$defs/__schema12"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "__schema6": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "default": "",
+          "type": "string"
+        },
+        "trigger": {
+          "default": {
+            "kind": "passive"
+          },
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "passive"
+                }
+              },
+              "required": ["kind"]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "active"
+                }
+              },
+              "required": ["kind"]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "chat-action"
+                },
+                "action": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "const": "guard"
+                    },
+                    {
+                      "type": "string",
+                      "const": "attack"
+                    },
+                    {
+                      "type": "string",
+                      "const": "spell"
+                    },
+                    {
+                      "type": "string",
+                      "const": "equipment"
+                    }
+                  ]
+                },
+                "condition": {
+                  "type": "object",
+                  "properties": {
+                    "guardVariant": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "const": "cover"
+                        },
+                        {
+                          "type": "string",
+                          "const": "no-cover"
+                        }
+                      ]
+                    }
+                  }
+                }
+              },
+              "required": ["kind", "action"]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "reactive"
+                },
+                "event": {
+                  "type": "string",
+                  "const": "ally-targeted"
+                },
+                "cooldown": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "const": "until-next-turn"
+                    },
+                    {
+                      "type": "string",
+                      "const": "until-next-round"
+                    }
+                  ]
+                }
+              },
+              "required": ["kind", "event"]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "combat-start"
+                }
+              },
+              "required": ["kind"]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "combat-end"
+                }
+              },
+              "required": ["kind"]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "on-hit"
+                },
+                "condition": {
+                  "type": "object",
+                  "properties": {
+                    "singleTarget": {
+                      "type": "boolean"
+                    },
+                    "targetHasStatusEffects": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              },
+              "required": ["kind"]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "const": "on-damage-taken"
+                }
+              },
+              "required": ["kind"]
+            }
+          ]
+        },
+        "predicate": {
+          "$ref": "#/$defs/__schema7"
+        },
+        "transfer": {
+          "type": "boolean"
+        },
+        "changes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/__schema8"
+          }
+        },
+        "grants": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/__schema9"
+          }
+        },
+        "voluntaryNoDamage": {
+          "type": "boolean"
+        },
+        "appliesEffect": {
+          "$ref": "#/$defs/__schema10"
+        },
+        "afterEffects": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/__schema11"
+          }
+        },
+        "branches": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "label": {
+                "default": "",
+                "type": "string"
+              },
+              "appliesEffect": {
+                "$ref": "#/$defs/__schema10"
+              },
+              "afterEffects": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/__schema11"
+                }
+              }
+            }
+          }
+        },
+        "manual": {
+          "type": "object",
+          "properties": {
+            "reason": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "const": "prompt-required"
+                },
+                {
+                  "type": "string",
+                  "const": "free-attack"
+                },
+                {
+                  "type": "string",
+                  "const": "future-effect"
+                },
+                {
+                  "type": "string",
+                  "const": "other"
+                }
+              ]
+            },
+            "hint": {
+              "type": "string"
+            }
+          }
+        },
+        "chatOutput": {
+          "type": "object",
+          "properties": {
+            "text": {
+              "type": "string"
+            }
+          },
+          "required": ["text"]
+        }
+      },
+      "required": ["id"]
+    },
+    "__schema7": {
+      "type": "object",
+      "properties": {
+        "crisisInteraction": {
+          "anyOf": [
+            {
+              "type": "string",
+              "const": "none"
+            },
+            {
+              "type": "string",
+              "const": "active"
+            },
+            {
+              "type": "string",
+              "const": "inactive"
+            }
+          ]
+        }
+      }
+    },
+    "__schema8": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "mode": {
+          "anyOf": [
+            {
+              "type": "number",
+              "const": 0
+            },
+            {
+              "type": "number",
+              "const": 1
+            },
+            {
+              "type": "number",
+              "const": 2
+            },
+            {
+              "type": "number",
+              "const": 3
+            },
+            {
+              "type": "number",
+              "const": 4
+            },
+            {
+              "type": "number",
+              "const": 5
+            }
+          ]
+        },
+        "value": {
+          "default": "0",
+          "type": "string"
+        },
+        "priority": {
+          "type": ["number", "null"]
+        }
+      },
+      "required": ["key", "mode"]
+    },
+    "__schema9": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "ref": {
+          "type": "string"
+        }
+      },
+      "required": ["type"]
+    },
+    "__schema10": {
+      "type": "object",
+      "properties": {
+        "label": {
+          "default": "",
+          "type": "string"
+        },
+        "target": {
+          "anyOf": [
+            {
+              "type": "string",
+              "const": "single"
+            },
+            {
+              "type": "string",
+              "const": "all"
+            },
+            {
+              "type": "string",
+              "const": "self"
+            },
+            {
+              "type": "string",
+              "const": "cover-target"
+            }
+          ]
+        },
+        "duration": {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "event": {
+                  "type": "string",
+                  "const": "none"
+                }
+              },
+              "required": ["event"]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "event": {
+                  "type": "string",
+                  "const": "rest"
+                }
+              },
+              "required": ["event"]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "event": {
+                  "type": "string",
+                  "const": "end-of-scene"
+                }
+              },
+              "required": ["event"]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "event": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "const": "start-of-turn"
+                    },
+                    {
+                      "type": "string",
+                      "const": "end-of-turn"
+                    },
+                    {
+                      "type": "string",
+                      "const": "end-of-round"
+                    }
+                  ]
+                },
+                "tracking": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "const": "self"
+                    },
+                    {
+                      "type": "string",
+                      "const": "source"
+                    }
+                  ]
+                }
+              },
+              "required": ["event", "tracking"]
+            }
+          ]
+        },
+        "changes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/__schema8"
+          }
+        },
+        "grants": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/__schema9"
+          }
+        },
+        "predicate": {
+          "$ref": "#/$defs/__schema7"
+        }
+      },
+      "required": ["target", "duration"]
+    },
+    "__schema11": {
+      "type": "object",
+      "properties": {
+        "resource": {
+          "anyOf": [
+            {
+              "type": "string",
+              "const": "hp"
+            },
+            {
+              "type": "string",
+              "const": "mp"
+            },
+            {
+              "type": "string",
+              "const": "ip"
+            }
+          ]
+        },
+        "direction": {
+          "anyOf": [
+            {
+              "type": "string",
+              "const": "loss"
+            },
+            {
+              "type": "string",
+              "const": "recovery"
+            }
+          ]
+        },
+        "amount": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string",
+              "const": "half-damage"
+            },
+            {
+              "type": "string",
+              "const": "half-loss"
+            },
+            {
+              "type": "object",
+              "properties": {
+                "expr": {
+                  "type": "string"
+                }
+              },
+              "required": ["expr"]
+            }
+          ]
+        },
+        "target": {
+          "anyOf": [
+            {
+              "type": "string",
+              "const": "self"
+            },
+            {
+              "type": "string",
+              "const": "targets"
+            },
+            {
+              "type": "string",
+              "const": "cover-target"
+            }
+          ]
+        },
+        "predicate": {
+          "$ref": "#/$defs/__schema7"
+        }
+      },
+      "required": ["resource", "direction", "amount", "target"]
+    },
+    "__schema12": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "default": false,
+          "type": "boolean"
+        },
+        "name": {
+          "default": "",
+          "type": "string"
+        },
+        "current": {
+          "default": 0,
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "step": {
+          "default": 1,
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "max": {
+          "default": 0,
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "maxScalesWithLevel": {
+          "default": false,
+          "type": "boolean"
+        },
+        "maxLevelBonus": {
+          "default": 0,
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        }
+      }
+    },
+    "__schema13": {
+      "type": "object",
+      "properties": {
+        "fuid": {
+          "type": "string"
+        },
+        "name": {
+          "default": "",
+          "type": "string"
+        },
+        "quote": {
+          "default": "",
+          "type": "string"
+        },
+        "description": {
+          "default": "",
+          "type": "string"
+        },
+        "specialSkill": {
+          "type": "string"
+        },
+        "meta": {
+          "$ref": "#/$defs/__schema4"
+        },
+        "behaviors": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/__schema6"
+          }
+        },
+        "resource": {
+          "$ref": "#/$defs/__schema12"
+        }
+      }
+    },
+    "__schema14": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "class": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "fuid": {
+              "type": "string"
+            },
+            "meta": {
+              "$ref": "#/$defs/__schema4"
+            },
+            "description": {
+              "type": "string"
+            },
+            "isOffensive": {
+              "type": "boolean"
+            },
+            "cost": {
+              "$ref": "#/$defs/__schema15"
+            },
+            "maxTargets": {
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            "targetDescription": {
+              "type": "string"
+            },
+            "duration": {
+              "type": "string"
+            },
+            "accuracy": {
+              "type": "object",
+              "properties": {
+                "attr1": {
+                  "type": "string"
+                },
+                "attr2": {
+                  "type": "string"
+                },
+                "value": {
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "defense": {
+                  "type": "string",
+                  "enum": ["def", "mdef"]
+                }
+              },
+              "required": ["attr1", "attr2", "value", "defense"]
+            },
+            "damage": {
+              "type": "object",
+              "properties": {
+                "value": {
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "type": {
+                  "type": "string"
+                },
+                "hrZero": {
+                  "type": "boolean"
+                }
+              },
+              "required": ["value", "type", "hrZero"]
+            },
+            "spellType": {
+              "type": "string",
+              "const": "default"
+            },
+            "behaviors": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/__schema6"
+              }
+            }
+          },
+          "required": [
+            "class",
+            "name",
+            "description",
+            "isOffensive",
+            "cost",
+            "maxTargets",
+            "targetDescription",
+            "duration",
+            "accuracy",
+            "damage",
+            "spellType"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/$defs/__schema16"
+            },
+            "name": {
+              "$ref": "#/$defs/__schema17"
+            },
+            "fuid": {
+              "$ref": "#/$defs/__schema18"
+            },
+            "meta": {
+              "$ref": "#/$defs/__schema19"
+            },
+            "description": {
+              "$ref": "#/$defs/__schema20"
+            },
+            "showInPlayerSheet": {
+              "$ref": "#/$defs/__schema21"
+            },
+            "behaviors": {
+              "$ref": "#/$defs/__schema22"
+            },
+            "spellType": {
+              "type": "string",
+              "const": "gift"
+            },
+            "clock": {
+              "default": 0,
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            "gifts": {
+              "default": [],
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "key": {
+                    "type": "string"
+                  },
+                  "customName": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "event": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "effect": {
+                    "default": "",
+                    "type": "string"
+                  }
+                },
+                "required": ["key"]
+              }
+            }
+          },
+          "required": ["name", "spellType"]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/$defs/__schema16"
+            },
+            "name": {
+              "$ref": "#/$defs/__schema17"
+            },
+            "fuid": {
+              "$ref": "#/$defs/__schema18"
+            },
+            "meta": {
+              "$ref": "#/$defs/__schema19"
+            },
+            "description": {
+              "$ref": "#/$defs/__schema20"
+            },
+            "showInPlayerSheet": {
+              "$ref": "#/$defs/__schema21"
+            },
+            "behaviors": {
+              "$ref": "#/$defs/__schema22"
+            },
+            "spellType": {
+              "type": "string",
+              "const": "dance"
+            },
+            "dances": {
+              "default": [],
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "key": {
+                    "type": "string"
+                  },
+                  "customName": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "effect": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "duration": {
+                    "default": "",
+                    "type": "string"
+                  }
+                },
+                "required": ["key"]
+              }
+            }
+          },
+          "required": ["name", "spellType"]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/$defs/__schema16"
+            },
+            "name": {
+              "$ref": "#/$defs/__schema17"
+            },
+            "fuid": {
+              "$ref": "#/$defs/__schema18"
+            },
+            "meta": {
+              "$ref": "#/$defs/__schema19"
+            },
+            "description": {
+              "$ref": "#/$defs/__schema20"
+            },
+            "showInPlayerSheet": {
+              "$ref": "#/$defs/__schema21"
+            },
+            "behaviors": {
+              "$ref": "#/$defs/__schema22"
+            },
+            "spellType": {
+              "type": "string",
+              "const": "therioform"
+            },
+            "therioforms": {
+              "default": [],
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "key": {
+                    "type": "string"
+                  },
+                  "customName": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "genoclepsis": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "description": {
+                    "default": "",
+                    "type": "string"
+                  }
+                },
+                "required": ["key"]
+              }
+            }
+          },
+          "required": ["name", "spellType"]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/$defs/__schema16"
+            },
+            "name": {
+              "$ref": "#/$defs/__schema17"
+            },
+            "fuid": {
+              "$ref": "#/$defs/__schema18"
+            },
+            "meta": {
+              "$ref": "#/$defs/__schema19"
+            },
+            "description": {
+              "$ref": "#/$defs/__schema20"
+            },
+            "showInPlayerSheet": {
+              "$ref": "#/$defs/__schema21"
+            },
+            "behaviors": {
+              "$ref": "#/$defs/__schema22"
+            },
+            "spellType": {
+              "type": "string",
+              "const": "magichant"
+            },
+            "keys": {
+              "default": [],
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "key": {
+                    "type": "string"
+                  },
+                  "customName": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "type": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "status": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "attribute": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "recovery": {
+                    "default": "",
+                    "type": "string"
+                  }
+                },
+                "required": ["key"]
+              }
+            },
+            "tones": {
+              "default": [],
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "key": {
+                    "type": "string"
+                  },
+                  "customName": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "effect": {
+                    "default": "",
+                    "type": "string"
+                  }
+                },
+                "required": ["key"]
+              }
+            }
+          },
+          "required": ["name", "spellType"]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/$defs/__schema16"
+            },
+            "name": {
+              "$ref": "#/$defs/__schema17"
+            },
+            "fuid": {
+              "$ref": "#/$defs/__schema18"
+            },
+            "meta": {
+              "$ref": "#/$defs/__schema19"
+            },
+            "description": {
+              "$ref": "#/$defs/__schema20"
+            },
+            "showInPlayerSheet": {
+              "$ref": "#/$defs/__schema21"
+            },
+            "behaviors": {
+              "$ref": "#/$defs/__schema22"
+            },
+            "spellType": {
+              "type": "string",
+              "const": "symbol"
+            },
+            "symbols": {
+              "default": [],
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "key": {
+                    "type": "string"
+                  },
+                  "customName": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "effect": {
+                    "default": "",
+                    "type": "string"
+                  }
+                },
+                "required": ["key"]
+              }
+            }
+          },
+          "required": ["name", "spellType"]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/$defs/__schema16"
+            },
+            "name": {
+              "$ref": "#/$defs/__schema17"
+            },
+            "fuid": {
+              "$ref": "#/$defs/__schema18"
+            },
+            "meta": {
+              "$ref": "#/$defs/__schema19"
+            },
+            "description": {
+              "$ref": "#/$defs/__schema20"
+            },
+            "showInPlayerSheet": {
+              "$ref": "#/$defs/__schema21"
+            },
+            "behaviors": {
+              "$ref": "#/$defs/__schema22"
+            },
+            "spellType": {
+              "type": "string",
+              "const": "invocation"
+            },
+            "spellName": {
+              "default": "Invocation",
+              "type": "string"
+            },
+            "tracker": {
+              "default": {
+                "innerWellspring": false,
+                "chosenWellspring": null,
+                "activeWellsprings": []
+              },
+              "type": "object",
+              "properties": {
+                "innerWellspring": {
+                  "default": false,
+                  "type": "boolean"
+                },
+                "chosenWellspring": {
+                  "default": null,
+                  "type": ["string", "null"]
+                },
+                "activeWellsprings": {
+                  "default": [],
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "invocations": {
+              "default": [],
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "fuid": {
+                    "type": "string"
+                  },
+                  "key": {
+                    "type": "string"
+                  },
+                  "customName": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "type": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "effect": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "wellspring": {
+                    "default": "",
+                    "type": "string"
+                  }
+                },
+                "required": ["key"]
+              }
+            },
+            "customWellsprings": {
+              "default": [],
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "color": {
+                    "default": "#888",
+                    "type": "string"
+                  },
+                  "textColor": {
+                    "default": "white",
+                    "type": "string",
+                    "enum": ["black", "white"]
+                  },
+                  "icon": {
+                    "default": "untyped",
+                    "type": "string"
+                  }
+                },
+                "required": ["name"]
+              }
+            }
+          },
+          "required": ["name", "spellType"]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/$defs/__schema16"
+            },
+            "name": {
+              "$ref": "#/$defs/__schema17"
+            },
+            "fuid": {
+              "$ref": "#/$defs/__schema18"
+            },
+            "meta": {
+              "$ref": "#/$defs/__schema19"
+            },
+            "description": {
+              "$ref": "#/$defs/__schema20"
+            },
+            "showInPlayerSheet": {
+              "$ref": "#/$defs/__schema21"
+            },
+            "behaviors": {
+              "$ref": "#/$defs/__schema22"
+            },
+            "spellType": {
+              "type": "string",
+              "const": "wellspring"
+            },
+            "color": {
+              "default": "#888888",
+              "type": "string"
+            },
+            "textColor": {
+              "default": "white",
+              "type": "string",
+              "enum": ["black", "white"]
+            },
+            "icon": {
+              "default": "untyped",
+              "type": "string"
+            }
+          },
+          "required": ["name", "spellType"]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/$defs/__schema16"
+            },
+            "name": {
+              "$ref": "#/$defs/__schema17"
+            },
+            "fuid": {
+              "$ref": "#/$defs/__schema18"
+            },
+            "meta": {
+              "$ref": "#/$defs/__schema19"
+            },
+            "description": {
+              "$ref": "#/$defs/__schema23"
+            },
+            "showInPlayerSheet": {
+              "$ref": "#/$defs/__schema21"
+            },
+            "behaviors": {
+              "$ref": "#/$defs/__schema22"
+            },
+            "spellType": {
+              "type": "string",
+              "const": "arcanist"
+            },
+            "domain": {
+              "$ref": "#/$defs/__schema24"
+            },
+            "domainDesc": {
+              "$ref": "#/$defs/__schema25"
+            },
+            "merge": {
+              "$ref": "#/$defs/__schema26"
+            },
+            "mergeDesc": {
+              "$ref": "#/$defs/__schema27"
+            },
+            "dismiss": {
+              "$ref": "#/$defs/__schema28"
+            },
+            "dismissDesc": {
+              "$ref": "#/$defs/__schema29"
+            }
+          },
+          "required": ["name", "spellType"]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/$defs/__schema16"
+            },
+            "name": {
+              "$ref": "#/$defs/__schema17"
+            },
+            "fuid": {
+              "$ref": "#/$defs/__schema18"
+            },
+            "meta": {
+              "$ref": "#/$defs/__schema19"
+            },
+            "description": {
+              "$ref": "#/$defs/__schema23"
+            },
+            "showInPlayerSheet": {
+              "$ref": "#/$defs/__schema21"
+            },
+            "behaviors": {
+              "$ref": "#/$defs/__schema22"
+            },
+            "spellType": {
+              "type": "string",
+              "const": "arcanist-rework"
+            },
+            "domain": {
+              "$ref": "#/$defs/__schema24"
+            },
+            "domainDesc": {
+              "$ref": "#/$defs/__schema25"
+            },
+            "merge": {
+              "$ref": "#/$defs/__schema26"
+            },
+            "mergeDesc": {
+              "$ref": "#/$defs/__schema27"
+            },
+            "dismiss": {
+              "$ref": "#/$defs/__schema28"
+            },
+            "dismissDesc": {
+              "$ref": "#/$defs/__schema29"
+            },
+            "pulse": {
+              "default": "",
+              "type": "string"
+            },
+            "pulseDesc": {
+              "default": "",
+              "type": "string"
+            }
+          },
+          "required": ["name", "spellType"]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/$defs/__schema16"
+            },
+            "name": {
+              "$ref": "#/$defs/__schema17"
+            },
+            "fuid": {
+              "$ref": "#/$defs/__schema18"
+            },
+            "meta": {
+              "$ref": "#/$defs/__schema19"
+            },
+            "description": {
+              "$ref": "#/$defs/__schema20"
+            },
+            "showInPlayerSheet": {
+              "$ref": "#/$defs/__schema21"
+            },
+            "behaviors": {
+              "$ref": "#/$defs/__schema22"
+            },
+            "spellType": {
+              "type": "string",
+              "const": "tinkerer-alchemy"
+            },
+            "category": {
+              "type": "string"
+            }
+          },
+          "required": ["name", "spellType"]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/$defs/__schema16"
+            },
+            "name": {
+              "$ref": "#/$defs/__schema17"
+            },
+            "fuid": {
+              "$ref": "#/$defs/__schema18"
+            },
+            "meta": {
+              "$ref": "#/$defs/__schema19"
+            },
+            "description": {
+              "$ref": "#/$defs/__schema20"
+            },
+            "showInPlayerSheet": {
+              "$ref": "#/$defs/__schema21"
+            },
+            "behaviors": {
+              "$ref": "#/$defs/__schema22"
+            },
+            "spellType": {
+              "type": "string",
+              "const": "tinkerer-infusion"
+            },
+            "infusionRank": {
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            }
+          },
+          "required": ["name", "spellType"]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/$defs/__schema16"
+            },
+            "name": {
+              "$ref": "#/$defs/__schema17"
+            },
+            "fuid": {
+              "$ref": "#/$defs/__schema18"
+            },
+            "meta": {
+              "$ref": "#/$defs/__schema19"
+            },
+            "description": {
+              "$ref": "#/$defs/__schema20"
+            },
+            "showInPlayerSheet": {
+              "$ref": "#/$defs/__schema21"
+            },
+            "behaviors": {
+              "$ref": "#/$defs/__schema22"
+            },
+            "spellType": {
+              "type": "string",
+              "const": "tinkerer-magitech"
+            },
+            "rank": {
+              "default": 1,
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 3
+            },
+            "magispheres": {
+              "default": [],
+              "type": "array",
+              "items": {}
+            }
+          },
+          "required": ["name", "spellType"]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/$defs/__schema16"
+            },
+            "name": {
+              "$ref": "#/$defs/__schema17"
+            },
+            "fuid": {
+              "$ref": "#/$defs/__schema18"
+            },
+            "meta": {
+              "$ref": "#/$defs/__schema19"
+            },
+            "description": {
+              "$ref": "#/$defs/__schema20"
+            },
+            "showInPlayerSheet": {
+              "$ref": "#/$defs/__schema21"
+            },
+            "behaviors": {
+              "$ref": "#/$defs/__schema22"
+            },
+            "spellType": {
+              "type": "string",
+              "const": "cooking"
+            },
+            "spellName": {
+              "default": "Cookbook",
+              "type": "string"
+            },
+            "cookbook": {
+              "default": {
+                "effects": [],
+                "ingredientInventory": []
+              },
+              "type": "object",
+              "properties": {
+                "effects": {
+                  "default": [],
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "taste1": {
+                        "default": "",
+                        "type": "string"
+                      },
+                      "taste2": {
+                        "default": "",
+                        "type": "string"
+                      },
+                      "effect": {
+                        "default": "",
+                        "type": "string"
+                      },
+                      "customChoices": {
+                        "default": {},
+                        "type": "object",
+                        "propertyNames": {
+                          "type": "string"
+                        },
+                        "additionalProperties": {}
+                      }
+                    }
+                  }
+                },
+                "ingredientInventory": {
+                  "default": [],
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "default": "",
+                        "type": "string"
+                      },
+                      "quantity": {
+                        "default": 1,
+                        "type": "integer",
+                        "minimum": -9007199254740991,
+                        "maximum": 9007199254740991
+                      },
+                      "taste": {
+                        "default": "",
+                        "type": "string"
+                      }
+                    },
+                    "required": ["id"]
+                  }
+                }
+              }
+            }
+          },
+          "required": ["name", "spellType"]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/$defs/__schema16"
+            },
+            "name": {
+              "$ref": "#/$defs/__schema17"
+            },
+            "fuid": {
+              "$ref": "#/$defs/__schema18"
+            },
+            "meta": {
+              "$ref": "#/$defs/__schema19"
+            },
+            "description": {
+              "$ref": "#/$defs/__schema20"
+            },
+            "showInPlayerSheet": {
+              "$ref": "#/$defs/__schema21"
+            },
+            "behaviors": {
+              "$ref": "#/$defs/__schema22"
+            },
+            "spellType": {
+              "type": "string",
+              "const": "magiseed"
+            },
+            "growthClock": {
+              "default": 0,
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            "gardenDescription": {
+              "default": "",
+              "type": "string"
+            },
+            "currentMagiseed": {
+              "default": null,
+              "type": ["string", "null"]
+            },
+            "magiseeds": {
+              "default": [],
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "key": {
+                    "type": "string"
+                  },
+                  "customName": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "description": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "rangeStart": {
+                    "default": 0,
+                    "type": "integer",
+                    "minimum": -9007199254740991,
+                    "maximum": 9007199254740991
+                  },
+                  "rangeEnd": {
+                    "default": 3,
+                    "type": "integer",
+                    "minimum": -9007199254740991,
+                    "maximum": 9007199254740991
+                  },
+                  "effects": {
+                    "default": {},
+                    "type": "object",
+                    "propertyNames": {
+                      "type": "string"
+                    },
+                    "additionalProperties": {}
+                  }
+                },
+                "required": ["key"]
+              }
+            }
+          },
+          "required": ["name", "spellType"]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/$defs/__schema16"
+            },
+            "name": {
+              "$ref": "#/$defs/__schema17"
+            },
+            "fuid": {
+              "$ref": "#/$defs/__schema18"
+            },
+            "meta": {
+              "$ref": "#/$defs/__schema19"
+            },
+            "description": {
+              "$ref": "#/$defs/__schema20"
+            },
+            "showInPlayerSheet": {
+              "default": true,
+              "type": "boolean"
+            },
+            "behaviors": {
+              "$ref": "#/$defs/__schema22"
+            },
+            "spellType": {
+              "type": "string",
+              "const": "pilot-vehicle"
+            },
+            "vehicles": {
+              "default": [],
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "key": {
+                    "type": "string"
+                  },
+                  "customName": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "frame": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "enabled": {
+                    "default": false,
+                    "type": "boolean"
+                  },
+                  "maxEnabledModules": {
+                    "default": 3,
+                    "type": "integer",
+                    "minimum": -9007199254740991,
+                    "maximum": 9007199254740991
+                  },
+                  "slots": {
+                    "default": {
+                      "main": null,
+                      "off": null,
+                      "armor": null,
+                      "support": []
+                    },
+                    "type": "object",
+                    "properties": {
+                      "main": {
+                        "default": null,
+                        "type": ["string", "null"]
+                      },
+                      "off": {
+                        "default": null,
+                        "type": ["string", "null"]
+                      },
+                      "armor": {
+                        "default": null,
+                        "type": ["string", "null"]
+                      },
+                      "support": {
+                        "default": [],
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  },
+                  "modules": {
+                    "default": [],
+                    "type": "array",
+                    "items": {
+                      "oneOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "fuid": {
+                              "$ref": "#/$defs/__schema30"
+                            },
+                            "key": {
+                              "$ref": "#/$defs/__schema31"
+                            },
+                            "customName": {
+                              "$ref": "#/$defs/__schema32"
+                            },
+                            "cost": {
+                              "$ref": "#/$defs/__schema33"
+                            },
+                            "type": {
+                              "type": "string",
+                              "const": "pilot_module_armor"
+                            },
+                            "category": {
+                              "type": "string",
+                              "const": "Armor"
+                            },
+                            "def": {
+                              "type": "integer",
+                              "minimum": -9007199254740991,
+                              "maximum": 9007199254740991
+                            },
+                            "mdef": {
+                              "type": "integer",
+                              "minimum": -9007199254740991,
+                              "maximum": 9007199254740991
+                            },
+                            "martial": {
+                              "type": "boolean"
+                            },
+                            "description": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "key",
+                            "type",
+                            "category",
+                            "def",
+                            "mdef",
+                            "martial"
+                          ]
+                        },
+                        {
+                          "type": "object",
+                          "properties": {
+                            "fuid": {
+                              "$ref": "#/$defs/__schema30"
+                            },
+                            "key": {
+                              "$ref": "#/$defs/__schema31"
+                            },
+                            "customName": {
+                              "$ref": "#/$defs/__schema32"
+                            },
+                            "cost": {
+                              "$ref": "#/$defs/__schema33"
+                            },
+                            "type": {
+                              "type": "string",
+                              "const": "pilot_module_weapon"
+                            },
+                            "category": {
+                              "type": "string"
+                            },
+                            "range": {
+                              "type": "string"
+                            },
+                            "cumbersome": {
+                              "default": false,
+                              "type": "boolean"
+                            },
+                            "isShield": {
+                              "default": false,
+                              "type": "boolean"
+                            },
+                            "takesTwoHands": {
+                              "default": false,
+                              "type": "boolean"
+                            },
+                            "quality": {
+                              "default": "",
+                              "type": "string"
+                            },
+                            "qualityCost": {
+                              "default": 0,
+                              "type": "integer",
+                              "minimum": -9007199254740991,
+                              "maximum": 9007199254740991
+                            },
+                            "accuracy": {
+                              "type": "object",
+                              "properties": {
+                                "attr1": {
+                                  "type": "string"
+                                },
+                                "attr2": {
+                                  "type": "string"
+                                },
+                                "value": {
+                                  "type": "integer",
+                                  "minimum": -9007199254740991,
+                                  "maximum": 9007199254740991
+                                },
+                                "defense": {
+                                  "type": "string",
+                                  "enum": ["def", "mdef"]
+                                }
+                              },
+                              "required": ["attr1", "attr2", "value", "defense"]
+                            },
+                            "damage": {
+                              "type": "object",
+                              "properties": {
+                                "value": {
+                                  "type": "integer",
+                                  "minimum": -9007199254740991,
+                                  "maximum": 9007199254740991
+                                },
+                                "type": {
+                                  "type": "string"
+                                },
+                                "hrZero": {
+                                  "type": "boolean"
+                                }
+                              },
+                              "required": ["value", "type", "hrZero"]
+                            }
+                          },
+                          "required": [
+                            "key",
+                            "type",
+                            "category",
+                            "range",
+                            "accuracy",
+                            "damage"
+                          ]
+                        },
+                        {
+                          "type": "object",
+                          "properties": {
+                            "fuid": {
+                              "$ref": "#/$defs/__schema30"
+                            },
+                            "key": {
+                              "$ref": "#/$defs/__schema31"
+                            },
+                            "customName": {
+                              "$ref": "#/$defs/__schema32"
+                            },
+                            "cost": {
+                              "default": 1000,
+                              "type": "integer",
+                              "minimum": -9007199254740991,
+                              "maximum": 9007199254740991
+                            },
+                            "type": {
+                              "type": "string",
+                              "const": "pilot_module_support"
+                            },
+                            "description": {
+                              "type": "string"
+                            },
+                            "isComplex": {
+                              "default": false,
+                              "type": "boolean"
+                            }
+                          },
+                          "required": ["key", "type"]
+                        }
+                      ]
+                    }
+                  }
+                },
+                "required": ["frame"]
+              }
+            }
+          },
+          "required": ["name", "spellType"]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/$defs/__schema16"
+            },
+            "name": {
+              "$ref": "#/$defs/__schema17"
+            },
+            "fuid": {
+              "$ref": "#/$defs/__schema18"
+            },
+            "meta": {
+              "$ref": "#/$defs/__schema19"
+            },
+            "description": {
+              "$ref": "#/$defs/__schema20"
+            },
+            "showInPlayerSheet": {
+              "$ref": "#/$defs/__schema21"
+            },
+            "behaviors": {
+              "$ref": "#/$defs/__schema22"
+            },
+            "spellType": {
+              "type": "string",
+              "const": "gamble"
+            },
+            "spellName": {
+              "default": "New Gamble",
+              "type": "string"
+            },
+            "cost": {
+              "$ref": "#/$defs/__schema15"
+            },
+            "maxTargets": {
+              "default": 2,
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            "targetDescription": {
+              "default": "Special",
+              "type": "string"
+            },
+            "duration": {
+              "default": "Instantaneous",
+              "type": "string"
+            },
+            "attr": {
+              "default": "willpower",
+              "type": "string"
+            },
+            "targets": {
+              "default": [],
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "rangeFrom": {
+                    "type": "integer",
+                    "minimum": -9007199254740991,
+                    "maximum": 9007199254740991
+                  },
+                  "rangeTo": {
+                    "type": "integer",
+                    "minimum": -9007199254740991,
+                    "maximum": 9007199254740991
+                  },
+                  "effect": {
+                    "default": "",
+                    "type": "string"
+                  },
+                  "secondRoll": {
+                    "default": false,
+                    "type": "boolean"
+                  },
+                  "secondEffects": {
+                    "default": [],
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "rangeFrom": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "rangeTo": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "effect": {
+                          "default": "",
+                          "type": "string"
+                        }
+                      },
+                      "required": ["rangeFrom", "rangeTo"]
+                    }
+                  }
+                },
+                "required": ["rangeFrom", "rangeTo"]
+              }
+            }
+          },
+          "required": ["name", "spellType", "cost"]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/$defs/__schema16"
+            },
+            "name": {
+              "$ref": "#/$defs/__schema17"
+            },
+            "fuid": {
+              "$ref": "#/$defs/__schema18"
+            },
+            "meta": {
+              "$ref": "#/$defs/__schema19"
+            },
+            "description": {
+              "$ref": "#/$defs/__schema20"
+            },
+            "showInPlayerSheet": {
+              "$ref": "#/$defs/__schema21"
+            },
+            "behaviors": {
+              "$ref": "#/$defs/__schema22"
+            },
+            "spellType": {
+              "type": "string",
+              "const": "deck"
+            },
+            "spellName": {
+              "default": "Ace of Cards Deck",
+              "type": "string"
+            },
+            "suitConfiguration": {
+              "default": {
+                "Air": "air",
+                "Earth": "earth",
+                "Fire": "fire",
+                "Ice": "ice"
+              },
+              "type": "object",
+              "propertyNames": {
+                "type": "string"
+              },
+              "additionalProperties": {
+                "type": "string"
+              }
+            },
+            "cardsInDeck": {
+              "default": 30,
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            "hand": {
+              "default": [],
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/__schema34"
+              }
+            },
+            "discardPile": {
+              "default": [],
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/__schema34"
+              }
+            }
+          },
+          "required": ["name", "spellType"]
+        }
+      ]
+    },
+    "__schema15": {
+      "type": "object",
+      "properties": {
+        "resource": {
+          "type": "string",
+          "const": "mp"
+        },
+        "amount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "perTarget": {
+          "type": "boolean"
+        }
+      },
+      "required": ["resource", "amount", "perTarget"]
+    },
+    "__schema16": {
+      "type": "string"
+    },
+    "__schema17": {
+      "type": "string",
+      "minLength": 1
+    },
+    "__schema18": {
+      "type": "string"
+    },
+    "__schema19": {
+      "$ref": "#/$defs/__schema4"
+    },
+    "__schema20": {
+      "type": "string"
+    },
+    "__schema21": {
+      "default": true,
+      "type": "boolean"
+    },
+    "__schema22": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/__schema6"
+      }
+    },
+    "__schema23": {
+      "default": "",
+      "type": "string"
+    },
+    "__schema24": {
+      "default": "",
+      "type": "string"
+    },
+    "__schema25": {
+      "default": "",
+      "type": "string"
+    },
+    "__schema26": {
+      "default": "",
+      "type": "string"
+    },
+    "__schema27": {
+      "default": "",
+      "type": "string"
+    },
+    "__schema28": {
+      "default": "",
+      "type": "string"
+    },
+    "__schema29": {
+      "default": "",
+      "type": "string"
+    },
+    "__schema30": {
+      "type": "string"
+    },
+    "__schema31": {
+      "type": "string"
+    },
+    "__schema32": {
+      "default": "",
+      "type": "string"
+    },
+    "__schema33": {
+      "default": 500,
+      "type": "integer",
+      "minimum": -9007199254740991,
+      "maximum": 9007199254740991
+    },
+    "__schema34": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "card"
+        },
+        "suit": {
+          "type": "string"
+        },
+        "value": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        "isJoker": {
+          "default": false,
+          "type": "boolean"
+        }
+      },
+      "required": ["type", "suit", "value"]
+    },
+    "__schema35": {
+      "type": "object",
+      "properties": {
+        "attr1": {
+          "$ref": "#/$defs/__schema36"
+        },
+        "attr2": {
+          "$ref": "#/$defs/__schema36"
+        },
+        "value": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        "defense": {
+          "default": "def",
+          "type": "string",
+          "enum": ["def", "mdef"]
+        }
+      },
+      "required": ["attr1", "attr2", "value"]
+    },
+    "__schema36": {
+      "type": "string",
+      "enum": ["might", "dexterity", "insight", "willpower"]
+    },
+    "__schema37": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        "type": {
+          "default": "physical",
+          "type": "string",
+          "enum": [
+            "physical",
+            "air",
+            "bolt",
+            "dark",
+            "earth",
+            "fire",
+            "ice",
+            "light",
+            "poison",
+            "untyped"
+          ]
+        },
+        "hrZero": {
+          "default": false,
+          "type": "boolean"
+        }
+      },
+      "required": ["value"]
+    },
+    "__schema38": {
+      "type": "object",
+      "properties": {
+        "damage": {
+          "default": 0,
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        "accuracy": {
+          "default": 0,
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        "def": {
+          "default": 0,
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        "mdef": {
+          "default": 0,
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        }
+      }
+    },
+    "__schema39": {
+      "type": "string",
+      "enum": ["might", "dexterity", "insight", "willpower"]
+    },
+    "__schema40": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "effect": {
+          "type": "string"
+        },
+        "martial": {
+          "type": "boolean"
+        },
+        "customCost": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": ["name", "effect", "martial", "customCost"]
+    },
+    "__schema41": {
+      "type": "object",
+      "properties": {
+        "source": {
+          "type": "string",
+          "enum": [
+            "weapons",
+            "customWeapons",
+            "shields",
+            "armor",
+            "accessories"
+          ]
+        },
+        "name": {
+          "type": "string"
+        },
+        "index": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": ["source", "name"]
+    },
+    "__schema42": {
+      "type": "object",
+      "properties": {
+        "vehicleName": {
+          "type": "string"
+        },
+        "moduleName": {
+          "type": "string"
+        }
+      },
+      "required": ["vehicleName", "moduleName"]
+    },
+    "__schema43": {
+      "type": "object",
+      "properties": {
+        "current": {
+          "type": "number"
+        },
+        "bonus": {
+          "type": "number"
+        }
+      },
+      "required": ["current", "bonus"]
+    },
+    "__schema44": {
+      "type": "object",
+      "properties": {
+        "bonus": {
+          "type": "number"
+        },
+        "override": {
+          "type": "number"
+        }
+      },
+      "required": ["bonus"]
+    },
+    "__schema45": {
+      "type": "object",
+      "properties": {
+        "hp": {
+          "type": "number"
+        },
+        "mp": {
+          "type": "number"
+        },
+        "ip": {
+          "type": "number"
+        }
+      },
+      "required": ["hp", "mp", "ip"]
+    },
+    "__schema46": {
+      "type": "object",
+      "properties": {
+        "all": {
+          "type": "number"
+        },
+        "melee": {
+          "type": "number"
+        },
+        "ranged": {
+          "type": "number"
+        },
+        "spell": {
+          "type": "number"
+        },
+        "arcane": {
+          "type": "number"
+        },
+        "bow": {
+          "type": "number"
+        },
+        "brawling": {
+          "type": "number"
+        },
+        "dagger": {
+          "type": "number"
+        },
+        "firearm": {
+          "type": "number"
+        },
+        "flail": {
+          "type": "number"
+        },
+        "heavy": {
+          "type": "number"
+        },
+        "spear": {
+          "type": "number"
+        },
+        "sword": {
+          "type": "number"
+        },
+        "thrown": {
+          "type": "number"
+        },
+        "physical": {
+          "type": "number"
+        },
+        "air": {
+          "type": "number"
+        },
+        "bolt": {
+          "type": "number"
+        },
+        "dark": {
+          "type": "number"
+        },
+        "earth": {
+          "type": "number"
+        },
+        "fire": {
+          "type": "number"
+        },
+        "ice": {
+          "type": "number"
+        },
+        "light": {
+          "type": "number"
+        },
+        "poison": {
+          "type": "number"
+        },
+        "beast": {
+          "type": "number"
+        },
+        "construct": {
+          "type": "number"
+        },
+        "demon": {
+          "type": "number"
+        },
+        "elemental": {
+          "type": "number"
+        },
+        "humanoid": {
+          "type": "number"
+        },
+        "monster": {
+          "type": "number"
+        },
+        "plant": {
+          "type": "number"
+        },
+        "undead": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "all",
+        "melee",
+        "ranged",
+        "spell",
+        "arcane",
+        "bow",
+        "brawling",
+        "dagger",
+        "firearm",
+        "flail",
+        "heavy",
+        "spear",
+        "sword",
+        "thrown",
+        "physical",
+        "air",
+        "bolt",
+        "dark",
+        "earth",
+        "fire",
+        "ice",
+        "light",
+        "poison",
+        "beast",
+        "construct",
+        "demon",
+        "elemental",
+        "humanoid",
+        "monster",
+        "plant",
+        "undead"
+      ]
+    },
+    "__schema47": {
+      "type": "object",
+      "properties": {
+        "hp": {
+          "type": "number"
+        },
+        "mp": {
+          "type": "number"
+        },
+        "ip": {
+          "type": "number"
+        }
+      },
+      "required": ["hp", "mp", "ip"]
+    }
+  }
+}

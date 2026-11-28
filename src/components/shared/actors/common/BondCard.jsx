@@ -65,10 +65,10 @@ export default function BondCard({
           sx={{
             color: "#fff",
             fontFamily: "Antonio",
-            fontWeight: 800,
+            fontWeight: 700,
             fontSize: compact
-              ? { xs: "0.82rem", sm: "0.88rem" }
-              : { xs: "0.9rem", sm: "0.95rem" },
+              ? { xs: "0.95rem", sm: "1rem" }
+              : { xs: "1.05rem", sm: "1.15rem" },
             textTransform: "uppercase",
             letterSpacing: "0.04em",
             flex: 1,
@@ -83,10 +83,10 @@ export default function BondCard({
             sx={{
               color: "#fff",
               fontFamily: "Antonio",
-              fontWeight: 800,
+              fontWeight: 700,
               fontSize: compact
-                ? { xs: "0.82rem", sm: "0.88rem" }
-                : { xs: "0.9rem", sm: "0.95rem" },
+                ? { xs: "0.95rem", sm: "1rem" }
+                : { xs: "1.05rem", sm: "1.15rem" },
               flexShrink: 0,
             }}
           >
@@ -128,8 +128,8 @@ export default function BondCard({
                     py: 0.2,
                     borderRadius: 0.5,
                     fontFamily: "Antonio",
-                    fontWeight: 800,
-                    fontSize: compact ? "0.6rem" : "0.7rem",
+                    fontWeight: 700,
+                    fontSize: compact ? "0.78rem" : "0.9rem",
                     letterSpacing: "0.03em",
                     color: isPositive ? positiveColor : negativeColor,
                     bgcolor: isPositive

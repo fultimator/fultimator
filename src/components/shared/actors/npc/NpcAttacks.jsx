@@ -77,13 +77,34 @@ function AttackRow({ attack, npc, attackType, showRoll }) {
 
   return (
     <Fragment>
-      <Grid sx={{ px: 1, py: 0.5 }} size={1}>
-        <Typography sx={{ textAlign: "center" }}>
+      <Grid
+        sx={{ pl: 2, pr: 0, py: 0.25, width: 40, flexShrink: 0 }}
+        size="auto"
+      >
+        <Typography
+          sx={{
+            textAlign: "left",
+            fontSize: "1.1em",
+            display: "flex",
+            alignItems: "center",
+            height: "1.32em",
+            "& svg": { display: "block" },
+          }}
+        >
           {attack.range === "melee" && <MeleeIcon />}
           {attack.range === "ranged" && <DistanceIcon />}
         </Typography>
       </Grid>
-      <Grid sx={{ px: 1, py: 0.5 }} size={11}>
+      <Grid
+        sx={{
+          pl: 1,
+          pr: 1,
+          py: 0.25,
+          minWidth: 0,
+          flex: "1 1 calc(100% - 40px)",
+          maxWidth: "calc(100% - 40px)",
+        }}
+      >
         <Typography component="div">
           {showRoll ? (
             <ClickableName name={attack.name} onAction={handleRoll} />
@@ -161,13 +182,26 @@ export function NpcAttacks({ npc, variant = "interactive" }) {
   if (!npc.attacks?.length && !npc.weaponattacks?.length) return null;
 
   return (
-    <Grid container>
-      <Grid sx={{ mt: 0, px: 2, py: 0.3, background }} size={12}>
+    <Grid container sx={{ pb: 0.75 }}>
+      <Grid
+        sx={{
+          mt: 0,
+          px: 2,
+          py: 0.3,
+          minHeight: 34,
+          mb: 0.75,
+          display: "flex",
+          alignItems: "center",
+          background,
+        }}
+        size={12}
+      >
         <Typography
           sx={{
             color: "white.main",
             fontFamily: "Antonio",
             fontSize: "1.1rem",
+            lineHeight: 1,
             fontWeight: "medium",
             textTransform: "uppercase",
           }}

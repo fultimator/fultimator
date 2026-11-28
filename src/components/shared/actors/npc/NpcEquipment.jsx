@@ -24,13 +24,26 @@ export function NpcEquipment({ npc }) {
   if (!hasWeapons && !hasArmor && !hasShield) return null;
 
   return (
-    <Grid container>
-      <Grid sx={{ mt: 0, px: 2, py: 0.3, background }} size={12}>
+    <Grid container sx={{ pb: 0.75 }}>
+      <Grid
+        sx={{
+          mt: 0,
+          px: 2,
+          py: 0.3,
+          minHeight: 34,
+          mb: 0.75,
+          display: "flex",
+          alignItems: "center",
+          background,
+        }}
+        size={12}
+      >
         <Typography
           sx={{
             color: "white.main",
             fontFamily: "Antonio",
             fontSize: "1.1rem",
+            lineHeight: 1,
             fontWeight: "medium",
             textTransform: "uppercase",
           }}

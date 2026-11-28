@@ -222,11 +222,16 @@ export default function EditPlayerClasses({
 
       updatedPlayer.classes.push({
         name: name,
-        lvl: lvl,
-        benefits: benefits,
-        skills: skills,
-        heroic: heroic,
-        spells: spells,
+        lvl: Number.isFinite(lvl) ? lvl : 1,
+        benefits: {
+          ...(benefits ?? {}),
+          spellClasses: Array.isArray(benefits?.spellClasses)
+            ? benefits.spellClasses
+            : [],
+        },
+        skills: Array.isArray(skills) ? skills : [],
+        heroic: heroic ?? { name: "", description: "" },
+        spells: Array.isArray(spells) ? spells : [],
         isHomebrew: isHomebrew || false,
       });
 

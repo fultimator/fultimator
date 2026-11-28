@@ -22,11 +22,8 @@ import { Add } from "@mui/icons-material";
 import { useDeleteConfirmation } from "/src/hooks/useDeleteConfirmation";
 import DeleteConfirmationDialog from "/src/components/common/DeleteConfirmationDialog";
 import Clock from "/src/components/shared/actors/pc/playerSheet/Clock";
-import RestartAltIcon from "@mui/icons-material/RestartAlt";
-import AddIcon from "@mui/icons-material/Add";
-import RemoveIcon from "@mui/icons-material/Remove";
+import ClockStepper from "/src/components/shared/common/ClockStepper";
 import EditIcon from "@mui/icons-material/Edit";
-import { Tooltip, Stack } from "@mui/material";
 
 export default function EditPlayerNotes({ player, setPlayer, isEditMode }) {
   const { t } = useTranslate();
@@ -469,38 +466,16 @@ export default function EditPlayerNotes({ player, setPlayer, isEditMode }) {
                               }
                             />
 
-                            <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
-                              <Tooltip title={t("Decrement")}>
-                                <IconButton
-                                  size="small"
-                                  onClick={() =>
-                                    decrementClockState(index, clockIndex)
-                                  }
-                                >
-                                  <RemoveIcon fontSize="small" />
-                                </IconButton>
-                              </Tooltip>
-                              <Tooltip title={t("Reset")}>
-                                <IconButton
-                                  size="small"
-                                  onClick={() =>
-                                    resetClockState(index, clockIndex)
-                                  }
-                                >
-                                  <RestartAltIcon fontSize="small" />
-                                </IconButton>
-                              </Tooltip>
-                              <Tooltip title={t("Increment")}>
-                                <IconButton
-                                  size="small"
-                                  onClick={() =>
-                                    incrementClockState(index, clockIndex)
-                                  }
-                                >
-                                  <AddIcon fontSize="small" />
-                                </IconButton>
-                              </Tooltip>
-                            </Stack>
+                            <ClockStepper
+                              sx={{ mt: 1 }}
+                              onDecrement={() =>
+                                decrementClockState(index, clockIndex)
+                              }
+                              onIncrement={() =>
+                                incrementClockState(index, clockIndex)
+                              }
+                              onReset={() => resetClockState(index, clockIndex)}
+                            />
                           </Paper>
                         </Grid>
                       ))}

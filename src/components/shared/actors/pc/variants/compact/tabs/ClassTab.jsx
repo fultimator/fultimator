@@ -4,6 +4,7 @@ export default function ClassTab({
   player,
   setPlayer,
   isEditMode = false,
+  isLocked,
   searchQuery = "",
   defaultExpandAll = false,
 }) {
@@ -12,6 +13,7 @@ export default function ClassTab({
       pc={player}
       variant="compact"
       isInteractive={isEditMode}
+      isLocked={isLocked}
       onUpdate={setPlayer}
       searchQuery={searchQuery}
       defaultExpanded={defaultExpandAll}

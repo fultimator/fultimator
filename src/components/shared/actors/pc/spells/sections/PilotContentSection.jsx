@@ -98,8 +98,6 @@ function VehicleAccordion({
         >
           <Button
             size="small"
-            variant="outlined"
-            color="inherit"
             onClick={() =>
               onVehicleChange(vehicleIndex, "enabled", !vehicle.enabled)
             }

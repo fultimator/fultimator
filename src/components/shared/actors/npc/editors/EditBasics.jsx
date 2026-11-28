@@ -113,7 +113,7 @@ export default function EditBasics({ npc, setNpc }) {
           </Grid>
 
           {(!npc.role || npc.role === "custom") && (
-            <Grid size={{ xs: 12, sm: 3 }}>
+            <Grid size={{ xs: 6, sm: 3 }}>
               <EditLevel npc={npc} setnpc={setNpc} />
             </Grid>
           )}

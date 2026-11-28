@@ -1,3 +1,4 @@
+import { selectedToggleSx } from "../common/selectedToggleSx";
 import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router";
 import {
@@ -379,15 +380,16 @@ export const AppDrawer: React.FC<AppDrawerProps> = ({
                   if (!open) onOpen();
                 }}
                 size="small"
-                sx={{
-                  width: 30,
-                  height: 30,
-                  borderRadius: 1,
-                  color: activeTab === id ? "primary.main" : "text.secondary",
-                  backgroundColor:
-                    activeTab === id ? "action.selected" : "transparent",
-                  "&:hover": { backgroundColor: "action.hover" },
-                }}
+                sx={[
+                  {
+                    width: 30,
+                    height: 30,
+                    borderRadius: 1,
+                    color: "text.secondary",
+                    "&:hover": { backgroundColor: "action.hover" },
+                  },
+                  activeTab === id && selectedToggleSx,
+                ]}
               >
                 {icon}
               </IconButton>

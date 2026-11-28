@@ -231,8 +231,6 @@ const VehicleModule = memo(
         <Button
           key={value}
           size="small"
-          variant="outlined"
-          color="inherit"
           disabled={disabled}
           onClick={(e) => {
             e.stopPropagation();
@@ -263,8 +261,6 @@ const VehicleModule = memo(
         module.cumbersome ? (
           <Button
             size="small"
-            variant="outlined"
-            color="inherit"
             disabled
             style={{
               minWidth: 36,
@@ -301,8 +297,6 @@ const VehicleModule = memo(
       <>
         {slotToggle}
         <Button
-          variant="outlined"
-          color="inherit"
           disabled={!isEquipped && !canEquip}
           onClick={handleEquipToggle}
           size="small"

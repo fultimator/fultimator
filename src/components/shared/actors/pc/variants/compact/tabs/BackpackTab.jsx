@@ -9,6 +9,7 @@ export default function BackpackTab({
   player,
   setPlayer,
   isEditMode = false,
+  isLocked = false,
   isMainTab = false,
   searchQuery = "",
 }) {
@@ -30,6 +31,7 @@ export default function BackpackTab({
         player={player}
         setPlayer={setPlayer}
         isEditMode={isEditMode}
+        isLocked={isLocked}
         compact
         isMainTab={isMainTab}
         searchQuery={searchQuery}

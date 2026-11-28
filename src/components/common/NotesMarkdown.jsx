@@ -114,7 +114,7 @@ const NotesMarkdown = ({
                     color: theme.palette.text.secondary,
                   }
                 : {
-                    fontFamily: "'PT Sans Narrow', sans-serif",
+                    fontFamily: "'PFU Sans Narrow', sans-serif",
                     mt: 0.75,
                     mb: 0.75,
                     marginLeft: 2,
@@ -287,7 +287,7 @@ const NotesMarkdown = ({
               style={{
                 listStyle: "none",
                 paddingLeft: "1.5em",
-                fontFamily: "'PT Sans Narrow', sans-serif",
+                fontFamily: "'PFU Sans Narrow', sans-serif",
                 color: theme.palette.text.primary,
                 marginTop: 8,
                 marginBottom: 8,
@@ -312,7 +312,7 @@ const NotesMarkdown = ({
             style={{
               listStyle: "none",
               paddingLeft: "1.5em",
-              fontFamily: "'PT Sans Narrow', sans-serif",
+              fontFamily: "'PFU Sans Narrow', sans-serif",
               color: theme.palette.text.primary,
               marginTop: 8,
               marginBottom: 8,
@@ -359,7 +359,7 @@ const NotesMarkdown = ({
         table: ({ _node, ...props }) => (
           <table
             style={{
-              fontFamily: "'PT Sans Narrow', sans-serif",
+              fontFamily: "'PFU Sans Narrow', sans-serif",
               width: "100%",
               marginBottom: "1em",
               borderCollapse: "collapse",

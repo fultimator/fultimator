@@ -370,8 +370,6 @@ function ThemedSpellPilot({
                       }}
                     >
                       <Button
-                        variant="outlined"
-                        color="inherit"
                         size="small"
                         onClick={() =>
                           onVehicleChange &&

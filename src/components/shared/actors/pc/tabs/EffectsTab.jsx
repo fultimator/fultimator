@@ -27,13 +27,13 @@ import {
   PlayerShieldModal,
   PlayerWeaponModal,
 } from "/src/components/shared/actors/pc/editors";
-import { Grid } from "@mui/material";
 import { TabbedSchemaFormRenderer } from "/src/forms/rendering/TabbedSchemaFormRenderer";
 import {
   actorEffectRowFields,
   BLANK_ACTOR_EFFECT,
   passiveGroupLabels,
 } from "/src/forms/rendering/config/shared/behaviorFields";
+import EmptySectionText from "/src/components/shared/common/EmptySectionText";
 
 const ACTOR_EFFECT_TABS = [];
 
@@ -310,9 +310,7 @@ function EffectSection({
     >
       <Box sx={{ display: "flex", flexDirection: "column", gap: 0.75, p: 1 }}>
         {rows.length === 0 ? (
-          <Typography color="text.secondary" variant="body2" sx={{ px: 0.5 }}>
-            {t("No effects.")}
-          </Typography>
+          <EmptySectionText>{t("No effects.")}</EmptySectionText>
         ) : (
           rows.map(({ effect, source, sourceRef }, index) => {
             const editable = canEdit && isEditableSource(sourceRef);

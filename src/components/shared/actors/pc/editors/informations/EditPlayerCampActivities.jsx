@@ -9,7 +9,6 @@ import {
   MenuItem,
   Snackbar,
   Tooltip,
-  Typography,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import Casino from "@mui/icons-material/Casino";
@@ -26,6 +25,7 @@ import CompendiumViewerModal from "/src/components/compendium/CompendiumViewerMo
 import ItemEditModal from "/src/forms/ui/ItemEditModal";
 import { useAddChatMessage } from "/src/hooks/useAddChatMessage";
 import { SharedOptionalCard } from "/src/components/shared/items";
+import EmptySectionText from "/src/components/shared/common/EmptySectionText";
 
 const CAMP_ACTIVITY_SUBTYPES = ["camp-activities"];
 
@@ -354,17 +354,9 @@ export default function EditPlayerCampActivities({
         )
       }
     >
-      <Box
-        sx={{ display: "flex", flexDirection: "column", gap: "4px", p: 0.75 }}
-      >
+      <Box sx={{ display: "flex", flexDirection: "column", gap: "4px", p: 1 }}>
         {activities.length === 0 ? (
-          <Typography
-            color="text.secondary"
-            variant="body2"
-            sx={{ px: 0.5, py: 0.25 }}
-          >
-            {t("No camp activities yet.")}
-          </Typography>
+          <EmptySectionText>{t("No camp activities yet.")}</EmptySectionText>
         ) : (
           activities.map((activity, index) => (
             <ActivityRow

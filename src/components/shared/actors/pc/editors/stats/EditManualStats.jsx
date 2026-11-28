@@ -32,6 +32,10 @@ export default function EditManualStats({
   useEffect(() => {
     setPlayer((prevPlayer) => ({
       ...prevPlayer,
+      resources: prevPlayer.resources && {
+        hp: { ...prevPlayer.resources.hp, bonus: parseInt(hpModifier) || 0 },
+        mp: { ...prevPlayer.resources.mp, bonus: parseInt(mpModifier) || 0 },
+      },
       modifiers: {
         hp: parseInt(hpModifier) || 0,
         mp: parseInt(mpModifier) || 0,

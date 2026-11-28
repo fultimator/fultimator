@@ -221,7 +221,8 @@ export default function DefaultSpellSection({ formState, setFormState, t }) {
               label={t("Target Description")}
               fullWidth
               slotProps={{
-                htmlInput: { ...params.inputProps, maxLength: 100 },
+                ...params.slotProps,
+                htmlInput: { ...params.slotProps.htmlInput, maxLength: 100 },
               }}
             />
           )}
@@ -249,7 +250,8 @@ export default function DefaultSpellSection({ formState, setFormState, t }) {
               label={t("Duration")}
               fullWidth
               slotProps={{
-                htmlInput: { ...params.inputProps, maxLength: 50 },
+                ...params.slotProps,
+                htmlInput: { ...params.slotProps.htmlInput, maxLength: 50 },
               }}
             />
           )}

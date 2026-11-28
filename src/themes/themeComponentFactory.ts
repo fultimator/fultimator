@@ -978,7 +978,7 @@ export function createThemeComponents({
           "&.Mui-disabled": {
             color: isDark ? alpha("#ffffff", 0.4) : alpha(quaternary, 0.45),
           },
-          ".MuiFormControl-root:has(input[readonly]) &, .MuiFormControl-root:has(textarea[readonly]) &":
+          ".MuiFormControl-root:has(input[readonly]) &, .MuiFormControl-root:has(textarea[readonly]:not([aria-hidden])) &":
             {
               color: isDark ? alpha("#ffffff", 0.4) : alpha(quaternary, 0.45),
             },
@@ -1281,13 +1281,23 @@ export function createThemeComponents({
         root: (() => {
           const useGradient =
             styleCustomization?.appBarGradient ?? appBarGradientProp ?? false;
-          if (useGradient) {
-            return {
-              background: `linear-gradient(180deg, ${secondary}, ${primary}, ${ternary})`,
-            };
-          }
+          const profileSurface =
+            isEffectProfile(profile) && allowProfileSurfaceColorStyling;
+          const background = profileSurface
+            ? profile === "dystopian"
+              ? (tokens.arcGradient ?? tokens.tabsBg)
+              : `linear-gradient(180deg, ${alpha(secondary, isDark ? 0.82 : 0.9)} 0%, ${alpha(primary, 0.95)} 100%)`
+            : useGradient
+              ? `linear-gradient(180deg, ${secondary}, ${primary}, ${ternary})`
+              : `linear-gradient(180deg, ${alpha(secondary, isDark ? 0.95 : 0.9)}, ${alpha(primary, isDark ? 1 : 0.95)})`;
           return {
-            background: `linear-gradient(180deg, ${alpha(secondary, isDark ? 0.95 : 0.9)}, ${alpha(primary, isDark ? 1 : 0.95)})`,
+            backgroundColor: primary,
+            backgroundImage: background,
+            borderBottom: `1px solid ${alpha(quaternary, isDark ? 0.8 : 0.5)}`,
+            boxShadow: tokens.paperShadow,
+            ...(shouldApplyTextEffectColor
+              ? { color: defaultDialogTitleTextColor }
+              : {}),
           };
         })(),
       },

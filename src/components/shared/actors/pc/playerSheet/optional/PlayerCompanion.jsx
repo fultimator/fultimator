@@ -10,7 +10,7 @@ export default function PlayerCompanion({ player, isEditMode }) {
   const navigate = useNavigate();
 
   const faithfulCompanionSkills = player.classes
-    .flatMap((cls) => cls.skills)
+    .flatMap((cls) => cls.skills ?? [])
     .filter(
       (skill) =>
         skill.specialSkill === "Faithful Companion" && skill.currentLvl > 0,

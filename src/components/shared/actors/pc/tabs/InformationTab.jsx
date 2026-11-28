@@ -15,6 +15,7 @@ export default function InformationTab({
   updateMaxStats,
   advancement,
   onLevelUpRequest,
+  db,
 }) {
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
@@ -25,6 +26,7 @@ export default function InformationTab({
         isEditMode={isOwner}
         advancement={advancement}
         onLevelUpRequest={onLevelUpRequest}
+        db={db}
       />
       <EditPlayerTraits
         player={player}

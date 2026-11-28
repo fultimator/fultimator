@@ -5,6 +5,7 @@ export default function PlayerEquipment({
   player,
   setPlayer,
   isEditMode,
+  isLocked = false,
   isCharacterSheet,
 }) {
   return (
@@ -12,6 +13,7 @@ export default function PlayerEquipment({
       player={player}
       setPlayer={setPlayer}
       isEditMode={isEditMode}
+      isLocked={isLocked}
       compact={false}
       showSectionCard
       noShadow={isCharacterSheet}

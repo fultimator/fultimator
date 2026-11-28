@@ -46,7 +46,7 @@ const lightMidnightBlue = createTheme({
     },
   } as PaletteOptions,
   typography: {
-    fontFamily: ["PT Sans Narrow", "sans-serif"].join(","),
+    fontFamily: ["PFU Sans Narrow", "sans-serif"].join(","),
     body1: {
       lineHeight: 1.45,
       color: "#111a4a",
@@ -56,32 +56,32 @@ const lightMidnightBlue = createTheme({
       color: "#2f3f78",
     },
     h1: {
-      fontFamily: ['"PT Sans Narrow"', "sans-serif"].join(","),
+      fontFamily: ['"PFU Sans Narrow"', "sans-serif"].join(","),
       fontSize: "2em",
       lineHeight: 1.618,
     },
     h2: {
-      fontFamily: ['"PT Sans Narrow"', "sans-serif"].join(","),
+      fontFamily: ['"PFU Sans Narrow"', "sans-serif"].join(","),
       fontSize: "1.2em",
       lineHeight: 1.5,
     },
     h3: {
-      fontFamily: ['"PT Sans Narrow"', "sans-serif"].join(","),
+      fontFamily: ['"PFU Sans Narrow"', "sans-serif"].join(","),
       fontSize: "1.05em",
       lineHeight: 1.5,
     },
     h4: {
-      fontFamily: ['"PT Sans Narrow"', "sans-serif"].join(","),
+      fontFamily: ['"PFU Sans Narrow"', "sans-serif"].join(","),
       fontSize: "1em",
       lineHeight: 1.5,
     },
     h5: {
-      fontFamily: ['"PT Sans Narrow"', "sans-serif"].join(","),
+      fontFamily: ['"PFU Sans Narrow"', "sans-serif"].join(","),
       fontSize: "0.83em",
       lineHeight: 1.5,
     },
     h6: {
-      fontFamily: ['"PT Sans Narrow"', "sans-serif"].join(","),
+      fontFamily: ['"PFU Sans Narrow"', "sans-serif"].join(","),
       fontSize: "0.75em",
       lineHeight: 1.5,
     },
@@ -152,7 +152,7 @@ const darkMidnightBlue = createTheme({
     },
   } as PaletteOptions,
   typography: {
-    fontFamily: ["PT Sans Narrow", "sans-serif"].join(","),
+    fontFamily: ["PFU Sans Narrow", "sans-serif"].join(","),
     body1: {
       lineHeight: 1.45,
       color: "#f3f8ff",
@@ -162,32 +162,32 @@ const darkMidnightBlue = createTheme({
       color: "#dbe8ff",
     },
     h1: {
-      fontFamily: ['"PT Sans Narrow"', "sans-serif"].join(","),
+      fontFamily: ['"PFU Sans Narrow"', "sans-serif"].join(","),
       fontSize: "2em",
       lineHeight: 1.618,
     },
     h2: {
-      fontFamily: ['"PT Sans Narrow"', "sans-serif"].join(","),
+      fontFamily: ['"PFU Sans Narrow"', "sans-serif"].join(","),
       fontSize: "1.2em",
       lineHeight: 1.5,
     },
     h3: {
-      fontFamily: ['"PT Sans Narrow"', "sans-serif"].join(","),
+      fontFamily: ['"PFU Sans Narrow"', "sans-serif"].join(","),
       fontSize: "1.05em",
       lineHeight: 1.5,
     },
     h4: {
-      fontFamily: ['"PT Sans Narrow"', "sans-serif"].join(","),
+      fontFamily: ['"PFU Sans Narrow"', "sans-serif"].join(","),
       fontSize: "1em",
       lineHeight: 1.5,
     },
     h5: {
-      fontFamily: ['"PT Sans Narrow"', "sans-serif"].join(","),
+      fontFamily: ['"PFU Sans Narrow"', "sans-serif"].join(","),
       fontSize: "0.83em",
       lineHeight: 1.5,
     },
     h6: {
-      fontFamily: ['"PT Sans Narrow"', "sans-serif"].join(","),
+      fontFamily: ['"PFU Sans Narrow"', "sans-serif"].join(","),
       fontSize: "0.75em",
       lineHeight: 1.5,
     },

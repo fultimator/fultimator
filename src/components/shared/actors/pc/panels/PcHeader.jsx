@@ -19,7 +19,7 @@ import Diamond from "/src/components/Diamond";
 import avatar_image from "/images/components/avatar.jpg";
 import ExpIcon from "/src/components/svgs/exp.svg?react";
 import ExpDisabledIcon from "/src/components/svgs/exp_disabled.svg?react";
-import { StyledMarkdown } from "/src/components/shared/actors/pc/shared";
+import { StyledMarkdown } from "/src/components/shared/actors/pc/pcStyled";
 import {
   MIN_LEVEL,
   MAX_LEVEL,
@@ -73,7 +73,7 @@ const TRAIT_FONT = {
 function LevelUpButton({ canLevelUpFromExp, onLevelUpRequest, size = 18, t }) {
   return (
     <Tooltip title={canLevelUpFromExp ? t("Level Up") : t("Need 10 EXP")}>
-      <span>
+      <span style={{ display: "inline-flex" }}>
         <IconButton
           size="small"
           onClick={onLevelUpRequest}
@@ -81,6 +81,7 @@ function LevelUpButton({ canLevelUpFromExp, onLevelUpRequest, size = 18, t }) {
           sx={{
             animation: canLevelUpFromExp ? "flash 1s infinite" : "none",
             p: 0.25,
+            fontSize: "inherit",
           }}
         >
           {canLevelUpFromExp ? (
@@ -203,6 +204,10 @@ export function PcNameBar({
               gap: { xs: 0.35, sm: 0.75 },
               flexWrap: "nowrap",
               "@container (max-width: 520px)": {
+                width: "100%",
+                justifyContent: "space-between",
+              },
+              "@container (max-width: 340px)": {
                 flexWrap: "wrap",
                 justifyContent: "center",
               },
@@ -259,73 +264,86 @@ export function PcNameBar({
               />
             </Box>
             <Diamond color={primary} />
-            <Typography sx={LABEL_FONT}>{t("Exp")}</Typography>
-            <IconButton size="small" onClick={() => bumpExp(-1)}>
-              <Remove fontSize="small" />
-            </IconButton>
-            <TextField
-              value={pc.info.exp || 0}
-              onChange={(e) => {
-                const v = parseInt(e.target.value, 10);
-                onUpdate?.((p) => ({
-                  ...p,
-                  info: {
-                    ...p.info,
-                    exp: Math.max(0, Number.isNaN(v) ? 0 : v),
-                  },
-                }));
-              }}
-              size="small"
-              variant="standard"
+            <Box
               sx={{
-                width: { xs: "48px", sm: "54px" },
-                "& .MuiInputBase-input": {
-                  textAlign: "center",
-                  ...ANTONIO,
-                  fontSize: { xs: "1.2rem", sm: "1.3rem" },
-                },
+                display: "inline-flex",
+                alignItems: "center",
+                gap: { xs: 0.35, sm: 0.75 },
               }}
-              slotProps={{ htmlInput: { maxLength: 2 } }}
-            />
-            <IconButton size="small" onClick={() => bumpExp(1)}>
-              <Add fontSize="small" />
-            </IconButton>
-            <LevelUpButton
-              canLevelUpFromExp={canLevelUpFromExp}
-              onLevelUpRequest={onLevelUpRequest}
-              size={18}
-              t={t}
-            />
+            >
+              <Typography sx={LABEL_FONT}>{t("Exp")}</Typography>
+              <IconButton size="small" onClick={() => bumpExp(-1)}>
+                <Remove fontSize="small" />
+              </IconButton>
+              <TextField
+                value={pc.info.exp || 0}
+                onChange={(e) => {
+                  const v = parseInt(e.target.value, 10);
+                  onUpdate?.((p) => ({
+                    ...p,
+                    info: {
+                      ...p.info,
+                      exp: Math.max(0, Number.isNaN(v) ? 0 : v),
+                    },
+                  }));
+                }}
+                size="small"
+                variant="standard"
+                sx={{
+                  width: { xs: "48px", sm: "54px" },
+                  "& .MuiInputBase-input": {
+                    textAlign: "center",
+                    ...ANTONIO,
+                    fontSize: { xs: "1.2rem", sm: "1.3rem" },
+                  },
+                }}
+                slotProps={{ htmlInput: { maxLength: 2 } }}
+              />
+              <IconButton size="small" onClick={() => bumpExp(1)}>
+                <Add fontSize="small" />
+              </IconButton>
+              <LevelUpButton
+                canLevelUpFromExp={canLevelUpFromExp}
+                onLevelUpRequest={onLevelUpRequest}
+                size={18}
+                t={t}
+              />
+            </Box>
           </Box>
         ) : (
           <Box
             sx={{
+              ...META_FONT,
               display: "flex",
               alignItems: "center",
               justifyContent: "flex-start",
-              gap: 0.35,
+              gap: "0.4em",
               flexWrap: "wrap",
+              lineHeight: 1,
               "@container (max-width: 520px)": {
-                justifyContent: "center",
+                width: "100%",
+                justifyContent: "space-evenly",
               },
             }}
           >
-            <Typography sx={META_FONT}>
-              {pc.info.pronouns && (
-                <>
-                  {pc.info.pronouns} <Diamond color={primary} />{" "}
-                </>
-              )}
-              {t("Lvl")} {pc.lvl} <Diamond color={primary} />
-            </Typography>
-            <Typography sx={META_FONT}>
+            {pc.info.pronouns && (
+              <>
+                <span>{pc.info.pronouns}</span>
+                <Diamond color={primary} />
+              </>
+            )}
+            <span>
+              {t("Lvl")} {pc.lvl}
+            </span>
+            <Diamond color={primary} />
+            <span>
               {t("Exp")} {pc.info.exp || 0}
-            </Typography>
+            </span>
             {onLevelUpRequest && (
               <LevelUpButton
                 canLevelUpFromExp={canLevelUpFromExp}
                 onLevelUpRequest={onLevelUpRequest}
-                size={16}
+                size="1em"
                 t={t}
               />
             )}

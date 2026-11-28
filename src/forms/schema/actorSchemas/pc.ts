@@ -307,6 +307,10 @@ const PlayerEquipmentSchema = z.object({
   mnemoReceptacle: z.array(z.string()).optional(),
 });
 
+export const PlayerTagSchema = z.object({
+  name: z.string(),
+});
+
 export const PlayerPersistedSchema = z.object({
   id: z.string(),
   uid: z.string(),
@@ -335,6 +339,7 @@ export const PlayerPersistedSchema = z.object({
   bonuses: ActorBonusesSchema.optional(),
   multipliers: ActorMultipliersSchema.optional(),
   effects: z.array(ActorEffectSchema).optional(),
+  tags: z.array(PlayerTagSchema).optional(),
 });
 
 export type Weapon = WeaponPersisted;

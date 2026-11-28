@@ -1,6 +1,8 @@
 # NPC Model
 
 Schema: `src/forms/schema/actorSchemas/npc.ts`
+JSON Schema: [schemas/npc.schema.json](../docs/schemas/npc.schema.json).
+Full example: [examples/npc-full.json](../docs/examples/npc-full.json).
 
 ---
 
@@ -28,6 +30,7 @@ Schema: `src/forms/schema/actorSchemas/npc.ts`
 - `rank` {string?}: `"soldier"` `"elite"` `"champion1"`-`"champion6"` `"companion"` `"groupvehicle"`
 - `role` {string}: Default `"custom"`. Quick Assembly role - `"brute"` `"hunter"` `"mage"` `"saboteur"` `"sentinel"` `"support"` `"custom"`. `"custom"` = classic freeform NPC. See [quick_assembly_model.md](quick_assembly_model.md)
 - `qaSelections` {Record<string, bool>?}: Quick Assembly per-slot selection flags. See [quick_assembly_model.md](quick_assembly_model.md#persisted-schema-fields)
+- `qaNegativeSkills` {object[]?}: Quick Assembly negative skills, each `{ id, bonusKind }` where `bonusKind` is `"roleSkill"` (default) or `"bossSkill"`
 - `sizes` {string?}: `"small"` `"medium"` `"large"` (empty string means none)
 - `villain` {string?}: `"minor"` `"major"` `"supreme"` - grants Ultima Points (UP)
 - `phases` {int?}: Number of boss phases
@@ -39,7 +42,7 @@ Schema: `src/forms/schema/actorSchemas/npc.ts`
 
 ## Attributes
 
-Replace `<key>` with: `dexterity` `insight` `might` `will`
+Replace `<key>` with: `dexterity` `insight` `might` `willpower`
 
 - `attributes.<key>.base` {int}: Die size - one of `6` `8` `10` `12`
 
@@ -49,9 +52,16 @@ Replace `<key>` with: `dexterity` `insight` `might` `will`
 
 Replace `<key>` with: `physical` `air` `bolt` `dark` `earth` `fire` `ice` `light` `poison`
 
-- `affinities.<key>` {string?}: Missing key means normal damage
+- `affinities.<key>` {string?}: Missing key means normal damage. On import every missing key is set to `"no"`
 
 Values: `"vu"` (Vulnerable) `"rs"` (Resistant) `"im"` (Immune) `"ab"` (Absorb) `"no"` (None)
+
+---
+
+## Species Grants
+
+- `speciesGrants.affinities` {Record<string, string>?}: Affinities granted by the species, e.g. `{ "poison": "im" }`
+- `speciesGrants.immunities` {Record<string, bool>?}: Status immunities granted by the species, e.g. `{ "poisoned": true }`
 
 ---
 
@@ -267,7 +277,7 @@ Multiplicative modifiers on resource changes (1.0 = no change).
 
 Used in `attacks`, `weaponattacks`, `spells`.
 
-- `attr1` {string}: Primary attribute - `"dexterity"` `"insight"` `"might"` `"will"`
+- `attr1` {string}: Primary attribute - `"dexterity"` `"insight"` `"might"` `"willpower"`
 - `attr2` {string}: Secondary attribute
 - `value` {number?}: Flat accuracy bonus
 - `defense` {string?}: Targeted defense - `"def"` `"mdef"`

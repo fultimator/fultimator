@@ -83,6 +83,10 @@ export const LocalAdapter: DatabaseAdapter = {
     }
   },
 
+  getCachedDocs(queryRef: unknown) {
+    return LocalAdapter.getDocs(queryRef);
+  },
+
   async addDoc(ref: unknown, data: Record<string, unknown>) {
     try {
       return await idbAddDoc(ref as Parameters<typeof idbAddDoc>[0], data);

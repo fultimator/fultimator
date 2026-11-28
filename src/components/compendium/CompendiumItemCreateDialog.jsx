@@ -121,6 +121,13 @@ const PILOT_DAMAGE_TYPES = [
 const PILOT_ATTRS = ["dexterity", "insight", "might", "willpower"];
 const PILOT_RANGES = ["Melee", "Ranged"];
 
+const TOUCH_CHIP_SX = {
+  height: { xs: 36, sm: 24 },
+  fontSize: { xs: "0.875rem", sm: "0.8125rem" },
+  borderRadius: { xs: "18px", sm: "16px" },
+  "& .MuiChip-label": { px: { xs: 1.5, sm: 1 } },
+};
+
 function slugify(str) {
   return (str ?? "")
     .toLowerCase()
@@ -1487,7 +1494,13 @@ export function ClassForm({
 
           {/* Martials + Ritualism */}
           <Grid size={12}>
-            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+            <Box
+              sx={{
+                display: "flex",
+                flexWrap: "wrap",
+                gap: { xs: 1, sm: 0.5 },
+              }}
+            >
               {[
                 { key: "melee", label: t("Martial Melee") },
                 { key: "ranged", label: t("Martial Ranged") },
@@ -1499,6 +1512,7 @@ export function ClassForm({
                   label={label}
                   size="small"
                   clickable
+                  sx={TOUCH_CHIP_SX}
                   color={martials[key] ? "primary" : "default"}
                   variant={martials[key] ? "filled" : "outlined"}
                   onClick={() => setMartials((m) => ({ ...m, [key]: !m[key] }))}
@@ -1508,6 +1522,7 @@ export function ClassForm({
                 label={t("Ritualism")}
                 size="small"
                 clickable
+                sx={TOUCH_CHIP_SX}
                 color={ritualism ? "primary" : "default"}
                 variant={ritualism ? "filled" : "outlined"}
                 onClick={() => setRitualism((v) => !v)}
@@ -1569,13 +1584,20 @@ export function ClassForm({
             >
               {t("Spell Types")}
             </Typography>
-            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+            <Box
+              sx={{
+                display: "flex",
+                flexWrap: "wrap",
+                gap: { xs: 1, sm: 0.5 },
+              }}
+            >
               {spellClassesList.map((sc) => (
                 <Chip
                   key={sc}
                   label={t(sc)}
                   size="small"
                   clickable
+                  sx={TOUCH_CHIP_SX}
                   color={spellClasses.includes(sc) ? "secondary" : "default"}
                   variant={spellClasses.includes(sc) ? "filled" : "outlined"}
                   onClick={() =>

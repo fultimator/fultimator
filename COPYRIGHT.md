@@ -9,6 +9,7 @@ Use this file to track copyright, creators, and licenses for all visual assets b
 | `Mildew`        | `Icon artist`          | `https://linktr.ee/not_mildew`                                                  | `Extra resource and action icon artist`                         |
 | `t3nshi`        | `Icon artist`          | `https://bsky.app/profile/t3nshi.bsky.social`                                   | `Status and attribute icon artist`                              |
 | `Aekashics`     | `Species token artist` | `https://aekashics.itch.io/aekashics-librarium-librarium-static-batch-megapack` | `Token species assets under public/images/routes/icons/species` |
+| `Unarekin`      | `Font editor`          | `https://ko-fi.com/unarekin`                                                    | `PFUSans-Narrow edit; GitHub: https://github.com/Unarekin`      |
 
 ## Asset Inventory
 
@@ -245,6 +246,14 @@ Use this file to track copyright, creators, and licenses for all visual assets b
 | `fultimatorlogo.webp`         | `fultimatorlogo.webp`                               | `Runty`         | `mailto:contactrunty@iCloud.com`                                                                   | `Explicit permission to use for Fultimator` |
 | `logo192.png`                 | `logo192.png`                                       | `Runty`         | `mailto:contactrunty@iCloud.com`                                                                   | `Explicit permission to use for Fultimator` |
 | `logo512.png`                 | `logo512.png`                                       | `Runty`         | `mailto:contactrunty@iCloud.com`                                                                   | `Explicit permission to use for Fultimator` |
+
+### Path: `public/fonts`
+
+`PFUSans-Narrow.ttf` is a customized version of [PT Sans Narrow](https://fonts.google.com/specimen/PT+Sans+Narrow) with edits to the lenticular brackets to reduce their spacing. It replaces PT Sans Narrow as the body font.
+
+| Asset Name           | Relative Path              | Author / Studio | Source Link                                        | License                                                    |
+| -------------------- | -------------------------- | --------------- | -------------------------------------------------- | ---------------------------------------------------------- |
+| `PFUSans-Narrow.ttf` | `fonts/PFUSans-Narrow.ttf` | `Unarekin`      | `https://fonts.google.com/specimen/PT+Sans+Narrow` | `SIL Open Font License 1.1 (https://openfontlicense.org/)` |
 
 ### Path: `src` (images outside `public/assets/icons` and `public/images`)
 

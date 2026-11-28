@@ -1,6 +1,5 @@
 [
   {
-    "": "",
     "key": "important_announcement",
     "en": "Important Announcements",
     "it": "Important Announcements",
@@ -13,7 +12,6 @@
     "zh-CN": "重要公告"
   },
   {
-    "": "",
     "key": "important_announcement_desc",
     "en": "Our URL has been updated! Please use the new address",
     "it": "Our URL has been updated! Please use the new address",
@@ -26,7 +24,6 @@
     "zh-CN": "我们的网址已更新！请使用新地址"
   },
   {
-    "": "",
     "key": "join_fultimator_community",
     "en": "Join the Fultimator Community!",
     "it": "Unisciti alla Comunità Fultimator!",
@@ -39,7 +36,6 @@
     "zh-CN": "加入 Fultimator 社区！"
   },
   {
-    "": "",
     "key": "join_fultimator_community_desc",
     "en": "We would love to have you on board!",
     "it": "Ci piacerebbe averti a bordo!",
@@ -52,7 +48,6 @@
     "zh-CN": "欢迎你的加入！"
   },
   {
-    "": "",
     "key": "join_discord",
     "en": "Dive into the Discord Hub!",
     "it": "Tuffati nel nostro Discord!",
@@ -65,7 +60,6 @@
     "zh-CN": "加入 Discord 社区！"
   },
   {
-    "": "",
     "key": "Check for New Releases",
     "en": "Check for New Releases",
     "it": "Controlla le Nuove Versioni",
@@ -78,7 +72,6 @@
     "zh-CN": "查看新版本"
   },
   {
-    "": "",
     "key": "Check for new releases and updates here:",
     "en": "Check for new releases and updates here:",
     "it": "Controlla le nuove versioni e aggiornamenti dell'app qui:",
@@ -91,7 +84,6 @@
     "zh-CN": "在此查看新版本和更新："
   },
   {
-    "": "",
     "key": "check_for_updates",
     "en": "Check for Updates",
     "it": "Controlla aggiornamenti",
@@ -104,7 +96,6 @@
     "zh-CN": "检查更新"
   },
   {
-    "": "",
     "key": "check_for_updates_description",
     "en": "Keep your Fultimator app up to date with the latest features and improvements.",
     "it": "Mantieni Fultimator aggiornato con le ultime funzionalità e miglioramenti.",
@@ -117,7 +108,6 @@
     "zh-CN": "更新 Fultimator，体验最新功能与改进。"
   },
   {
-    "": "",
     "key": "Fultimator Desktop App Releases",
     "en": "Fultimator Desktop App Releases",
     "it": "Rilasci dell'App Fultimator Desktop",
@@ -130,7 +120,6 @@
     "zh-CN": "Fultimator 桌面应用版本"
   },
   {
-    "": "",
     "key": "download_desktop_app_header",
     "en": "Download the Fultimator Desktop App",
     "it": "Scarica l'Applicazione Fultimator Desktop",
@@ -143,20 +132,18 @@
     "zh-CN": "下载 Fultimator 桌面应用"
   },
   {
-    "": "",
     "key": "download_desktop_app_desc",
-    "en": "Fultimator is also available as a desktop app for Windows and Linux. Download it from the following link:",
-    "it": "Fultimator è disponibile anche come applicazione desktop per Windows e Linux. Scaricala dal seguente link:",
-    "de": "Fultimator ist auch als Desktop App für Windows und Linux erhältlich. Lade sie unter dem folgenden Link herunter:",
-    "fr": "Fultimator est également disponible sous forme d'application de bureau pour Windows et Linux. Téléchargez-la à partir du lien suivant :",
-    "es": "Fultimator también está disponible como una aplicación de escritorio para Windows",
-    "pt-BR": "O Fultimator também está disponível como um aplicativo de desktop para Windows e Linux. Baixe-o no seguinte link:",
-    "ru": "Fultimator также доступен в виде настольного приложения для Windows и Linux. Скачать его можно по следующей ссылке:",
-    "pl": "Fultimator is also available as a desktop app for Windows and Linux. Download it from the following link:",
-    "zh-CN": "Fultimator 还提供 Windows 和 Linux 桌面应用。请通过以下链接下载："
+    "en": "Fultimator is also available for Windows, macOS, Linux and Android.",
+    "it": "Fultimator è disponibile anche per Windows, macOS, Linux e Android.",
+    "de": "Fultimator gibt es auch für Windows, macOS, Linux und Android.",
+    "fr": "Fultimator est aussi disponible pour Windows, macOS, Linux et Android.",
+    "es": "Fultimator también está disponible para Windows, macOS, Linux y Android.",
+    "pt-BR": "O Fultimator também está disponível para Windows, macOS, Linux e Android.",
+    "ru": "Fultimator также доступен для Windows, macOS, Linux и Android.",
+    "pl": "Fultimator jest również dostępny na Windows, macOS, Linux i Androida.",
+    "zh-CN": "Fultimator 还提供 Windows、macOS、Linux 和 Android 版本。"
   },
   {
-    "": "",
     "key": "Fultimator Desktop App",
     "en": "Fultimator Desktop App",
     "it": "Fultimator Desktop App",
@@ -169,7 +156,6 @@
     "zh-CN": "Fultimator 桌面应用"
   },
   {
-    "": "",
     "key": "desktop_app_description",
     "en": "Take Fultimator offline. Download the desktop app for Windows, macOS, and Linux.",
     "it": "Usa Fultimator anche offline. Scarica l'app desktop per Windows, macOS e Linux.",
@@ -182,7 +168,6 @@
     "zh-CN": "离线使用 Fultimator。下载适用于 Windows、macOS 和 Linux 的桌面应用。"
   },
   {
-    "": "",
     "key": "download_now",
     "en": "Download Now",
     "it": "Scarica Ora",
@@ -195,7 +180,6 @@
     "zh-CN": "立即下载"
   },
   {
-    "": "",
     "key": "extra_resources",
     "en": "Extra Resources",
     "it": "Altre Risorse",
@@ -208,7 +192,6 @@
     "zh-CN": "更多资源"
   },
   {
-    "": "",
     "key": "contact_runty",
     "en": "The wonderful Fultimator Icons are made by Runty!",
     "it": "Le meravigliose icone di Fultimator sono realizzate da Runty!",
@@ -221,7 +204,6 @@
     "zh-CN": "Fultimator 的精美图标由 Runty 制作！"
   },
   {
-    "": "",
     "key": "akashics_moe_desc",
     "en": "Monster Icons are taken from:",
     "it": "Le icone dei mostri sono state prese da:",
@@ -234,7 +216,6 @@
     "zh-CN": "怪物图标来源："
   },
   {
-    "": "",
     "key": "contact_us_header",
     "en": "Contact Us",
     "it": "Contattaci",
@@ -247,7 +228,6 @@
     "zh-CN": "联系我们"
   },
   {
-    "": "",
     "key": "feedback_description",
     "en": "If you have any feedback or questions, feel free to reach out to us.",
     "it": "Se hai feedback o domande, sentiti libero di contattarci.",
@@ -260,7 +240,6 @@
     "zh-CN": "如有反馈或疑问，欢迎联系我们。"
   },
   {
-    "": "",
     "key": "google_form",
     "en": "Google Form",
     "it": "Google Form",
@@ -273,7 +252,6 @@
     "zh-CN": "Google 表单"
   },
   {
-    "": "",
     "key": "fabula_ultima_resources_header",
     "en": "Fabula Ultima Resources",
     "it": "Fabula Ultima Resources",
@@ -286,7 +264,6 @@
     "zh-CN": "最终物语资源"
   },
   {
-    "": "",
     "key": "fabula_ultima_resources_desc",
     "en": "Access the list of official and homebrew Fabula Ultima resources in multiple languages.",
     "it": "Access the list of official and homebrew Fabula Ultima resources in multiple languages.",
@@ -299,7 +276,6 @@
     "zh-CN": "查看多种语言的最终物语官方与自制资源。"
   },
   {
-    "": "",
     "key": "fabula_ultima_resources_btn",
     "en": "View All Resources",
     "it": "View All Resources",
@@ -312,7 +288,6 @@
     "zh-CN": "查看全部资源"
   },
   {
-    "": "",
     "key": "copyright_notice_header",
     "en": "Copyright Notice",
     "it": "Avviso di Copyright",
@@ -325,7 +300,6 @@
     "zh-CN": "版权声明"
   },
   {
-    "": "",
     "key": "copyright_notice_desc_1",
     "en": "Fultimator is an independent production by",
     "it": "Fultimator is an independent production by",
@@ -338,7 +312,6 @@
     "zh-CN": "Fultimator 为独立作品，制作者为"
   },
   {
-    "": "",
     "key": "copyright_notice_desc_2",
     "en": " and is not affiliated with Need Games or Rooster Games.",
     "it": " and is not affiliated with Need Games or Rooster Games.",
@@ -351,7 +324,6 @@
     "zh-CN": "与 Need Games 或 Rooster Games 无关联。"
   },
   {
-    "": "",
     "key": "copyright_notice_desc_3",
     "en": "It is published under the",
     "it": "It is published under the",
@@ -364,7 +336,6 @@
     "zh-CN": "本作品依据以下许可发布："
   },
   {
-    "": "",
     "key": "copyright_notice_desc_4",
     "en": "Fabula Ultima is a roleplaying game created by Emanuele Galletto and and published by Need Games.",
     "it": "Fabula Ultima is a roleplaying game created by Emanuele Galletto and and published by Need Games.",
@@ -377,7 +348,6 @@
     "zh-CN": "最终物语是由 Emanuele Galletto 创作、Need Games 发行的角色扮演游戏。"
   },
   {
-    "": "",
     "key": "copyright_notice_desc_5",
     "en": "Fabula Ultima is © Need Games and Rooster Games.",
     "it": "Fabula Ultima is © Need Games and Rooster Games.",
@@ -388,6 +358,114 @@
     "ru": "Fabula Ultima is © Need Games and Rooster Games.",
     "pl": "Fabula Ultima is © Need Games and Rooster Games.",
     "zh-CN": "最终物语的版权归 Need Games 和 Rooster Games 所有。"
+  },
+  {
+    "key": "credits_header",
+    "en": "Credits",
+    "it": "Credits",
+    "de": "Credits",
+    "fr": "Credits",
+    "es": "Credits",
+    "pt-BR": "Credits",
+    "ru": "Credits",
+    "pl": "Credits",
+    "zh-CN": "Credits"
+  },
+  {
+    "key": "credits_desc",
+    "en": "The artists behind Fultimator's icons, tokens and logo.",
+    "it": "Gli artisti dietro icone, token e logo di Fultimator.",
+    "de": "Die Künstler hinter Icons, Tokens und Logo von Fultimator.",
+    "fr": "Les artistes derrière les icônes, jetons et le logo de Fultimator.",
+    "es": "Los artistas detrás de los iconos, fichas y el logo de Fultimator.",
+    "pt-BR": "Os artistas por trás dos ícones, tokens e do logo do Fultimator.",
+    "ru": "Художники, создавшие иконки, токены и логотип Fultimator.",
+    "pl": "Twórcy ikon, tokenów i logo Fultimatora.",
+    "zh-CN": "Fultimator 图标、token 和徽标背后的艺术家。"
+  },
+  {
+    "key": "icon_credits",
+    "en": "Icon Credits",
+    "it": "Icon Credits",
+    "de": "Icon Credits",
+    "fr": "Icon Credits",
+    "es": "Icon Credits",
+    "pt-BR": "Icon Credits",
+    "ru": "Icon Credits",
+    "pl": "Icon Credits",
+    "zh-CN": "Icon Credits"
+  },
+  {
+    "key": "icon_credits_intro",
+    "en": "Every icon bundled with Fultimator, with the artist, license and source it comes from. Select an icon for details.",
+    "it": "Every icon bundled with Fultimator, with the artist, license and source it comes from. Select an icon for details.",
+    "de": "Every icon bundled with Fultimator, with the artist, license and source it comes from. Select an icon for details.",
+    "fr": "Every icon bundled with Fultimator, with the artist, license and source it comes from. Select an icon for details.",
+    "es": "Every icon bundled with Fultimator, with the artist, license and source it comes from. Select an icon for details.",
+    "pt-BR": "Every icon bundled with Fultimator, with the artist, license and source it comes from. Select an icon for details.",
+    "ru": "Every icon bundled with Fultimator, with the artist, license and source it comes from. Select an icon for details.",
+    "pl": "Every icon bundled with Fultimator, with the artist, license and source it comes from. Select an icon for details.",
+    "zh-CN": "Every icon bundled with Fultimator, with the artist, license and source it comes from. Select an icon for details."
+  },
+  {
+    "key": "icon_credits_artist",
+    "en": "Artist",
+    "it": "Artist",
+    "de": "Artist",
+    "fr": "Artist",
+    "es": "Artist",
+    "pt-BR": "Artist",
+    "ru": "Artist",
+    "pl": "Artist",
+    "zh-CN": "Artist"
+  },
+  {
+    "key": "icon_credits_license",
+    "en": "License",
+    "it": "License",
+    "de": "License",
+    "fr": "License",
+    "es": "License",
+    "pt-BR": "License",
+    "ru": "License",
+    "pl": "License",
+    "zh-CN": "License"
+  },
+  {
+    "key": "icon_credits_source",
+    "en": "Source",
+    "it": "Source",
+    "de": "Source",
+    "fr": "Source",
+    "es": "Source",
+    "pt-BR": "Source",
+    "ru": "Source",
+    "pl": "Source",
+    "zh-CN": "Source"
+  },
+  {
+    "key": "icon_credits_select_hint",
+    "en": "Select an icon to see its artist, license and source.",
+    "it": "Select an icon to see its artist, license and source.",
+    "de": "Select an icon to see its artist, license and source.",
+    "fr": "Select an icon to see its artist, license and source.",
+    "es": "Select an icon to see its artist, license and source.",
+    "pt-BR": "Select an icon to see its artist, license and source.",
+    "ru": "Select an icon to see its artist, license and source.",
+    "pl": "Select an icon to see its artist, license and source.",
+    "zh-CN": "Select an icon to see its artist, license and source."
+  },
+  {
+    "key": "icon_credits_empty",
+    "en": "No icons match your filters.",
+    "it": "No icons match your filters.",
+    "de": "No icons match your filters.",
+    "fr": "No icons match your filters.",
+    "es": "No icons match your filters.",
+    "pt-BR": "No icons match your filters.",
+    "ru": "No icons match your filters.",
+    "pl": "No icons match your filters.",
+    "zh-CN": "No icons match your filters."
   },
   {
     "key": "resource_request_submitted_successfully",
@@ -29094,6 +29172,42 @@
     "zh-CN": "Player not found."
   },
   {
+    "key": "Homebrew",
+    "en": "Homebrew",
+    "it": "Homebrew",
+    "de": "Homebrew",
+    "fr": "Homebrew",
+    "es": "Homebrew",
+    "pt-BR": "Homebrew",
+    "ru": "Homebrew",
+    "pl": "Homebrew",
+    "zh-CN": "Homebrew"
+  },
+  {
+    "key": "Custom species name:",
+    "en": "Custom species name:",
+    "it": "Custom species name:",
+    "de": "Custom species name:",
+    "fr": "Custom species name:",
+    "es": "Custom species name:",
+    "pt-BR": "Custom species name:",
+    "ru": "Custom species name:",
+    "pl": "Custom species name:",
+    "zh-CN": "Custom species name:"
+  },
+  {
+    "key": "Disabled for local",
+    "en": "Disabled for local",
+    "it": "Disabled for local",
+    "de": "Disabled for local",
+    "fr": "Disabled for local",
+    "es": "Disabled for local",
+    "pt-BR": "Disabled for local",
+    "ru": "Disabled for local",
+    "pl": "Disabled for local",
+    "zh-CN": "Disabled for local"
+  },
+  {
     "key": "shared.fuid",
     "en": "FUID",
     "it": "FUID",
@@ -40579,14 +40693,14 @@
   },
   {
     "key": "esper_details_1",
-    "en": "**Gifts** can only be used when specific **events** take place. When this happens, you may spend an amount of Mind Points equal to **【the number of filled sections in your Brainwave Clock, multiplied by 5】** minimum 5 Mind Points) in order to apply the effects of that **gift** to the event.\nYou may only use a **single gift** per event.\nIf a gift causes **HP or MP recovery**, or if it causes **MP loss**, the amounts increase by 10\nif you are **level 20 or higher**, or by 20 if you are **level 40 or higher**.\n\nWhen you first acquire the **Psychic Gifts** Skill, you also receive a **Brainwave Clock**.\nYour Brainwave Clock has **4 sections**, and it begins each scene **empty**.\nAfter you resolve one of your **gifts, fill 1 section** of your Brainwave Clock (you do so **after** the effects of the **gift** have been calculated and applied).\nYour Brainwave Clock determines your **gifts’ cost in Mind Points**, as well as their **effectiveness** (see above). You can still use your **gifts** when the Clock is full.\nSections of your Brainwave Clock may **not be filled** in any way other than described above, and they **may only be erased** through the **Brainwave Discharge** Heroic Skill (see page **171**) or through effects that **expressly** influence Brainwave Clocks.",
-    "it": "**Gifts** can only be used when specific **events** take place. When this happens, you may spend an amount of Mind Points equal to **【the number of filled sections in your Brainwave Clock, multiplied by 5】** minimum 5 Mind Points) in order to apply the effects of that **gift** to the event.\nYou may only use a **single gift** per event.\nIf a gift causes **HP or MP recovery**, or if it causes **MP loss**, the amounts increase by 10\nif you are **level 20 or higher**, or by 20 if you are **level 40 or higher**.\n\nWhen you first acquire the **Psychic Gifts** Skill, you also receive a **Brainwave Clock**.\nYour Brainwave Clock has **4 sections**, and it begins each scene **empty**.\nAfter you resolve one of your **gifts, fill 1 section** of your Brainwave Clock (you do so **after** the effects of the **gift** have been calculated and applied).\nYour Brainwave Clock determines your **gifts’ cost in Mind Points**, as well as their **effectiveness** (see above). You can still use your **gifts** when the Clock is full.\nSections of your Brainwave Clock may **not be filled** in any way other than described above, and they **may only be erased** through the **Brainwave Discharge** Heroic Skill (see page **171**) or through effects that **expressly** influence Brainwave Clocks.",
-    "de": "**Gifts** can only be used when specific **events** take place. When this happens, you may spend an amount of Mind Points equal to **【the number of filled sections in your Brainwave Clock, multiplied by 5】** minimum 5 Mind Points) in order to apply the effects of that **gift** to the event.\nYou may only use a **single gift** per event.\nIf a gift causes **HP or MP recovery**, or if it causes **MP loss**, the amounts increase by 10\nif you are **level 20 or higher**, or by 20 if you are **level 40 or higher**.\n\nWhen you first acquire the **Psychic Gifts** Skill, you also receive a **Brainwave Clock**.\nYour Brainwave Clock has **4 sections**, and it begins each scene **empty**.\nAfter you resolve one of your **gifts, fill 1 section** of your Brainwave Clock (you do so **after** the effects of the **gift** have been calculated and applied).\nYour Brainwave Clock determines your **gifts’ cost in Mind Points**, as well as their **effectiveness** (see above). You can still use your **gifts** when the Clock is full.\nSections of your Brainwave Clock may **not be filled** in any way other than described above, and they **may only be erased** through the **Brainwave Discharge** Heroic Skill (see page **171**) or through effects that **expressly** influence Brainwave Clocks.",
-    "fr": "**Gifts** can only be used when specific **events** take place. When this happens, you may spend an amount of Mind Points equal to **【the number of filled sections in your Brainwave Clock, multiplied by 5】** minimum 5 Mind Points) in order to apply the effects of that **gift** to the event.\nYou may only use a **single gift** per event.\nIf a gift causes **HP or MP recovery**, or if it causes **MP loss**, the amounts increase by 10\nif you are **level 20 or higher**, or by 20 if you are **level 40 or higher**.\n\nWhen you first acquire the **Psychic Gifts** Skill, you also receive a **Brainwave Clock**.\nYour Brainwave Clock has **4 sections**, and it begins each scene **empty**.\nAfter you resolve one of your **gifts, fill 1 section** of your Brainwave Clock (you do so **after** the effects of the **gift** have been calculated and applied).\nYour Brainwave Clock determines your **gifts’ cost in Mind Points**, as well as their **effectiveness** (see above). You can still use your **gifts** when the Clock is full.\nSections of your Brainwave Clock may **not be filled** in any way other than described above, and they **may only be erased** through the **Brainwave Discharge** Heroic Skill (see page **171**) or through effects that **expressly** influence Brainwave Clocks.",
-    "es": "**Gifts** can only be used when specific **events** take place. When this happens, you may spend an amount of Mind Points equal to **【the number of filled sections in your Brainwave Clock, multiplied by 5】** minimum 5 Mind Points) in order to apply the effects of that **gift** to the event.\nYou may only use a **single gift** per event.\nIf a gift causes **HP or MP recovery**, or if it causes **MP loss**, the amounts increase by 10\nif you are **level 20 or higher**, or by 20 if you are **level 40 or higher**.\n\nWhen you first acquire the **Psychic Gifts** Skill, you also receive a **Brainwave Clock**.\nYour Brainwave Clock has **4 sections**, and it begins each scene **empty**.\nAfter you resolve one of your **gifts, fill 1 section** of your Brainwave Clock (you do so **after** the effects of the **gift** have been calculated and applied).\nYour Brainwave Clock determines your **gifts’ cost in Mind Points**, as well as their **effectiveness** (see above). You can still use your **gifts** when the Clock is full.\nSections of your Brainwave Clock may **not be filled** in any way other than described above, and they **may only be erased** through the **Brainwave Discharge** Heroic Skill (see page **171**) or through effects that **expressly** influence Brainwave Clocks.",
-    "pt-BR": "**Dons** só podem ser usados quando **eventos** específicos ocorrem. Quando isso acontece, você pode gastar uma quantidade de Pontos de Mente igual a **【o número de seções preenchidas em seu Relógio Mental, multiplicado por 5】** (mínimo de 5 Pontos de Mente) para aplicar os efeitos daquele dom ao evento.\nVocê só pode usar um **único dom** por evento.\n\nSe um dom causar **recuperação de PV ou PM**, ou se causar **perda de PM**, os valores aumentam em 10 se você for **nível 20 ou superior**, ou em 20 se você for **nível 40 ou superior**.\n\nQuando você adquire o Poder **Dons Psíquicos** pela primeira vez, você também recebe um **Relógio Mental**.\nSeu Relógio Mental tem **4 seções**, e começa cada cena **vazio**.\nApós você resolver um de seus **dons, preencha 1 seção** de seu Relógio Mental (isso é feito **após** os efeitos do **dom** terem sido calculados e aplicados).\n\nSeu Relógio Mental determina o custo em PM de seus dons, assim como sua efetividade (veja acima). Você ainda pode usar seus dons mesmo quando o Relógio estiver cheio.\n\nSeções do seu Relógio Mental **não podem ser preenchidas** de nenhuma outra forma além da descrita acima, e elas **só podem ser apagadas** por meio do Poder Heroico **Descarga Mental** (veja a página 171) ou por efeitos que explicitamente influenciem Relógios Mentais.",
-    "ru": "**Gifts** can only be used when specific **events** take place. When this happens, you may spend an amount of Mind Points equal to **【the number of filled sections in your Brainwave Clock, multiplied by 5】** minimum 5 Mind Points) in order to apply the effects of that **gift** to the event.\nYou may only use a **single gift** per event.\nIf a gift causes **HP or MP recovery**, or if it causes **MP loss**, the amounts increase by 10\nif you are **level 20 or higher**, or by 20 if you are **level 40 or higher**.\n\nWhen you first acquire the **Psychic Gifts** Skill, you also receive a **Brainwave Clock**.\nYour Brainwave Clock has **4 sections**, and it begins each scene **empty**.\nAfter you resolve one of your **gifts, fill 1 section** of your Brainwave Clock (you do so **after** the effects of the **gift** have been calculated and applied).\nYour Brainwave Clock determines your **gifts’ cost in Mind Points**, as well as their **effectiveness** (see above). You can still use your **gifts** when the Clock is full.\nSections of your Brainwave Clock may **not be filled** in any way other than described above, and they **may only be erased** through the **Brainwave Discharge** Heroic Skill (see page **171**) or through effects that **expressly** influence Brainwave Clocks.",
-    "pl": "**Gifts** can only be used when specific **events** take place. When this happens, you may spend an amount of Mind Points equal to **【the number of filled sections in your Brainwave Clock, multiplied by 5】** minimum 5 Mind Points) in order to apply the effects of that **gift** to the event.\nYou may only use a **single gift** per event.\nIf a gift causes **HP or MP recovery**, or if it causes **MP loss**, the amounts increase by 10\nif you are **level 20 or higher**, or by 20 if you are **level 40 or higher**.\n\nWhen you first acquire the **Psychic Gifts** Skill, you also receive a **Brainwave Clock**.\nYour Brainwave Clock has **4 sections**, and it begins each scene **empty**.\nAfter you resolve one of your **gifts, fill 1 section** of your Brainwave Clock (you do so **after** the effects of the **gift** have been calculated and applied).\nYour Brainwave Clock determines your **gifts’ cost in Mind Points**, as well as their **effectiveness** (see above). You can still use your **gifts** when the Clock is full.\nSections of your Brainwave Clock may **not be filled** in any way other than described above, and they **may only be erased** through the **Brainwave Discharge** Heroic Skill (see page **171**) or through effects that **expressly** influence Brainwave Clocks.",
+    "en": "**Gifts** can only be used when specific **events** take place. When this happens, you may spend an amount of Mind Points equal to **【the number of filled sections in your Brainwave Clock, multiplied by 5】** minimum 5 Mind Points) in order to apply the effects of that **gift** to the event.\\n\\nYou may only use a **single gift** per event.\\nIf a gift causes **HP or MP recovery**, or if it causes **MP loss**, the amounts increase by 10\\nif you are **level 20 or higher**, or by 20 if you are **level 40 or higher**.\\n\\nWhen you first acquire the **Psychic Gifts** Skill, you also receive a **Brainwave Clock**.\\n\\nYour Brainwave Clock has **4 sections**, and it begins each scene **empty**.\\nAfter you resolve one of your **gifts, fill 1 section** of your Brainwave Clock (you do so **after** the effects of the **gift** have been calculated and applied).\\nYour Brainwave Clock determines your **gifts’ cost in Mind Points**, as well as their **effectiveness** (see above). You can still use your **gifts** when the Clock is full.\\nSections of your Brainwave Clock may **not be filled** in any way other than described above, and they **may only be erased** through the **Brainwave Discharge** Heroic Skill (see page **171**) or through effects that **expressly** influence Brainwave Clocks.",
+    "it": "**Gifts** can only be used when specific **events** take place. When this happens, you may spend an amount of Mind Points equal to **【the number of filled sections in your Brainwave Clock, multiplied by 5】** minimum 5 Mind Points) in order to apply the effects of that **gift** to the event.\\n\\nYou may only use a **single gift** per event.\\nIf a gift causes **HP or MP recovery**, or if it causes **MP loss**, the amounts increase by 10\\nif you are **level 20 or higher**, or by 20 if you are **level 40 or higher**.\\n\\nWhen you first acquire the **Psychic Gifts** Skill, you also receive a **Brainwave Clock**.\\n\\nYour Brainwave Clock has **4 sections**, and it begins each scene **empty**.\\nAfter you resolve one of your **gifts, fill 1 section** of your Brainwave Clock (you do so **after** the effects of the **gift** have been calculated and applied).\\nYour Brainwave Clock determines your **gifts’ cost in Mind Points**, as well as their **effectiveness** (see above). You can still use your **gifts** when the Clock is full.\\nSections of your Brainwave Clock may **not be filled** in any way other than described above, and they **may only be erased** through the **Brainwave Discharge** Heroic Skill (see page **171**) or through effects that **expressly** influence Brainwave Clocks.",
+    "de": "**Gifts** can only be used when specific **events** take place. When this happens, you may spend an amount of Mind Points equal to **【the number of filled sections in your Brainwave Clock, multiplied by 5】** minimum 5 Mind Points) in order to apply the effects of that **gift** to the event.\\n\\nYou may only use a **single gift** per event.\\nIf a gift causes **HP or MP recovery**, or if it causes **MP loss**, the amounts increase by 10\\nif you are **level 20 or higher**, or by 20 if you are **level 40 or higher**.\\n\\nWhen you first acquire the **Psychic Gifts** Skill, you also receive a **Brainwave Clock**.\\n\\nYour Brainwave Clock has **4 sections**, and it begins each scene **empty**.\\nAfter you resolve one of your **gifts, fill 1 section** of your Brainwave Clock (you do so **after** the effects of the **gift** have been calculated and applied).\\nYour Brainwave Clock determines your **gifts’ cost in Mind Points**, as well as their **effectiveness** (see above). You can still use your **gifts** when the Clock is full.\\nSections of your Brainwave Clock may **not be filled** in any way other than described above, and they **may only be erased** through the **Brainwave Discharge** Heroic Skill (see page **171**) or through effects that **expressly** influence Brainwave Clocks.",
+    "fr": "**Gifts** can only be used when specific **events** take place. When this happens, you may spend an amount of Mind Points equal to **【the number of filled sections in your Brainwave Clock, multiplied by 5】** minimum 5 Mind Points) in order to apply the effects of that **gift** to the event.\\n\\nYou may only use a **single gift** per event.\\nIf a gift causes **HP or MP recovery**, or if it causes **MP loss**, the amounts increase by 10\\nif you are **level 20 or higher**, or by 20 if you are **level 40 or higher**.\\n\\nWhen you first acquire the **Psychic Gifts** Skill, you also receive a **Brainwave Clock**.\\n\\nYour Brainwave Clock has **4 sections**, and it begins each scene **empty**.\\nAfter you resolve one of your **gifts, fill 1 section** of your Brainwave Clock (you do so **after** the effects of the **gift** have been calculated and applied).\\nYour Brainwave Clock determines your **gifts’ cost in Mind Points**, as well as their **effectiveness** (see above). You can still use your **gifts** when the Clock is full.\\nSections of your Brainwave Clock may **not be filled** in any way other than described above, and they **may only be erased** through the **Brainwave Discharge** Heroic Skill (see page **171**) or through effects that **expressly** influence Brainwave Clocks.",
+    "es": "**Gifts** can only be used when specific **events** take place. When this happens, you may spend an amount of Mind Points equal to **【the number of filled sections in your Brainwave Clock, multiplied by 5】** minimum 5 Mind Points) in order to apply the effects of that **gift** to the event.\\n\\nYou may only use a **single gift** per event.\\nIf a gift causes **HP or MP recovery**, or if it causes **MP loss**, the amounts increase by 10\\nif you are **level 20 or higher**, or by 20 if you are **level 40 or higher**.\\n\\nWhen you first acquire the **Psychic Gifts** Skill, you also receive a **Brainwave Clock**.\\n\\nYour Brainwave Clock has **4 sections**, and it begins each scene **empty**.\\nAfter you resolve one of your **gifts, fill 1 section** of your Brainwave Clock (you do so **after** the effects of the **gift** have been calculated and applied).\\nYour Brainwave Clock determines your **gifts’ cost in Mind Points**, as well as their **effectiveness** (see above). You can still use your **gifts** when the Clock is full.\\nSections of your Brainwave Clock may **not be filled** in any way other than described above, and they **may only be erased** through the **Brainwave Discharge** Heroic Skill (see page **171**) or through effects that **expressly** influence Brainwave Clocks.",
+    "pt-BR": "**Dons** só podem ser usados quando **eventos** específicos ocorrem. Quando isso acontece, você pode gastar uma quantidade de Pontos de Mente igual a **【o número de seções preenchidas em seu Relógio Mental, multiplicado por 5】** (mínimo de 5 Pontos de Mente) para aplicar os efeitos daquele dom ao evento.\\n\\nVocê só pode usar um **único dom** por evento.\\n\\nSe um dom causar **recuperação de PV ou PM**, ou se causar **perda de PM**, os valores aumentam em 10 se você for **nível 20 ou superior**, ou em 20 se você for **nível 40 ou superior**.\\n\\nQuando você adquire o Poder **Dons Psíquicos** pela primeira vez, você também recebe um **Relógio Mental**.\\n\\nSeu Relógio Mental tem **4 seções**, e começa cada cena **vazio**.\\nApós você resolver um de seus **dons, preencha 1 seção** de seu Relógio Mental (isso é feito **após** os efeitos do **dom** terem sido calculados e aplicados).\\n\\nSeu Relógio Mental determina o custo em PM de seus dons, assim como sua efetividade (veja acima). Você ainda pode usar seus dons mesmo quando o Relógio estiver cheio.\\n\\nSeções do seu Relógio Mental **não podem ser preenchidas** de nenhuma outra forma além da descrita acima, e elas **só podem ser apagadas** por meio do Poder Heroico **Descarga Mental** (veja a página 171) ou por efeitos que explicitamente influenciem Relógios Mentais.",
+    "ru": "**Gifts** can only be used when specific **events** take place. When this happens, you may spend an amount of Mind Points equal to **【the number of filled sections in your Brainwave Clock, multiplied by 5】** minimum 5 Mind Points) in order to apply the effects of that **gift** to the event.\\n\\nYou may only use a **single gift** per event.\\nIf a gift causes **HP or MP recovery**, or if it causes **MP loss**, the amounts increase by 10\\nif you are **level 20 or higher**, or by 20 if you are **level 40 or higher**.\\n\\nWhen you first acquire the **Psychic Gifts** Skill, you also receive a **Brainwave Clock**.\\n\\nYour Brainwave Clock has **4 sections**, and it begins each scene **empty**.\\nAfter you resolve one of your **gifts, fill 1 section** of your Brainwave Clock (you do so **after** the effects of the **gift** have been calculated and applied).\\nYour Brainwave Clock determines your **gifts’ cost in Mind Points**, as well as their **effectiveness** (see above). You can still use your **gifts** when the Clock is full.\\nSections of your Brainwave Clock may **not be filled** in any way other than described above, and they **may only be erased** through the **Brainwave Discharge** Heroic Skill (see page **171**) or through effects that **expressly** influence Brainwave Clocks.",
+    "pl": "**Gifts** can only be used when specific **events** take place. When this happens, you may spend an amount of Mind Points equal to **【the number of filled sections in your Brainwave Clock, multiplied by 5】** minimum 5 Mind Points) in order to apply the effects of that **gift** to the event.\\n\\nYou may only use a **single gift** per event.\\nIf a gift causes **HP or MP recovery**, or if it causes **MP loss**, the amounts increase by 10\\nif you are **level 20 or higher**, or by 20 if you are **level 40 or higher**.\\n\\nWhen you first acquire the **Psychic Gifts** Skill, you also receive a **Brainwave Clock**.\\n\\nYour Brainwave Clock has **4 sections**, and it begins each scene **empty**.\\nAfter you resolve one of your **gifts, fill 1 section** of your Brainwave Clock (you do so **after** the effects of the **gift** have been calculated and applied).\\nYour Brainwave Clock determines your **gifts’ cost in Mind Points**, as well as their **effectiveness** (see above). You can still use your **gifts** when the Clock is full.\\nSections of your Brainwave Clock may **not be filled** in any way other than described above, and they **may only be erased** through the **Brainwave Discharge** Heroic Skill (see page **171**) or through effects that **expressly** influence Brainwave Clocks.",
     "zh-CN": "**天赋**仅能在发生特定**事件**时使用。此时，你可以消耗等同于**【你的脑波命刻中已填充的格数×5】**的精神值（精神值消耗最低为5点），将该**天赋**的效果应用于此次**事件**。•每次**事件**中仅能使用**一次天赋**。•如果一个**天赋**会**恢复生命值或精神值**，或**消耗精神值**，那么当你的**等级大于等于20级**时，则恢复量或消耗量增加10点；当你的**等级大于等于40级**时，改为增加20点。**脑波命刻**当你第一次学习**念力天赋**技能时，你会获得一个**脑波命刻**。•你的**脑波命刻**包含**4格**，并在每个场景开始时**清空**。•你每使用**一次天赋**后，将你的**脑波命刻**填充1格（在**天赋**的效果结算完成**之后**）。•你的**脑波命刻**会决定**天赋的精神值消耗**和**效力**（见上方）。当命刻填满后，你依然可以使用**天赋**。•除上述方式之外，你的**脑波命刻无法以其他任何方式填充**，且**只能通过脑波倾泻**英雄技能（见第**171**页）或其他**明确规定**可以影响**脑波命刻**的效果来擦除。"
   },
   {
@@ -41623,13 +41737,13 @@
   },
   {
     "key": "pilot_details_1",
-    "en": "**Entering** the **personal vehicle** during a conflict requires the **Objective** action. Normally there is no Check required, but the Game Master may introduce a **Clock** if there are serious dangers or obstacles. If the **personal vehicle** is accessible when the conflict begins, characters may **enter it immediately** before the Initiative Check (see **Core Rulebook**, page **59**).  **Leaving** the **personal vehicle** doesn’t require an action, but during a conflict it can only be done on your turn, **before or after** an action.  The **personal vehicle** can contain a variable number of human-sized creatures depending on its **frame** and **modules**, but **only its Pilot may drive it**. Additionally, the other passengers **cannot cover creatures** when they perform the **Guard** action.  The **maximum number of modules enabled at the same time** on a **personal vehicle** is equal to **【3 + its Pilot’s SL in Personal Vehicle】**. The Pilot may freely reassign their personal vehicle’s enabled and disabled modules outside conflicts.",
-    "it": "**Entering** the **personal vehicle** during a conflict requires the **Objective** action. Normally there is no Check required, but the Game Master may introduce a **Clock** if there are serious dangers or obstacles. If the **personal vehicle** is accessible when the conflict begins, characters may **enter it immediately** before the Initiative Check (see **Core Rulebook**, page **59**).  **Leaving** the **personal vehicle** doesn’t require an action, but during a conflict it can only be done on your turn, **before or after** an action.  The **personal vehicle** can contain a variable number of human-sized creatures depending on its **frame** and **modules**, but **only its Pilot may drive it**. Additionally, the other passengers **cannot cover creatures** when they perform the **Guard** action.  The **maximum number of modules enabled at the same time** on a **personal vehicle** is equal to **【3 + its Pilot’s SL in Personal Vehicle】**. The Pilot may freely reassign their personal vehicle’s enabled and disabled modules outside conflicts.",
+    "en": "**Entering** the **personal vehicle** during a conflict requires the **Objective** action. Normally there is no Check required, but the Game Master may introduce a **Clock** if there are serious dangers or obstacles. If the **personal vehicle** is accessible when the conflict begins, characters may **enter it immediately** before the Initiative Check (see **Core Rulebook**, page **59**).\\n\\n**Leaving** the **personal vehicle** doesn’t require an action, but during a conflict it can only be done on your turn, **before or after** an action.\\n\\nThe **personal vehicle** can contain a variable number of human-sized creatures depending on its **frame** and **modules**, but **only its Pilot may drive it**. Additionally, the other passengers **cannot cover creatures** when they perform the **Guard** action.\\n\\nThe **maximum number of modules enabled at the same time** on a **personal vehicle** is equal to **【3 + its Pilot’s SL in Personal Vehicle】**. The Pilot may freely reassign their personal vehicle’s enabled and disabled modules outside conflicts.",
+    "it": "**Entering** the **personal vehicle** during a conflict requires the **Objective** action. Normally there is no Check required, but the Game Master may introduce a **Clock** if there are serious dangers or obstacles. If the **personal vehicle** is accessible when the conflict begins, characters may **enter it immediately** before the Initiative Check (see **Core Rulebook**, page **59**).\\n\\n**Leaving** the **personal vehicle** doesn’t require an action, but during a conflict it can only be done on your turn, **before or after** an action.\\n\\nThe **personal vehicle** can contain a variable number of human-sized creatures depending on its **frame** and **modules**, but **only its Pilot may drive it**. Additionally, the other passengers **cannot cover creatures** when they perform the **Guard** action.\\n\\nThe **maximum number of modules enabled at the same time** on a **personal vehicle** is equal to **【3 + its Pilot’s SL in Personal Vehicle】**. The Pilot may freely reassign their personal vehicle’s enabled and disabled modules outside conflicts.",
     "de": "**Entering** the **personal vehicle** during a conflict requires the **Objective** action. Normally there is no Check required, but the Game Master may introduce a **Clock** if there are serious dangers or obstacles. If the **personal vehicle** is accessible when the conflict begins, characters may **enter it immediately** before the Initiative Check (see **Core Rulebook**, page **59**).  **Leaving** the **personal vehicle** doesn’t require an action, but during a conflict it can only be done on your turn, **before or after** an action.  The **personal vehicle** can contain a variable number of human-sized creatures depending on its **frame** and **modules**, but **only its Pilot may drive it**. Additionally, the other passengers **cannot cover creatures** when they perform the **Guard** action.  The **maximum number of modules enabled at the same time** on a **personal vehicle** is equal to **【3 + its Pilot’s SL in Personal Vehicle】**. The Pilot may freely reassign their personal vehicle’s enabled and disabled modules outside conflicts.",
     "fr": "**Entering** the **personal vehicle** during a conflict requires the **Objective** action. Normally there is no Check required, but the Game Master may introduce a **Clock** if there are serious dangers or obstacles. If the **personal vehicle** is accessible when the conflict begins, characters may **enter it immediately** before the Initiative Check (see **Core Rulebook**, page **59**).  **Leaving** the **personal vehicle** doesn’t require an action, but during a conflict it can only be done on your turn, **before or after** an action.  The **personal vehicle** can contain a variable number of human-sized creatures depending on its **frame** and **modules**, but **only its Pilot may drive it**. Additionally, the other passengers **cannot cover creatures** when they perform the **Guard** action.  The **maximum number of modules enabled at the same time** on a **personal vehicle** is equal to **【3 + its Pilot’s SL in Personal Vehicle】**. The Pilot may freely reassign their personal vehicle’s enabled and disabled modules outside conflicts.",
     "es": "**Entering** the **personal vehicle** during a conflict requires the **Objective** action. Normally there is no Check required, but the Game Master may introduce a **Clock** if there are serious dangers or obstacles. If the **personal vehicle** is accessible when the conflict begins, characters may **enter it immediately** before the Initiative Check (see **Core Rulebook**, page **59**).  **Leaving** the **personal vehicle** doesn’t require an action, but during a conflict it can only be done on your turn, **before or after** an action.  The **personal vehicle** can contain a variable number of human-sized creatures depending on its **frame** and **modules**, but **only its Pilot may drive it**. Additionally, the other passengers **cannot cover creatures** when they perform the **Guard** action.  The **maximum number of modules enabled at the same time** on a **personal vehicle** is equal to **【3 + its Pilot’s SL in Personal Vehicle】**. The Pilot may freely reassign their personal vehicle’s enabled and disabled modules outside conflicts.",
-    "pt-BR": " **Entrar** no **veículo pessoal** num conflito requer a ação **Objetivo**. Normalmente, não é preciso um teste, mas o mestre pode introduzir um **Relógio** se houver perigos ou obstáculos complicados. Se o **veículo pessoal** estiver disponível quando o conflito começa, os PJs podem **entrar imediatamente** antes do teste de Iniciativa (**Livro Básico**, página **59**).  **Deixar** o **veículo pessoal** não requer uma ação, mas, durante um conflito, só pode ser feito no seu turno, **antes** ou **depois** de uma ação.  O **veículo pessoal** acomoda um número variável de criaturas de tamanho humano, dependendo da sua **estrutura** e **módulos**, mas **apenas seu respectivo piloto pode dirigi-lo**. Além disso, outros passageiros **não podem dar cobertura** a criaturas quando fizerem a ação **Guarda**.  O **número máximo de módulos disponíveis ao mesmo tempo** em um **veículo pessoal** é igual a **【 3 + o NP do piloto em Veículo Pessoal】】**. O piloto pode redistribuir os módulos ativos e inativos livremente fora de conflitos.",
-    "ru": "**Entering** the **personal vehicle** during a conflict requires the **Objective** action. Normally there is no Check required, but the Game Master may introduce a **Clock** if there are serious dangers or obstacles. If the **personal vehicle** is accessible when the conflict begins, characters may **enter it immediately** before the Initiative Check (see **Core Rulebook**, page **59**).  **Leaving** the **personal vehicle** doesn’t require an action, but during a conflict it can only be done on your turn, **before or after** an action.  The **personal vehicle** can contain a variable number of human-sized creatures depending on its **frame** and **modules**, but **only its Pilot may drive it**. Additionally, the other passengers **cannot cover creatures** when they perform the **Guard** action.  The **maximum number of modules enabled at the same time** on a **personal vehicle** is equal to **【3 + its Pilot’s SL in Personal Vehicle】**. The Pilot may freely reassign their personal vehicle’s enabled and disabled modules outside conflicts.",
+    "pt-BR": "**Entrar** no **veículo pessoal** num conflito requer a ação **Objetivo**. Normalmente, não é preciso um teste, mas o mestre pode introduzir um **Relógio** se houver perigos ou obstáculos complicados. Se o **veículo pessoal** estiver disponível quando o conflito começa, os PJs podem **entrar imediatamente** antes do teste de Iniciativa (**Livro Básico**, página **59**).\\n\\n**Deixar** o **veículo pessoal** não requer uma ação, mas, durante um conflito, só pode ser feito no seu turno, **antes** ou **depois** de uma ação.\\n\\nO **veículo pessoal** acomoda um número variável de criaturas de tamanho humano, dependendo da sua **estrutura** e **módulos**, mas **apenas seu respectivo piloto pode dirigi-lo**. Além disso, outros passageiros **não podem dar cobertura** a criaturas quando fizerem a ação **Guarda**.\\n\\nO **número máximo de módulos disponíveis ao mesmo tempo** em um **veículo pessoal** é igual a **【 3 + o NP do piloto em Veículo Pessoal】】**. O piloto pode redistribuir os módulos ativos e inativos livremente fora de conflitos.",
+    "ru": "**Entering** the **personal vehicle** during a conflict requires the **Objective** action. Normally there is no Check required, but the Game Master may introduce a **Clock** if there are serious dangers or obstacles. If the **personal vehicle** is accessible when the conflict begins, characters may **enter it immediately** before the Initiative Check (see **Core Rulebook**, page **59**).\\n\\n**Leaving** the **personal vehicle** doesn’t require an action, but during a conflict it can only be done on your turn, **before or after** an action.\\n\\nThe **personal vehicle** can contain a variable number of human-sized creatures depending on its **frame** and **modules**, but **only its Pilot may drive it**. Additionally, the other passengers **cannot cover creatures** when they perform the **Guard** action.\\n\\nThe **maximum number of modules enabled at the same time** on a **personal vehicle** is equal to **【3 + its Pilot’s SL in Personal Vehicle】**. The Pilot may freely reassign their personal vehicle’s enabled and disabled modules outside conflicts.",
     "pl": "**Entering** the **personal vehicle** during a conflict requires the **Objective** action. Normally there is no Check required, but the Game Master may introduce a **Clock** if there are serious dangers or obstacles. If the **personal vehicle** is accessible when the conflict begins, characters may **enter it immediately** before the Initiative Check (see **Core Rulebook**, page **59**).  **Leaving** the **personal vehicle** doesn’t require an action, but during a conflict it can only be done on your turn, **before or after** an action.  The **personal vehicle** can contain a variable number of human-sized creatures depending on its **frame** and **modules**, but **only its Pilot may drive it**. Additionally, the other passengers **cannot cover creatures** when they perform the **Guard** action.  The **maximum number of modules enabled at the same time** on a **personal vehicle** is equal to **【3 + its Pilot’s SL in Personal Vehicle】**. The Pilot may freely reassign their personal vehicle’s enabled and disabled modules outside conflicts.",
     "zh-CN": "在冲突场景中**进入个人载具**需要**推进目标**行动。通常来说这无需进行检定，但如果存在严重的危险或阻碍，游戏主持人可以引入一个**命刻**。如果在冲突开始时**个人载具**可用，角色可以在进行先攻检定（**核心规则书**第**59**页）之前**立即进入载具**。•**离开个人载具**不需要消耗行动，但在冲突场景中，你只能在自己的回合内，**不存在其他正在结算中的效果时**这样做。•取决于其**框架**和**模块**的不同，一部**个人载具**可以容纳数量不等的人类体型生物，但**只有其机师能够驾驶它**。此外，其他乘客在执行**防御**行动时，**无法为任何生物提供掩护**。•**个人载具同时能够启用的模块数量上限**等于**【3+机师的个人载具技能等级】**。在冲突场景之外，机师可以自由地重新分配其**个人载具**上已启用和已停用的**模块**。"
   },
@@ -42919,13 +43033,13 @@
   },
   {
     "key": "magiseed_details_1",
-    "en": "**Magiseeds** can have passive effects, or have effects that trigger at the **end** of your turn, **after** your Growth Clock has increased.  The effects of a **magiseed** apply only while it is present in your **garden**, and they vary depending on the current number of filled sections in your **Growth Clock** (T).  You **only** apply the effect corresponding to the **exact number** of currently filled sections in your **Growth Clock**, not any effect above or below it.  If a magiseed’s effect deals damage, it deals 5 extra damage if you are **level 30 or higher**. If a magiseed’s effect causes Hit Point and/or Mind Point loss and/or recovery, the amount increases by 10 if you are **level 30 or higher**.",
-    "it": "**Magiseeds** can have passive effects, or have effects that trigger at the **end** of your turn, **after** your Growth Clock has increased.  The effects of a **magiseed** apply only while it is present in your **garden**, and they vary depending on the current number of filled sections in your **Growth Clock** (T).  You **only** apply the effect corresponding to the **exact number** of currently filled sections in your **Growth Clock**, not any effect above or below it.  If a magiseed’s effect deals damage, it deals 5 extra damage if you are **level 30 or higher**. If a magiseed’s effect causes Hit Point and/or Mind Point loss and/or recovery, the amount increases by 10 if you are **level 30 or higher**.",
+    "en": "**Magiseeds** can have passive effects, or have effects that trigger at the **end** of your turn, **after** your Growth Clock has increased.\\n\\nThe effects of a **magiseed** apply only while it is present in your **garden**, and they vary depending on the current number of filled sections in your **Growth Clock** (T).\\n\\nYou **only** apply the effect corresponding to the **exact number** of currently filled sections in your **Growth Clock**, not any effect above or below it.\\n\\nIf a magiseed’s effect deals damage, it deals 5 extra damage if you are **level 30 or higher**. If a magiseed’s effect causes Hit Point and/or Mind Point loss and/or recovery, the amount increases by 10 if you are **level 30 or higher**.",
+    "it": "**Magiseeds** can have passive effects, or have effects that trigger at the **end** of your turn, **after** your Growth Clock has increased.\\n\\nThe effects of a **magiseed** apply only while it is present in your **garden**, and they vary depending on the current number of filled sections in your **Growth Clock** (T).\\n\\nYou **only** apply the effect corresponding to the **exact number** of currently filled sections in your **Growth Clock**, not any effect above or below it.\\n\\nIf a magiseed’s effect deals damage, it deals 5 extra damage if you are **level 30 or higher**. If a magiseed’s effect causes Hit Point and/or Mind Point loss and/or recovery, the amount increases by 10 if you are **level 30 or higher**.",
     "de": "**Magiseeds** can have passive effects, or have effects that trigger at the **end** of your turn, **after** your Growth Clock has increased.  The effects of a **magiseed** apply only while it is present in your **garden**, and they vary depending on the current number of filled sections in your **Growth Clock** (T).  You **only** apply the effect corresponding to the **exact number** of currently filled sections in your **Growth Clock**, not any effect above or below it.  If a magiseed’s effect deals damage, it deals 5 extra damage if you are **level 30 or higher**. If a magiseed’s effect causes Hit Point and/or Mind Point loss and/or recovery, the amount increases by 10 if you are **level 30 or higher**.",
     "fr": "**Magiseeds** can have passive effects, or have effects that trigger at the **end** of your turn, **after** your Growth Clock has increased.  The effects of a **magiseed** apply only while it is present in your **garden**, and they vary depending on the current number of filled sections in your **Growth Clock** (T).  You **only** apply the effect corresponding to the **exact number** of currently filled sections in your **Growth Clock**, not any effect above or below it.  If a magiseed’s effect deals damage, it deals 5 extra damage if you are **level 30 or higher**. If a magiseed’s effect causes Hit Point and/or Mind Point loss and/or recovery, the amount increases by 10 if you are **level 30 or higher**.",
     "es": "**Magiseeds** can have passive effects, or have effects that trigger at the **end** of your turn, **after** your Growth Clock has increased.  The effects of a **magiseed** apply only while it is present in your **garden**, and they vary depending on the current number of filled sections in your **Growth Clock** (T).  You **only** apply the effect corresponding to the **exact number** of currently filled sections in your **Growth Clock**, not any effect above or below it.  If a magiseed’s effect deals damage, it deals 5 extra damage if you are **level 30 or higher**. If a magiseed’s effect causes Hit Point and/or Mind Point loss and/or recovery, the amount increases by 10 if you are **level 30 or higher**.",
-    "pt-BR": "**Magigrãos** podem ter efeitos passivos ou efeitos que são acionados no **final** do seu turno, **depois** que seu Relógio de Crescimento tiver avançado.  Os efeitos de um **magigrão** se aplicam apenas enquanto ele estiver presente em seu **jardim**, e variam dependendo do número atual de seções preenchidas em seu **Relógio de Crescimento** (T).  Você aplica apenas o efeito correspondente ao **número exato** de seções atualmente preenchidas em seu **Relógio de Crescimento**, e não qualquer efeito acima ou abaixo dele.  Se o efeito de um magigrão causar dano, ele causa 5 de dano extra se você for **nível 30 ou superior**. Se o efeito de um magigrão causar perda e/ou recuperação de Pontos de Vida e/ou Pontos de Mente, a quantidade aumenta em 10 se você for **nível 30 ou superior**.",
-    "ru": "**Magiseeds** can have passive effects, or have effects that trigger at the **end** of your turn, **after** your Growth Clock has increased.  The effects of a **magiseed** apply only while it is present in your **garden**, and they vary depending on the current number of filled sections in your **Growth Clock** (T).  You **only** apply the effect corresponding to the **exact number** of currently filled sections in your **Growth Clock**, not any effect above or below it.  If a magiseed’s effect deals damage, it deals 5 extra damage if you are **level 30 or higher**. If a magiseed’s effect causes Hit Point and/or Mind Point loss and/or recovery, the amount increases by 10 if you are **level 30 or higher**.",
+    "pt-BR": "**Magigrãos** podem ter efeitos passivos ou efeitos que são acionados no **final** do seu turno, **depois** que seu Relógio de Crescimento tiver avançado.\\n\\nOs efeitos de um **magigrão** se aplicam apenas enquanto ele estiver presente em seu **jardim**, e variam dependendo do número atual de seções preenchidas em seu **Relógio de Crescimento** (T).\\n\\nVocê aplica apenas o efeito correspondente ao **número exato** de seções atualmente preenchidas em seu **Relógio de Crescimento**, e não qualquer efeito acima ou abaixo dele.\\n\\nSe o efeito de um magigrão causar dano, ele causa 5 de dano extra se você for **nível 30 ou superior**. Se o efeito de um magigrão causar perda e/ou recuperação de Pontos de Vida e/ou Pontos de Mente, a quantidade aumenta em 10 se você for **nível 30 ou superior**.",
+    "ru": "**Magiseeds** can have passive effects, or have effects that trigger at the **end** of your turn, **after** your Growth Clock has increased.\\n\\nThe effects of a **magiseed** apply only while it is present in your **garden**, and they vary depending on the current number of filled sections in your **Growth Clock** (T).\\n\\nYou **only** apply the effect corresponding to the **exact number** of currently filled sections in your **Growth Clock**, not any effect above or below it.\\n\\nIf a magiseed’s effect deals damage, it deals 5 extra damage if you are **level 30 or higher**. If a magiseed’s effect causes Hit Point and/or Mind Point loss and/or recovery, the amount increases by 10 if you are **level 30 or higher**.",
     "pl": "**Magiseeds** can have passive effects, or have effects that trigger at the **end** of your turn, **after** your Growth Clock has increased.  The effects of a **magiseed** apply only while it is present in your **garden**, and they vary depending on the current number of filled sections in your **Growth Clock** (T).  You **only** apply the effect corresponding to the **exact number** of currently filled sections in your **Growth Clock**, not any effect above or below it.  If a magiseed’s effect deals damage, it deals 5 extra damage if you are **level 30 or higher**. If a magiseed’s effect causes Hit Point and/or Mind Point loss and/or recovery, the amount increases by 10 if you are **level 30 or higher**.",
     "zh-CN": "**魔种**可以具有被动效果，也可以在你的回合**结束**、且**生长命刻**增加**后**触发效果。•**魔种**的效果**仅**在其存在于你的**花园**中时生效，并且其效果会根据你的**生长命刻**中当前已填充的格数（T）而变化。•只有与你的**生长命刻**中当前已填充的格数**正好对应**的效果才会生效，高于或低于该格数的任何效果都不会生效。•当**魔种**的效果造成伤害时，如果你的**等级大于等于30级**，则造成5点额外伤害。当**魔种**的效果使得生命值和/或精神值损失和/或恢复时，如果你的**等级大于等于30级**，则该数值增加10点。"
   },

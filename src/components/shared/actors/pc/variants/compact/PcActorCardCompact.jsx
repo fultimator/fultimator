@@ -303,6 +303,7 @@ export default function PcActorCardCompact({
             player={player}
             setPlayer={setPlayer}
             isEditMode={ownerEditMode}
+            isLocked={!isInteractive}
             searchQuery={searchQuery}
             defaultExpandAll={expandAllSections}
           />
@@ -325,6 +326,7 @@ export default function PcActorCardCompact({
             player={player}
             setPlayer={setPlayer}
             isEditMode={ownerEditMode}
+            isLocked={!isInteractive}
             isMainTab={false}
             searchQuery={searchQuery}
           />
@@ -334,7 +336,7 @@ export default function PcActorCardCompact({
           <NoteTab
             player={player}
             setPlayer={setPlayer}
-            isEditMode={ownerEditMode}
+            isEditMode={isInteractive}
             searchQuery={searchQuery}
             defaultExpanded={!ownerEditMode}
             speaker={pc?.name ?? ""}
@@ -393,7 +395,7 @@ export default function PcActorCardCompact({
             >
               <Typography
                 sx={{
-                  fontFamily: ["PT Sans Narrow", "sans-serif"].join(","),
+                  fontFamily: ["PFU Sans Narrow", "sans-serif"].join(","),
                   fontSize: { xs: "0.82rem", sm: "0.92rem", md: "0.98rem" },
                   lineHeight: 1.45,
                   whiteSpace: "pre-line",

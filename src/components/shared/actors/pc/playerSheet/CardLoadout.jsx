@@ -385,6 +385,8 @@ export default function CardLoadout({
             color: theme.palette.text.secondary,
             whiteSpace: "nowrap",
             flexShrink: 0,
+            minWidth: "3em",
+            textAlign: "center",
           }}
         >
           {t(SLOT_LABEL_KEY[key])}

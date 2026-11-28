@@ -59,9 +59,21 @@ function VillainPhase({ villain, phases, multipart, role }) {
     phaseString,
     multipart,
   ].filter(Boolean);
-  const combinedString = values.length > 0 ? values.join(" ⬥ ") : null;
-
-  return <>{combinedString}</>;
+  return (
+    <>
+      {values.map((value, i) => (
+        <React.Fragment key={i}>
+          {i > 0 && (
+            <>
+              {" "}
+              <Diamond />{" "}
+            </>
+          )}
+          {value}
+        </React.Fragment>
+      ))}
+    </>
+  );
 }
 
 export function NpcHeader({ npc, npcImage }) {
@@ -73,11 +85,6 @@ export function NpcHeader({ npc, npcImage }) {
     theme.mode === "dark"
       ? `linear-gradient(90deg, #583871 0%, #4C3D51 100%)`
       : `linear-gradient(90deg, #674168 0%, #b9a9be 100%)`;
-
-  const borderImage =
-    theme.mode === "dark"
-      ? "linear-gradient(45deg, #b9a9be, #ffffff) 1"
-      : "linear-gradient(45deg, #b9a9be, #ffffff) 1";
 
   const borderImageBody =
     theme.mode === "dark"
@@ -97,8 +104,8 @@ export function NpcHeader({ npc, npcImage }) {
         container
         sx={{
           width: 1,
-          flexDirection: "column",
-          "@container (min-width: 480px)": { flexDirection: "row" },
+          flexDirection: "row",
+          flexWrap: "nowrap",
         }}
       >
         <Grid
@@ -107,13 +114,15 @@ export function NpcHeader({ npc, npcImage }) {
             borderRight,
             px: 1,
             flex: "1 1 auto",
+            minWidth: 0,
           }}
         >
           <Typography
             sx={{
               color: "white.main",
               fontFamily: "Antonio",
-              fontSize: "1.5rem",
+              fontSize: "clamp(1rem, 4.2cqw, 1.5rem)",
+              lineHeight: 1.2,
               fontWeight: "medium",
               textTransform: "uppercase",
             }}
@@ -126,15 +135,14 @@ export function NpcHeader({ npc, npcImage }) {
             px: 1,
             py: 0.5,
             borderLeft,
-            borderBottom,
-            borderImage,
-            flex: "0 0 auto",
+            flex: "0 1 auto",
+            maxWidth: "48%",
           }}
         >
           <Typography
             sx={{
               fontFamily: "Antonio",
-              fontSize: "1.25rem",
+              fontSize: "clamp(0.8rem, 3.4cqw, 1.25rem)",
               fontWeight: "medium",
               textTransform: "uppercase",
             }}
@@ -143,12 +151,23 @@ export function NpcHeader({ npc, npcImage }) {
           </Typography>
         </Grid>
       </Grid>
+      <Box
+        sx={{
+          width: 1,
+          height: "3px",
+          background:
+            theme.mode === "dark"
+              ? "linear-gradient(90deg, #2f2234 0%, #4C3D51 62%, rgba(255,255,255,0) 100%)"
+              : "linear-gradient(90deg, #583a5a 0%, #b9a9be 62%, rgba(255,255,255,0) 100%)",
+        }}
+      />
       <Box sx={{ display: "flex", width: 1 }}>
         {npcImage ? (
           <Box
             sx={{
-              minWidth: "128px",
-              width: "128px",
+              minWidth: "96px",
+              width: "clamp(96px, 20cqw, 220px)",
+              flexShrink: 0,
               height: "auto",
               background: "white",
               border: "1px solid #684268",
@@ -191,8 +210,8 @@ export function NpcHeader({ npc, npcImage }) {
             (npc.role && npc.role !== "custom")) && (
             <Box
               sx={{
-                px: 1,
-                py: 0.25,
+                px: 2,
+                py: 0.5,
                 borderBottom,
                 borderImage: borderImageBody,
               }}
@@ -200,7 +219,7 @@ export function NpcHeader({ npc, npcImage }) {
               <Typography
                 sx={{
                   fontFamily: "Antonio",
-                  fontSize: "1rem",
+                  fontSize: "clamp(0.9rem, 3.4cqw, 1.25rem)",
                   textTransform: "uppercase",
                 }}
               >
@@ -215,8 +234,8 @@ export function NpcHeader({ npc, npcImage }) {
           )}
           <Box
             sx={{
-              px: 1,
-              py: 0.5,
+              px: 2,
+              py: 1,
               borderBottom,
               borderImage: borderImageBody,
               flexGrow: 1,
@@ -224,7 +243,7 @@ export function NpcHeader({ npc, npcImage }) {
           >
             <StyledMarkdown>{npc.description}</StyledMarkdown>
           </Box>
-          <Box sx={{ px: 1, py: 0.5 }}>
+          <Box sx={{ px: 2, pt: 1, pb: 0.5 }}>
             <Typography>
               <strong>{t("Typical Traits:")} </strong>
               {npc.traits}

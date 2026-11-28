@@ -1,4 +1,5 @@
 import React from "react";
+import { sectionHeadingSx } from "/src/components/shared/actors/common/sectionHeadingSx";
 import {
   Box,
   Button,
@@ -496,7 +497,7 @@ export default function EditQuickAssembly({ npc, setNpc }) {
     <Card sx={{ p: 2, background }}>
       <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
         <AutoFixHigh fontSize="small" />
-        <Typography variant="h6" sx={{ flexGrow: 1 }}>
+        <Typography sx={{ ...sectionHeadingSx, flexGrow: 1 }}>
           {t("quick_assembly")}
         </Typography>
         <FormControlLabel

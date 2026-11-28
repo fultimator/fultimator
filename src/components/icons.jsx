@@ -345,10 +345,18 @@ export function SpellIcon() {
     <svg
       xmlns="http://www.w3.org/2000/svg"
       version="1.1"
-      viewBox="-10 0 1059 1059"
-      width="1.2em"
+      viewBox="-4 21 1054 1054"
+      width="1.06em"
       style={{ verticalAlign: "text-bottom" }}
     >
+      <circle
+        cx="523"
+        cy="548"
+        r="485"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="84"
+      />
       <g transform="matrix(1 0 0 -1 0 800)">
         <path
           fill="currentColor"

@@ -7,6 +7,7 @@ import React, {
 } from "react";
 import { flushSync } from "react-dom";
 import { useLocation, useParams } from "react-router";
+import PlayerActionsMenu from "../../components/shared/actors/pc/PlayerActionsMenu";
 import { useDatabase } from "../../hooks/useDatabase";
 import { useAppDrawerStore } from "../../store/appDrawerStore";
 import { useChatMessagesStore } from "../../store/chatMessagesStore";
@@ -123,6 +124,15 @@ import {
   MAX_LEVEL,
 } from "../../libs/player/levelUpLogic";
 import { executeCommand } from "../../components/app-drawer/panels/chat/domain/commands";
+
+const ICON_BTN_SX = {
+  width: 36,
+  height: 36,
+  flexShrink: 0,
+  border: 1,
+  borderColor: "divider",
+  borderRadius: 1,
+};
 
 export default function PlayerEdit() {
   const { t } = useTranslate();
@@ -976,70 +986,45 @@ export default function PlayerEdit() {
                 <Settings />
               </Tab>
             </TabsList>
-            {isOwner ? (
-              <Paper
-                elevation={0}
-                sx={{
-                  backgroundColor: ternary,
-                  borderRadius: "12px",
-                  px: 0.5,
-                  py: 0.5,
-                  boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.2)",
-                  display: "flex",
-                  alignItems: "center",
-                }}
-              >
-                <Tooltip
-                  title={
-                    isSheetEditMode
-                      ? t("Switch to Preview Mode")
-                      : t("Switch to Edit Mode")
-                  }
-                >
-                  <IconButton
-                    size="small"
-                    onClick={() => setIsSheetEditMode((v) => !v)}
-                    sx={{ color: "inherit", flexShrink: 0 }}
-                  >
-                    {isSheetEditMode ? <LockOpen /> : <Lock />}
-                  </IconButton>
-                </Tooltip>
-              </Paper>
-            ) : null}
           </Box>
         )}
 
         {/* Compact View Toggle: only show when on Player Sheet tab */}
         {openTab === 0 && (
-          <Grid container spacing={1} sx={{ mb: 2, paddingX: 1 }}>
-            <Grid size={isSmallScreen ? (compactView ? 8 : 10) : 6}>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={() => setExportDialogOpen(true)}
-                style={{ width: "100%" }}
-                startIcon={<Download />}
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: 1,
+              mb: 2,
+              px: 1,
+              "& .MuiButton-root": { height: 36 },
+            }}
+          >
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => setExportDialogOpen(true)}
+              startIcon={<Download />}
+              sx={{ flex: 1, minWidth: 0, whiteSpace: "nowrap" }}
+            >
+              <Box
+                component="span"
+                sx={{ overflow: "hidden", textOverflow: "ellipsis" }}
               >
                 {t("Download Character Sheet")}
-              </Button>
-            </Grid>
-            <Grid size={isSmallScreen ? 2 : 6}>
-              <Button
-                variant="outlined"
-                color="primary"
-                onClick={() => setCompactView(!compactView)}
-                style={{ width: "100%" }}
-                sx={{ display: isSmallScreen ? "none" : "flex" }}
+              </Box>
+            </Button>
+            {isSmallScreen ? (
+              <Tooltip
+                title={compactView ? t("Normal View") : t("Compact View")}
               >
-                {compactView ? t("Normal View") : t("Compact View")}
-              </Button>
-
-              {/* Mobile icon version */}
-              {isSmallScreen && (
                 <IconButton
+                  aria-label={
+                    compactView ? t("Normal View") : t("Compact View")
+                  }
                   onClick={() => setCompactView(!compactView)}
-                  color="primary"
-                  sx={{ display: "flex", mx: "auto" }}
+                  sx={ICON_BTN_SX}
                 >
                   {compactView ? (
                     <FullscreenTwoTone />
@@ -1047,28 +1032,75 @@ export default function PlayerEdit() {
                     <FullscreenExitTwoTone />
                   )}
                 </IconButton>
-              )}
-            </Grid>
+              </Tooltip>
+            ) : (
+              <Button
+                variant="outlined"
+                color="primary"
+                onClick={() => setCompactView(!compactView)}
+                sx={{ flex: 1 }}
+              >
+                {compactView ? t("Normal View") : t("Compact View")}
+              </Button>
+            )}
+            {isOwner && (
+              <Tooltip
+                title={
+                  isSheetEditMode
+                    ? t("Switch to Preview Mode")
+                    : t("Switch to Edit Mode")
+                }
+              >
+                <IconButton
+                  aria-label={
+                    isSheetEditMode
+                      ? t("Switch to Preview Mode")
+                      : t("Switch to Edit Mode")
+                  }
+                  aria-pressed={isSheetEditMode}
+                  onClick={() => setIsSheetEditMode((v) => !v)}
+                  sx={{
+                    ...ICON_BTN_SX,
+                    ...(isSheetEditMode && {
+                      bgcolor: "primary.main",
+                      borderColor: "primary.main",
+                      color: "primary.contrastText",
+                      "&:hover": { bgcolor: "primary.dark" },
+                    }),
+                  }}
+                >
+                  {isSheetEditMode ? <LockOpen /> : <Lock />}
+                </IconButton>
+              </Tooltip>
+            )}
             {isSmallScreen && compactView && (
-              <Grid size={2}>
-                <Tooltip
-                  title={
+              <Tooltip
+                title={
+                  compactViewExpanded
+                    ? t("Collapse Details")
+                    : t("Expand Details")
+                }
+              >
+                <IconButton
+                  aria-label={
                     compactViewExpanded
                       ? t("Collapse Details")
                       : t("Expand Details")
                   }
+                  onClick={() => setCompactViewExpanded((prev) => !prev)}
+                  sx={ICON_BTN_SX}
                 >
-                  <IconButton
-                    onClick={() => setCompactViewExpanded((prev) => !prev)}
-                    color="primary"
-                    sx={{ display: "flex", mx: "auto" }}
-                  >
-                    {compactViewExpanded ? <ExpandLess /> : <ExpandMore />}
-                  </IconButton>
-                </Tooltip>
-              </Grid>
+                  {compactViewExpanded ? <ExpandLess /> : <ExpandMore />}
+                </IconButton>
+              </Tooltip>
             )}
-          </Grid>
+            <PlayerActionsMenu
+              player={{ ...playerTemp, id: params.playerId }}
+              isLocal={isUsingLocalDb}
+              onDownloadImage={() => setExportDialogOpen(true)}
+              buttonSx={ICON_BTN_SX}
+            />
+          </Box>
         )}
         <TabPanel value={0} currentValue={openTab}>
           {compactView ? (
@@ -1205,6 +1237,7 @@ export default function PlayerEdit() {
             updateMaxStats={updateMaxStats}
             advancement={advancement}
             onLevelUpRequest={openLevelUpDialog}
+            db={db}
           />
         </TabPanel>
         <TabPanel value={2} currentValue={openTab}>
@@ -1481,6 +1514,7 @@ export default function PlayerEdit() {
             right: 0,
             bottom: 0,
             zIndex: 1300,
+            backgroundImage: "none",
             borderTop: "1px solid",
             borderColor: "divider",
             display: "flex",
@@ -1560,10 +1594,20 @@ export default function PlayerEdit() {
             <Tooltip title={t("Save")} placement="top">
               <span>
                 <IconButton
-                  color={isUpdated && isOwner ? "primary" : "default"}
                   onClick={handleSave}
                   disabled={!isOwner || !isUpdated}
                   aria-label="save"
+                  sx={{
+                    borderRadius: 1,
+                    color: "#fff",
+                    bgcolor: "primary.main",
+                    "&:hover": { bgcolor: "primary.dark" },
+                    "&.Mui-disabled": {
+                      bgcolor: "transparent",
+                      color: "text.secondary",
+                      opacity: 0.6,
+                    },
+                  }}
                 >
                   <Save />
                 </IconButton>
@@ -1610,28 +1654,6 @@ export default function PlayerEdit() {
               onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
             >
               <KeyboardArrowUp fontSize="medium" />
-            </Fab>
-          </Tooltip>
-        )}
-
-        {isSmallScreen && isOwner && openTab === 0 && (
-          <Tooltip
-            title={
-              isSheetEditMode
-                ? t("Switch to Preview Mode")
-                : t("Switch to Edit Mode")
-            }
-          >
-            <Fab
-              size="medium"
-              onClick={() => setIsSheetEditMode((v) => !v)}
-              color="primary"
-            >
-              {isSheetEditMode ? (
-                <LockOpen fontSize="medium" />
-              ) : (
-                <Lock fontSize="medium" />
-              )}
             </Fab>
           </Tooltip>
         )}

@@ -516,6 +516,28 @@ function SkillStars({ current, max, secondaryColor, onClick, sx }) {
 }
 // SkillCard
 
+const SL_BADGE_SX = {
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+  height: 26,
+  minWidth: 36,
+  px: "8px",
+  borderRadius: "4px",
+  bgcolor: "rgba(255,255,255,0.18)",
+  color: "#fff",
+  fontFamily: "Antonio",
+  fontSize: "0.9rem",
+  fontWeight: "bold",
+  lineHeight: 1,
+  whiteSpace: "nowrap",
+};
+const SL_BADGE_CLICKABLE_SX = {
+  ...SL_BADGE_SX,
+  cursor: "pointer",
+  "&:hover": { bgcolor: "rgba(255,255,255,0.28)" },
+};
+
 function SkillCard({
   skill,
   originalIdx,
@@ -523,6 +545,7 @@ function SkillCard({
   translatedDescription,
   pc,
   isInteractive,
+  canEdit = isInteractive,
   onUpdate,
   updateMaxStats,
   searchQuery,
@@ -652,9 +675,10 @@ function SkillCard({
               sx={{
                 display: "flex",
                 alignItems: "center",
-                px: 2,
+                pl: 2,
+                pr: 1,
                 py: 0.5,
-                gap: 1,
+                gap: "6px",
                 minHeight: 40,
                 width: "100%",
               }}
@@ -672,12 +696,12 @@ function SkillCard({
               >
                 {highlightMatch(t(skill.skillName), searchQuery)}
               </Typography>
-              {isInteractive && onUpdate ? (
+              {canEdit && onUpdate ? (
                 <Box
                   sx={{
                     display: "flex",
                     alignItems: "center",
-                    gap: "4px",
+                    gap: "6px",
                     flexShrink: 0,
                   }}
                   onClick={(e) => e.stopPropagation()}
@@ -704,15 +728,7 @@ function SkillCard({
                       <Tooltip title={t("View Skill Level")}>
                         <Typography
                           onClick={() => setLevelModalOpen(true)}
-                          sx={{
-                            fontFamily: "Antonio",
-                            fontSize: "0.85rem",
-                            fontWeight: "bold",
-                            color: "#fff",
-                            lineHeight: 1,
-                            cursor: "pointer",
-                            "&:hover": { textDecoration: "underline" },
-                          }}
+                          sx={SL_BADGE_CLICKABLE_SX}
                         >
                           SL{skill.currentLvl}/{skill.maxLvl}
                         </Typography>
@@ -748,16 +764,7 @@ function SkillCard({
                           </IconButton>
                         </span>
                       </Tooltip>
-                      <Typography
-                        sx={{
-                          fontFamily: "Antonio",
-                          fontSize: "0.85rem",
-                          fontWeight: "bold",
-                          color: "#fff",
-                          lineHeight: 1,
-                          mr: "4px",
-                        }}
-                      >
+                      <Typography sx={SL_BADGE_SX}>
                         SL{skill.currentLvl}
                       </Typography>
                     </>
@@ -796,15 +803,7 @@ function SkillCard({
                     <Tooltip title={t("View Skill Level")}>
                       <Typography
                         onClick={() => setLevelModalOpen(true)}
-                        sx={{
-                          fontFamily: "Antonio",
-                          fontSize: "0.85rem",
-                          fontWeight: "bold",
-                          color: "rgba(255,255,255,0.9)",
-                          lineHeight: 1,
-                          cursor: "pointer",
-                          "&:hover": { textDecoration: "underline" },
-                        }}
+                        sx={SL_BADGE_CLICKABLE_SX}
                       >
                         SL{skill.currentLvl}/{skill.maxLvl}
                       </Typography>
@@ -822,15 +821,7 @@ function SkillCard({
                           />
                         </span>
                       </Tooltip>
-                      <Typography
-                        sx={{
-                          fontFamily: "Antonio",
-                          fontSize: "0.85rem",
-                          fontWeight: "bold",
-                          color: "rgba(255,255,255,0.9)",
-                          lineHeight: 1,
-                        }}
-                      >
+                      <Typography sx={SL_BADGE_SX}>
                         SL{skill.currentLvl}
                       </Typography>
                     </>
@@ -862,8 +853,8 @@ function SkillCard({
                 <IconButton
                   size="small"
                   sx={{
-                    p: "3px",
-                    color: "rgba(255,255,255,0.7)",
+                    p: "4px",
+                    color: "#fff",
                     flexShrink: 0,
                   }}
                   onClick={(e) => {
@@ -872,9 +863,9 @@ function SkillCard({
                   }}
                 >
                   {descOpen ? (
-                    <KeyboardArrowUp sx={{ fontSize: "1.2rem" }} />
+                    <KeyboardArrowUp sx={{ fontSize: "1.3rem" }} />
                   ) : (
-                    <KeyboardArrowDown sx={{ fontSize: "1.2rem" }} />
+                    <KeyboardArrowDown sx={{ fontSize: "1.3rem" }} />
                   )}
                 </IconButton>
               )}
@@ -901,7 +892,7 @@ function SkillCard({
           maxLvl={skill.maxLvl}
           onIncrease={handleIncrement}
           onDecrease={handleDecrement}
-          isEditMode={isInteractive && !!onUpdate}
+          isEditMode={canEdit && !!onUpdate}
           increaseDisabled={atClassLevelCap}
           investedLevels={totalSkillLevels}
         />
@@ -939,7 +930,7 @@ function SkillCard({
         }
         actions={
           <>
-            {isInteractive && onUpdate ? (
+            {canEdit && onUpdate ? (
               <Box
                 sx={{
                   display: "flex",
@@ -1611,10 +1602,77 @@ function SpellTypeAccordion({
 }
 // ClassSection
 
+function LeveledSkillsSummary({ skills, onClick, compact, speaker, t }) {
+  const leveled = (skills || []).filter((sk) => sk.currentLvl > 0);
+  if (leveled.length === 0) return null;
+  return (
+    <Box
+      onClick={onClick}
+      sx={{
+        px: compact ? 1 : 1.5,
+        py: compact ? 0.75 : 1,
+        display: "flex",
+        flexWrap: "wrap",
+        alignItems: "center",
+        gap: 0.75,
+        cursor: "pointer",
+      }}
+    >
+      {leveled.map((sk, i) => (
+        <Tooltip key={`${sk.skillName}-${i}`} title={t("Send to Chat")} arrow>
+          <Box
+            component="button"
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              sendDisplayMessage("skill", t(sk.skillName), {
+                speaker,
+                description: t(sk.description || "") || undefined,
+              });
+            }}
+            sx={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 0.5,
+              height: compact ? 26 : 30,
+              px: 1,
+              border: "1px solid",
+              borderColor: "divider",
+              borderRadius: "4px",
+              bgcolor: "action.hover",
+              color: "text.primary",
+              fontFamily: "Antonio",
+              fontSize: compact ? "0.85rem" : "0.95rem",
+              lineHeight: 1,
+              whiteSpace: "nowrap",
+              cursor: "pointer",
+              "&:hover": { bgcolor: "action.selected" },
+              "&:focus-visible": {
+                outline: "2px solid",
+                outlineColor: "text.primary",
+                outlineOffset: 1,
+              },
+            }}
+          >
+            {t(sk.skillName)}
+            <Box
+              component="span"
+              sx={{ fontWeight: "bold", color: "text.secondary" }}
+            >
+              SL{sk.currentLvl}
+            </Box>
+          </Box>
+        </Tooltip>
+      ))}
+    </Box>
+  );
+}
+
 function ClassSection({
   cls,
   classIdx,
   isInteractive,
+  canEdit = isInteractive,
   onUpdate,
   updateMaxStats,
   onLevelChange,
@@ -1627,6 +1685,7 @@ function ClassSection({
   compact,
   defaultExpanded = false,
   forceExpanded,
+  showLeveledSummary = false,
   theme,
   t,
 }) {
@@ -1699,7 +1758,7 @@ function ClassSection({
 
   const filteredSkills = (cls.skills || [])
     .map((skill, originalIdx) => ({ skill, originalIdx }))
-    .filter(({ skill }) => isInteractive || skill.currentLvl >= 1)
+    .filter(({ skill }) => canEdit || skill.currentLvl >= 1)
     .filter(({ skill }) => {
       if (!searchQuery?.trim()) return true;
       const q = searchQuery.trim().toLowerCase();
@@ -1781,6 +1840,15 @@ function ClassSection({
               </Tooltip>
             )}
           </CompactSectionHeader>
+          {collapsed && showLeveledSummary && (
+            <LeveledSkillsSummary
+              skills={cls.skills}
+              onClick={() => setCollapsedState(false)}
+              compact
+              speaker={pc?.info?.name || pc?.name || ""}
+              t={t}
+            />
+          )}
           {!collapsed && (
             <>
               {hasBenefits(cls.benefits) && (
@@ -1816,6 +1884,7 @@ function ClassSection({
                     translatedDescription={t(skill.description || "")}
                     pc={pc}
                     isInteractive={isInteractive}
+                    canEdit={canEdit}
                     onUpdate={onUpdate}
                     updateMaxStats={updateMaxStats}
                     searchQuery={searchQuery}
@@ -1875,7 +1944,7 @@ function ClassSection({
                       {cls.companion &&
                         ` - ${cls.companion.name} Lv ${cls.companion.lvl}`}
                     </Typography>
-                    {isInteractive && (
+                    {canEdit && (
                       <Button
                         size="small"
                         variant="outlined"
@@ -2147,6 +2216,14 @@ function ClassSection({
             </Box>
           )}
         </Box>
+        {collapsed && showLeveledSummary && (
+          <LeveledSkillsSummary
+            skills={cls.skills}
+            onClick={() => setCollapsedState(false)}
+            speaker={pc?.info?.name || pc?.name || ""}
+            t={t}
+          />
+        )}
         {!collapsed && (
           <>
             {hasBenefits(cls.benefits) && (
@@ -2184,6 +2261,7 @@ function ClassSection({
                   translatedDescription={t(skill.description || "")}
                   pc={pc}
                   isInteractive={isInteractive}
+                  canEdit={canEdit}
                   onUpdate={onUpdate}
                   updateMaxStats={updateMaxStats}
                   searchQuery={searchQuery}
@@ -2267,7 +2345,7 @@ function ClassSection({
                     >
                       {t("Faithful Companion")}
                     </Typography>
-                    {isInteractive && (
+                    {canEdit && (
                       <Button
                         size="small"
                         variant="outlined"
@@ -2328,6 +2406,7 @@ export default function PcClasses({
   pc,
   variant = "compact",
   isInteractive = false,
+  isLocked,
   onUpdate,
   updateMaxStats,
   searchQuery = "",
@@ -2337,6 +2416,7 @@ export default function PcClasses({
   const theme = useCustomTheme();
 
   const isCompact = variant === "compact";
+  const canEdit = isInteractive && !isLocked;
 
   const isTechnospheres = pc?.settings?.optionalRules?.technospheres ?? false;
   const technospheresVariant =
@@ -2610,7 +2690,7 @@ export default function PcClasses({
     <Box
       sx={{ display: "flex", alignItems: "center", gap: isCompact ? 0.5 : 1 }}
     >
-      {isInteractive && (
+      {canEdit && (
         <>
           <Tooltip title={t("Add Blank Class")}>
             <span>
@@ -2655,58 +2735,61 @@ export default function PcClasses({
           letterSpacing: "0.04em",
           whiteSpace: "nowrap",
           flexShrink: 0,
+          "@container (max-width: 480px)": { display: "none" },
         }}
       >
         {t("Total Invested Levels")}
       </Typography>
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          gap: "2px",
-          flexShrink: 0,
-        }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        {[
-          totalInvested,
-          usesInnateClassRules
-            ? characterLevel - totalMnemoInvested
-            : characterLevel,
-        ].map((val, i) => (
-          <Box key={i} sx={{ display: "flex", alignItems: "center" }}>
-            {i === 1 && (
-              <Typography
+      <Tooltip title={t("Total Invested Levels")}>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: "2px",
+            flexShrink: 0,
+          }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {[
+            totalInvested,
+            usesInnateClassRules
+              ? characterLevel - totalMnemoInvested
+              : characterLevel,
+          ].map((val, i) => (
+            <Box key={i} sx={{ display: "flex", alignItems: "center" }}>
+              {i === 1 && (
+                <Typography
+                  sx={{
+                    color: "#fff",
+                    fontFamily: "Antonio",
+                    fontWeight: 700,
+                    fontSize: isCompact ? "0.8rem" : "1rem",
+                    px: "2px",
+                  }}
+                >
+                  /
+                </Typography>
+              )}
+              <Box
                 sx={{
-                  color: "#fff",
+                  background: "#fff",
+                  color: theme.primary,
                   fontFamily: "Antonio",
                   fontWeight: 700,
                   fontSize: isCompact ? "0.8rem" : "1rem",
-                  px: "2px",
+                  px: isCompact ? 0.5 : 0.75,
+                  py: "1px",
+                  minWidth: isCompact ? 24 : 32,
+                  textAlign: "center",
+                  borderRadius: "2px",
                 }}
               >
-                /
-              </Typography>
-            )}
-            <Box
-              sx={{
-                background: "#fff",
-                color: theme.primary,
-                fontFamily: "Antonio",
-                fontWeight: 700,
-                fontSize: isCompact ? "0.8rem" : "1rem",
-                px: isCompact ? 0.5 : 0.75,
-                py: "1px",
-                minWidth: isCompact ? 24 : 32,
-                textAlign: "center",
-                borderRadius: "2px",
-              }}
-            >
-              {val}
+                {val}
+              </Box>
             </Box>
-          </Box>
-        ))}
-      </Box>
+          ))}
+        </Box>
+      </Tooltip>
       <Tooltip
         title={
           expandSignal?.expanded
@@ -2770,19 +2853,23 @@ export default function PcClasses({
               onUpdate={isInteractive ? applyUpdate : undefined}
               updateMaxStats={updateMaxStats}
               onLevelChange={
-                isInteractive && !automaticClassLevel
-                  ? handleLevelChange
-                  : undefined
+                canEdit && !automaticClassLevel ? handleLevelChange : undefined
               }
-              onRemoveClass={isInteractive ? handleRemoveClass : undefined}
-              onEditClass={isInteractive ? openEditClass : undefined}
+              onRemoveClass={canEdit ? handleRemoveClass : undefined}
+              onEditClass={canEdit ? openEditClass : undefined}
               pc={pc}
               searchQuery={searchQuery}
-              setHeroicPickerClassIdx={setHeroicPickerClassIdx}
-              setHeroicEditClassIdx={setHeroicEditClassIdx}
+              canEdit={canEdit}
+              setHeroicPickerClassIdx={
+                canEdit ? setHeroicPickerClassIdx : undefined
+              }
+              setHeroicEditClassIdx={
+                canEdit ? setHeroicEditClassIdx : undefined
+              }
               compact={isCompact}
               defaultExpanded={defaultExpanded}
               forceExpanded={expandSignal}
+              showLeveledSummary={isLocked ?? !isInteractive}
               theme={theme}
               t={t}
             />
@@ -2918,7 +3005,7 @@ export default function PcClasses({
     <>
       {isCompact ? (
         <Paper
-          sx={{ mb: 1, overflow: "hidden" }}
+          sx={{ mb: 1, overflow: "hidden", containerType: "inline-size" }}
           elevation={0}
           variant="outlined"
         >
@@ -2932,7 +3019,7 @@ export default function PcClasses({
       ) : (
         <SectionCard
           title={t(usesInnateClassRules ? "Innate Classes" : "Classes")}
-          sx={{ minWidth: 0, mb: 1 }}
+          sx={{ minWidth: 0, mb: 1, containerType: "inline-size" }}
           actions={classesActions}
         >
           {classesContent}

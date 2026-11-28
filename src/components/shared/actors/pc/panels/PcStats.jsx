@@ -21,7 +21,7 @@ import {
 import StatTooltip from "/src/components/common/StatTooltip";
 import { calculateAttribute } from "/src/libs/playerCalculations";
 import { deriveCombatStats } from "/src/components/shared/actors/core-utils";
-import { CombatStatCard } from "/src/components/shared/actors/pc/shared";
+import { CombatStatCard } from "/src/components/shared/actors/pc/pcStyled";
 import PcResources from "/src/components/shared/actors/common/PcResources";
 
 const STAT_LABEL_SHADOW =

@@ -1585,6 +1585,7 @@ export default function PcEquipment({
   player,
   setPlayer,
   isEditMode = false,
+  isLocked = false,
   compact = false,
   isMainTab = false,
   searchQuery = "",
@@ -1594,6 +1595,7 @@ export default function PcEquipment({
 }) {
   const { t } = useTranslate();
   const theme = useCustomTheme();
+  const canAddItems = isEditMode && !isLocked;
 
   const [compendiumType, setCompendiumType] = useState(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
@@ -2723,7 +2725,7 @@ export default function PcEquipment({
           <CompactSection
             key={group.key}
             group={group}
-            isEditMode={isEditMode}
+            isEditMode={canAddItems}
             isMainTab={isMainTab}
             onAdd={() => handleAddNew(group.key)}
             onCompendium={() => setCompendiumType(group.compendium)}
@@ -2777,7 +2779,7 @@ export default function PcEquipment({
         {!isMainTab && (
           <CompactSection
             group={{ label: t("Consumables"), key: "consumables" }}
-            isEditMode={isEditMode}
+            isEditMode={canAddItems}
             isMainTab={isMainTab}
             onAdd={handleAddConsumable}
             onCompendium={() => setCompendiumType("consumables")}
@@ -2988,7 +2990,7 @@ export default function PcEquipment({
         <React.Fragment key={key}>
           <FullSectionHeader
             label={label}
-            isEditMode={isEditMode}
+            isEditMode={canAddItems}
             onAdd={() => handleAddNew(key)}
             onCompendium={() =>
               setCompendiumType(
@@ -3076,7 +3078,7 @@ export default function PcEquipment({
       ))}
       <FullSectionHeader
         label={t("Consumables")}
-        isEditMode={isEditMode}
+        isEditMode={canAddItems}
         onAdd={handleAddConsumable}
         onCompendium={() => setCompendiumType("consumables")}
         primary={primary}

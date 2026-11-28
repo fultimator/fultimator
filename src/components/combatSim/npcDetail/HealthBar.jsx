@@ -47,7 +47,7 @@ const HealthBar = ({
         <Typography
           sx={{
             fontWeight: "bold",
-            fontFamily: "'PT Sans Narrow', sans-serif",
+            fontFamily: "'PFU Sans Narrow', sans-serif",
             fontSize: `calc(0.60rem + 0.25vw)`,
             color: isDarkMode ? "#fff" : bgColor, // Text color for label
           }}
@@ -82,7 +82,7 @@ const HealthBar = ({
             transform: "translate(-50%, -50%)",
             fontWeight: "bold",
             color: "#fff",
-            fontFamily: "'PT Sans Narrow', sans-serif",
+            fontFamily: "'PFU Sans Narrow', sans-serif",
             letterSpacing: "3px",
             fontSize: `calc(0.60rem + 0.25vw)`,
             whiteSpace: "nowrap",
@@ -103,7 +103,7 @@ const HealthBar = ({
               transform: "translateY(-50%)",
               fontWeight: "bold",
               color: rightTextColor,
-              fontFamily: "'PT Sans Narrow', sans-serif",
+              fontFamily: "'PFU Sans Narrow', sans-serif",
               letterSpacing: "2px",
               fontSize: `calc(0.60rem + 0.25vw)`,
               whiteSpace: "nowrap",

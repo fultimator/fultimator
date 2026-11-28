@@ -27,7 +27,7 @@ import {
   UpResourceIcon,
   ZenitResourceIcon,
 } from "/src/components/icons";
-import { GradientLinearProgress } from "/src/components/shared/actors/pc/shared";
+import { GradientLinearProgress } from "/src/components/shared/actors/pc/pcStyled";
 import { newShade } from "/src/libs/playerCalculations";
 import {
   getPipFlashSx,
@@ -293,7 +293,17 @@ export default function EditResourcesModal({
   };
 
   const actions = (
-    <Box sx={{ display: "flex", justifyContent: "center", gap: 1 }}>
+    <Box
+      sx={{
+        display: "flex",
+        justifyContent: "center",
+        gap: 1,
+        width: "100%",
+        "& > .MuiButton-root, & > span, & > span > .MuiButton-root": {
+          flex: 1,
+        },
+      }}
+    >
       {isPipResource || isFpResource || isUpResource ? (
         <>
           <Tooltip title={t("Subtract Amount")} placement="top">
@@ -538,12 +548,14 @@ export default function EditResourcesModal({
                         onClick={() => handlePipClick(i + 1)}
                         onMouseEnter={() => setPipHover(i + 1)}
                         sx={{
-                          width: "1.35em",
+                          flex: 1,
+                          minWidth: 0,
+                          maxWidth: 44,
+                          alignSelf: "stretch",
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "center",
                           cursor: "pointer",
-                          flexShrink: 0,
                           position: "relative",
                           overflow: "hidden",
                           opacity:

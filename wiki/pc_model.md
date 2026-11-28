@@ -4,6 +4,9 @@ Schema: `src/forms/schema/actorSchemas/pc.ts`
 
 For item schemas (weapons, armor, shields, accessories, custom weapons, spells) see [item_model.md](item_model.md).
 
+JSON Schema: [schemas/pc.schema.json](../docs/schemas/pc.schema.json).
+Full example: [examples/pc-full.json](../docs/examples/pc-full.json).
+
 ---
 
 ## Identity
@@ -11,7 +14,7 @@ For item schemas (weapons, armor, shields, accessories, custom weapons, spells) 
 - `id` {string}: Document ID
 - `uid` {string}: Owner user ID
 - `name` {string}: Display name
-- `lvl` {int}: Level
+- `lvl` {int 1-60}: Level. The sum of the class levels
 - `published` {bool?}: Firestore-only. Stripped on export. Not part of the Zod schema
 - `schemaVersion` {int?}: Bumped during post-load migration transforms
 
@@ -47,9 +50,11 @@ Replace `<key>` with: `dexterity` `insight` `might` `willpower`
 
 ## Stats
 
-- `stats.hp` {object}: `{ base: int, current: int }` - Hit Points
-- `stats.mp` {object}: `{ base: int, current: int }` - Mind Points
-- `stats.ip` {object}: `{ base: int, current: int }` - Inventory Points
+- `stats.hp` {object}: `{ max: int, current: int }` - Hit Points
+- `stats.mp` {object}: `{ max: int, current: int }` - Mind Points
+- `stats.ip` {object}: `{ max: int, current: int }` - Inventory Points
+
+The app reads `max` and recalculates it from level, attributes and classes. A missing `max` is calculated on load; `base` is not used.
 
 ---
 
@@ -75,7 +80,7 @@ Flat numeric modifiers applied to derived stats.
 
 Replace `<key>` with: `physical` `air` `bolt` `dark` `earth` `fire` `ice` `light` `poison`
 
-- `affinities.<key>` {string}: `"rs"` (Resistant) `"vu"` (Vulnerable) `"ab"` (Absorb) `"im"` (Immune) `"no"` (None)
+- `affinities.<key>` {string}: `"rs"` (Resistant) `"vu"` (Vulnerable) `"ab"` (Absorb) `"im"` (Immune) `"no"` (None). A missing key means normal damage; keys are not filled in on import
 
 ---
 
@@ -106,7 +111,7 @@ Aggregate ritual discipline access derived from equipped classes.
 ## Classes - `pc.classes[]`
 
 - `classes[n].name` {string}
-- `classes[n].lvl` {int}
+- `classes[n].lvl` {int}: Sum of the class skills' `currentLvl`, capped at 10. Recalculated on load unless `settings.automaticClassLevel` is `false`
 - `classes[n].benefits.hpplus` / `.mpplus` / `.ipplus` {int}: Default `0`
 - `classes[n].benefits.isCustomBenefit` {bool}: Default `false`
 - `classes[n].benefits.martials` {object}: `{ armor, shields, melee, ranged }` booleans
