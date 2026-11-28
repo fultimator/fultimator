@@ -124,9 +124,7 @@ const AppBar: React.FC<AppBarProps> = ({
                         style={{
                           height: "100%",
                           maxHeight: "60px",
-                          filter: isDarkMode
-                            ? "brightness(0.9) drop-shadow(0 0 2px rgba(255, 255, 255, 0.3))"
-                            : "brightness(1.05) drop-shadow(0 0 1px rgba(0, 0, 0, 0.2))",
+                          filter: `brightness(${isDarkMode ? 0.95 : 1.05}) drop-shadow(0 1px 1px rgba(0, 0, 0, 0.6)) drop-shadow(0 0 6px rgba(0, 0, 0, 0.4))`,
                         }}
                         src={isSmallViewport ? logo929 : undefined}
                         srcSet={
