@@ -100,6 +100,15 @@ const TOOL_BUTTON_SX = {
   borderRadius: 1,
 };
 
+const COMPACT_PAGE_BUTTON_SX = {
+  minWidth: 0,
+  px: { xs: 1, sm: 1.5 },
+  fontSize: { xs: 0, sm: "inherit" },
+  "& .MuiButton-startIcon, & .MuiButton-endIcon": {
+    mx: { xs: 0, sm: undefined },
+  },
+};
+
 export default function NpcCompedium() {
   const { t } = useTranslate();
   const [user, loading] = useAuthState(auth);
@@ -696,7 +705,7 @@ function Personal({ user }) {
             <Box
               sx={{
                 display: "grid",
-                gridTemplateColumns: { xs: "1fr", md: "1fr auto 1fr" },
+                gridTemplateColumns: { xs: "1fr auto", md: "1fr auto 1fr" },
                 alignItems: "center",
                 gap: 1.5,
                 rowGap: 1,
@@ -726,11 +735,16 @@ function Personal({ user }) {
                   </IconButton>
                 </Tooltip>
                 <Divider orientation="vertical" flexItem />
-                <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                <Typography
+                  variant="body1"
+                  sx={{ fontWeight: 600, whiteSpace: "nowrap" }}
+                >
                   {t("Adversaries")}: {personalList?.length ?? 0}
                 </Typography>
               </Box>
-              <Box sx={{ justifySelf: "center" }}>{pageButtons()}</Box>
+              <Box sx={{ justifySelf: { xs: "end", md: "center" } }}>
+                {pageButtons(COMPACT_PAGE_BUTTON_SX)}
+              </Box>
               {desktop && (
                 <PreviewWidthToggle
                   value={masonrySize}

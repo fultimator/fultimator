@@ -145,6 +145,11 @@ const toolButtonSx = {
   borderRadius: 1,
 };
 
+const desktopToolSx = [
+  toolButtonSx,
+  { display: { xs: "none", md: "inline-flex" } },
+];
+
 const iconOnlyMobileSx = {
   minWidth: 0,
   fontSize: { xs: 0, sm: "inherit" },
@@ -1196,9 +1201,7 @@ function Personal() {
                   display: "flex",
                   alignItems: "center",
                   gap: 0.75,
-                  flex: { xs: "1 1 100%", md: "none" },
-                  order: { xs: 5, md: 0 },
-                  justifyContent: { xs: "space-between", md: "flex-start" },
+                  order: { xs: 2, md: 0 },
                 }}
               >
                 {listToggle({ display: { md: "none" } })}
@@ -1308,7 +1311,7 @@ function Personal() {
                 <Tooltip title={t("Add NPC from JSON")}>
                   <IconButton
                     aria-label={t("Add NPC from JSON")}
-                    sx={toolButtonSx}
+                    sx={desktopToolSx}
                     onClick={() => fileInputRef.current.click()}
                   >
                     <UploadFile />
@@ -1338,7 +1341,7 @@ function Personal() {
                 <Tooltip title={t("Add NPC from Clipboard")}>
                   <IconButton
                     aria-label={t("Add NPC from Clipboard")}
-                    sx={toolButtonSx}
+                    sx={desktopToolSx}
                     onClick={handlePasteNpc}
                   >
                     <ContentPaste />
@@ -1347,13 +1350,13 @@ function Personal() {
                 <ExportAllNPCs
                   iconOnly
                   buttonRef={exportButtonRef}
-                  sx={toolButtonSx}
+                  sx={desktopToolSx}
                   npcs={filteredList?.length > 0 ? filteredList : []}
                 />
                 <Tooltip title={collapse ? t("Collapse") : t("Expand")}>
                   <IconButton
                     aria-label={collapse ? t("Collapse") : t("Expand")}
-                    sx={toolButtonSx}
+                    sx={desktopToolSx}
                     onClick={() => setCollapse(!collapse)}
                   >
                     {collapse ? <UnfoldLess /> : <UnfoldMore />}
@@ -1369,7 +1372,7 @@ function Personal() {
               <ToggleButtonGroup
                 size="small"
                 exclusive
-                sx={{ order: { xs: 4, md: 0 } }}
+                sx={{ display: { xs: "none", md: "inline-flex" } }}
                 value={layout}
                 onChange={(_, value) => value && setLayout(value)}
                 aria-label="Layout"
@@ -1412,7 +1415,10 @@ function Personal() {
                   order: { xs: 6, md: 0 },
                 }}
               >
-                <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                <Typography
+                  variant="body1"
+                  sx={{ fontWeight: 600, whiteSpace: "nowrap" }}
+                >
                   {t("filtered_npc_count") + " " + filteredList?.length}
                 </Typography>
                 {staleNpcs.length > 0 && (
@@ -1422,8 +1428,16 @@ function Personal() {
                       color="warning"
                       startIcon={<SystemUpdateAltIcon />}
                       onClick={() => setMigrationDialogOpen(true)}
+                      aria-label={`${t("Migrate")} (${staleNpcs.length})`}
+                      sx={{ whiteSpace: "nowrap" }}
                     >
-                      {t("Migrate")} ({staleNpcs.length})
+                      <Box
+                        component="span"
+                        sx={{ display: { xs: "none", sm: "inline" }, mr: 0.5 }}
+                      >
+                        {t("Migrate")}
+                      </Box>
+                      ({staleNpcs.length})
                     </Button>
                   </Tooltip>
                 )}

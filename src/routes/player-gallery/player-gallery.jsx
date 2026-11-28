@@ -136,6 +136,11 @@ const toolButtonSx = {
   borderRadius: 1,
 };
 
+const desktopToolSx = [
+  toolButtonSx,
+  { display: { xs: "none", md: "inline-flex" } },
+];
+
 export default function PlayerGallery() {
   const { authLoading, dbMode } = useDatabaseContext();
 
@@ -1290,7 +1295,7 @@ function Personal() {
                   display: "flex",
                   alignItems: "center",
                   gap: 0.75,
-                  order: { xs: 4, md: 0 },
+                  order: { xs: 2, md: 0 },
                 }}
               >
                 {listToggle({ display: { md: "none" } })}
@@ -1400,7 +1405,7 @@ function Personal() {
                 <Tooltip title={t("Add PC from JSON")}>
                   <IconButton
                     aria-label={t("Add PC from JSON")}
-                    sx={toolButtonSx}
+                    sx={desktopToolSx}
                     onClick={() => fileInputRef.current.click()}
                   >
                     <UploadFile />
@@ -1430,7 +1435,7 @@ function Personal() {
                 <Tooltip title={t("Add PC from Clipboard")}>
                   <IconButton
                     aria-label={t("Add PC from Clipboard")}
-                    sx={toolButtonSx}
+                    sx={desktopToolSx}
                     onClick={handlePastePlayer}
                   >
                     <ContentPaste />
@@ -1440,7 +1445,7 @@ function Personal() {
                   <span>
                     <IconButton
                       aria-label={t("Export all")}
-                      sx={toolButtonSx}
+                      sx={desktopToolSx}
                       disabled={!filteredList.length}
                       onClick={exportAllAsJson}
                     >
@@ -1457,7 +1462,7 @@ function Personal() {
                     aria-label={
                       expandAll ? t("Collapse Details") : t("Expand Details")
                     }
-                    sx={toolButtonSx}
+                    sx={desktopToolSx}
                     onClick={() => setExpandAll(!expandAll)}
                   >
                     {expandAll ? <UnfoldLess /> : <UnfoldMore />}
@@ -1473,7 +1478,7 @@ function Personal() {
               <ToggleButtonGroup
                 size="small"
                 exclusive
-                sx={{ order: { xs: 4, md: 0 } }}
+                sx={{ display: { xs: "none", md: "inline-flex" } }}
                 value={layout}
                 onChange={(_, value) => value && setLayout(value)}
                 aria-label="Layout"
@@ -1516,7 +1521,10 @@ function Personal() {
                   order: { xs: 5, md: 0 },
                 }}
               >
-                <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                <Typography
+                  variant="body1"
+                  sx={{ fontWeight: 600, whiteSpace: "nowrap" }}
+                >
                   {filteredList?.length ?? 0} {t("Players")}
                 </Typography>
                 {stalePlayers.length > 0 && (
@@ -1526,8 +1534,16 @@ function Personal() {
                       color="warning"
                       startIcon={<SystemUpdateAltIcon />}
                       onClick={() => setMigrationDialogOpen(true)}
+                      aria-label={`${t("Migrate")} (${stalePlayers.length})`}
+                      sx={{ whiteSpace: "nowrap" }}
                     >
-                      {t("Migrate")} ({stalePlayers.length})
+                      <Box
+                        component="span"
+                        sx={{ display: { xs: "none", sm: "inline" }, mr: 0.5 }}
+                      >
+                        {t("Migrate")}
+                      </Box>
+                      ({stalePlayers.length})
                     </Button>
                   </Tooltip>
                 )}
