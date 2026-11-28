@@ -1,116 +1,146 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import Chip from "@mui/material/Chip";
 import TextField from "@mui/material/TextField";
+import Autocomplete from "@mui/material/Autocomplete";
 import Stack from "@mui/material/Stack";
+import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import { useCustomTheme } from "../hooks/useCustomTheme";
+import { useTagSuggestions } from "../hooks/useTagSuggestions";
 import { useTranslate } from "../translation/translate";
 import AddIcon from "@mui/icons-material/Add";
+import { alpha } from "@mui/material/styles";
 
 const MAX_TAGS = 5;
 const MAX_TAG_LENGTH = 50;
+const NO_TAGS = [];
+const TAG_CHIP_SX = (theme) =>
+  theme.palette.mode === "dark"
+    ? {
+        color: "text.primary",
+        borderColor: alpha(theme.palette.secondary.main, 0.7),
+        "& .MuiChip-deleteIcon": {
+          color: "text.secondary",
+          "&:hover": { color: "text.primary" },
+        },
+      }
+    : {};
 
-export const TagEditor = ({ item, setItem, readOnly = false, label }) => {
+export const TagEditor = ({
+  item,
+  setItem,
+  readOnly = false,
+  label,
+  db,
+  collection,
+}) => {
   const { t } = useTranslate();
   const [inputValue, setInputValue] = useState("");
-  const tags = item.tags ?? [];
+  const { suggestions, load } = useTagSuggestions(db, collection);
+  const tags = item.tags ?? NO_TAGS;
+  const isFull = tags.length >= MAX_TAGS;
 
-  const handleDelete = (i) => () => {
-    setItem((prevState) => ({
-      ...prevState,
-      tags: (prevState.tags ?? []).filter((_, idx) => idx !== i),
-    }));
-  };
+  const options = useMemo(() => {
+    const used = new Set(tags.map((tag) => tag.name?.toUpperCase()));
+    return suggestions.filter((name) => !used.has(name));
+  }, [suggestions, tags]);
 
-  const handleInputChange = (e) => {
-    if (e.target.value.length <= MAX_TAG_LENGTH) {
-      setInputValue(e.target.value);
-    }
-  };
+  const setTags = (update) =>
+    setItem((prev) => ({ ...prev, tags: update(prev.tags ?? NO_TAGS) }));
 
-  const handleAddTag = () => {
-    const trimmedValue = inputValue.trim().toUpperCase();
+  const addTag = (raw) => {
+    const name = raw?.trim().toUpperCase();
     if (
-      trimmedValue &&
-      tags.length < MAX_TAGS &&
-      !tags.some((tag) => tag.name?.toUpperCase() === trimmedValue)
+      name &&
+      !isFull &&
+      !tags.some((tag) => tag.name?.toUpperCase() === name)
     ) {
-      setItem((prevState) => ({
-        ...prevState,
-        tags: [...(prevState.tags ?? []), { name: trimmedValue }],
-      }));
-      setInputValue("");
+      setTags((prev) => [...prev, { name }]);
     }
+    setInputValue("");
   };
-
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      handleAddTag();
-    }
-  };
-
-  const isInputDisabled = tags.length >= MAX_TAGS;
 
   return (
     <>
       {!readOnly && (
         <Stack direction="row" spacing={1} sx={{ alignItems: "flex-start" }}>
-          <TextField
-            value={inputValue}
-            onChange={handleInputChange}
-            onKeyDown={handleKeyDown}
-            label={
-              isInputDisabled ? t("Reached tag limit") : (label ?? t("Add Tag"))
-            }
-            variant="outlined"
-            size="small"
+          <Autocomplete
+            freeSolo
             fullWidth
-            disabled={isInputDisabled}
-            slotProps={{
-              htmlInput: { maxLength: MAX_TAG_LENGTH },
-            }}
-          />
-          <Button
-            variant="contained"
-            color="primary"
             size="small"
-            onClick={handleAddTag}
-            disabled={isInputDisabled}
-            aria-label={t("Add Tag")}
-            sx={{
-              height: "40px",
-              display: isInputDisabled ? "none" : "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              padding: "0 16px",
+            options={options}
+            value={null}
+            inputValue={inputValue}
+            onInputChange={(e, value, reason) => {
+              if (reason !== "reset") setInputValue(value);
             }}
-          >
-            <AddIcon />
-          </Button>
+            onChange={(e, value) => addTag(value)}
+            onFocus={load}
+            filterOptions={(opts, state) => {
+              const query = state.inputValue.trim().toUpperCase();
+              return opts.filter((option) => option.includes(query));
+            }}
+            disabled={isFull}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label={
+                  isFull ? t("Reached tag limit") : (label ?? t("Add Tag"))
+                }
+                slotProps={{
+                  ...params.slotProps,
+                  htmlInput: {
+                    ...params.slotProps.htmlInput,
+                    maxLength: MAX_TAG_LENGTH,
+                  },
+                }}
+              />
+            )}
+          />
+          {!isFull && (
+            <Button
+              variant="contained"
+              onClick={() => addTag(inputValue)}
+              aria-label={t("Add Tag")}
+              sx={{ height: 40, minWidth: 0, px: 2 }}
+            >
+              <AddIcon />
+            </Button>
+          )}
         </Stack>
       )}
       {tags.length > 0 && (
-        <div style={{ marginTop: readOnly ? 0 : "8px" }}>
+        <Box
+          sx={{
+            mt: readOnly ? 0 : 1,
+            display: "flex",
+            flexWrap: "wrap",
+            gap: 0.625,
+          }}
+        >
           {tags.map((tag, i) => (
             <Chip
               key={`${tag.name}-${i}`}
               label={tag.name?.toUpperCase()}
-              onDelete={readOnly ? undefined : handleDelete(i)}
+              onDelete={
+                readOnly
+                  ? undefined
+                  : () => setTags((prev) => prev.filter((_, idx) => idx !== i))
+              }
               color="primary"
               variant="outlined"
-              style={{ marginRight: "5px", marginBottom: "5px" }}
+              sx={TAG_CHIP_SX}
             />
           ))}
-        </div>
+        </Box>
       )}
     </>
   );
 };
 
-const TagList = ({ npc, setNpc }) => {
+const TagList = ({ npc, setNpc, db }) => {
   const { t } = useTranslate();
   const theme = useCustomTheme();
 
@@ -138,7 +168,12 @@ const TagList = ({ npc, setNpc }) => {
       >
         {t("Personal Tags")}
       </Typography>
-      <TagEditor item={npc} setItem={setNpc} />
+      <TagEditor
+        item={npc}
+        setItem={setNpc}
+        db={db}
+        collection="npc-personal"
+      />
     </Paper>
   );
 };

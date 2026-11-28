@@ -38,6 +38,7 @@ export default function EditPlayerBasics({
   isEditMode,
   advancement,
   onLevelUpRequest,
+  db,
 }) {
   const { t } = useTranslate();
   const [imgUrlTemp, setImgUrlTemp] = React.useState(player.info.imgurl);
@@ -226,6 +227,8 @@ export default function EditPlayerBasics({
                 setItem={setPlayer}
                 readOnly={!isEditMode}
                 label={t("Personal Tags")}
+                db={db}
+                collection="player-personal"
               />
             </Grid>
           )}

@@ -18,6 +18,7 @@ import {
 } from "../../libs/actor/timestamps";
 import SystemUpdateAltIcon from "@mui/icons-material/SystemUpdateAlt";
 import { useNavigate } from "react-router";
+import { rankTags } from "../../hooks/useTagSuggestions";
 
 import {
   Autocomplete,
@@ -343,17 +344,7 @@ function Personal() {
     [personalList, deferredName, sort, direction, tagFilter],
   );
 
-  const sortedTags = useMemo(() => {
-    const counts = {};
-    (personalList ?? []).forEach((player) => {
-      player.tags?.forEach((tag) => {
-        if (!tag?.name) return;
-        const tagName = tag.name.toUpperCase();
-        counts[tagName] = (counts[tagName] || 0) + 1;
-      });
-    });
-    return Object.keys(counts).sort((a, b) => counts[b] - counts[a]);
-  }, [personalList]);
+  const sortedTags = useMemo(() => rankTags(personalList), [personalList]);
 
   const gridItems = useMemo(
     () =>

@@ -551,7 +551,9 @@ export default function NpcEdit() {
                     isUpdated={isUpdated}
                   />
                 )}
-                {isOwner && <TagList npc={npcTemp} setNpc={setNpcTemp} />}
+                {isOwner && (
+                  <TagList npc={npcTemp} setNpc={setNpcTemp} db={db} />
+                )}
                 {isOwner && <NpcClockList npc={npcTemp} setNpc={setNpcTemp} />}
               </Grid>
             </Grid>

@@ -14,6 +14,7 @@ import {
   deleteDoc as fsDeleteDoc,
   getDoc as fsGetDoc,
   getDocs as fsGetDocs,
+  getDocsFromCache as fsGetDocsFromCache,
   writeBatch as fsWriteBatch,
   type CollectionReference,
   type DocumentReference,
@@ -106,6 +107,15 @@ export const CloudAdapter: DatabaseAdapter = {
       return snapshot.docs.map((d) => ({ ...d.data(), id: d.id }));
     } catch (err) {
       throw normalizeFirestoreError(err);
+    }
+  },
+
+  async getCachedDocs(queryRef: unknown) {
+    try {
+      const snapshot = await fsGetDocsFromCache(queryRef as Query);
+      return snapshot.docs.map((d) => ({ ...d.data(), id: d.id }));
+    } catch {
+      return [];
     }
   },
 

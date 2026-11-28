@@ -1237,6 +1237,7 @@ export default function PlayerEdit() {
             updateMaxStats={updateMaxStats}
             advancement={advancement}
             onLevelUpRequest={openLevelUpDialog}
+            db={db}
           />
         </TabPanel>
         <TabPanel value={2} currentValue={openTab}>

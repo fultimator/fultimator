@@ -42,6 +42,7 @@ export interface DatabaseAdapter {
   // One-time reads (non-reactive)
   getDoc: (ref: unknown) => Promise<unknown | null>;
   getDocs: (query: unknown) => Promise<unknown[]>;
+  getCachedDocs: (query: unknown) => Promise<unknown[]>;
 
   // Writes
   addDoc: (
