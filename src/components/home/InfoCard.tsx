@@ -19,7 +19,7 @@ export default function InfoCard({
   return (
     <Paper
       sx={{
-        p: 3,
+        p: { xs: 2, sm: 3 },
         height: "100%",
         display: "flex",
         flexDirection: { xs: "column", md: "row" },

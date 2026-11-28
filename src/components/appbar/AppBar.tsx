@@ -78,11 +78,9 @@ const AppBar: React.FC<AppBarProps> = ({
               sx={{ alignItems: "center", justifyContent: "space-between" }}
             >
               <Grid
-                size={{ xs: showGoBackButton ? 2 : 2, sm: 2 }}
+                size={{ xs: "auto", sm: 2 }}
                 sx={{
-                  textAlign: "left",
                   display: "flex",
-                  flexDirection: { xs: "column", sm: "row" },
                   alignItems: "center",
                   justifyContent: "flex-start",
                 }}
@@ -101,8 +99,9 @@ const AppBar: React.FC<AppBarProps> = ({
 
               {!isNpcEdit && (
                 <Grid
-                  size={8}
+                  size={{ xs: "grow", sm: 8 }}
                   sx={{
+                    minWidth: 0,
                     textAlign: "center",
                     height: "60px",
                     display: "flex",
@@ -124,6 +123,7 @@ const AppBar: React.FC<AppBarProps> = ({
                         style={{
                           height: "100%",
                           maxHeight: "60px",
+                          maxWidth: "100%",
                           filter: `brightness(${isDarkMode ? 0.95 : 1.05}) drop-shadow(0 1px 1px rgba(0, 0, 0, 0.6)) drop-shadow(0 0 6px rgba(0, 0, 0, 0.4))`,
                         }}
                         src={isSmallViewport ? logo929 : undefined}
@@ -140,11 +140,11 @@ const AppBar: React.FC<AppBarProps> = ({
                 </Grid>
               )}
 
-              <Grid sx={{ textAlign: "right" }} size={2}>
+              <Grid size={{ xs: "auto", sm: 2 }}>
                 <Grid
                   container
+                  wrap="nowrap"
                   sx={{
-                    display: "flex",
                     alignItems: "center",
                     justifyContent: "flex-end",
                   }}

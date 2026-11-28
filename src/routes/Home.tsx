@@ -1,5 +1,4 @@
 import {
-  CardMedia,
   Typography,
   Link,
   Box,
@@ -8,17 +7,10 @@ import {
   Button,
   Tooltip,
 } from "@mui/material";
-import { useNavigate } from "react-router";
+import { Link as RouterLink, useNavigate } from "react-router";
 import Layout from "../components/Layout";
 import React, { Suspense, lazy, useState } from "react";
 import { useTranslate } from "../translation/translate";
-import adversary_compedium from "/images/routes/navigation/adversary_compedium.webp";
-import adversary_designer from "/images/routes/navigation/adversary_designer.webp";
-import combat_simulator from "/images/routes/navigation/combat_simulator.webp";
-import dice_roller from "/images/routes/navigation/dice_roller.webp";
-import items_rituals_projects from "/images/routes/items_rituals_projects.webp";
-import compendium_viewer from "/images/routes/navigation/compendia_viewer.webp"; // placeholder, replace with dedicated asset
-import character_designer from "/images/routes/navigation/character_designer.webp";
 import FeedbackIcon from "@mui/icons-material/Feedback";
 import DesktopMacIcon from "@mui/icons-material/DesktopMac";
 import { DiscordIcon } from "../components/icons";
@@ -38,11 +30,12 @@ const IconCreditsModal = lazy(() => import("../components/IconCreditsModal"));
 import powered_by_fu from "/images/routes/powered_by_fu.png";
 import LanguageIcon from "@mui/icons-material/Language";
 
+const NAV_IMAGES = "/images/routes/navigation";
+
 function Home() {
   const theme = useCustomTheme();
   const isDarkMode = theme.mode === "dark";
   const navigate = useNavigate();
-  const [hover, setHover] = useState("");
   const [creditsOpen, setCreditsOpen] = useState(false);
   const { t } = useTranslate();
   const greenAccent = isDarkMode ? "#81c784" : "#388e3c";
@@ -60,7 +53,7 @@ function Home() {
       icon: <AppleIcon fontSize="inherit" />,
       color: ["#111111", "#e0e0e0"],
     },
-    { label: "Linux", icon: <FaLinux />, color: ["#111111", "#fcc624"] },
+    { label: "Linux", icon: <FaLinux />, color: ["#111111", "#e0e0e0"] },
     {
       label: "Android",
       icon: <AndroidIcon fontSize="inherit" />,
@@ -82,89 +75,108 @@ function Home() {
     : filledAccentSx("#b55c00", "#964d00");
   const discordFilledSx = filledAccentSx("#4752c4", "#3c45a5");
 
-  const mediaItems = [
+  const navItems = [
     {
-      image: character_designer,
+      name: "character_designer",
       link: "/pc-gallery",
-      hoverKey: "character_designer",
+      label: "Character Designer",
     },
     {
-      image: adversary_designer,
+      name: "adversary_designer",
       link: "/npc-gallery",
-      hoverKey: "adversary_designer",
+      label: "Adversary Designer",
     },
     {
-      image: adversary_compedium,
+      name: "adversary_compedium",
       link: "/npc-compedium",
-      hoverKey: "adversary_compendium",
+      label: "Adversary Compendium",
     },
     {
-      image: combat_simulator,
+      name: "combat_simulator",
       link: "/combat-sim",
-      hoverKey: "combat_simulator",
+      label: "Combat Simulator",
     },
     {
-      image: items_rituals_projects,
+      name: "items_rituals_projects",
       link: "/generate",
-      hoverKey: "items_rituals_projects",
+      label: "Rituals, Projects and Items",
     },
-    {
-      image: compendium_viewer,
-      link: "/compendium",
-      hoverKey: "compendium_viewer",
-    },
-    {
-      image: dice_roller,
-      link: "/roller",
-      hoverKey: "dice_roller",
-    },
+    { name: "compendia_viewer", link: "/compendium", label: "Compendium" },
+    { name: "dice_roller", link: "/roller", label: "Dice Roller" },
   ];
 
   return (
     <Layout>
-      <div
-        style={{
+      <Box
+        component="nav"
+        sx={{
           display: "flex",
-          justifyContent: "center",
           flexWrap: "wrap",
-          gap: "1em",
-          margin: "1em",
+          justifyContent: "center",
+          gap: { xs: 1, sm: 2 },
+          m: { xs: 1, sm: 2 },
         }}
       >
-        {mediaItems.map((item, index) => (
-          <CardMedia
-            key={index}
-            component="img"
-            image={item.image}
-            alt=""
+        {navItems.map((item) => (
+          <Box
+            key={item.link}
+            component={RouterLink}
+            to={item.link}
+            state={{ from: "/" }}
+            aria-label={t(item.label)}
             sx={{
-              objectFit: "contain",
-              width: 360,
-              cursor: "pointer",
-              transform: hover === item.hoverKey ? "scale(1.05)" : "none",
-              transition: "transform 0.3s",
+              position: "relative",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              width: {
+                xs: "calc((100% - 8px) / 2)",
+                sm: "calc((100% - 32px) / 3)",
+                lg: "calc((100% - 48px) / 4)",
+              },
+              maxWidth: 340,
+              aspectRatio: { sm: "600 / 360" },
+              py: { xs: 0.5, sm: 0 },
+              borderRadius: 2,
+              transition: "transform 0.2s",
+              "&:hover, &:focus-visible": { transform: "scale(1.05)" },
             }}
-            onMouseEnter={() => {
-              setHover(item.hoverKey);
-            }}
-            onMouseLeave={() => {
-              setHover("");
-            }}
-            onClick={() => {
-              navigate(item.link, {
-                state: {
-                  from: "/",
-                },
-              });
-            }}
-          />
+          >
+            <Box
+              component="img"
+              src={`${NAV_IMAGES}/labels/${item.name}.webp?v=4`}
+              alt=""
+              sx={{
+                position: { sm: "absolute" },
+                left: { sm: "51.8%" },
+                top: { sm: "35%" },
+                width: { xs: "80%", sm: "47.8%" },
+                aspectRatio: { xs: "247 / 106", sm: "auto" },
+                objectFit: "cover",
+                objectPosition: "right",
+                mt: { xs: "-4%", sm: 0 },
+                order: { xs: 1, sm: 0 },
+              }}
+            />
+            <Box
+              component="img"
+              src={`${NAV_IMAGES}/icons/${item.name}.webp?v=4`}
+              alt=""
+              sx={{
+                position: { xs: "relative", sm: "absolute" },
+                zIndex: 1,
+                left: 0,
+                top: 0,
+                width: { xs: "70%", sm: "59.3%" },
+              }}
+            />
+          </Box>
         ))}
-      </div>
+      </Box>
       <Box
         sx={{
-          mt: 5,
-          mb: 5,
-          padding: "2em",
+          my: { xs: 3, sm: 5 },
+          p: { xs: 1.5, sm: 4 },
           backgroundColor: alpha(theme.text.primary, isDarkMode ? 0.06 : 0.04),
           border: `1px solid ${alpha(theme.quaternary || theme.text.primary, 0.35)}`,
           borderRadius: `${theme.panelRadius}px`,
@@ -182,14 +194,14 @@ function Home() {
                 target="_blank"
                 rel="noopener noreferrer"
                 underline="hover"
-                sx={{ fontWeight: "bold" }}
+                sx={{ ...linkSx, fontWeight: "bold" }}
               >
                 https://fultimator.com
               </Link>
             </Typography>
           </InfoCard>
         </Box>
-        <Grid container spacing={4}>
+        <Grid container spacing={{ xs: 2, sm: 4 }}>
           <Grid size={{ xs: 12, md: 6 }}>
             <InfoCard
               icon={<DiscordIcon size={24} color="#7289da" />}
