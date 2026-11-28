@@ -548,12 +548,14 @@ export default function EditResourcesModal({
                         onClick={() => handlePipClick(i + 1)}
                         onMouseEnter={() => setPipHover(i + 1)}
                         sx={{
-                          width: "1.35em",
+                          flex: 1,
+                          minWidth: 0,
+                          maxWidth: 44,
+                          alignSelf: "stretch",
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "center",
                           cursor: "pointer",
-                          flexShrink: 0,
                           position: "relative",
                           overflow: "hidden",
                           opacity:

@@ -986,36 +986,6 @@ export default function PlayerEdit() {
                 <Settings />
               </Tab>
             </TabsList>
-            {isOwner ? (
-              <Paper
-                elevation={0}
-                sx={{
-                  backgroundColor: ternary,
-                  borderRadius: "12px",
-                  px: 0.5,
-                  py: 0.5,
-                  boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.2)",
-                  display: "flex",
-                  alignItems: "center",
-                }}
-              >
-                <Tooltip
-                  title={
-                    isSheetEditMode
-                      ? t("Switch to Preview Mode")
-                      : t("Switch to Edit Mode")
-                  }
-                >
-                  <IconButton
-                    size="small"
-                    onClick={() => setIsSheetEditMode((v) => !v)}
-                    sx={{ color: "inherit", flexShrink: 0 }}
-                  >
-                    {isSheetEditMode ? <LockOpen /> : <Lock />}
-                  </IconButton>
-                </Tooltip>
-              </Paper>
-            ) : null}
           </Box>
         )}
 
@@ -1038,7 +1008,12 @@ export default function PlayerEdit() {
               startIcon={<Download />}
               sx={{ flex: 1, minWidth: 0, whiteSpace: "nowrap" }}
             >
-              {t("Download Character Sheet")}
+              <Box
+                component="span"
+                sx={{ overflow: "hidden", textOverflow: "ellipsis" }}
+              >
+                {t("Download Character Sheet")}
+              </Box>
             </Button>
             {isSmallScreen ? (
               <Tooltip
@@ -1067,6 +1042,36 @@ export default function PlayerEdit() {
               >
                 {compactView ? t("Normal View") : t("Compact View")}
               </Button>
+            )}
+            {isOwner && (
+              <Tooltip
+                title={
+                  isSheetEditMode
+                    ? t("Switch to Preview Mode")
+                    : t("Switch to Edit Mode")
+                }
+              >
+                <IconButton
+                  aria-label={
+                    isSheetEditMode
+                      ? t("Switch to Preview Mode")
+                      : t("Switch to Edit Mode")
+                  }
+                  aria-pressed={isSheetEditMode}
+                  onClick={() => setIsSheetEditMode((v) => !v)}
+                  sx={{
+                    ...ICON_BTN_SX,
+                    ...(isSheetEditMode && {
+                      bgcolor: "primary.main",
+                      borderColor: "primary.main",
+                      color: "primary.contrastText",
+                      "&:hover": { bgcolor: "primary.dark" },
+                    }),
+                  }}
+                >
+                  {isSheetEditMode ? <LockOpen /> : <Lock />}
+                </IconButton>
+              </Tooltip>
             )}
             {isSmallScreen && compactView && (
               <Tooltip
@@ -1648,28 +1653,6 @@ export default function PlayerEdit() {
               onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
             >
               <KeyboardArrowUp fontSize="medium" />
-            </Fab>
-          </Tooltip>
-        )}
-
-        {isSmallScreen && isOwner && openTab === 0 && (
-          <Tooltip
-            title={
-              isSheetEditMode
-                ? t("Switch to Preview Mode")
-                : t("Switch to Edit Mode")
-            }
-          >
-            <Fab
-              size="medium"
-              onClick={() => setIsSheetEditMode((v) => !v)}
-              color="primary"
-            >
-              {isSheetEditMode ? (
-                <LockOpen fontSize="medium" />
-              ) : (
-                <Lock fontSize="medium" />
-              )}
             </Fab>
           </Tooltip>
         )}

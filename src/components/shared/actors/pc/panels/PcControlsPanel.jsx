@@ -40,6 +40,30 @@ import {
 } from "/src/components/shared/actors/common/barShellUtils";
 import BarShell from "/src/components/shared/actors/common/BarShell";
 
+function BarLabel({ tooltip, Icon, label, labelBg, labelBorder }) {
+  const label_ = (
+    <Box
+      sx={{
+        ...LABEL_SX,
+        height: "100%",
+        bgcolor: labelBg,
+        borderRight: `1px solid ${labelBorder}`,
+      }}
+    >
+      {Icon && <Icon size="1.4em" />}
+      <span style={{ lineHeight: 1 }}>{label}</span>
+    </Box>
+  );
+  if (!tooltip) return label_;
+  return (
+    <Box onClick={(e) => e.stopPropagation()} sx={{ display: "flex" }}>
+      <StatTooltip {...tooltip} display="flex">
+        {label_}
+      </StatTooltip>
+    </Box>
+  );
+}
+
 function StatBar({
   label,
   Icon,
@@ -52,6 +76,7 @@ function StatBar({
   onSetCrisis = null,
   onClick,
   isClickable = false,
+  tooltip,
 }) {
   const { shellBg, shellBorder, labelBg, labelBorder, trackBg } = useBarShell();
   const [crisisHover, setCrisisHover] = useState(false);
@@ -63,18 +88,13 @@ function StatBar({
 
   return (
     <BarShell shellBg={shellBg} shellBorder={shellBorder}>
-      <Box
-        onClick={isClickable ? onClick : undefined}
-        sx={{
-          ...LABEL_SX,
-          bgcolor: labelBg,
-          borderRight: `1px solid ${labelBorder}`,
-          cursor: isClickable ? "pointer" : "default",
-        }}
-      >
-        {Icon && <Icon size="1.4em" />}
-        <span style={{ lineHeight: 1 }}>{label}</span>
-      </Box>
+      <BarLabel
+        tooltip={tooltip}
+        Icon={Icon}
+        label={label}
+        labelBg={labelBg}
+        labelBorder={labelBorder}
+      />
       <Box
         onClick={isClickable ? onClick : undefined}
         sx={{
@@ -340,25 +360,20 @@ function ResourceCell({
     <Box
       sx={{ display: "flex", flexDirection: "column", gap: "4px", minWidth: 0 }}
     >
-      <StatTooltip
-        {...(tooltip ?? {})}
-        display="block"
-        disabled={isInteractive}
-      >
-        <StatBar
-          label={label}
-          Icon={Icon}
-          value={value}
-          max={max}
-          color1={color1}
-          color2={color2}
-          crisis={crisis}
-          crisisTooltip={crisisTooltip}
-          onSetCrisis={onSetCrisis}
-          isClickable={barClickable}
-          onClick={onBarClick}
-        />
-      </StatTooltip>
+      <StatBar
+        label={label}
+        Icon={Icon}
+        value={value}
+        max={max}
+        color1={color1}
+        color2={color2}
+        crisis={crisis}
+        crisisTooltip={crisisTooltip}
+        onSetCrisis={onSetCrisis}
+        isClickable={barClickable}
+        onClick={onBarClick}
+        tooltip={tooltip}
+      />
       {isInteractive && <DeltaControls onApply={onApply} steps={steps} />}
     </Box>
   );
@@ -396,119 +411,114 @@ function FpCell({
     <Box
       sx={{ display: "flex", flexDirection: "column", gap: "4px", minWidth: 0 }}
     >
-      <StatTooltip
-        {...(tooltip ?? {})}
-        display="block"
-        disabled={isInteractive}
+      <Box
+        onClick={!isInteractive && barClickable ? onBarClick : undefined}
+        sx={{
+          cursor: !isInteractive && barClickable ? "pointer" : undefined,
+        }}
       >
-        <Box
-          onClick={!isInteractive && barClickable ? onBarClick : undefined}
-          sx={{
-            cursor: !isInteractive && barClickable ? "pointer" : undefined,
-          }}
-        >
-          <BarShell shellBg={shellBg} shellBorder={shellBorder}>
-            <Box
-              sx={{
-                ...LABEL_SX,
-                bgcolor: labelBg,
-                borderRight: `1px solid ${labelBorder}`,
-              }}
-            >
-              <FpResourceIcon size="1.4em" />
-              <span style={{ lineHeight: 1 }}>{t("FP")}</span>
-            </Box>
-            <Box
-              sx={{
-                flex: 1,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                mx: "-4px",
-                bgcolor: trackBg,
-              }}
-              onMouseLeave={() => setHoveredPip(null)}
-            >
-              {Array.from({ length: MAX_FP_PIPS }).map((_, i) => {
-                const isPreview = i < previewCount;
-                const animFill = Math.max(0, Math.min(1, animatedFilled - i));
-                const fpChanged = fpDelta
-                  ? i < fpDelta.from !== i < fpDelta.to
-                  : false;
-                return (
+        <BarShell shellBg={shellBg} shellBorder={shellBorder}>
+          <BarLabel
+            tooltip={tooltip}
+            Icon={FpResourceIcon}
+            label={t("FP")}
+            labelBg={labelBg}
+            labelBorder={labelBorder}
+          />
+          <Box
+            sx={{
+              flex: 1,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "2px",
+              px: "4px",
+              bgcolor: trackBg,
+            }}
+            onMouseLeave={() => setHoveredPip(null)}
+          >
+            {Array.from({ length: MAX_FP_PIPS }).map((_, i) => {
+              const isPreview = i < previewCount;
+              const animFill = Math.max(0, Math.min(1, animatedFilled - i));
+              const fpChanged = fpDelta
+                ? i < fpDelta.from !== i < fpDelta.to
+                : false;
+              return (
+                <Box
+                  key={i}
+                  onMouseEnter={() => isInteractive && setHoveredPip(i)}
+                  onClick={() => handleSetPip(i)}
+                  sx={{
+                    flex: 1,
+                    minWidth: 0,
+                    maxWidth: 44,
+                    alignSelf: "stretch",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    cursor: isInteractive ? "pointer" : "inherit",
+                    flexShrink: 0,
+                    position: "relative",
+                    overflow: "hidden",
+                    ...getPipFlashSx({
+                      changed: fpChanged,
+                      keyframeName: "fpDeltaFade",
+                      fromOpacity: 0.9,
+                      stripe: PIP_STRIPES.strong,
+                    }),
+                  }}
+                >
                   <Box
-                    key={i}
-                    onMouseEnter={() => isInteractive && setHoveredPip(i)}
-                    onClick={() => handleSetPip(i)}
                     sx={{
                       width: "1.35em",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      cursor: isInteractive ? "pointer" : "inherit",
+                      opacity:
+                        hoveredPip === null
+                          ? 0.2 + animFill * 0.8
+                          : isPreview
+                            ? 1
+                            : 0.28,
+                      filter:
+                        animFill > 0.6
+                          ? "drop-shadow(0 0 2px rgba(255,255,255,0.45))"
+                          : "none",
                       flexShrink: 0,
-                      position: "relative",
-                      overflow: "hidden",
-                      ...getPipFlashSx({
-                        changed: fpChanged,
-                        keyframeName: "fpDeltaFade",
-                        fromOpacity: 0.9,
-                        stripe: PIP_STRIPES.strong,
-                      }),
                     }}
                   >
-                    <Box
-                      sx={{
-                        width: "1.35em",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        opacity:
-                          hoveredPip === null
-                            ? 0.2 + animFill * 0.8
-                            : isPreview
-                              ? 1
-                              : 0.28,
-                        filter:
-                          animFill > 0.6
-                            ? "drop-shadow(0 0 2px rgba(255,255,255,0.45))"
-                            : "none",
-                        flexShrink: 0,
-                      }}
-                    >
-                      <FpResourceIcon size="1.8em" />
-                    </Box>
+                    <FpResourceIcon size="1.8em" />
                   </Box>
-                );
-              })}
-              {overflow > 0 && (
-                <Typography
-                  sx={{
-                    fontFamily: "Antonio",
-                    fontWeight: "bold",
-                    fontSize: "0.75rem",
-                    color: "#fff",
-                    lineHeight: 1,
-                  }}
-                >
-                  +{overflow}
-                </Typography>
-              )}
-            </Box>
-            <Box
-              onClick={barClickable ? onBarClick : undefined}
-              sx={{
-                ...VALUE_SX,
-                bgcolor: labelBg,
-                borderLeft: `1px solid ${labelBorder}`,
-                cursor: barClickable ? "pointer" : "default",
-              }}
-            >
-              {value}
-            </Box>
-          </BarShell>
-        </Box>
-      </StatTooltip>
+                </Box>
+              );
+            })}
+            {overflow > 0 && (
+              <Typography
+                sx={{
+                  fontFamily: "Antonio",
+                  fontWeight: "bold",
+                  fontSize: "0.75rem",
+                  color: "#fff",
+                  lineHeight: 1,
+                }}
+              >
+                +{overflow}
+              </Typography>
+            )}
+          </Box>
+          <Box
+            onClick={barClickable ? onBarClick : undefined}
+            sx={{
+              ...VALUE_SX,
+              bgcolor: labelBg,
+              borderLeft: `1px solid ${labelBorder}`,
+              cursor: barClickable ? "pointer" : "default",
+            }}
+          >
+            {value}
+          </Box>
+        </BarShell>
+      </Box>
       {isInteractive && <DeltaControls onApply={onApply} steps={[1, 2, 3]} />}
     </Box>
   );
@@ -547,101 +557,92 @@ function IpCell({
     <Box
       sx={{ display: "flex", flexDirection: "column", gap: "4px", minWidth: 0 }}
     >
-      <StatTooltip
-        {...(tooltip ?? {})}
-        display="block"
-        disabled={isInteractive}
+      <Box
+        onClick={!isInteractive && barClickable ? onBarClick : undefined}
+        sx={{
+          cursor: !isInteractive && barClickable ? "pointer" : undefined,
+        }}
       >
-        <Box
-          onClick={!isInteractive && barClickable ? onBarClick : undefined}
-          sx={{
-            cursor: !isInteractive && barClickable ? "pointer" : undefined,
-          }}
-        >
-          <BarShell shellBg={shellBg} shellBorder={shellBorder}>
-            <Box
-              sx={{
-                ...LABEL_SX,
-                bgcolor: labelBg,
-                borderRight: `1px solid ${labelBorder}`,
-              }}
-            >
-              <IpResourceIcon size="1.4em" />
-              <span style={{ lineHeight: 1 }}>{t("IP")}</span>
-            </Box>
-            <Box
-              sx={{
-                flex: 1,
-                display: "flex",
-                alignItems: "stretch",
-                gap: "2px",
-                px: "3px",
-                py: "3px",
-                bgcolor: trackBg,
-              }}
-              onMouseLeave={() => setHoveredPip(null)}
-            >
-              {Array.from({ length: max }).map((_, i) =>
-                (() => {
-                  const isPreview = i < previewCount;
-                  const animFill = Math.max(0, Math.min(1, animatedValue - i));
-                  const ipChanged = ipDelta
-                    ? i < ipDelta.from !== i < ipDelta.to
-                    : false;
-                  return (
-                    <Box
-                      key={i}
-                      onMouseEnter={() => isInteractive && setHoveredPip(i)}
-                      onClick={() => handleSetPip(i)}
-                      sx={{
-                        flex: 1,
-                        minWidth: 0,
-                        borderRadius: "2px",
-                        background:
-                          animFill > 0.01
-                            ? `linear-gradient(to bottom, ${color1}, ${color2})`
-                            : "transparent",
-                        border: `1px solid ${animFill > 0.01 ? color2 : shellBorder}`,
-                        opacity:
-                          hoveredPip === null
-                            ? 0.22 + animFill * 0.78
-                            : isPreview
-                              ? 1
-                              : 0.28,
-                        cursor: isInteractive ? "pointer" : "inherit",
-                        transition: (t) =>
-                          t.transitions.create(["background", "opacity"], {
-                            duration: t.transitions.duration.standard,
-                            easing: t.transitions.easing.easeOut,
-                          }),
-                        position: "relative",
-                        overflow: "hidden",
-                        ...getPipFlashSx({
-                          changed: ipChanged,
-                          keyframeName: "ipPipDeltaFade",
-                          fromOpacity: 0.9,
-                          stripe: PIP_STRIPES.subtle,
+        <BarShell shellBg={shellBg} shellBorder={shellBorder}>
+          <BarLabel
+            tooltip={tooltip}
+            Icon={IpResourceIcon}
+            label={t("IP")}
+            labelBg={labelBg}
+            labelBorder={labelBorder}
+          />
+          <Box
+            sx={{
+              flex: 1,
+              display: "flex",
+              alignItems: "stretch",
+              gap: "2px",
+              px: "3px",
+              py: "3px",
+              bgcolor: trackBg,
+            }}
+            onMouseLeave={() => setHoveredPip(null)}
+          >
+            {Array.from({ length: max }).map((_, i) =>
+              (() => {
+                const isPreview = i < previewCount;
+                const animFill = Math.max(0, Math.min(1, animatedValue - i));
+                const ipChanged = ipDelta
+                  ? i < ipDelta.from !== i < ipDelta.to
+                  : false;
+                return (
+                  <Box
+                    key={i}
+                    onMouseEnter={() => isInteractive && setHoveredPip(i)}
+                    onClick={() => handleSetPip(i)}
+                    sx={{
+                      flex: 1,
+                      minWidth: 0,
+                      borderRadius: "2px",
+                      background:
+                        animFill > 0.01
+                          ? `linear-gradient(to bottom, ${color1}, ${color2})`
+                          : "transparent",
+                      border: `1px solid ${animFill > 0.01 ? color2 : shellBorder}`,
+                      opacity:
+                        hoveredPip === null
+                          ? 0.22 + animFill * 0.78
+                          : isPreview
+                            ? 1
+                            : 0.28,
+                      cursor: isInteractive ? "pointer" : "inherit",
+                      transition: (t) =>
+                        t.transitions.create(["background", "opacity"], {
+                          duration: t.transitions.duration.standard,
+                          easing: t.transitions.easing.easeOut,
                         }),
-                      }}
-                    />
-                  );
-                })(),
-              )}
-            </Box>
-            <Box
-              onClick={barClickable ? onBarClick : undefined}
-              sx={{
-                ...VALUE_SX,
-                bgcolor: labelBg,
-                borderLeft: `1px solid ${labelBorder}`,
-                cursor: barClickable ? "pointer" : "default",
-              }}
-            >
-              {value}/{max}
-            </Box>
-          </BarShell>
-        </Box>
-      </StatTooltip>
+                      position: "relative",
+                      overflow: "hidden",
+                      ...getPipFlashSx({
+                        changed: ipChanged,
+                        keyframeName: "ipPipDeltaFade",
+                        fromOpacity: 0.9,
+                        stripe: PIP_STRIPES.subtle,
+                      }),
+                    }}
+                  />
+                );
+              })(),
+            )}
+          </Box>
+          <Box
+            onClick={barClickable ? onBarClick : undefined}
+            sx={{
+              ...VALUE_SX,
+              bgcolor: labelBg,
+              borderLeft: `1px solid ${labelBorder}`,
+              cursor: barClickable ? "pointer" : "default",
+            }}
+          >
+            {value}/{max}
+          </Box>
+        </BarShell>
+      </Box>
       {isInteractive && <DeltaControls onApply={onApply} steps={[1, 2, 3]} />}
     </Box>
   );
@@ -660,60 +661,57 @@ function ZenitRow({
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-      <StatTooltip {...(tooltip ?? {})} display="block">
-        <Box
-          onClick={!isInteractive && barClickable ? onBarClick : undefined}
-          sx={{
-            cursor: !isInteractive && barClickable ? "pointer" : undefined,
-          }}
-        >
-          <BarShell shellBg={shellBg} shellBorder={shellBorder}>
-            <Box
+      <Box
+        onClick={!isInteractive && barClickable ? onBarClick : undefined}
+        sx={{
+          cursor: !isInteractive && barClickable ? "pointer" : undefined,
+        }}
+      >
+        <BarShell shellBg={shellBg} shellBorder={shellBorder}>
+          <BarLabel
+            tooltip={tooltip}
+            Icon={ZenitResourceIcon}
+            label={t("Z")}
+            labelBg={labelBg}
+            labelBorder={labelBorder}
+          />
+          <Box
+            onClick={barClickable ? onBarClick : undefined}
+            sx={{
+              flex: 1,
+              bgcolor: trackBg,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: barClickable ? "pointer" : "default",
+            }}
+          >
+            <Typography
               sx={{
-                ...LABEL_SX,
-                bgcolor: labelBg,
-                borderRight: `1px solid ${labelBorder}`,
+                fontFamily: "Antonio",
+                fontWeight: 900,
+                fontSize: "1.1rem",
+                color: "#fff",
+                lineHeight: 1,
+                letterSpacing: "0.04em",
               }}
             >
-              <ZenitResourceIcon size="1.4em" />
-              <span style={{ lineHeight: 1 }}>{t("Z")}</span>
-            </Box>
-            <Box
-              sx={{
-                flex: 1,
-                bgcolor: trackBg,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <Typography
-                sx={{
-                  fontFamily: "Antonio",
-                  fontWeight: 900,
-                  fontSize: "1.1rem",
-                  color: "#fff",
-                  lineHeight: 1,
-                  letterSpacing: "0.04em",
-                }}
-              >
-                {value.toLocaleString()}
-              </Typography>
-            </Box>
-            <Box
-              onClick={barClickable ? onBarClick : undefined}
-              sx={{
-                ...LABEL_SX,
-                bgcolor: labelBg,
-                borderLeft: `1px solid ${labelBorder}`,
-                cursor: barClickable ? "pointer" : "default",
-              }}
-            >
-              <ZenitResourceIcon size="1.4em" />
-            </Box>
-          </BarShell>
-        </Box>
-      </StatTooltip>
+              {value.toLocaleString()}
+            </Typography>
+          </Box>
+          <Box
+            onClick={barClickable ? onBarClick : undefined}
+            sx={{
+              ...LABEL_SX,
+              bgcolor: labelBg,
+              borderLeft: `1px solid ${labelBorder}`,
+              cursor: barClickable ? "pointer" : "default",
+            }}
+          >
+            <ZenitResourceIcon size="1.4em" />
+          </Box>
+        </BarShell>
+      </Box>
       {isInteractive && (
         <DeltaControls
           onApply={onApply}

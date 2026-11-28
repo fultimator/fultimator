@@ -535,7 +535,12 @@ export default function CharacterSheet() {
           startIcon={<Download />}
           sx={{ flex: 1, minWidth: 0, whiteSpace: "nowrap" }}
         >
-          {t("Download Character Sheet")}
+          <Box
+            component="span"
+            sx={{ overflow: "hidden", textOverflow: "ellipsis" }}
+          >
+            {t("Download Character Sheet")}
+          </Box>
         </Button>
         {isMobile ? (
           <Tooltip
@@ -579,6 +584,41 @@ export default function CharacterSheet() {
               ? t("Short Character Sheet")
               : t("Full Character Sheet")}
           </Button>
+        )}
+        {isOwner && (
+          <Tooltip
+            title={
+              isSheetEditMode
+                ? t("Switch to Preview Mode")
+                : t("Switch to Edit Mode")
+            }
+          >
+            <IconButton
+              aria-label={
+                isSheetEditMode
+                  ? t("Switch to Preview Mode")
+                  : t("Switch to Edit Mode")
+              }
+              aria-pressed={isSheetEditMode}
+              onClick={() => setIsSheetEditMode((v) => !v)}
+              sx={{
+                width: 36,
+                height: 36,
+                flexShrink: 0,
+                border: 1,
+                borderColor: "divider",
+                borderRadius: 1,
+                ...(isSheetEditMode && {
+                  bgcolor: "primary.main",
+                  borderColor: "primary.main",
+                  color: "primary.contrastText",
+                  "&:hover": { bgcolor: "primary.dark" },
+                }),
+              }}
+            >
+              {isSheetEditMode ? <LockOpen /> : <Lock />}
+            </IconButton>
+          </Tooltip>
         )}
         {isOwner && isUpdated && (
           <Tooltip title={t("Save Changes")}>
@@ -720,26 +760,6 @@ export default function CharacterSheet() {
               </Fab>
             </Tooltip>
           )}
-          <Tooltip
-            title={
-              isSheetEditMode
-                ? t("Switch to Preview Mode")
-                : t("Switch to Edit Mode")
-            }
-            placement="left"
-          >
-            <Fab
-              color="primary"
-              size="medium"
-              onClick={() => setIsSheetEditMode(!isSheetEditMode)}
-            >
-              {isSheetEditMode ? (
-                <LockOpen fontSize="medium" />
-              ) : (
-                <Lock fontSize="medium" />
-              )}
-            </Fab>
-          </Tooltip>
         </Box>
       )}
       <ExportDialog
